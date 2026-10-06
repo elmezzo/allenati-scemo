@@ -503,10 +503,13 @@ nav.bar .ndot::before{content:"";width:34px;height:3px;border-radius:0 0 3px 3px
 .blade::after{content:"";position:absolute;top:-30%;bottom:-30%;width:45%;left:-70%;transform:skewX(-18deg);background:linear-gradient(100deg,transparent,rgba(255,236,180,.75),rgba(255,255,255,.9),rgba(255,200,120,.5),transparent);mix-blend-mode:screen;animation:blade 1.1s cubic-bezier(.3,.6,.2,1) forwards}
 .recgo{animation:goldrim 1.6s ease-out}
 @keyframes blade{to{left:140%}}
+.gold-end{position:fixed;inset:0;z-index:50;pointer-events:none;overflow:hidden;box-shadow:inset 0 0 0 2px rgba(255,214,140,.0);animation:goldframe 1.4s ease-out forwards}
+.gold-end i{position:absolute;top:-20%;bottom:-20%;width:55%;left:-80%;transform:skewX(-18deg);background:linear-gradient(100deg,transparent,rgba(255,226,150,.35),rgba(255,248,220,.75),rgba(255,196,90,.35),transparent);mix-blend-mode:screen;animation:goldsweep 1.15s cubic-bezier(.3,.6,.2,1) forwards}
+@keyframes goldsweep{to{left:140%}}
+@keyframes goldframe{25%{box-shadow:inset 0 0 0 3px rgba(255,214,140,.85),inset 0 0 60px rgba(255,190,90,.35)}100%{box-shadow:inset 0 0 0 2px rgba(255,214,140,0)}}
 @keyframes goldrim{30%{box-shadow:0 0 0 1.5px rgba(255,214,140,.9),0 0 30px rgba(255,190,90,.45)}}
 /* 5 Vetro vivo: luce che segue il telefono, bordo che gira sull'esercizio attivo, aurora che si scalda con le serie */
 html[data-skin="vetro"]:not([data-skin="notte"]) :is(.card,.ex,.status,details.h){background:radial-gradient(280px 200px at var(--mx) var(--my),rgba(255,255,255,.30),rgba(255,255,255,.08) 45%,transparent 72%),radial-gradient(120% 70% at 0% 0%,rgba(255,255,255,.13),transparent 55%),linear-gradient(160deg,rgba(255,255,255,.09),rgba(255,255,255,.03))}
-@media (prefers-reduced-motion:no-preference){html:is([data-skin="vetro"],[data-skin="carbonio"]):not(.tilt){animation:drift 12s ease-in-out infinite alternate}}
 @keyframes drift{0%{--mx:8%;--my:6%}50%{--mx:92%;--my:40%}100%{--mx:30%;--my:88%}}
 html[data-skin="vetro"]:not([data-skin="notte"]) :is(.card,.ex:not(.cur),.status,details.h)::before{background:radial-gradient(240px 170px at var(--mx) var(--my),#fff,rgba(255,255,255,.35) 45%,transparent 80%),linear-gradient(140deg,rgba(255,255,255,.35),rgba(255,255,255,.05) 35%,rgba(255,255,255,.02) 60%,rgba(255,120,200,.4));padding:1.6px}
 html[data-skin="vetro"] .ex.cur{outline:none}
@@ -523,7 +526,6 @@ html[data-skin="vetro"] #aurw{display:block;position:fixed;inset:-25%;z-index:-1
 .lu{font:800 .34em/1 var(--ui);color:#d9dee4;letter-spacing:.02em;margin:0 .3em;white-space:pre}
 html.boot .seg7 .on{animation:flick .9s steps(1) both}
 @keyframes flick{0%{opacity:0}12%{opacity:1}18%{opacity:.1}30%{opacity:1}36%{opacity:.3}46%,100%{opacity:1}}
-html[data-skin="carbonio"] body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(105deg,transparent calc(var(--mx) - 25%),rgba(255,255,255,.055) var(--mx),transparent calc(var(--mx) + 25%))}
 html[data-skin="carbonio"] :is(.tgt b,.kpi b){display:inline-flex;align-items:center;line-height:1}
 /* 7 Campo: righe che si disegnano, pallina che rimbalza mentre carica */
 html[data-skin="campo"]{--bgimg:radial-gradient(600px 420px at 50% 0%,rgba(60,140,255,.35),transparent 65%),#061430}
@@ -1302,8 +1304,10 @@ function isRecord(g,ex,exId,j,r){if(noEff(ex)||!history(exId).length)return fals
 function tickFx(g,exId,j,rec,wow){
   const b=document.querySelector(`#exs .tick[data-ex="${exId}"][data-j="${j}"]`)||document.querySelector(`#exs .xrow[data-open="${exId}"] .ck`);
   if(b&&!RM())popEl(b,"pop");
-  if(rec)setTimeout(()=>{const t=document.querySelector(`#exs .tick[data-ex="${exId}"]`);blade(t?t.closest(".ex"):document.querySelector(`#exs .xrow[data-open="${exId}"]`))},wow?2400:250);
 }
+// Fine esercizio (ultima serie completa): lama di luce dorata su tutto lo schermo, senza scritte
+function goldEnd(){try{navigator.vibrate&&navigator.vibrate([50,40,50,40,120])}catch(e){}if(RM())return;const slot=document.getElementById("celeSlot");
+  slot.innerHTML=`<div class="gold-end" aria-hidden="true"><i></i></div>`;clearTimeout(celebrate.t);celebrate.t=setTimeout(()=>{slot.innerHTML=""},1500)}
 // Passaggi tra le sezioni
 const VORD={oggi:0,train:1,prog:2,set:3,imp:4,edit:5};
 function slideIn(c){if(RM())return;app.classList.remove("in-r","in-l");void app.offsetWidth;app.classList.add(c)}
@@ -1542,7 +1546,7 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;audioUnlock();
     const sessionDone=allEx.every(e=>((draftFor(g).ex[e.id]||[]).filter(x=>x.done).length)>=setsFor(e,mods));
     const want=num(tgFor(ex,mods).reps[j]??ex.lo),got=num(r.reps);
     const fail=ex.t!=="perf"&&want!=null&&got!=null&&got<want;
-    if(fail)celebrate("fail");else if(doneN>=n)celebrate("wow");else{try{navigator.vibrate&&navigator.vibrate(40)}catch(e){}}
+    if(fail)celebrate("fail");else if(doneN>=n)goldEnd();else{try{navigator.vibrate&&navigator.vibrate(40)}catch(e){}}
     // Recupero adattivo: serie sotto le ripetizioni su un multiarticolare = 30 s in più
     const plus=fail&&ex.t==="comp"&&S.adrest!==false?30:0;
     if(ex.rest&&!sessionDone)startTimer(ex.rest+plus,ex.n,plus);
@@ -2190,7 +2194,7 @@ function renderSettings(){
    <div class="tgl"><div><b>Recupero adattivo</b><small>30 s in più dopo una serie sotto le ripetizioni o segnata "Al limite" su un multiarticolare.</small></div><button role="switch" data-tg="adrest" aria-checked="${S.adrest!==false}" aria-label="Recupero adattivo"></button></div>
   </section>
   <section class="card"><h3>Stile</h3><div class="skins" id="skins">${SKINS.map(([k,l,g])=>`<button data-s="${k}" aria-pressed="${(S.skin||"vetro")===k}"><i style="background:${g}"></i>${l}</button>`).join("")}</div>
-   <div class="vars" role="group" aria-label="Colore dello stile"><span>Colore: ${SKVARS[S.skin||"vetro"][(S.vars||{})[S.skin||"vetro"]||0][0]}</span>${SKVARS[S.skin||"vetro"].map(([l,g],i)=>`<button data-var="${i}" aria-label="${l}" aria-pressed="${((S.vars||{})[S.skin||"vetro"]||0)===i}" style="background:${g}"></button>`).join("")}</div>${tiltAsk&&!tiltOn.on?`<button class="sbtn" id="tiltBtn">Luce che segue il telefono (Vetro e Carbonio)</button>`:""}</section>
+   <div class="vars" role="group" aria-label="Colore dello stile"><span>Colore: ${SKVARS[S.skin||"vetro"][(S.vars||{})[S.skin||"vetro"]||0][0]}</span>${SKVARS[S.skin||"vetro"].map(([l,g],i)=>`<button data-var="${i}" aria-label="${l}" aria-pressed="${((S.vars||{})[S.skin||"vetro"]||0)===i}" style="background:${g}"></button>`).join("")}</div></section>
   <section class="card"><h3>Regole che l'app applica</h3>
    <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px">
     <li>Ripetizioni prima, carico poi: +1 ripetizione per serie finché chiudi tutto al limite alto del range, poi aumenta il carico e riparti dal basso. L'aumento segue l'attrezzo: +5 kg macchine e cavi (pacco pesi), +2,5 kg bilanciere e Smith, +2 kg manubri e zavorra con kettlebell. Sui multiarticolari pesanti, se il 2,5% (parte alta) o il 5% (gambe) del carico è più del gradino, sale di quello, arrotondato al gradino.</li>
@@ -2320,7 +2324,7 @@ function loadDemo(){
 
 /* ================= BOOT ================= */
 applySkin();render();
-if(typeof DeviceOrientationEvent!=="undefined"){if(!tiltAsk)tiltOn();else if(S.tilt)addEventListener("pointerdown",()=>DeviceOrientationEvent.requestPermission().then(r=>{if(r==="granted")tiltOn()}).catch(()=>{}),{once:true})}
+// Luce che segue il telefono tolta su richiesta (2026-10-06)
 if("serviceWorker" in navigator&&location.protocol==="https:"){navigator.serviceWorker.register("sw.js").catch(()=>{})}
 </script>
 <!--APP-BODY-END-->
