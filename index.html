@@ -912,6 +912,7 @@ details.wu[open] ol{margin-top:12px}
 .rk-next{margin:8px 0 0;font-size:14px;color:var(--muted);line-height:1.35}
 html:not(#z) .rk-gen .rk-next,html:not(#z) .rk-gen .rk-next b{font-family:"Manrope",system-ui,sans-serif;font-size:14px;line-height:1.35;letter-spacing:0;text-transform:none;font-style:normal}
 html:not(#z) .rk-gen .rk-next b{color:var(--fg);font-weight:800;display:inline}
+.wd2 .dk{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--go);color:#06140c;font-size:12px;font-weight:900;line-height:1}
 /* ===== VETRO RIFINITO (2026-10-07): meno "da IA". Via gradienti a tre colori, aloni rosa, bordo che gira, riflesso infinito sul bottone e luce che insegue il dito. Resta: viola-blu, vetro, grana, accento caldo, aurora che si scalda con la seduta. Una sola luce, dall'alto a sinistra, uguale per sfondo, schede e bordi. ===== */
 html[data-skin="vetro"]:not(#z){--acc:#ff7d66;--acc-rgb:255,125,102;--hot:#ff7d66;--hot-ink:#1f0a06;
   --grad:linear-gradient(180deg,#ff9078,#ff7259);--glow:rgba(0,0,0,0);--title:linear-gradient(#f4f2ff,#f4f2ff);--match:#c9a8ff;
@@ -1552,22 +1553,34 @@ function renderToday(){
   const mods=new Set(a.mods);if(deloadOn())mods.add("deload");
   const big=hasGym?PLAN[a.gym].name:a.padel==="match"?"Partita":a.padel==="train"?"Padel":"Riposo";
   const nEx=hasGym?PLAN[a.gym].ex.filter(e=>setsFor(effEx(a.gym,e),mods)>0).length:0;
-  const week=[...Array(7)].map((_,i)=>{const x=addDays(d,i),p=dayPlan(x);return `<div class="wd2 ${i===0?"t":""}"><b>${WD[x.getDay()]}</b><span class="ics">${dayIcons(p)}</span><small>${p.gym in PLAN?esc(PLAN[p.gym].name):p.padel==="match"?"Partita":p.padel==="train"?"Padel":"Riposo"}</small></div>`}).join("");
+  // Seduta di oggi già salvata (l'ultima di oggi) o iniziata e non ancora salvata
+  const doneS=S.sessions.filter(x=>iso(x.date)===k).sort((x,y)=>y.date.localeCompare(x.date))[0]||null;
+  const runG=hasGym&&!doneS&&S.draft&&S.draft[a.gym]?a.gym:null;let runN=0,runT=0;
+  if(runG){const L=trainList(runG,trainMods(runG));for(const {ex} of L){const n=setsFor(ex,trainMods(runG));runT+=n;runN+=Math.min(n,doneCount(runG,ex.id))}}
+  const doneSt=doneS?sessStats(doneS):null,doneAt=doneS?new Date(doneS.date).toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"}):"";
+  const week=[...Array(7)].map((_,i)=>{const x=addDays(d,i),p=dayPlan(x);return `<div class="wd2 ${i===0?"t":""}"><b>${WD[x.getDay()]}</b><span class="ics">${i===0&&doneS?dayIcons(p).replace(I("gym"),`<b class="dk" aria-label="Fatta">✓</b>`):dayIcons(p)}</span><small>${p.gym in PLAN?esc(PLAN[p.gym].name):p.padel==="match"?"Partita":p.padel==="train"?"Padel":"Riposo"}</small></div>`}).join("");
   let dl="";
   if(deloadOn())dl=`<div class="banner">${I("bolt")}<div><b>Scarico in corso</b><span>Fino a ${fmtShort(S.deload.to)}: metà serie, stessi carichi, 3-4 in canna.</span></div><button id="endDl">Termina</button></div>`;
   else{const w=deloadAdvice();if(w)dl=`<div class="banner">${I("bolt")}<div><b>Scarico consigliato</b><span>${esc(cap(w.join(" e ")))}.</span></div><button id="startDl">Inizia</button><button id="snoozeDl">Non ora</button></div>`}
   const bk=backupDue();if(bk)dl+=`<div class="banner bk">${I("info")}<div><b>Salva un backup</b><span>${bk.never?`${bk.n} sedute salvate solo su questo telefono, mai copiate.`:`Ultimo backup ${bk.days} giorni fa.`} Se cancelli l'app o cambi telefono le perdi.</span></div><button id="bkNow">Salva</button><button id="bkLater">Non ora</button></div>`;
   app.innerHTML=`
   <header class="head"><span class="today-d">${esc(cap(WD_LONG[d.getDay()]))} ${d.getDate()} ${d.toLocaleDateString("it-IT",{month:"long"})}${phaseStart()?` · ${PH[phaseAt()].n} settimana ${Math.floor((d-new Date(phaseStart()+"T00:00:00"))/(7*864e5))+1}`:""}</span></header>
-  <section class="card hero" aria-live="polite">
+  ${doneS?`<section class="card hero done" aria-live="polite">
+    <span class="lbl">Oggi in palestra</span>
+    <div class="big">${esc(doneS.planName||big)}</div>
+    <span class="pill go"><span class="dot"></span>Seduta fatta alle ${doneAt}</span>
+    <div class="meta"><span><b>${doneSt.n}</b> serie</span>${doneS.dur?`<span><b>${doneS.dur}</b> min</span>`:""}<span><b>${Math.round(doneSt.vol).toLocaleString("it-IT")}</b> kg sollevati</span></div>
+    <button class="btn" id="seeSum">Vedi il riepilogo</button>
+    <button class="link" id="chGym">Fai un'altra seduta</button>
+  </section>`:`<section class="card hero" aria-live="polite">
     <span class="lbl">${hasGym?"Oggi in palestra":"Oggi"}</span>
     <div class="big">${esc(big)}</div>
     ${hasGym?`<div class="meta"><span><b>${nEx}</b> esercizi</span><span>circa <b>${estMin(a.gym,mods)}</b> min</span></div><span class="pill ${a.level}"><span class="dot"></span>${esc(a.title)}</span>`:""}
     <div class="hn">${a.notes.map(n=>`<p>${esc(n)}</p>`).join("")}</div>
-    ${hasGym&&a.level!=="stop"?`<button class="btn hot" id="startGym">Inizia ${I("arrow")}</button>`:""}
+    ${hasGym&&a.level!=="stop"?`<button class="btn hot" id="startGym">${runN?`Continua · ${runN}/${runT} serie`:"Inizia"} ${I("arrow")}</button>`:""}
     ${a.gymAlt?`<button class="btn" id="startAlt">Fai ${esc(PLAN[a.gymAlt].name)} oggi</button>`:""}
     <button class="link" id="chGym">${hasGym?"Cambia seduta di oggi":"Aggiungi una seduta oggi"}</button>
-  </section>
+  </section>`}
   <div class="ctx">
     <button id="cPad"><small>Padel oggi</small><b class="${a.padel==="train"?"c-pad":a.padel==="match"?"c-match":""}">${PADEL_LBL[a.padel]}</b></button>
     <button id="cTom"><small>Padel domani</small><b class="${tm.padel==="train"?"c-pad":tm.padel==="match"?"c-match":""}">${PADEL_LBL[tm.padel]}</b></button>
@@ -1581,7 +1594,8 @@ function renderToday(){
   document.getElementById("cPad").onclick=()=>pickSheet("Padel oggi",padOpts,a.padel,v=>setO(d,"padel",v));
   document.getElementById("cTom").onclick=()=>pickSheet("Padel domani",padOpts,tm.padel,v=>setO(addDays(d,1),"padel",v));
   document.getElementById("cEn").onclick=()=>pickSheet("Come ti senti",[{v:"low",l:"Stanco",sub:"Stessi carichi, una serie in meno per esercizio"},{v:"ok",l:"Normale"},{v:"high",l:"Carico"}],a.energy,v=>{S.energy[k]=v;save();renderToday()});
-  document.getElementById("chGym").onclick=()=>pickSheet("Palestra oggi",[{v:"none",l:"Niente palestra"},...GYM_ORDER.map(g=>({v:g,l:PLAN[g].name,sub:PLAN[g].sub}))],a.gym,v=>setO(d,"gym",v));
+  if(doneS)document.getElementById("chGym").onclick=()=>pickSheet("Quale seduta",GYM_ORDER.map(g=>({v:g,l:PLAN[g].name,sub:PLAN[g].sub})),"",v=>{gymSel=v;S.gym=v;save();go("train")});
+  else document.getElementById("chGym").onclick=()=>pickSheet("Palestra oggi",[{v:"none",l:"Niente palestra"},...GYM_ORDER.map(g=>({v:g,l:PLAN[g].name,sub:PLAN[g].sub}))],a.gym,v=>setO(d,"gym",v));
   const sd=document.getElementById("startDl");if(sd)sd.onclick=()=>{startDeload();renderToday();reviewSheet(S.cycles[S.cycles.length-1])};
   const bkN=document.getElementById("bkNow");if(bkN)bkN.onclick=()=>{dlBackup();renderToday()};
   const bkL=document.getElementById("bkLater");if(bkL)bkL.onclick=()=>{S.bkSnooze=iso(addDays(today(),7));save();renderToday()};
@@ -1589,6 +1603,7 @@ function renderToday(){
   const ed=document.getElementById("endDl");if(ed)ed.onclick=()=>{endDeload();renderToday()};
   const bg=document.getElementById("bodyGo");if(bg)bg.onclick=()=>bodySheet(renderToday);
   const bn=document.getElementById("bodyNo");if(bn)bn.onclick=()=>{S.bodySnooze=iso(addDays(today(),2));save();renderToday()};
+  const ss2=document.getElementById("seeSum");if(ss2)ss2.onclick=()=>summarySheet(doneS);
   const sg=document.getElementById("startGym");if(sg)sg.onclick=()=>{gymSel=a.gym;go("train")};
   const sa=document.getElementById("startAlt");if(sa)sa.onclick=()=>{setO(d,"gym",a.gymAlt);gymSel=a.gymAlt;go("train")};
 }
