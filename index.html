@@ -1633,10 +1633,9 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;audioUnlock();
 function keepFocus(changed){
   const c=document.querySelector("#exs .ex.cur");if(!c)return;
   const f=document.querySelector("#exs").firstElementChild,tgt=f&&f.classList.contains("ask")?f:c;
-  const th=document.querySelector(".thead"),off=(th?th.getBoundingClientRect().height:0)+10;
+  const th=document.querySelector(".thead"),off=(th?(parseFloat(getComputedStyle(th).top)||0)+th.offsetHeight:0)+16;
   let dy=tgt.getBoundingClientRect().top-off;
-  const nx=c.querySelector("#restIn")||c.querySelector(".set.now");
-  if(nx){const lim=innerHeight-(T("timer").hidden?0:90)-80,b=nx.getBoundingClientRect().bottom-dy;if(b>lim)dy+=b-lim}
+  // la parte alta della scheda resta sempre sotto l'intestazione: niente scorrimento extra per mostrare la serie in basso
   if(Math.abs(dy)>2)window.scrollBy({top:dy,behavior:changed&&!RM()?"smooth":"auto"})}
 function finish(g,mods){
   const d=draftFor(g),sets={};let n=0;
