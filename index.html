@@ -913,6 +913,8 @@ details.wu[open] ol{margin-top:12px}
 html:not(#z) .rk-gen .rk-next,html:not(#z) .rk-gen .rk-next b{font-family:"Manrope",system-ui,sans-serif;font-size:14px;line-height:1.35;letter-spacing:0;text-transform:none;font-style:normal}
 html:not(#z) .rk-gen .rk-next b{color:var(--fg);font-weight:800;display:inline}
 .wd2 .dk{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--go);color:#06140c;font-size:12px;font-weight:900;line-height:1}
+html:not(#z) .sheet .fxgo{position:sticky;bottom:8px;margin-top:12px;z-index:3;box-shadow:0 -12px 24px rgba(0,0,0,.45)}
+.sheet .fxgo:disabled{opacity:.5}
 /* ===== VETRO RIFINITO (2026-10-07): meno "da IA". Via gradienti a tre colori, aloni rosa, bordo che gira, riflesso infinito sul bottone e luce che insegue il dito. Resta: viola-blu, vetro, grana, accento caldo, aurora che si scalda con la seduta. Una sola luce, dall'alto a sinistra, uguale per sfondo, schede e bordi. ===== */
 html[data-skin="vetro"]:not(#z){--acc:#ff7d66;--acc-rgb:255,125,102;--hot:#ff7d66;--hot-ink:#1f0a06;
   --grad:linear-gradient(180deg,#ff9078,#ff7259);--glow:rgba(0,0,0,0);--title:linear-gradient(#f4f2ff,#f4f2ff);--match:#c9a8ff;
@@ -1157,7 +1159,17 @@ function variant(e,a){return {...e,...a.o,id:e.id+"~"+a.k,n:a.n,note:a.o.note??"
 function rebuild(){
   PLAN={...BUILTIN,...(S.plans||{})};GYM_ORDER=[...new Set([...Object.keys(BUILTIN),...Object.keys(S.plans||{})])];ALL_EX=[];EX={};
   for(const k of GYM_ORDER)for(const e of PLAN[k].ex){const b={...e,day:k};if(!EX[e.id]){ALL_EX.push(b);EX[e.id]=b}for(const a of altsOf(e)){const v=variant(e,a);v.day=k;if(!EX[v.id]){ALL_EX.push(v);EX[v.id]=v}}}
+  // Seduta libera: esercizi scelti al volo, fuori dal piano, solo per oggi. Stessi id della scheda, quindi carichi e progressi restano quelli
+  if(S.free&&(S.free.d===iso(today())||(S.draft&&S.draft.LIB))){const ex=S.free.ex.filter(id=>EX[id]).map(id=>({...EX[id],ss:""}));
+    if(ex.length){PLAN.LIB={name:"Libera",title:"Seduta libera",sub:"Fuori dal piano",custom:true,ex};GYM_ORDER.push("LIB")}}
 }
+function freeSheet(){const sel=[],mus=[...new Set(ALL_EX.map(e=>muLbl(e.mu||"Altro")))];
+  const L=ALL_EX.filter(e=>!e.custom);
+  openSheet({html:()=>`<h2>Seduta libera</h2><p class="note" style="margin:0">Scegli gli esercizi nell'ordine in cui li fai. Vale solo per oggi; carichi e progressi sono quelli di sempre.</p>
+    ${mus.map(m=>{const xs=L.filter(e=>muLbl(e.mu||"Altro")===m);return xs.length?`<p class="grp">${esc(m)}</p><div class="opts">${xs.map(e=>`<button class="opt" data-fx="${e.id}" aria-pressed="${sel.includes(e.id)}"><b>${sel.includes(e.id)?(sel.indexOf(e.id)+1)+". ":""}${esc(e.n)}</b><span>${e.s} serie · ${e.lo===e.hi?e.lo:e.lo+"-"+e.hi} rip</span></button>`).join("")}</div>`:""}).join("")}
+    <button class="btn hot fxgo" id="fxGo" ${sel.length?"":"disabled"}>${sel.length?`Inizia con ${sel.length} esercizi`:"Scegli almeno un esercizio"}</button>`,
+   bind:(w,draw,close)=>{w.querySelectorAll("[data-fx]").forEach(b=>b.onclick=()=>{const id=b.dataset.fx,i=sel.indexOf(id);if(i<0)sel.push(id);else sel.splice(i,1);const y=w.querySelector(".sheet").scrollTop;draw();w.querySelector(".sheet").scrollTop=y});
+     w.querySelector("#fxGo").onclick=()=>{if(!sel.length)return;S.free={d:iso(today()),ex:sel.slice()};delete S.draft.LIB;rebuild();gymSel="LIB";save();close();go("train")}}})}
 function exName(id){if(EX[id])return EX[id].n;for(const s of S.sessions){if(s.names&&s.names[id])return s.names[id]}return id}
 function exById(id){return EX[id]||{id,n:exName(id),t:"comp",s:3,lo:8,hi:12}}
 function effEx(g,ex){const sw=(S.swaps||{})[g+"|"+ex.id];if(sw&&(sw.always||sw.date===iso(today()))){const v=EX[ex.id+"~"+sw.k];if(v)return v}return ex}
@@ -1554,7 +1566,7 @@ function renderToday(){
   const big=hasGym?PLAN[a.gym].name:a.padel==="match"?"Partita":a.padel==="train"?"Padel":"Riposo";
   const nEx=hasGym?PLAN[a.gym].ex.filter(e=>setsFor(effEx(a.gym,e),mods)>0).length:0;
   // Seduta di oggi già salvata (l'ultima di oggi) o iniziata e non ancora salvata
-  const doneS=S.sessions.filter(x=>iso(x.date)===k).sort((x,y)=>y.date.localeCompare(x.date))[0]||null;
+  const doneS=S.sessions.filter(x=>iso(x.date)===k).sort((x,y)=>(x.day==="LIB")-(y.day==="LIB")||y.date.localeCompare(x.date))[0]||null;
   const runG=hasGym&&!doneS&&S.draft&&S.draft[a.gym]?a.gym:null;let runN=0,runT=0;
   if(runG){const L=trainList(runG,trainMods(runG));for(const {ex} of L){const n=setsFor(ex,trainMods(runG));runT+=n;runN+=Math.min(n,doneCount(runG,ex.id))}}
   const doneSt=doneS?sessStats(doneS):null,doneAt=doneS?new Date(doneS.date).toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"}):"";
@@ -1571,7 +1583,7 @@ function renderToday(){
     <span class="pill go"><span class="dot"></span>Seduta fatta alle ${doneAt}</span>
     <div class="meta"><span><b>${doneSt.n}</b> serie</span>${doneS.dur?`<span><b>${doneS.dur}</b> min</span>`:""}<span><b>${Math.round(doneSt.vol).toLocaleString("it-IT")}</b> kg sollevati</span></div>
     <button class="btn" id="seeSum">Vedi il riepilogo</button>
-    <button class="link" id="chGym">Fai un'altra seduta</button>
+    <button class="link" id="freeGo">${PLAN.LIB&&S.draft.LIB?"Continua la seduta libera":"Seduta libera fuori dal piano"}</button>
   </section>`:`<section class="card hero" aria-live="polite">
     <span class="lbl">${hasGym?"Oggi in palestra":"Oggi"}</span>
     <div class="big">${esc(big)}</div>
@@ -1594,8 +1606,8 @@ function renderToday(){
   document.getElementById("cPad").onclick=()=>pickSheet("Padel oggi",padOpts,a.padel,v=>setO(d,"padel",v));
   document.getElementById("cTom").onclick=()=>pickSheet("Padel domani",padOpts,tm.padel,v=>setO(addDays(d,1),"padel",v));
   document.getElementById("cEn").onclick=()=>pickSheet("Come ti senti",[{v:"low",l:"Stanco",sub:"Stessi carichi, una serie in meno per esercizio"},{v:"ok",l:"Normale"},{v:"high",l:"Carico"}],a.energy,v=>{S.energy[k]=v;save();renderToday()});
-  if(doneS)document.getElementById("chGym").onclick=()=>pickSheet("Quale seduta",GYM_ORDER.map(g=>({v:g,l:PLAN[g].name,sub:PLAN[g].sub})),"",v=>{gymSel=v;S.gym=v;save();go("train")});
-  else document.getElementById("chGym").onclick=()=>pickSheet("Palestra oggi",[{v:"none",l:"Niente palestra"},...GYM_ORDER.map(g=>({v:g,l:PLAN[g].name,sub:PLAN[g].sub}))],a.gym,v=>setO(d,"gym",v));
+  const fg=document.getElementById("freeGo");if(fg)fg.onclick=()=>{if(PLAN.LIB&&S.draft.LIB){gymSel="LIB";go("train")}else freeSheet()};
+  const cg=document.getElementById("chGym");if(cg)cg.onclick=()=>pickSheet("Palestra oggi",[{v:"none",l:"Niente palestra"},...GYM_ORDER.filter(x=>x!=="LIB").map(g=>({v:g,l:PLAN[g].name,sub:PLAN[g].sub}))],a.gym,v=>setO(d,"gym",v));
   const sd=document.getElementById("startDl");if(sd)sd.onclick=()=>{startDeload();renderToday();reviewSheet(S.cycles[S.cycles.length-1])};
   const bkN=document.getElementById("bkNow");if(bkN)bkN.onclick=()=>{dlBackup();renderToday()};
   const bkL=document.getElementById("bkLater");if(bkL)bkL.onclick=()=>{S.bkSnooze=iso(addDays(today(),7));save();renderToday()};
@@ -1820,7 +1832,7 @@ function finish(g,mods){
   if(!n){m.className="msg err";m.textContent="Spunta almeno una serie con ✓ prima di salvare.";return}
   const dur=d.start?Math.max(1,Math.round((Date.now()-d.start)/60000)):null;
   S.sessions.push({id:"s"+Date.now(),day:g,planName:PLAN[g].name,date:new Date().toISOString(),sets,names,eff,mods:[...mods],deload:mods.has("deload"),dur});
-  delete S.draft[g];openEx[g]=null;save();stopTimer();renderTrain();summarySheet(S.sessions[S.sessions.length-1]);
+  delete S.draft[g];openEx[g]=null;if(g==="LIB"){delete S.free;rebuild();gymSel=null}save();stopTimer();renderTrain();summarySheet(S.sessions[S.sessions.length-1]);
   const mm=document.getElementById("msg");mm.className="msg ok";mm.textContent=`Seduta salvata: ${n} serie. I carichi della prossima volta sono già pronti.`;
   if(!storageOk){mm.className="msg err";mm.textContent="Non riesco a salvare su questo dispositivo: controlla che il browser non sia in navigazione privata."}
 }
@@ -2404,7 +2416,7 @@ function legRule(d){
 function daySheet(d){
   openSheet({html:()=>{const w=S.week[d]||{padel:"none",gym:"none"};return `<h2>${cap(WD_LONG[d])}</h2>
     <div class="q"><span class="lab">Padel</span><div class="seg" id="sdP">${["none","train","match"].map(v=>`<button data-v="${v}" aria-pressed="${w.padel===v}">${PADEL_LBL[v]}</button>`).join("")}</div></div>
-    <div class="q"><span class="lab">Palestra</span><div class="opts">${["none",...GYM_ORDER].map(k=>`<button class="opt" data-g="${k}" aria-pressed="${w.gym===k}"><b>${k==="none"?"Niente palestra":esc(PLAN[k].name)}</b>${k!=="none"&&PLAN[k].sub?`<span>${esc(PLAN[k].sub)}</span>`:""}</button>`).join("")}</div></div>`},
+    <div class="q"><span class="lab">Palestra</span><div class="opts">${["none",...GYM_ORDER.filter(x=>x!=="LIB")].map(k=>`<button class="opt" data-g="${k}" aria-pressed="${w.gym===k}"><b>${k==="none"?"Niente palestra":esc(PLAN[k].name)}</b>${k!=="none"&&PLAN[k].sub?`<span>${esc(PLAN[k].sub)}</span>`:""}</button>`).join("")}</div></div>`},
     bind:(wr,draw)=>{const set=(f,v)=>{S.week[d]={...(S.week[d]||{padel:"none",gym:"none"}),[f]:v};save();draw();renderWeek()};
       wr.querySelectorAll("#sdP button").forEach(b=>b.onclick=()=>set("padel",b.dataset.v));
       wr.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>set("gym",b.dataset.g))}});
@@ -2429,7 +2441,7 @@ function renderSettings(){
   app.innerHTML=`<header class="head"><button class="back" id="back">‹ Settimana</button><h1>Impostazioni</h1></header>
   <section class="card"><h3>Palestra e padel nello stesso giorno</h3><p class="note" style="margin:0">Cosa fai prima di solito? Con la palestra prima, l'app tiene almeno 1 ripetizione in canna e mette la prevenzione di spalla e polso dopo il padel.</p><div class="seg two" id="segOrd">${[["gym","Palestra prima"],["padel","Padel prima"]].map(([v,l])=>`<button data-v="${v}" aria-pressed="${(S.order||"gym")===v}">${l}</button>`).join("")}</div></section>
   <section class="card"><h3>Piani</h3><p class="note" style="margin:0">Modifica, duplica o crea piani, poi assegnali ai giorni in Settimana. Quando modifichi o elimini un piano, la versione precedente finisce in Piani vecchi.</p>
-   <div class="plist">${GYM_ORDER.map(k=>{const P=PLAN[k],c=!BUILTIN[k],m=!c&&!!S.plans[k];return `<div class="pitem"><div><b>${esc(P.name)}</b><small>${P.ex.length} esercizi${c?" · creato da te":m?" · scheda modificata":" · scheda"}</small></div><button class="sbtn" data-ed="${k}">Modifica</button><button class="sbtn" data-dup="${k}">Duplica</button>${c?`<button class="sbtn danger" data-delp="${k}">Elimina</button>`:""}</div>`}).join("")}</div>
+   <div class="plist">${GYM_ORDER.filter(x=>x!=="LIB").map(k=>{const P=PLAN[k],c=!BUILTIN[k],m=!c&&!!S.plans[k];return `<div class="pitem"><div><b>${esc(P.name)}</b><small>${P.ex.length} esercizi${c?" · creato da te":m?" · scheda modificata":" · scheda"}</small></div><button class="sbtn" data-ed="${k}">Modifica</button><button class="sbtn" data-dup="${k}">Duplica</button>${c?`<button class="sbtn danger" data-delp="${k}">Elimina</button>`:""}</div>`}).join("")}</div>
    <button class="btn hot" id="newPlan">Crea nuovo piano</button><p class="msg" id="wmsg"></p></section>
   ${S.archive.length?`<section class="card"><h3>Piani vecchi</h3><p class="note" style="margin:0">Le versioni precedenti dei tuoi piani. Ripristinandone una, quella attuale viene salvata qui al suo posto. Lo storico delle sedute resta sempre.</p>
    <div class="plist">${S.archive.map(v=>{const live=!!PLAN[v.key];return `<div class="arch"><div class="pitem"><div><b>${esc(v.plan.name)}</b><small>${v.why==="eliminato"?"eliminato il":"versione del"} ${fmtShort(v.at)} · ${v.plan.ex.length} ${v.plan.ex.length===1?"esercizio":"esercizi"}${live&&PLAN[v.key].name!==v.plan.name?` · ora "${esc(PLAN[v.key].name)}"`:""}</small></div><button class="sbtn" data-vw="${v.id}">Vedi</button><button class="sbtn" data-rs="${v.id}">Ripristina</button><button class="sbtn danger" data-rmv="${v.id}" aria-label="Elimina versione">✕</button></div>
