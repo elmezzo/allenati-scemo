@@ -1,4 +1,4 @@
-const CACHE="allenati-scemo-v21";
+const CACHE="allenati-scemo-v22";
 const CORE=["./","index.html","manifest.webmanifest","icons/icon-192.png","icons/icon-512.png","icons/apple-touch-icon.png",
   "img/chest-press-alla-macchina.jpg","img/trazioni-presa-neutra.jpg","img/rematore-petto-in-appoggio.jpg","img/alzate-laterali-al-cavo.jpg",
   "img/curl-panca-inclinata.jpg","img/lento-manubri-seduto.jpg","img/lat-machine-presa-neutra.jpg","img/pulley-basso.jpg"];

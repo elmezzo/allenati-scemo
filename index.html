@@ -1049,6 +1049,45 @@ html[data-skin="eclisse"]:not(#z) body{background:var(--bg)}
 html[data-skin="eclisse"]:not(#z) :is(.card,.ex,.status,details.h){background:linear-gradient(180deg,rgba(var(--cor-rgb),.055),rgba(var(--cor-rgb),.02) 60%),rgba(10,10,16,.72);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 html[data-skin="eclisse"]:not(#z) :is(.tabs button,.tile,.ctx button,.xrow,.dayr){background:rgba(14,14,22,.7)}
 html[data-skin="eclisse"]:not(#z) .hero{background:radial-gradient(90% 70% at 100% 0%,rgba(var(--acc-rgb),.16),transparent 60%),linear-gradient(180deg,rgba(var(--cor-rgb),.06),rgba(var(--cor-rgb),.02) 60%),rgba(10,10,16,.72)}
+/* ===== ECLISSE PIÙ VIVA (2026-10-07): un secondo colore per variante, raggi della corona nella scheda di Oggi, stella cadente rara, bordi colorati ===== */
+html[data-skin="eclisse"]:not(#z){--acc2:#9b6bff;--acc2-rgb:155,107,255}
+html[data-skin="eclisse"][data-var="1"]:not(#z){--acc2:#ff6a3d;--acc2-rgb:255,106,61}
+html[data-skin="eclisse"][data-var="2"]:not(#z){--acc2:#3fd8ff;--acc2-rgb:63,216,255}
+/* 1 Cielo a due colori: nebulosa nel colore dello stile in alto, nel secondo colore a metà e in basso */
+html[data-skin="eclisse"]:not(#z) body::after{background:
+  radial-gradient(75% 42% at 88% -6%,rgba(var(--acc-rgb),.48),transparent 70%),
+  radial-gradient(60% 34% at -6% 42%,rgba(var(--acc2-rgb),.30),transparent 70%),
+  radial-gradient(80% 40% at 70% 108%,rgba(var(--acc2-rgb),.34),transparent 70%),
+  radial-gradient(50% 30% at 10% 100%,rgba(var(--acc-rgb),.22),transparent 70%),
+  radial-gradient(1px 1px at 12% 18%,rgba(255,255,255,.8) 50%,transparent 51%),radial-gradient(1px 1px at 73% 9%,rgba(255,255,255,.6) 50%,transparent 51%),radial-gradient(1.5px 1.5px at 88% 34%,rgba(255,255,255,.75) 50%,transparent 51%),radial-gradient(1px 1px at 31% 47%,rgba(255,255,255,.5) 50%,transparent 51%),radial-gradient(1px 1px at 58% 66%,rgba(255,255,255,.55) 50%,transparent 51%),radial-gradient(1.5px 1.5px at 7% 79%,rgba(var(--acc2-rgb),.8) 50%,transparent 51%),radial-gradient(1px 1px at 92% 88%,rgba(255,255,255,.5) 50%,transparent 51%),radial-gradient(1px 1px at 44% 93%,rgba(255,255,255,.45) 50%,transparent 51%),radial-gradient(1px 1px at 38% 6%,rgba(255,255,255,.6) 50%,transparent 51%),radial-gradient(1px 1px at 5% 40%,rgba(255,255,255,.5) 50%,transparent 51%),radial-gradient(1px 1px at 66% 38%,rgba(255,255,255,.4) 50%,transparent 51%),radial-gradient(1.5px 1.5px at 52% 24%,rgba(var(--cor-rgb),.7) 50%,transparent 51%),radial-gradient(1px 1px at 96% 58%,rgba(255,255,255,.5) 50%,transparent 51%),radial-gradient(1px 1px at 20% 60%,rgba(255,255,255,.45) 50%,transparent 51%),radial-gradient(1px 1px at 83% 74%,rgba(255,255,255,.5) 50%,transparent 51%),radial-gradient(1px 1px at 27% 84%,rgba(255,255,255,.4) 50%,transparent 51%),radial-gradient(1.5px 1.5px at 62% 82%,rgba(var(--acc-rgb),.8) 50%,transparent 51%),radial-gradient(1px 1px at 47% 56%,rgba(255,255,255,.35) 50%,transparent 51%)}
+/* 2 Raggi della corona: lame di luce nei due colori che partono dall'eclissi e girano piano dentro la scheda di Oggi */
+html[data-skin="eclisse"]:not(#z) .hero>.lbl{position:static}
+html[data-skin="eclisse"]:not(#z) .hero>.lbl::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:0;
+  background:conic-gradient(from var(--a) at calc(100% - 41px) 49px,transparent 0 3%,rgba(var(--acc-rgb),.6) 4.5%,transparent 6.5% 17%,rgba(var(--acc2-rgb),.5) 18.5%,transparent 21% 34%,rgba(var(--cor-rgb),.35) 35%,transparent 37% 52%,rgba(var(--acc-rgb),.5) 54%,transparent 57% 70%,rgba(var(--acc2-rgb),.55) 72%,transparent 75% 88%,rgba(var(--cor-rgb),.3) 89.5%,transparent 91%);
+  -webkit-mask:radial-gradient(circle at calc(100% - 41px) 49px,transparent 0 70px,#000 76px,rgba(0,0,0,.35) 210px,transparent 340px);mask:radial-gradient(circle at calc(100% - 41px) 49px,transparent 0 70px,#000 76px,rgba(0,0,0,.35) 210px,transparent 340px)}
+@media (prefers-reduced-motion:no-preference){html[data-skin="eclisse"]:not(#z) .hero>.lbl::before{animation:spin 80s linear infinite}}
+html[data-skin="eclisse"]:not(#z) .hero>.lbl{z-index:auto}
+/* 3 Bordi: la scheda di Oggi e l'esercizio in corso hanno il bordo alto che sfuma dal secondo colore al colore dello stile */
+html[data-skin="eclisse"]:not(#z) :is(.hero,.ex.cur){border-color:transparent;background-clip:padding-box}
+html[data-skin="eclisse"]:not(#z) .ex.cur::before{left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent,rgba(var(--acc2-rgb),.9) 20%,var(--corona) 50%,rgba(var(--acc-rgb),.95) 80%,transparent)}
+html[data-skin="eclisse"]:not(#z) .ex.cur{box-shadow:inset 0 1px 0 rgba(var(--cor-rgb),.4),0 -14px 44px -16px rgba(var(--acc-rgb),.6),-30px -10px 60px -40px rgba(var(--acc2-rgb),.7),0 24px 48px -24px rgba(0,0,0,.9)}
+html[data-skin="eclisse"]:not(#z) .hero{box-shadow:inset 0 1px 0 rgba(var(--cor-rgb),.25),0 0 0 1px rgba(255,255,255,.07),0 30px 60px -30px rgba(var(--acc-rgb),.45)}
+/* 4 Barra della seduta e intestazione: perle che vanno dal secondo colore al colore dello stile, filo colorato sotto l'intestazione */
+html[data-skin="eclisse"]:not(#z) .pbar i{background:linear-gradient(90deg,var(--acc2),var(--acc) 70%,var(--corona))}
+html[data-skin="eclisse"]:not(#z) .thead{box-shadow:0 1px 0 rgba(var(--acc2-rgb),.25),0 12px 30px -20px rgba(var(--acc-rgb),.5)}
+/* 5 Serie fatta: il lampo ad anello è doppio, prima il colore dello stile poi il secondo */
+html[data-skin="eclisse"]:not(#z) .tick.pop::after{border-color:var(--acc);box-shadow:0 0 14px rgba(var(--acc-rgb),.8),0 0 0 3px rgba(var(--acc2-rgb),.45)}
+/* 6 Stella cadente: una ogni 18 s circa, attraversa il cielo in meno di un secondo */
+html[data-skin="eclisse"]:not(#z)::after{content:"";position:fixed;top:12%;left:-20%;width:140px;height:1.5px;border-radius:2px;pointer-events:none;z-index:-1;opacity:0;
+  background:linear-gradient(90deg,transparent,rgba(var(--acc2-rgb),.6) 40%,#fff);transform:rotate(18deg)}
+@media (prefers-reduced-motion:no-preference){html[data-skin="eclisse"]:not(#z)::after{animation:ecShoot 18s linear infinite 4s}}
+@keyframes ecShoot{0%{opacity:0;transform:translate(0,0) rotate(18deg)}0.6%{opacity:1}4%{opacity:0;transform:translate(150vw,48vw) rotate(18deg)}100%{opacity:0;transform:translate(150vw,48vw) rotate(18deg)}}
+/* 7 Tessere della barra in basso e giorno di oggi nella settimana col secondo colore */
+html[data-skin="eclisse"]:not(#z) .wd2.t{box-shadow:inset 0 0 0 1px rgba(var(--acc-rgb),.6),0 0 18px -6px rgba(var(--acc2-rgb),.7)}
+html[data-skin="eclisse"]:not(#z) nav.bar{box-shadow:0 -1px 0 rgba(var(--acc2-rgb),.18)}
+/* 8 Corona più luminosa e piena */
+html[data-skin="eclisse"]:not(#z) .hero::before{filter:drop-shadow(0 0 16px rgba(var(--acc-rgb),.55))}
+@keyframes ecBreath{from{opacity:.9;scale:1}to{opacity:1;scale:1.06}}
 </style>
 <!--APP-HEAD-END-->
 </head>
