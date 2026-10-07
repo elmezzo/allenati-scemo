@@ -456,9 +456,6 @@ details.more > div{display:flex;flex-direction:column;gap:6px}
 .qm:active{color:var(--fg);background:rgba(var(--acc-rgb,255,79,154),.22);border-color:rgba(var(--acc-rgb,255,79,154),.55)}
 .exhead h3 .qm{width:24px;height:24px;font-size:14px;margin-left:6px;transform:translateY(-2px)}
 .exhead{align-items:center}
-.exfig{margin:0;display:flex;flex-direction:column;gap:6px}
-.exfig img{width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:14px;border:1px solid var(--line);background:var(--line)}
-.exfig figcaption{display:grid;grid-template-columns:1fr 1fr;text-align:center;font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.04em}
 /* ===== EFFETTI v3: anello, molla, passaggi, lama record, Vetro vivo, LED Carbonio, Campo, Oro, Manga. PIPPA e WOW non toccati. ===== */
 @property --a{syntax:'<angle>';inherits:false;initial-value:0deg}
 @property --mx{syntax:'<percentage>';inherits:true;initial-value:50%}
@@ -534,12 +531,6 @@ html[data-skin="campo"] #court{display:block;position:fixed;left:50%;top:50%;hei
   #court.draw .ln:nth-of-type(2){animation-delay:.15s}#court.draw .ln:nth-of-type(3){animation-delay:.35s}#court.draw .ln:nth-of-type(4){animation-delay:.5s}#court.draw .ln:nth-of-type(5){animation-delay:.65s}
 }
 @keyframes drawln{to{stroke-dashoffset:0}}
-.imw{position:relative}
-.bl{display:none}
-html[data-skin="campo"] .bl{display:block;position:absolute;left:50%;top:50%;width:34px;height:52px;transform:translate(-50%,-50%)}
-.bl .ball{position:absolute;left:5px;top:0;width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f7ff9e,var(--acc,#e4ff3a) 45%,#a8c800);box-shadow:inset -3px -3px 5px rgba(0,0,0,.25);animation:bounce .7s cubic-bezier(.5,0,.5,1) infinite alternate}
-.bl .ball::after{content:"";position:absolute;inset:3px;border-radius:50%;border:1.5px solid transparent;border-color:rgba(255,255,255,.85) transparent transparent rgba(255,255,255,.85);transform:rotate(20deg)}
-.bl .shad{position:absolute;left:7px;bottom:0;width:20px;height:5px;border-radius:50%;background:rgba(0,0,0,.45);animation:shad .7s cubic-bezier(.5,0,.5,1) infinite alternate}
 @keyframes bounce{0%{transform:translateY(0)}85%{transform:translateY(24px)}100%{transform:translateY(26px) scale(1.15,.82)}}
 @keyframes shad{0%{transform:scale(.55);opacity:.4}100%{transform:scale(1.1);opacity:.8}}
 /* 8 Oro: lamina d'oro, carattere elegante, filetti */
@@ -622,7 +613,6 @@ html[data-skin="manga"]:not([data-skin="notte"]) .wd2.t{background:#1a191e;box-s
 html[data-skin="manga"]:not([data-skin="notte"]) .banner{background:#2a2116;border:2px solid #ece6d6}
 html[data-skin="manga"]:not([data-skin="notte"]) .sheet{background:#0f0e12;border-top:3px solid #ece6d6}
 html[data-skin="manga"]:not([data-skin="notte"]) :is(.hero .lbl,.kicker){color:var(--acc,#ff2340)}
-html[data-skin="manga"]:not([data-skin="notte"]) .exfig img{border:2px solid #ece6d6}
 html[data-skin="manga"]:not([data-skin="notte"]) .trk{background:#24222a;box-shadow:inset 0 0 0 1.5px #ece6d6}
 html[data-skin="manga"]:not([data-skin="notte"]) .pbar{background:#24222a;box-shadow:inset 0 0 0 1.5px #ece6d6;height:8px}
 html[data-skin="manga"]:not([data-skin="notte"]) .empty{border:2px dashed #ece6d6;color:#bdb6aa}
@@ -648,6 +638,9 @@ html[data-skin="manga"]:not([data-skin="notte"]) .ex.cur{box-shadow:5px 5px 0 va
 .painw span{flex:1}
 .painw button{border:0;background:none;color:var(--stop);font-weight:800;font-size:14px;min-height:40px;white-space:nowrap}
 .errs{margin:0;font-size:14px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.how{display:flex;flex-direction:column;gap:8px}
+.how p{margin:0;font-size:14px;line-height:1.45;color:var(--muted)}
+.how b{display:block;color:var(--fg)}
 .errs b{color:var(--fg)}
 .errs ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:3px}
 .bodyf{grid-template-columns:1fr 1fr}
@@ -1593,14 +1586,52 @@ const tiltAsk=typeof DeviceOrientationEvent!=="undefined"&&typeof DeviceOrientat
 
 const I=n=>`<svg class="ic" aria-hidden="true"><use href="#i-${n}"/></svg>`;
 const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
-// Illustrazioni: una per movimento, cercata per nome. Due pannelli: inizio a sinistra, fine a destra.
-const IMGS={"chest press alla macchina":"img/chest-press-alla-macchina.jpg","trazioni presa neutra":"img/trazioni-presa-neutra.jpg","rematore petto in appoggio":"img/rematore-petto-in-appoggio.jpg","alzate laterali al cavo":"img/alzate-laterali-al-cavo.jpg","curl panca inclinata":"img/curl-panca-inclinata.jpg","lento manubri seduto":"img/lento-manubri-seduto.jpg","lat machine presa neutra":"img/lat-machine-presa-neutra.jpg","pulley basso":"img/pulley-basso.jpg"};
-const imgOf=ex=>IMGS[(ex.n||"").toLowerCase().trim()]||null;
+// Come si fa: posizione di partenza e movimento, cercati per nome.
+const HOW={
+ "chest press alla macchina":["Seduto con la schiena contro lo schienale, sedile regolato in modo che le maniglie siano all'altezza del petto.", "Spingi in avanti fino a braccia quasi tese, poi torna in 2-3 s finché le mani arrivano vicino al petto."],
+ "trazioni presa neutra":["Appeso alle maniglie parallele, palmi uno verso l'altro, braccia quasi tese.", "Tira portando i gomiti verso i fianchi finché il mento supera le maniglie, poi scendi controllato."],
+ "panca inclinata 30° al smith":["Panca a 30° dentro lo Smith, il bilanciere cade appena sotto le clavicole, mani poco più larghe delle spalle.", "Scendi in 2-3 s fino a sfiorare il petto alto, poi spingi fino a braccia tese."],
+ "rematore petto in appoggio":["Petto sul cuscino di una panca inclinata a 30-45°, piedi a terra, un manubrio per mano, braccia tese.", "Porta i gomiti indietro vicino ai fianchi fino alle costole basse, stringi le scapole, scendi lento."],
+ "alzate laterali al cavo":["In piedi di fianco al cavo basso, maniglia nella mano lontana dalla colonna, braccio davanti ai fianchi.", "Alza il braccio di lato, gomito appena piegato, fino all'altezza della spalla; scendi in 2-3 s."],
+ "alzate laterali manubri":["In piedi, un manubrio per mano lungo i fianchi, busto appena inclinato in avanti.", "Alza le braccia di lato, gomiti appena piegati, fino all'altezza delle spalle; scendi in 2-3 s."],
+ "curl panca inclinata":["Seduto su panca a 45-60°, schiena appoggiata, braccia tese che pendono dietro il busto.", "Piega i gomiti e porta i manubri verso le spalle senza spostare i gomiti; scendi fino al braccio teso."],
+ "french press al cavo":["Di spalle al cavo alto, un piede avanti, busto un po' inclinato, corda dietro la testa e gomiti alti vicino alle orecchie.", "Stendi le braccia in avanti e in alto muovendo solo gli avambracci; torna finché le mani sono dietro la testa."],
+ "skater jump, arrivo bloccato":["In piedi su una gamba, ginocchio piegato, busto un po' in avanti.", "Salta di lato e atterra sull'altro piede con il ginocchio in linea col piede; fermo 2 s, poi riparti dall'altra parte."],
+ "box jump":["In piedi davanti al box, piedi alla larghezza delle anche.", "Piegati, slancia le braccia e salta sul box atterrando morbido a ginocchia piegate; alzati e scendi camminando."],
+ "squat bilanciere":["Bilanciere sui trapezi, piedi alla larghezza delle spalle, punte un po' aperte.", "Scendi spingendo le anche indietro e le ginocchia in fuori fino a cosce parallele; risali spingendo coi talloni."],
+ "stacco rumeno":["In piedi, bilanciere in mano davanti alle cosce, ginocchia appena piegate.", "Spingi il bacino indietro a schiena piatta, bilanciere che sfiora le gambe fino a sotto le ginocchia; risali portando il bacino avanti."],
+ "bulgarian split squat":["Collo del piede dietro appoggiato su una panca, piede davanti un passo lungo avanti, manubri in mano.", "Scendi dritto finché il ginocchio dietro quasi tocca terra; risali spingendo col piede davanti."],
+ "nordic curl":["In ginocchio su un cuscino, caviglie bloccate sotto un rullo o tenute da un compagno, corpo dritto.", "Inclinati in avanti a corpo dritto frenando con i femorali più a lungo possibile; prendi la caduta con le mani e torna su."],
+ "copenhagen plank":["Di fianco su un avambraccio, gamba sopra appoggiata sulla panca (caviglia o ginocchio), gamba sotto libera.", "Solleva il bacino finché il corpo è dritto dalla testa ai piedi e tieni la posizione per i secondi indicati."],
+ "calf in piedi":["Spalle sotto i cuscinetti, avampiedi sul bordo del gradino, gambe tese.", "Scendi coi talloni sotto il gradino e fermati 1 s, poi sali in punta più in alto possibile."],
+ "woodchop al cavo":["Di fianco alla colonna, cavo alto, maniglia con due mani sopra la spalla vicina, piedi larghi.", "Tira in diagonale verso il fianco opposto ruotando anche e busto, braccia quasi tese; torna controllato."],
+ "extrarotazione al cavo":["Di fianco al cavo regolato all'altezza del gomito, gomito a 90° attaccato al fianco, mano davanti alla pancia.", "Ruota l'avambraccio verso l'esterno tenendo il gomito fermo al fianco; torna lento."],
+ "estensione del polso":["Seduto, avambraccio appoggiato sulla coscia, palmo verso il basso, mano oltre il ginocchio con un manubrio leggero.", "Alza il dorso della mano piegando solo il polso; scendi in 3 s."],
+ "landmine press":["In ginocchio su una gamba o in piedi, estremità del bilanciere in una mano davanti alla spalla, l'altra estremità fissata a terra.", "Spingi in alto e in avanti fino al braccio teso; torna alla spalla controllando."],
+ "lento manubri seduto":["Seduto con lo schienale quasi verticale, manubri all'altezza delle spalle, gomiti un po' in avanti.", "Spingi in alto fino a braccia quasi tese; scendi finché i manubri arrivano all'altezza delle orecchie."],
+ "lat machine presa neutra":["Seduto, cosce bloccate sotto i rulli, maniglia stretta con i palmi uno verso l'altro, braccia tese.", "Abbassa le scapole e tira la maniglia al petto alto con i gomiti verso i fianchi; risali lento a braccia tese."],
+ "croci ai cavi dal basso":["In piedi tra due cavi bassi, una maniglia per mano, braccia in basso e aperte, gomiti appena piegati.", "Porta le mani in alto e davanti fino all'altezza del petto alto, gomiti fermi; torna lento."],
+ "pulley basso":["Seduto, piedi sulla pedana, ginocchia appena piegate, busto dritto, braccia tese in avanti.", "Tira la maniglia all'ombelico portando i gomiti indietro e stringendo le scapole; torna allungando le braccia senza piegarti."],
+ "face pull":["Cavo all'altezza degli occhi, corda presa dall'alto, un passo indietro, braccia tese in avanti.", "Tira la corda verso gli occhi aprendo le mani ai lati della testa, gomiti alti; torna lento."],
+ "curl panca scott":["Seduto alla panca Scott, ascelle sul bordo, dietro delle braccia appoggiato sul cuscino, bilanciere EZ in mano.", "Piega i gomiti portando il bilanciere verso le spalle; scendi lento fino a braccia quasi tese."],
+ "pushdown o dip alla macchina":["Seduto alla dip machine, schiena allo schienale, maniglie ai lati del busto all'altezza del petto.", "Spingi in basso fino a braccia tese lungo i fianchi; torna lento fino a gomiti a 90°."],
+ "pushdown al cavo":["In piedi davanti al cavo alto, gomiti ai fianchi, avambracci paralleli al pavimento.", "Stendi le braccia verso il basso muovendo solo gli avambracci; torna fino a gomiti a 90°."],
+ "pushdown con corda":["In piedi davanti al cavo alto con la corda, gomiti ai fianchi, avambracci paralleli al pavimento.", "Stendi le braccia e in fondo apri la corda ai lati delle cosce; torna fino a gomiti a 90°."],
+ "butterfly alla macchina":["Seduto, schiena allo schienale, maniglie aperte all'altezza del petto, gomiti appena piegati.", "Chiudi le braccia davanti al petto finché le mani si avvicinano; torna lento finché senti allungare il petto."],
+ "pullover al cavo":["In piedi davanti al cavo alto, busto un po' inclinato, corda o barra con braccia tese in alto.", "Porta le mani giù fino alle cosce a braccia quasi tese, muovendo solo le spalle; torna lento in alto."],
+ "reverse fly":["Petto contro lo schienale della pec deck, maniglie davanti all'altezza delle spalle, braccia tese.", "Apri le braccia di lato fino alla linea del corpo, gomiti appena piegati; torna lento."],
+ "curl al cavo dietro la schiena":["Di spalle al cavo basso, un passo avanti, maniglia in una mano, braccio teso dietro il fianco.", "Piega il gomito portando la mano verso la spalla, gomito fermo dietro il busto; scendi lento."],
+ "pallof press":["Di fianco al cavo all'altezza del petto, maniglia con due mani al centro del petto, piedi larghi.", "Spingi le braccia dritte in avanti senza far ruotare il busto, tieni 2 s e torna al petto."],
+ "lat machine presa larga":["Seduto, cosce sotto i rulli, barra presa larga dall'alto, braccia tese.", "Abbassa le scapole e tira la barra al petto alto, gomiti verso i fianchi; risali lento."],
+ "panca piana al smith":["Sdraiato sulla panca piana, bilanciere sopra la metà del petto, mani poco più larghe delle spalle.", "Scendi in 2-3 s fino a 3-4 cm dal petto; spingi fino a braccia tese."],
+ "chest press inclinata alla macchina":["Seduto con la schiena allo schienale, maniglie all'altezza del petto alto.", "Spingi in avanti e in alto fino a braccia quasi tese; torna in 2-3 s."]
+};
+const howOf=ex=>HOW[(ex.n||"").toLowerCase().trim()]||null;
 const errOf=ex=>(typeof ERRS!=="undefined"&&ERRS[(ex.n||"").toLowerCase().trim()])||null;
 const IMGEX={};
-const qmark=ex=>(imgOf(ex)||errOf(ex)||ex.note)?(IMGEX[ex.id]=ex,`<span class="qm" role="button" tabindex="0" data-img="${ex.id}" aria-label="Come si fa: ${esc(ex.n)}">?</span>`):"";
-function imgSheet(ex){const src=imgOf(ex);const mu=ex.mu||muOf(ex.id);
-  openSheet({html:()=>`<h2>${esc(ex.n)}</h2>${src?`<figure class="exfig"><div class="imw"><img src="${src}" alt="${esc(ex.n)}: posizione di partenza a sinistra, di arrivo a destra"><span class="bl" aria-hidden="true"><i class="ball"></i><i class="shad"></i></span></div><figcaption><span>Inizio</span><span>Fine</span></figcaption></figure>`:""}${mu?`<p class="note"><b>Muscolo:</b> ${esc(muLbl(mu))}</p>`:""}${errOf(ex)?`<div class="errs"><b>Errori da evitare</b><ul>${errOf(ex).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}${ex.note?`<p class="note">${esc(ex.note)}</p>`:""}`,bind:w=>{const im=w.querySelector(".exfig img"),bl=w.querySelector(".bl");if(!im)return;const done=()=>bl&&bl.remove();if(im.complete)done();else{im.onload=done;im.onerror=done}}})}
+const qmark=ex=>(howOf(ex)||errOf(ex)||ex.note)?(IMGEX[ex.id]=ex,`<span class="qm" role="button" tabindex="0" data-img="${ex.id}" aria-label="Come si fa: ${esc(ex.n)}">?</span>`):"";
+function imgSheet(ex){const how=howOf(ex);const mu=ex.mu||muOf(ex.id);
+  openSheet({html:()=>`<h2>${esc(ex.n)}</h2>${mu?`<p class="note"><b>Muscolo:</b> ${esc(muLbl(mu))}</p>`:""}${how?`<div class="how"><p><b>Posizione</b>${esc(how[0])}</p><p><b>Movimento</b>${esc(how[1])}</p></div>`:""}${errOf(ex)?`<div class="errs"><b>Errori da evitare</b><ul>${errOf(ex).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}${ex.note?`<p class="note">${esc(ex.note)}</p>`:""}`,bind:()=>{}})}
 const EN_LBL={low:"Stanco",ok:"Normale",high:"Carico"};
 function openSheet(build){
   const wrap=document.createElement("div");wrap.className="sheet-wrap";const close=()=>wrap.remove();
@@ -1817,7 +1848,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   const over=tOn&&tEnd<=Date.now();
   const rest=withRest&&tOn?`<div class="rest ${over?"over":""}" id="restIn" role="timer"><span class="rr"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rk" cx="32" cy="32" r="28"/><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg><b class="tv"></b></span><span class="tl">${over?"Recupero finito":"Recupero"+(tPlus?" · +"+tPlus+" s":"")}</span><button data-tp>+15 s</button><button data-ts>Chiudi</button></div>`:"";
   return `<article class="ex cur ${ssP.length?"ss":""}" data-ex="${ex.id}">
-    <div class="exhead"><h3>${esc(ex.n)}${(imgOf(ex)||errOf(ex)||ex.note)?(IMGEX[ex.id]=ex,`<button class="qm" data-img="${ex.id}" aria-label="Come si fa: ${esc(ex.n)}">?</button>`):""}</h3><button class="swap" data-base="${base.id}" aria-label="Sostituisci ${esc(ex.n)}">⇄ Cambia</button></div>
+    <div class="exhead"><h3>${esc(ex.n)}${(howOf(ex)||errOf(ex)||ex.note)?(IMGEX[ex.id]=ex,`<button class="qm" data-img="${ex.id}" aria-label="Come si fa: ${esc(ex.n)}">?</button>`):""}</h3><button class="swap" data-base="${base.id}" aria-label="Sostituisci ${esc(ex.n)}">⇄ Cambia</button></div>
     <div class="tgt"><b${cu?` data-cu="${lk}|${tg.kg}|${esc(" kg × "+r0)}|${ex.id}"`:""}>${big}</b>${tg.badge?`<small class="${tg.kind}">${esc(tg.badge)}</small>`:""}</div>
     <p class="prog ${tg.kind}"><span>${esc(tg.msg)}</span></p>
     <div class="chips">${chips.join("")}</div>
