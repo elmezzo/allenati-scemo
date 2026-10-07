@@ -938,13 +938,13 @@ html[data-skin="vetro"]:not(#z) .kicker{color:var(--muted)}
 html[data-skin="vetro"]:not(#z) .wd2.t{box-shadow:inset 0 0 0 1px rgba(var(--acc-rgb),.6)}
 /* ===== ECLISSE (2026-10-07): nero totale, corona bianca, protuberanze rosa. Mossa: la seduta scopre il sole. All'inizio la luna copre tutto e si vede solo la corona; ogni serie la sposta (var --p, già aggiornata dall'allenamento); a seduta finita il sole è libero. ===== */
 html[data-skin="eclisse"]{--bg:#040406;--card:#0b0b10;--card-2:#15151c;--field:#07070a;--line:rgba(255,255,255,.085);--fg:#f6f3ee;--muted:#b1adbb;--dim:#9a96a5;
-  --acc:#ff5277;--acc-rgb:255,82,119;--hot:var(--acc);--hot-ink:#17040a;--corona:#fffaf2;
+  --acc:#ff5277;--acc-rgb:255,82,119;--hot:var(--acc);--hot-ink:#17040a;--corona:#fffaf2;--cor-rgb:255,250,242;
   --grad:linear-gradient(#f6f3ee,#f6f3ee);--glow:rgba(var(--acc-rgb),0);--hl:rgba(255,255,255,.09);
   --cardbg:linear-gradient(180deg,#0f0f15,#09090d);--title:linear-gradient(#f6f3ee,#f6f3ee);--navbg:rgba(4,4,6,.96);--tilebg:#0f0f15;
   --bgimg:radial-gradient(1px 1px at 12% 18%,rgba(255,255,255,.55) 50%,transparent 51%),radial-gradient(1px 1px at 73% 9%,rgba(255,255,255,.4) 50%,transparent 51%),radial-gradient(1.5px 1.5px at 88% 34%,rgba(255,255,255,.5) 50%,transparent 51%),radial-gradient(1px 1px at 31% 47%,rgba(255,255,255,.3) 50%,transparent 51%),radial-gradient(1px 1px at 58% 66%,rgba(255,255,255,.35) 50%,transparent 51%),radial-gradient(1.5px 1.5px at 7% 79%,rgba(255,255,255,.4) 50%,transparent 51%),radial-gradient(1px 1px at 92% 88%,rgba(255,255,255,.3) 50%,transparent 51%),radial-gradient(1px 1px at 44% 93%,rgba(255,255,255,.25) 50%,transparent 51%),radial-gradient(900px 520px at 50% -18%,rgba(var(--acc-rgb),.10),transparent 60%),#040406;
   --pad:#7fd8ff;--match:#c9a8ff;--info:#a9bdff;--display:"Syne","Manrope",system-ui,sans-serif}
-html[data-skin="eclisse"][data-var="1"]{--acc:#7c9dff;--acc-rgb:124,157,255;--hot-ink:#050b1c}
-html[data-skin="eclisse"][data-var="2"]{--acc:#52e8b4;--acc-rgb:82,232,180;--hot-ink:#021a11}
+html[data-skin="eclisse"][data-var="1"]{--bg:#050403;--card:#0e0b07;--card-2:#18130c;--cardbg:linear-gradient(180deg,#120e09,#0a0806);--tilebg:#110d08;--acc:#ffb347;--acc-rgb:255,179,71;--hot-ink:#1a0f00;--corona:#fff1d2;--cor-rgb:255,241,210;--muted:#b9ae9c;--dim:#a39886}
+html[data-skin="eclisse"][data-var="2"]{--bg:#02040a;--card:#080b16;--card-2:#10142a;--cardbg:linear-gradient(180deg,#0b0f1e,#060812);--tilebg:#0a0d1c;--acc:#8f7bff;--acc-rgb:143,123,255;--hot-ink:#0a0624;--corona:#e2f4ff;--cor-rgb:226,244,255;--muted:#a9adc6;--dim:#9297b2}
 /* Caratteri: Syne largo e deciso per titoli e numeri, Manrope per il resto */
 html[data-skin="eclisse"]:not(#z) :is(h1,h2,h3,.hero .big,details.h summary b,.tgt b,.kpi b,.wd b){font-family:var(--display);font-weight:700;letter-spacing:-.02em;text-transform:none}
 html[data-skin="eclisse"]:not(#z) h1{font-size:40px;line-height:1}
@@ -999,6 +999,28 @@ html[data-skin="eclisse"]:not(#z) nav.bar button[aria-current="page"]{color:var(
 html[data-skin="eclisse"]:not(#z) nav.bar button[aria-current="page"] svg{color:var(--acc);filter:none}
 html[data-skin="eclisse"]:not(#z) .wd2.t{box-shadow:inset 0 0 0 1px rgba(255,255,255,.35);background:rgba(255,255,255,.05)}
 html[data-skin="eclisse"]:not(#z) .rest .tv{font:700 22px/1 "Manrope",system-ui,sans-serif;letter-spacing:-.01em}
+/* ===== ECLISSE: effetti nuovi (perle di Baily, anello di diamante, corona che respira, stelle, alone sull'esercizio in corso) ===== */
+/* 1 Corona viva: due strati che girano in senso opposto e respirano piano */
+html[data-skin="eclisse"]:not(#z) .hero::before{animation:none}
+@media (prefers-reduced-motion:no-preference){
+  html[data-skin="eclisse"]:not(#z) .hero::after{animation:ecCorona 48s linear infinite,ecBreath 7s ease-in-out infinite alternate}
+}
+@keyframes ecBreath{from{opacity:.75;scale:1}to{opacity:1;scale:1.05}}
+/* 2 Perle di Baily: la barra della seduta diventa una fila di perle di luce */
+html[data-skin="eclisse"]:not(#z) .pbar{height:6px;background:radial-gradient(circle,rgba(255,255,255,.14) 0 1.6px,transparent 2.2px) 0 50%/9px 6px repeat-x}
+html[data-skin="eclisse"]:not(#z) .pbar i{background:linear-gradient(90deg,rgba(var(--acc-rgb),.55),var(--acc) 75%,var(--corona));
+  -webkit-mask:radial-gradient(circle,#000 0 2.4px,transparent 3px) 0 50%/9px 6px repeat-x;mask:radial-gradient(circle,#000 0 2.4px,transparent 3px) 0 50%/9px 6px repeat-x}
+html[data-skin="eclisse"]:not(#z) .pbar i::after{display:none}
+/* 3 Stelle che brillano piano (poche, lente) */
+html[data-skin="eclisse"]:not(#z) body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(1.5px 1.5px at 22% 28%,#fff 50%,transparent 51%),radial-gradient(1.5px 1.5px at 81% 61%,#fff 50%,transparent 51%),radial-gradient(2px 2px at 64% 14%,#fff 50%,transparent 51%),radial-gradient(1.5px 1.5px at 12% 71%,#fff 50%,transparent 51%);opacity:.5}
+@media (prefers-reduced-motion:no-preference){html[data-skin="eclisse"]:not(#z) body::before{animation:ecTwinkle 5.5s ease-in-out infinite alternate}}
+@keyframes ecTwinkle{from{opacity:.15}to{opacity:.85}}
+/* 4 Anello di diamante: a seduta finita la mini eclissi si apre con un punto di luce */
+html[data-skin="eclisse"]:not(#z) .thead:has(.pbar[aria-valuenow="100"]) .r>span::after{background:radial-gradient(circle at 78% 26%,#fff 0 9%,rgba(255,255,255,.6) 14%,transparent 30%),radial-gradient(circle,var(--corona) 0 44%,rgba(var(--acc-rgb),.7) 52%,transparent 70%);box-shadow:0 0 18px rgba(var(--cor-rgb),.8)}
+/* 5 Esercizio in corso: la corona abbraccia il bordo alto, non solo una linea */
+html[data-skin="eclisse"]:not(#z) .ex.cur{box-shadow:inset 0 1px 0 rgba(var(--cor-rgb),.5),0 -10px 40px -18px rgba(var(--acc-rgb),.55),0 24px 48px -24px rgba(0,0,0,.9)}
+html[data-skin="eclisse"][data-var="2"]:not(#z) .hero::after{background:conic-gradient(from 0deg,transparent 0 6%,rgba(111,227,255,.9) 9%,transparent 14% 31%,rgba(var(--acc-rgb),.95) 34%,transparent 38% 58%,rgba(111,227,255,.8) 62%,transparent 67% 82%,rgba(var(--acc-rgb),.85) 86%,transparent 90%)}
 </style>
 <!--APP-HEAD-END-->
 </head>
@@ -2303,7 +2325,7 @@ function barChart(el,data){
 /* ================= WEEK / SETTINGS ================= */
 const SKINS=[["vetro","Vetro","linear-gradient(135deg,#ff7d66 45%,#4b46b8 55%)"],["carbonio","Carbonio","repeating-linear-gradient(45deg,#2a2f36 0 3px,#14171b 3px 6px),#ffb000"],["campo","Campo","linear-gradient(135deg,#12306a 50%,#e4ff3a 50%)"],["manga","Manga","radial-gradient(circle,rgba(255,255,255,.35) 1.1px,transparent 1.5px) 0 0/6px 6px,linear-gradient(135deg,#1a191e 58%,#ff2340 58%)"],["eclisse","Eclisse","radial-gradient(circle at 50% 50%,#040406 0 34%,#fffaf2 36%,#ff5277 48%,#040406 66%)"]];
 const SKVARS={vetro:[["Viola","linear-gradient(135deg,#ff7d66 45%,#4b46b8 55%)"],["Oceano","linear-gradient(135deg,#5cc8ff 45%,#3b3fa8 55%)"],["Smeraldo","linear-gradient(135deg,#3fe0b0 45%,#1d4f8a 55%)"]],
- eclisse:[["Rosa","radial-gradient(circle,#040406 0 34%,#fffaf2 36%,#ff5277 50%,#040406 68%)"],["Zaffiro","radial-gradient(circle,#040406 0 34%,#fffaf2 36%,#7c9dff 50%,#040406 68%)"],["Menta","radial-gradient(circle,#040406 0 34%,#fffaf2 36%,#52e8b4 50%,#040406 68%)"]],
+ eclisse:[["Rosa","radial-gradient(circle,#040406 0 34%,#fffaf2 36%,#ff5277 50%,#040406 68%)"],["Oro","radial-gradient(circle,#050403 0 34%,#fff1d2 36%,#ffb347 50%,#050403 68%)"],["Plasma","radial-gradient(circle,#02040a 0 34%,#e2f4ff 36%,#8f7bff 50%,#02040a 68%)"]],
  carbonio:[["Ambra","radial-gradient(circle,#ffd257,#ffb000 60%,#14171b 62%)"],["Rosso","radial-gradient(circle,#ff9a90,#ff3b30 60%,#14171b 62%)"],["Ciano","radial-gradient(circle,#a6f6ff,#19e3ff 60%,#14171b 62%)"]],
  campo:[["Cemento","linear-gradient(135deg,#12306a 55%,#e4ff3a 55%)"],["Terra rossa","linear-gradient(135deg,#a8441f 55%,#e4ff3a 55%)"],["Erba","linear-gradient(135deg,#1f6a38 55%,#e4ff3a 55%)"]],
  manga:[["Rosso","linear-gradient(135deg,#1a191e 55%,#ff2340 55%)"],["Blu","linear-gradient(135deg,#1a191e 55%,#2f7bff 55%)"],["Giallo","linear-gradient(135deg,#1a191e 55%,#ffd400 55%)"]]};
