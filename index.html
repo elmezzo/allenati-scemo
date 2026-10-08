@@ -1298,6 +1298,19 @@ html[data-skin="manga"]:not(#z):not(#y) .rk-gen>b{margin-bottom:4px}
 .gold-end{animation:none;box-shadow:none}
 .gold-end::before{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 3px rgba(255,214,140,.85),inset 0 0 60px rgba(255,190,90,.3),inset 0 0 120px rgba(var(--acc-rgb,255,190,90),.28);opacity:0;animation:goldglow 1.4s ease-out forwards}
 @keyframes goldglow{25%{opacity:1}100%{opacity:0}}
+/* Giro 5 */
+:root:not(#z):not(#y) .kpi .pill{align-self:center}
+html[data-skin="eclisse"]:not(#z):not(#y){--go:#9fe3b0}
+html[data-skin="carbonio"]:not(#z):not(#y) .kpi b{align-items:flex-end}
+html[data-skin="carbonio"]:not(#z):not(#y) .kpi :is(.lu,small){padding-bottom:.08em}
+html[data-skin="carbonio"]:not(#z):not(#y) .rest:not(.over){background:linear-gradient(180deg,#1d2228,#14181d);border:1px solid rgba(var(--acc-rgb),.45)}
+html[data-skin="campo"]:not(#z):not(#y) #court{opacity:.45}
+html[data-skin="campo"]:not(#z):not(#y) #court .ln{stroke-width:.42}
+html[data-skin="campo"]:not(#z):not(#y) #court .net{stroke-width:.7}
+html[data-skin="campo"]:not(#z):not(#y) :is(details.mn>summary,p.note,p.grp){width:fit-content;max-width:calc(100% + 16px)}
+html[data-skin="manga"]:not(#z):not(#y) .gold-end i{background:repeating-linear-gradient(100deg,transparent 0 18px,rgba(255,214,90,.55) 18px 24px);mix-blend-mode:normal}
+html[data-skin="manga"]:not(#z):not(#y) .gold-end::before{box-shadow:inset 0 0 0 4px #ffd65a}
+html[data-skin="manga"][data-var="2"]:not(#z):not(#y) .tabs button[aria-pressed="true"]{background:#1a191e;border-color:var(--acc);color:var(--acc);box-shadow:3px 3px 0 var(--acc)}
 </style>
 <!--APP-HEAD-END-->
 </head>
@@ -1661,7 +1674,7 @@ function render(){
   if(tOn)tick();
   wakeSync();
 }
-function go(v){const from=view;view=v;if(v!=="edit"){S.view=v;save()}render();window.scrollTo(0,0);if(from!==v)slideIn((VORD[v]??0)>=(VORD[from]??0)?"in-r":"in-l");if(from!==v&&S.skin==="campo"){const c=T("court");c.classList.remove("draw");void c.getBoundingClientRect();c.classList.add("draw")}}
+function go(v){const from=view;view=v;if(v!=="edit"){S.view=v;save()}render();window.scrollTo(0,0);if(from!==v)slideIn((VORD[v]??0)>=(VORD[from]??0)?"in-r":"in-l")}
 document.querySelectorAll("nav.bar button").forEach(b=>b.onclick=()=>go(b.dataset.v));
 
 /* ================= CONTENUTI: errori comuni, riscaldamento, avvicinamento, fastidio, peso e misure ================= */
@@ -1883,7 +1896,7 @@ function segSVG(str,fixed){let x=0,p="";for(const ch of str){
     if(ch==="-"){p+=`<rect class="on" x="${x+1}" y="16.5" width="10" height="3" rx="1.3"/>`;x+=15;continue}
     if(ch===","){p+=`<rect class="on" x="${x}" y="32" width="3.4" height="4" rx="1"/>`;x+=6;continue}
     if(ch==="1"&&!fixed){p+=`<g transform="translate(${x-12} 0) skewX(-6)">`+["b","c"].map(k=>{const [sx,sy,w,h]=SEG[k];return `<rect class="on" x="${sx}" y="${sy}" width="${w}" height="${h}" rx="1.3"/>`}).join("")+`</g>`;x+=12;continue}
-    const on=SEGMAP[ch]||"";p+=`<g transform="translate(${x} 0) skewX(-6)">`+Object.entries(SEG).map(([k,[sx,sy,w,h]])=>`<rect class="${on.includes(k)?"on":"off"}" x="${sx}" y="${sy}" width="${w}" height="${h}" rx="1.3"/>`).join("")+`</g>`;x+=24}
+    const on=SEGMAP[ch]||"";p+=`<g transform="translate(${ch==="1"?x-6:x} 0) skewX(-6)">`+Object.entries(SEG).map(([k,[sx,sy,w,h]])=>`<rect class="${on.includes(k)?"on":"off"}" x="${sx}" y="${sy}" width="${w}" height="${h}" rx="1.3"/>`).join("")+`</g>`;x+=24}
   return `<svg viewBox="-2 -1 ${x+2} 38" aria-hidden="true">${p}</svg>`}
 function setNum(el,txt){if(!el)return;if(skinNow()==="carbonio"){if(el.dataset.t===txt&&el.querySelector(".seg7"))return;el.dataset.t=txt;el.innerHTML=`<span class="sr">${esc(txt)}</span>`+txt.replace(/([0-9:,\-]+)|([^0-9:,\-]+)/g,(m,d,o)=>d?`<span class="seg7">${segSVG(d,!!el.closest(".tr,.rr"))}</span>`:`<span class="lu" aria-hidden="true">${esc(o)}</span>`)}else{delete el.dataset.t;el.textContent=txt}}
 function ledify(){if(skinNow()!=="carbonio")return;app.querySelectorAll(".tgt b,.kpi b").forEach(b=>{if(!b.querySelector(".seg7"))setNum(b,b.textContent)})}
