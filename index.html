@@ -1221,8 +1221,7 @@ html[data-skin="campo"]:not(#z):not(#y) .hero{position:relative;overflow:hidden}
 html[data-skin="campo"]:not(#z):not(#y) .hero .big{max-width:calc(100% - 104px)}
 html[data-skin="campo"]:not(#z):not(#y) .hero::after{content:"";position:absolute;top:20px;right:18px;width:88px;height:48px;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 88 48' fill='none' stroke='%23f2f7ff' stroke-linecap='round'%3E%3Crect x='2' y='2' width='84' height='44' rx='1.5' stroke-width='1.6' stroke-opacity='.6'/%3E%3Cpath d='M15 2v44M73 2v44M15 24h58' stroke-width='1.2' stroke-opacity='.45'/%3E%3Cpath d='M44 -1v50' stroke-width='2.4' stroke-opacity='.9'/%3E%3C/svg%3E") center/contain no-repeat}
 html[data-skin="campo"]:not(#z):not(#y) .hero::before{content:"";position:absolute;top:31px;right:34px;width:9px;height:9px;border-radius:50%;background:var(--acc,#e4ff3a);box-shadow:0 0 10px rgba(var(--acc-rgb,228,255,58),.7);pointer-events:none;z-index:1}
-@media (prefers-reduced-motion:no-preference){html[data-skin="campo"]:not(#z):not(#y) .hero::before{animation:cpBall .9s cubic-bezier(.3,.7,.4,1) .25s backwards}}
-@keyframes cpBall{0%{translate:-62px 18px;scale:.6;opacity:0}45%{translate:-24px 10px;scale:1;opacity:1}62%{translate:-12px 2px;scale:.85}100%{translate:0 0;scale:1}}
+@media (prefers-reduced-motion:no-preference){html[data-skin="campo"]:not(#z):not(#y) .hero::before{animation:cpBall .9s linear .25s backwards}}
 html[data-skin="campo"]:not(#z):not(#y) :is(.tile,.ctx>*,.tabs button,.wd2,.field,.btn){border-radius:8px}
 /* Giro 2 */
 html[data-skin="vetro"]:not(#z):not(#y) .rest:not(.over){background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.035));border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
@@ -1243,11 +1242,39 @@ html[data-skin="campo"]:not(#z):not(#y) div.timer:not(.over) .ra{stroke:var(--ac
 html[data-skin="campo"]:not(#z):not(#y) div.timer:not(.over) button{color:var(--acc);border-color:color-mix(in srgb,var(--acc) 60%,transparent);background:transparent}
 html[data-skin="campo"]:not(#z):not(#y) div.timer:not(.over) .l{color:var(--fg)}
 html[data-skin="campo"][data-var="2"]:not(#z):not(#y){--go:#b6ffcf}
-@keyframes cpBall{0%{translate:-62px 18px;scale:.6;opacity:0}45%{translate:-24px 10px;scale:1;opacity:1}62%{translate:-12px 2px;scale:1.14 .82}100%{translate:0 0;scale:1}}
+@keyframes cpBall{0%{translate:-62px -10px;scale:.7;opacity:0;animation-timing-function:cubic-bezier(.5,0,.9,.5)}45%{translate:-26px 10px;scale:1.16 .8;opacity:1;animation-timing-function:cubic-bezier(.2,.7,.3,1)}100%{translate:0 0;scale:1}}
 html[data-skin="manga"]:not(#z):not(#y) .tgt b{letter-spacing:-.05em;font-kerning:normal}
 html[data-skin="manga"]:not(#z):not(#y) select{border:2px solid var(--fg);border-radius:6px;box-shadow:3px 3px 0 rgba(236,230,214,.14)}
 html[data-skin="manga"]:not(#z):not(#y) .hero{box-shadow:5px 5px 0 var(--acc,#ff2340)}
 html[data-skin="manga"]:not(#z):not(#y) .tgt b{font:800 30px/1 "Manrope",system-ui,sans-serif;letter-spacing:-.02em;font-variant-numeric:proportional-nums;text-shadow:2px 2px 0 var(--acc)}
+/* Giro 3 */
+html[data-skin="carbonio"]:not(#z):not(#y) :is(.timer .tr,.rest .rr) .seg7 svg{height:.8em}
+html[data-skin="carbonio"]:not(#z):not(#y) .timer .tr .t{font-size:24px}
+html[data-skin="carbonio"]:not(#z):not(#y) .rest .rr .tv{font-size:28px}
+html[data-skin="carbonio"]:not(#z):not(#y) .tgt .seg7+.lu{vertical-align:0}
+html[data-skin="eclisse"]:not(#z):not(#y) .wu h3{font-size:20px}
+html[data-skin="eclisse"]:not(#z):not(#y) .rest:not(.over) .ra{stroke:var(--acc);filter:none}
+html[data-skin="eclisse"]:not(#z):not(#y) .timer .tr .t{font-size:20px;letter-spacing:-.03em}
+html[data-skin="campo"]:not(#z):not(#y) .rest:not(.over) .ra{stroke:var(--acc);filter:none}
+html[data-skin="campo"]:not(#z):not(#y) .rest:not(.over){background:color-mix(in srgb,var(--card) 90%,var(--acc));border:1.5px solid color-mix(in srgb,var(--acc) 45%,transparent)}
+html[data-skin="campo"]:not(#z):not(#y) details.mn>summary{padding-top:6px}
+html[data-skin="manga"]:not(#z):not(#y) .timer .tr .t{font-size:19px}
+html[data-skin="manga"]:not(#z):not(#y) .rest .rr .tv{font-size:22px;letter-spacing:-.03em}
+html[data-skin="manga"][data-var="2"]:not(#z):not(#y) .tgt b{text-shadow:2px 2px 0 rgba(var(--acc-rgb),.75)}
+html[data-skin="vetro"][data-var="1"]:not(#z):not(#y){--pad:#c3a6ff}
+/* Riscaldamento: "Fatto" è l'azione principale */
+:root:not(#z):not(#y) .wu .wub .btn:not(.ghost){background:color-mix(in srgb,var(--acc,var(--hot)) 24%,var(--card));color:var(--fg);border:1px solid color-mix(in srgb,var(--acc,var(--hot)) 55%,transparent)}
+html[data-skin="eclisse"]:not(#z):not(#y) .wu .wub .btn:not(.ghost){background:var(--corona);color:#08080b;border-color:transparent}
+html[data-skin="manga"]:not(#z):not(#y) .wu .wub .btn:not(.ghost){background:#ece6d6;color:#1a191e}
+/* Lame di luce con transform invece di left */
+.pbar i::after{left:0;width:100%;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.75) 50%,transparent 70%);transform:translateX(-100%)}
+.pbar.shine i::after{animation-name:sweepT}
+@keyframes sweepT{to{transform:translateX(100%)}}
+.blade::after{left:0;transform:skewX(-18deg) translateX(-156%);animation-name:bladeT}
+@keyframes bladeT{to{transform:skewX(-18deg) translateX(311%)}}
+.gold-end i{left:0;transform:skewX(-18deg) translateX(-145%);animation-name:goldsweepT}
+@keyframes goldsweepT{to{transform:skewX(-18deg) translateX(255%)}}
+html[data-skin="carbonio"]:not(#z):not(#y) :is(.timer .tr,.rest .rr) .seg7 .on{stroke:var(--acc);stroke-width:1.4;paint-order:stroke}
 </style>
 <!--APP-HEAD-END-->
 </head>
@@ -1828,12 +1855,14 @@ function blade(el){if(RM()||!el)return;if(getComputedStyle(el).position==="stati
 // Display a 7 segmenti (stile Carbonio)
 const SEG={a:[4,0,12,3],b:[16.5,3.5,3,13],c:[16.5,19.5,3,13],d:[4,33,12,3],e:[.5,19.5,3,13],f:[.5,3.5,3,13],g:[4,16.5,12,3]};
 const SEGMAP={"+":"g","-":"g","0":"abcdef","1":"bc","2":"abged","3":"abgcd","4":"fgbc","5":"afgcd","6":"afgedc","7":"abc","8":"abcdefg","9":"abcdfg"};
-function segSVG(str){let x=0,p="";for(const ch of str){
+function segSVG(str,fixed){let x=0,p="";for(const ch of str){
     if(ch===":"){p+=`<rect class="on" x="${x+1}" y="10" width="3.2" height="3.2" rx="1"/><rect class="on" x="${x+1}" y="23" width="3.2" height="3.2" rx="1"/>`;x+=7;continue}
+    if(ch==="-"){p+=`<rect class="on" x="${x+1}" y="16.5" width="10" height="3" rx="1.3"/>`;x+=15;continue}
     if(ch===","){p+=`<rect class="on" x="${x}" y="32" width="3.4" height="4" rx="1"/>`;x+=6;continue}
+    if(ch==="1"&&!fixed){p+=`<g transform="translate(${x-12} 0) skewX(-6)">`+["b","c"].map(k=>{const [sx,sy,w,h]=SEG[k];return `<rect class="on" x="${sx}" y="${sy}" width="${w}" height="${h}" rx="1.3"/>`}).join("")+`</g>`;x+=12;continue}
     const on=SEGMAP[ch]||"";p+=`<g transform="translate(${x} 0) skewX(-6)">`+Object.entries(SEG).map(([k,[sx,sy,w,h]])=>`<rect class="${on.includes(k)?"on":"off"}" x="${sx}" y="${sy}" width="${w}" height="${h}" rx="1.3"/>`).join("")+`</g>`;x+=24}
   return `<svg viewBox="-2 -1 ${x+2} 38" aria-hidden="true">${p}</svg>`}
-function setNum(el,txt){if(!el)return;if(skinNow()==="carbonio"){if(el.dataset.t===txt&&el.querySelector(".seg7"))return;el.dataset.t=txt;el.innerHTML=`<span class="sr">${esc(txt)}</span>`+txt.replace(/([0-9:,\-]+)|([^0-9:,\-]+)/g,(m,d,o)=>d?`<span class="seg7">${segSVG(d)}</span>`:`<span class="lu" aria-hidden="true">${esc(o)}</span>`)}else{delete el.dataset.t;el.textContent=txt}}
+function setNum(el,txt){if(!el)return;if(skinNow()==="carbonio"){if(el.dataset.t===txt&&el.querySelector(".seg7"))return;el.dataset.t=txt;el.innerHTML=`<span class="sr">${esc(txt)}</span>`+txt.replace(/([0-9:,\-]+)|([^0-9:,\-]+)/g,(m,d,o)=>d?`<span class="seg7">${segSVG(d,!!el.closest(".tr,.rr"))}</span>`:`<span class="lu" aria-hidden="true">${esc(o)}</span>`)}else{delete el.dataset.t;el.textContent=txt}}
 function ledify(){if(skinNow()!=="carbonio")return;app.querySelectorAll(".tgt b,.kpi b").forEach(b=>{if(!b.querySelector(".seg7"))setNum(b,b.textContent)})}
 // Il carico della prossima volta sale contando, una volta al giorno per esercizio
 const lastPct={},counted=new Set(),recShown=new Set();
