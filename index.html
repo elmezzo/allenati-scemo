@@ -1381,7 +1381,7 @@ function assess(d){
     else if(p.padel==="train")r.notes.push("Solo padel oggi. Se ti avanza tempo: 10 minuti di extrarotazioni e polso.");
     else r.notes.push("Riposo. Dormi, mangia, e se vuoi 10 minuti di mobilità per anche e spalle.");
   }
-  if(energy==="low"&&p.gym in PLAN&&!(PLAN[p.gym].legs&&r.level==="stop")){say("adapt","Energia bassa: stessi carichi, una serie in meno per esercizio.");r.mods.add("light")}
+  if(energy==="low"&&p.gym in PLAN&&!(PLAN[p.gym].legs&&r.level==="stop")){say("adapt",r.mods.has("light")?"Energia bassa: la serie in meno c'è già, stessi carichi e niente serie al limite.":"Energia bassa: stessi carichi, una serie in meno per esercizio.");r.mods.add("light")}
   if(deloadOn(d)&&p.gym in PLAN){say("adapt",`Settimana di scarico fino a ${fmtShort(S.deload.to)}: metà serie, stessi carichi, 3-4 ripetizioni in canna.`);r.mods.add("deload")}
   r.title={go:"Via libera",adapt:"Seduta adattata",stop:"Cambia programma"}[r.level];
   if(!(p.gym in PLAN))r.title=p.padel==="match"?"Giorno di partita":p.padel==="train"?"Giorno di padel":"Giorno di riposo";
@@ -1432,7 +1432,7 @@ function target(ex){
   const prev=h[1]?h[1].sets[ex.id].filter(x=>num(x.reps)!=null).map(x=>num(x.reps)):null;
   const missTwice=!allIn&&prev&&prev.some(r=>r<ex.lo);
   if(ex.t==="time"){
-    if(allTop)return {kg:null,reps:Array(ex.s).fill(ex.lo),kind:"up",badge:"Livello +",msg:`Hai tenuto ${ex.hi} s su tutte: passa alla versione più dura (gamba tesa) e riparti da ${ex.lo} s.`};
+    if(allTop)return {kg:null,reps:Array(ex.s).fill(ex.lo),kind:"up",badge:"Livello +",msg:`Hai tenuto ${ex.hi} s su tutte: ${/leva corta/i.test(ex.n)?"torna al Copenhagen con la caviglia sulla panca (⇄ Cambia)":/copenhagen/i.test(ex.n)?"passa alla versione più dura (gamba tesa, appoggio alla caviglia)":"passa a una versione più dura"} e riparti da ${ex.lo} s.`};
     const nr=reps.map(r=>Math.min(ex.hi,Math.max(ex.lo,r+5)));
     return {kg:null,reps:pad(nr,ex.s),kind:"up",badge:"+5 s",msg:"Aggiungi 5 secondi per serie."};
   }
@@ -1446,7 +1446,7 @@ function target(ex){
     if(ex.t==="comp"&&kg)inc=Math.max(st,roundStep(kg*(ex.lower?0.05:0.025),st));
     const easy=eff==="easy"&&(ex.t==="comp"||ex.t==="bw")&&(!kg||(inc+st)/kg<=0.1);
     if(easy)inc+=st;
-    if(ex.t==="bw"&&kg==null)return {kg:inc,reps:Array(ex.s).fill(ex.lo),top,kind:"up",badge:"Zavorra",msg:`Chiuse tutte a ${ex.hi}: aggiungi ${fk(inc)} kg di zavorra e riparti da ${ex.lo}.`};
+    if(ex.t==="bw"&&!kg)return {kg:inc,reps:Array(ex.s).fill(ex.lo),top,kind:"up",badge:"Zavorra",msg:`Chiuse tutte a ${ex.hi}: aggiungi ${fk(inc)} kg di zavorra e riparti da ${ex.lo}.`};
     if(kg==null&&ex.t!=="bw"){const fx=/flexbar/i.test(ex.n);return {kg:null,reps:Array(ex.s).fill(ex.lo),top,kind:"up",badge:"Più duro",msg:`Chiuse tutte a ${top}: passa a ${fx?"una Flexbar":"un elastico"} più dur${fx?"a":"o"} e riparti da ${ex.lo}.`}}
     const nk=(kg||0)+inc;
     return {kg:nk,reps:Array(ex.s).fill(ex.lo),top,kind:"up",badge:`+${fk(inc)} kg`,msg:easy?`Range chiuso ed era facile: doppio aumento, ${fk(nk)} kg, riparti da ${ex.lo} ripetizioni.`:big?`Arrivato a ${top} ripetizioni: passa a ${fk(nk)} kg e riparti da ${ex.lo}.`:`Tutte le serie al limite alto: ${fk(nk)} kg e riparti da ${ex.lo} ripetizioni.`};
@@ -1454,15 +1454,15 @@ function target(ex){
   const sm=a=>a.reduce((t,r)=>t+r,0);
   if(missTwice&&kg&&!(prev&&prev.length&&sm(reps)/reps.length>sm(prev)/prev.length)){
     let nk=Math.max(st,roundStep(kg*0.9,st));if(nk>=kg&&kg-st>0)nk=kg-st;
-    if((kg-nk)/kg>0.15)return {kg,reps:pad(reps.map(r=>Math.min(top,r+1)),ex.s,ex.lo),top,kind:"up",badge:"+1 rip",msg:`Stesso carico: scendere di un gradino sarebbe troppo. Una ripetizione in più per serie, finché arrivi a ${ex.lo}.`};
+    if(ex.t!=="bw"&&(kg-nk)/kg>0.15)return {kg,reps:pad(reps.map(r=>Math.min(top,r+1)),ex.s,ex.lo),top,kind:"up",badge:"+1 rip",msg:`Stesso carico: scendere di un gradino sarebbe troppo. Una ripetizione in più per serie, finché arrivi a ${ex.lo}.`};
     return {kg:nk,reps:Array(ex.s).fill(ex.lo),top,kind:"down",badge:nk<kg?`-${fk(kg-nk)} kg`:"=",msg:`Due sedute sotto le ${ex.lo} ripetizioni: scendi a ${fk(nk)} kg e ricostruisci.`};
   }
-  if(!allIn)return {kg,reps:Array(ex.s).fill(ex.lo),top,kind:"flat",badge:"=",msg:`Stesso carico, obiettivo ${ex.lo} ripetizioni su tutte le serie.`};
-  if(!full&&hReps.length&&hReps.every(r=>r>=top))return {kg,reps:Array(ex.s).fill(top),top,kind:"flat",badge:"=",msg:`Fai tutte le ${planned} serie a ${fk(kg)} kg: poi sale il carico.`};
+  if(!allIn)return {kg,reps:Array(ex.s).fill(ex.lo),top,kind:"flat",badge:"=",msg:`${kg==null&&ex.t!=="bw"?"Stesso elastico":"Stesso carico"}, obiettivo ${ex.lo} ripetizioni su tutte le serie.`};
+  if(!full&&hReps.length&&hReps.every(r=>r>=top))return {kg,reps:Array(ex.s).fill(top),top,kind:"flat",badge:"=",msg:`Fai tutte le serie previste a ${fk(kg)} kg: poi sale il carico.`};
   const add=eff==="easy"?2:1;
   const nr=pad(reps.map(r=>Math.min(top,r+add)),ex.s,ex.lo);
   const over=big&&reps.every(r=>r>=ex.hi);
-  return {kg,reps:nr,top,kind:"up",badge:`+${add} rip`,msg:over?`Il prossimo peso è un salto del ${Math.round(st/kg*100)}%: prima porta tutte le serie a ${top} ripetizioni.`:add===2?"Era facile: stesso carico, due ripetizioni in più per serie.":"Stesso carico, una ripetizione in più per serie."};
+  return {kg,reps:nr,top,kind:"up",badge:`+${add} rip`,msg:over?`Il prossimo peso è un salto del ${Math.round(st/kg*100)}%: prima porta tutte le serie a ${top} ripetizioni.`:add===2?`Era facile: ${kg==null&&ex.t!=="bw"?"stesso elastico":"stesso carico"}, due ripetizioni in più per serie.`:`${kg==null&&ex.t!=="bw"?"Stesso elastico":"Stesso carico"}, una ripetizione in più per serie.`};
 }
 function lastKg(ex){const l=history(ex.id).filter(x=>!x.deload)[0];if(!l)return null;const k=l.sets[ex.id].map(x=>num(x.kg)).filter(v=>v!=null);return k.length?Math.max(...k):null}
 function tgFor(ex,mods){const t=target(ex);if(!mods.has("deload")||["perf","time","nordic"].includes(ex.t))return t;const k=lastKg(ex);return {...t,kg:k,reps:Array(ex.s).fill(ex.lo),kind:"flat",badge:"Scarico",msg:`Stesso carico dell'ultima volta, ${ex.lo} ripetizioni, 3-4 in canna.`}}
@@ -1815,7 +1815,7 @@ const HOW={
  "panca piana al smith":["Sdraiato sulla panca piana, bilanciere sopra la metà del petto, mani poco più larghe delle spalle.", "Scendi in 2-3 s fino a 3-4 cm dal petto; spingi fino a braccia tese."],
  "chest press inclinata alla macchina":["Seduto con la schiena allo schienale, maniglie all'altezza del petto alto.", "Spingi in avanti e in alto fino a braccia quasi tese; torna in 2-3 s."],
  "chest press ai cavi in piedi":["In piedi al centro tra due cavi all'altezza del petto, un piede avanti, maniglie vicino al petto, gomiti a 45°.", "Spingi in avanti fino a braccia quasi tese, mani che si avvicinano davanti al petto; torna in 2-3 s."],
- "piegamenti zavorrati":["Mani poco più larghe delle spalle, corpo dritto da testa a talloni, zavorra sulla parte alta della schiena.", "Scendi con i gomiti a 45° finché il petto sfiora il pavimento, poi spingi fino a braccia tese senza far cadere il bacino."],
+ "piegamenti zavorrati":["Mani poco più larghe delle spalle, corpo dritto da testa a talloni, zavorra sulla parte alta della schiena.", "Scendi con i gomiti a 45° fino a 3-4 cm dal pavimento, poi spingi fino a braccia tese senza far cadere il bacino."],
  "chest press altra macchina (hammer)":["Seduto con la schiena allo schienale, sedile regolato con le maniglie all'altezza del petto.", "Spingi in avanti fino a braccia quasi tese, poi torna in 2-3 s finché le mani arrivano vicino al petto."],
  "panca piana con manubri":["Sdraiato sulla panca piana, manubri ai lati del petto, gomiti a 45° dal busto, scapole strette.", "Spingi in alto fino a braccia tese sopra il petto; scendi in 2-3 s fermandoti prima che la spalla tiri."],
  "lat machine a un braccio":["Seduto con le cosce bloccate, una maniglia in mano, braccio teso sopra la testa.", "Tira il gomito giù verso il fianco fino a portare la mano vicino alla spalla; risali lento allungando il fianco."],
@@ -2623,12 +2623,14 @@ function buildReview(c){
   const wk=Math.max(1,(to-from)/(7*864e5));
   const grp={};for(const s of ss)for(const id in s.sets){const k=String(exName(id)).trim().toLowerCase();(grp[k]=grp[k]||new Set()).add(id)}
   const ex=[];for(const k in grp){const ids=[...grp[k]],e=exById(ids[0]);if(["perf","prev","time"].includes(e.t))continue;
-    const m=s=>Math.max(0,...ids.flatMap(id=>(s.sets[id]||[]).map(x=>metricOf(e,x))));
-    const mk=s=>Math.max(0,...ids.flatMap(id=>(s.sets[id]||[]).map(x=>num(x.kg)||0)));
-    const pr=ss.filter(s=>ids.some(id=>s.sets[id])).map(s=>[m(s),mk(s)]).filter(v=>v[0]>0),hs=pr.map(v=>v[0]);if(hs.length<2)continue;
-    const L4=pr.slice(-4),ph=phaseAt(c.to);
-    const ch=(hs[hs.length-1]-hs[0])/hs[0],st=ph==="def"?stallBy(ph,hs.slice(-4).reverse()):L4.length>=4&&!(L4[3][1]>L4[0][1])&&!(L4[3][0]>L4[0][0]+1e-9);
-    ex.push({n:exName(ids[0]),ch,st,t:e.t,n0:hs.length})}
+    // Stesso nome in giorni diversi (es. alzate laterali in A e in C) = serie separate: si valuta ogni esercizio per conto suo
+    const ph=phaseAt(c.to),chs=[],sts=[];let n0=0;
+    for(const id of ids){const pr=ss.filter(s=>s.sets[id]).map(s=>[Math.max(0,...s.sets[id].map(x=>metricOf(e,x))),Math.max(0,...s.sets[id].map(x=>num(x.kg)||0))]).filter(v=>v[0]>0);
+      n0+=pr.length;if(pr.length<2)continue;const hs=pr.map(v=>v[0]),L4=pr.slice(-4);chs.push((hs[hs.length-1]-hs[0])/hs[0]);
+      if(pr.length>=4)sts.push(ph==="def"?stallBy(ph,hs.slice(-4).reverse()):!(L4[3][1]>L4[0][1])&&!(L4[3][0]>L4[0][0]+1e-9))}
+    if(!chs.length)continue;
+    const ch=chs.reduce((a,b)=>a+b,0)/chs.length,st=sts.length>0&&sts.every(Boolean);
+    ex.push({n:exName(ids[0]),ch,st,t:e.t,n0})}
   const vr=volRange(from,to),vol=RMU.map(([k,n])=>({k,n,v:vr[k]/wk}));
   const eff={comp:{easy:0,ok:0,hard:0},iso:{easy:0,ok:0,hard:0}};
   for(const s of ss)for(const id in (s.eff||{})){const e=exById(id),g=e.t==="comp"?"comp":e.t==="iso"?"iso":null,v=s.eff[id];if(g&&eff[g][v]!=null)eff[g][v]++}
@@ -2854,7 +2856,7 @@ function renderSettings(){
     <li>Ripetizioni prima, carico poi: +1 ripetizione per serie finché chiudi tutto al limite alto del range, poi aumenta il carico e riparti dal basso. L'aumento segue l'attrezzo: +5 kg macchine e cavi (pacco pesi), +2,5 kg bilanciere e Smith, +1-2 kg manubri e zavorra con kettlebell. Sui multiarticolari pesanti, se il 2,5% (parte alta) o il 5% (gambe) del carico è più del gradino, sale di quello, arrotondato al gradino.</li>
     <li>Dopo l'ultima serie puoi dire com'era. Facile: due ripetizioni in più invece di una, oppure aumento doppio se resta entro il 10% del carico. Al limite su un multiarticolare a fine range: il carico resta fermo finché non chiudi con le ripetizioni in canna previste.</li>
     <li>Isolamento e prevenzione con un gradino grosso rispetto al carico (oltre il 15%, es. extrarotazione da 5 a 10 kg): prima porti le ripetizioni fino a 5 oltre il range, poi sali di peso.</li>
-    <li>Due sedute di fila sotto il minimo del range e ripetizioni totali non salite: -10% e riparti dal basso. Se il -10% vuol dire scendere più del 15% (gradino grosso), carico fermo e una ripetizione in più per serie.</li>
+    <li>Due sedute di fila sotto il minimo del range e ripetizioni medie per serie non salite: -10% e riparti dal basso. Se il -10% vuol dire scendere più del 15% (gradino grosso), carico fermo e una ripetizione in più per serie.</li>
     <li>Esercizio fermo (né kg né massimale stimato saliti in 3 sedute): prova una variante o togli una serie per due settimane.</li>
     <li>Salti: ripetizioni fisse, si progredisce in altezza o distanza. Nordic: meno aiuto dall'elastico. Copenhagen: +5 s fino a 30, poi versione più dura.</li>
     <li>Gambe mai nello stesso giorno del padel e mai il giorno prima di una partita. Partita dopo 2 giorni: niente Nordic e una serie in meno sugli eccentrici.</li>
