@@ -1275,6 +1275,29 @@ html[data-skin="manga"]:not(#z):not(#y) .wu .wub .btn:not(.ghost){background:#ec
 .gold-end i{left:0;transform:skewX(-18deg) translateX(-145%);animation-name:goldsweepT}
 @keyframes goldsweepT{to{transform:skewX(-18deg) translateX(255%)}}
 html[data-skin="carbonio"]:not(#z):not(#y) :is(.timer .tr,.rest .rr) .seg7 .on{stroke:var(--acc);stroke-width:1.4;paint-order:stroke}
+/* Giro 4 */
+.nw{white-space:nowrap}
+:root:not(#z):not(#y) .kpi{align-items:baseline}
+:root:not(#z):not(#y) .kpi b small{font-size:.42em;letter-spacing:0;margin-left:.14em;font-weight:inherit}
+html[data-skin="eclisse"]:not(#z):not(#y) .timer:not(.over){background:linear-gradient(180deg,rgba(var(--cor-rgb),.08),rgba(var(--cor-rgb),.03)),rgba(10,10,16,.94);color:var(--fg);border:1px solid rgba(var(--cor-rgb),.22);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:inset 0 1px 0 rgba(var(--cor-rgb),.3),0 0 0 1px rgba(var(--acc-rgb),.35),0 14px 34px rgba(0,0,0,.7)}
+html[data-skin="eclisse"]:not(#z):not(#y) .timer:not(.over) .l{color:var(--fg)}
+html[data-skin="eclisse"]:not(#z):not(#y) .timer:not(.over) button{color:var(--corona);border-color:rgba(var(--cor-rgb),.4);background:transparent}
+html[data-skin="carbonio"]:not(#z):not(#y) .headrow::after{position:absolute;left:0;bottom:0}
+html[data-skin="carbonio"]:not(#z):not(#y) .tgt b{align-items:flex-end}
+html[data-skin="carbonio"]:not(#z):not(#y) .tgt .lu{padding-bottom:.06em}
+html[data-skin="carbonio"][data-var="1"]:not(#z):not(#y){--info:#ff9d94}
+html[data-skin="campo"]:not(#z):not(#y) #court{height:100dvh}
+html[data-skin="campo"]:not(#z):not(#y) :is(details.mn>summary,p.note,p.grp){background:color-mix(in srgb,var(--bg) 85%,transparent);border-radius:6px;padding:4px 8px;margin-inline:-8px;text-shadow:none}
+html[data-skin="campo"][data-var="2"]:not(#z):not(#y){--go:var(--acc)}
+html[data-skin="vetro"]:not(#z):not(#y) .wu .wub .btn:not(.ghost){background:color-mix(in srgb,var(--acc) 30%,transparent);color:#fff;border-color:var(--acc)}
+html[data-skin="vetro"][data-var="2"]:not(#z):not(#y){--go:#b5f27a}
+html[data-skin="manga"]:not(#z):not(#y) .rest:not(.over){box-shadow:4px 4px 0 var(--acc);border-color:var(--fg)}
+html[data-skin="manga"]:not(#z):not(#y) .rest:not(.over) button{border-color:var(--fg)}
+html[data-skin="manga"]:not(#z):not(#y) .rk-gen>b{margin-bottom:4px}
+/* Oro di fine esercizio: si anima solo l'opacità */
+.gold-end{animation:none;box-shadow:none}
+.gold-end::before{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 3px rgba(255,214,140,.85),inset 0 0 60px rgba(255,190,90,.3),inset 0 0 120px rgba(var(--acc-rgb,255,190,90),.28);opacity:0;animation:goldglow 1.4s ease-out forwards}
+@keyframes goldglow{25%{opacity:1}100%{opacity:0}}
 </style>
 <!--APP-HEAD-END-->
 </head>
@@ -1812,7 +1835,7 @@ function bodyCard(){const W=S.body.filter(x=>x.kg!=null).sort((a,b)=>a.d.localeC
   const mk=(f,l)=>{const a=M.filter(x=>x[f]!=null);if(!a.length)return"";const z=a[a.length-1],p=a[a.length-2];return `<div class="tile"><b>${fk(z[f])}</b><span>${l}${p?` · ${z[f]-p[f]>=0?"+":""}${fk(Math.round((z[f]-p[f])*10)/10)}`:""}</span></div>`};
   const tiles=[mk("arm","Braccio cm"),mk("chest","Petto cm"),mk("waist","Vita cm")].join("");
   return `<section class="card body"><div class="wuh"><h3>Peso e misure</h3><button class="sbtn" id="bodyAdd">Segna</button></div>
-    ${L?`<div class="kpi"><b>${fk(L.kg)} kg</b>${trend}</div><span class="cap">Ultima pesata il ${fmtShort(L.d+"T12:00:00")}</span>`:`<p class="note" style="margin:0">Segna il peso una volta a settimana: vedrai se i chili salgono insieme ai carichi.</p>`}
+    ${L?`<div class="kpi"><b>${fk(L.kg)}<small>kg</small></b>${trend}</div><span class="cap">Ultima pesata il ${fmtShort(L.d+"T12:00:00")}</span>`:`<p class="note" style="margin:0">Segna il peso una volta a settimana: vedrai se i chili salgono insieme ai carichi.</p>`}
     ${W.length>=2?`<div class="chart" id="bodyChart"></div>`:""}${calo}${tiles?`<div class="tiles">${tiles}</div>`:""}</section>`}
 
 /* ================= RIEPILOGO FINE SEDUTA ================= */
@@ -2643,7 +2666,7 @@ function rankCard(){
   const G=A.gen,nx=G.r<8?RANKS[G.r+1][0]:null;
   return `<section class="card rank">${head}
   <div class="rk-g"><div class="rk-fig">${rFigure(A)}</div>
-    <div class="rk-gen" style="--rc:${RANKS[G.r][2]}">${rBadge(G.r,"big")}<b>${RANKS[G.r][0]}</b><span>${G.pt}/100 pt</span><div class="rk-bar"><i style="width:${G.pt}%"></i></div><small>${nx?`${100-G.pt} pt a ${nx}`:"Rango massimo"}</small>${(()=>{const e=A.ex.filter(x=>x.need).sort((a,b)=>a.need.pct-b.need.pct)[0];return e?`<p class="rk-next">Il passo più vicino: <b>${esc(e.n)} ${e.need.txt}</b> porta quell'esercizio a ${RANKS[Math.min(8,e.r+1)][0]}.</p>`:""})()}</div></div>
+    <div class="rk-gen" style="--rc:${RANKS[G.r][2]}">${rBadge(G.r,"big")}<b>${RANKS[G.r][0]}</b><span>${G.pt}/100 pt</span><div class="rk-bar"><i style="width:${G.pt}%"></i></div><small>${nx?`${100-G.pt} pt a ${nx}`:"Rango massimo"}</small>${(()=>{const e=A.ex.filter(x=>x.need).sort((a,b)=>a.need.pct-b.need.pct)[0];return e?`<p class="rk-next">Il passo più vicino: <b>${esc(e.n)} <span class="nw">${e.need.txt}</span></b> porta quell'esercizio a ${RANKS[Math.min(8,e.r+1)][0]}.</p>`:""})()}</div></div>
   <div class="rk-tr">${RANKS.map((r,i)=>`<span class="${i>G.r?"off":""}${i===G.r?" cur":""}">${rBadge(i)}<em>${r[0]}</em></span>`).join("")}</div>
   ${rankHist()}
   <div class="rk-mus">${RMU.map(([k,n])=>{const m=A.mus[k];return `<button class="rk-m${m.none?" none":""}" data-rm="${k}">${m.none?rNone():rBadge(m.r)}<b>${n}</b><small>${m.none?"Nessun dato":`${m.approx?"≈ ":""}${RANKS[m.r][0]} · ${m.pt}/100`}</small></button>`}).join("")}</div>
@@ -2809,7 +2832,7 @@ function renderProg(){
   ${balanceCard()}${reviewCard()}
   <section class="card ph">
     <label class="exsel"><span class="sr">Esercizio</span><select id="exSel">${progGroups(seen).map(([lab,ids])=>`<optgroup label="${esc(lab)}">${ids.map(id=>`<option value="${id}" ${id===progEx?"selected":""}>${esc(exName(id))}</option>`).join("")}</optgroup>`).join("")}</select></label>
-    <div class="kpi"><b>${fk(weighted?Math.round(lastV):Math.round(lastV*10)/10)} ${unit}</b>${pts.length>1?`<span class="pill ${delta>=0?"go":"stop"}">${delta>=0?"+":""}${fk(Math.round(delta))}% in ${wks} sett.</span>`:""}</div>
+    <div class="kpi"><b>${fk(weighted?Math.round(lastV):Math.round(lastV*10)/10)}<small>${unit}</small></b>${pts.length>1?`<span class="pill ${delta>=0?"go":"stop"}">${delta>=0?"+":""}${fk(Math.round(delta))}% in ${wks} sett.</span>`:""}</div>
     <span class="cap">${weighted?"Massimale stimato":ex.t==="time"?"Tenuta migliore":"Ripetizioni migliori"} · record ${fk(weighted?Math.round(bestV):Math.round(bestV*10)/10)} ${unit} il ${fmtShort(bestP.date)}</span>
     <div class="chart" id="lineChart"></div>
     ${weighted?`<p class="note">Stimato dalla serie migliore di ogni seduta: kg × (1 + ripetizioni/30).</p>`:""}
