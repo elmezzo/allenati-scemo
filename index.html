@@ -1008,7 +1008,6 @@ html[data-skin="eclisse"]:not(#z) .hero::before{animation:none}
 @media (prefers-reduced-motion:no-preference){
   html[data-skin="eclisse"]:not(#z) .hero::after{animation:ecCorona 48s linear infinite,ecBreath 7s ease-in-out infinite alternate}
 }
-@keyframes ecBreath{from{opacity:.75;scale:1}to{opacity:1;scale:1.05}}
 /* 2 Perle di Baily: la barra della seduta diventa una fila di perle di luce */
 html[data-skin="eclisse"]:not(#z) .pbar{height:6px;background:radial-gradient(circle,rgba(255,255,255,.14) 0 1.6px,transparent 2.2px) 0 50%/9px 6px repeat-x}
 html[data-skin="eclisse"]:not(#z) .pbar i{background:linear-gradient(90deg,rgba(var(--acc-rgb),.55),var(--acc) 75%,var(--corona));
@@ -1163,6 +1162,63 @@ html[data-skin="vetro"]:not(#z) .rest:not(.over) :is(.tv,.tl){color:var(--fg)}
 :root:not(#z):not(#y) .wd2 small{padding:0 4px}
 @media (max-width:360px){:root:not(#z):not(#y) .wd2 small{font-size:11px;padding:0;letter-spacing:-.02em}}
 @media (max-width:340px){:root:not(#z) .wk{padding-inline:4px!important;gap:2px!important}}
+/* ===== STILI VERSO IL 10 (2026-10-08) ===== */
+@property --p{syntax:'<number>';inherits:true;initial-value:0}
+html{transition:--p .5s var(--ease-out)}
+/* Tutti: recupero nel colore dello stile, numeri grandi, un solo colore per gli avvisi */
+:root:not(#z):not(#y){--info:color-mix(in srgb,var(--acc,var(--hot)) 55%,var(--fg))}
+:root:not(#z):not(#y) .rest:not(.over){background:color-mix(in srgb,var(--acc,var(--hot)) 12%,transparent);color:var(--fg)}
+:root:not(#z):not(#y) .rest:not(.over) button{color:var(--acc,var(--hot));border-color:color-mix(in srgb,var(--acc,var(--hot)) 60%,transparent)}
+:root:not(#z):not(#y) .rest .rr{width:76px;height:76px}
+:root:not(#z):not(#y) .rest .rr .tv{font-size:28px}
+:root:not(#z):not(#y) .timer .tr{width:64px;height:64px}
+:root:not(#z):not(#y) .timer .tr .t{font-size:24px}
+:root:not(#z):not(#y) .banner{background:var(--cardbg,var(--card));border:1px solid color-mix(in srgb,var(--info) 35%,var(--line))}
+.gold-end{animation-name:goldframe2}
+@keyframes goldframe2{25%{box-shadow:inset 0 0 0 3px rgba(255,214,140,.85),inset 0 0 60px rgba(255,190,90,.3),inset 0 0 120px rgba(var(--acc-rgb,255,190,90),.28)}100%{box-shadow:inset 0 0 0 2px rgba(255,214,140,0)}}
+/* Vetro: vetro con profondità e timer di vetro */
+html[data-skin="vetro"]:not(#z):not(#y) .hero{background:linear-gradient(180deg,rgba(var(--acc-rgb),.10),rgba(255,255,255,.04) 55%)}
+html[data-skin="vetro"]:not(#z):not(#y) .banner{background:linear-gradient(180deg,rgba(255,255,255,.085),rgba(255,255,255,.04) 70%);-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%)}
+html[data-skin="vetro"]:not(#z):not(#y) div.timer:not(.over){background:rgba(22,18,48,.78);color:var(--fg);border:1px solid rgba(255,255,255,.14);-webkit-backdrop-filter:blur(20px) saturate(140%);backdrop-filter:blur(20px) saturate(140%);box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 10px 30px rgba(0,0,0,.5)}
+html[data-skin="vetro"]:not(#z):not(#y) div.timer:not(.over) .ra{stroke:var(--acc);filter:none}
+html[data-skin="vetro"]:not(#z):not(#y) div.timer:not(.over) button{color:var(--acc);border-color:color-mix(in srgb,var(--acc) 60%,transparent);background:transparent}
+html[data-skin="vetro"]:not(#z):not(#y) div.timer:not(.over) .l{color:var(--fg)}
+/* Eclisse: cifre fisse nel timer, anello visibile, schede più piene, corona e raggi allo stesso passo */
+html[data-skin="eclisse"]:not(#z):not(#y) .timer .tr .t{font:800 24px/1 "Manrope",system-ui,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+html[data-skin="eclisse"]:not(#z):not(#y) .rest .rr .tv{font:800 28px/1 "Manrope",system-ui,sans-serif;font-variant-numeric:tabular-nums}
+html[data-skin="eclisse"]:not(#z):not(#y) .timer:not(.over) .ra{stroke:var(--acc);filter:none}
+html[data-skin="eclisse"]:not(#z):not(#y) :is(.card,.ex,.status,details.h,.banner){background:linear-gradient(180deg,rgba(var(--cor-rgb),.055),rgba(var(--cor-rgb),.02) 60%),rgba(10,10,16,.86);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+@media (prefers-reduced-motion:no-preference){html[data-skin="eclisse"]:not(#z):not(#y) .hero>.lbl::before{animation-duration:48s}}
+/* Carbonio: niente arancio fisso nelle varianti Rosso e Ciano, LED grandi */
+html[data-skin="carbonio"]:not(#z):not(#y) .head::after{background:var(--acc);box-shadow:0 0 12px rgba(var(--acc-rgb),.7)}
+html[data-skin="carbonio"]:not(#z):not(#y) div.timer:not(.over){box-shadow:0 0 0 1px rgba(0,0,0,.6),0 0 24px rgba(var(--acc-rgb),.25),0 10px 30px rgba(0,0,0,.6)}
+html[data-skin="carbonio"]:not(#z):not(#y) .seg7 .on{filter:drop-shadow(0 0 3px rgba(var(--acc-rgb),.9)) drop-shadow(0 0 8px rgba(var(--acc-rgb),.45))}
+html[data-skin="carbonio"]:not(#z):not(#y) .rest .rr .tv{font-size:32px}
+html[data-skin="carbonio"]:not(#z):not(#y) .timer .tr .t{font-size:28px}
+html[data-skin="carbonio"][data-var="1"]{--grad:linear-gradient(180deg,#ff9a90,#ff3b30 60%,#e5261c)}
+/* Campo: il campo si vede, schede squadrate con le righe, terra rossa più leggibile */
+html[data-skin="campo"]:not(#z):not(#y) #court{opacity:.32}
+html[data-skin="campo"]:not(#z):not(#y) #court .ln{stroke-width:1.6}
+html[data-skin="campo"]:not(#z):not(#y) #court .net{stroke-width:2}
+html[data-skin="campo"]:not(#z):not(#y) :is(.card,.ex,.status,details.h,.banner){border:1.5px solid rgba(242,247,255,.22);border-radius:10px}
+html[data-skin="campo"][data-var="1"]:not(#z):not(#y){--card:#5a2414;--line:#a04a2c;--field:#1a0804}
+html[data-skin="campo"][data-var="1"]:not(#z):not(#y) .field{border:1px solid rgba(255,200,170,.18)}
+/* Manga: cifre che stanno nell'anello, spunta disegnata, avviso da fumetto */
+html[data-skin="manga"]:not(#z):not(#y) :is(.timer .tr .t,.rest .rr .tv){font:800 22px/1 "Manrope",system-ui,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+html[data-skin="manga"]:not(#z):not(#y) .rest .rr .tv{font-size:26px}
+html[data-skin="manga"]:not(#z):not(#y) button.tick[aria-pressed="true"]::before{content:"";background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235fd38f' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/24px no-repeat,rgba(26,25,30,.88)}
+html[data-skin="manga"]:not(#z):not(#y) .banner{background:#1a191e;border:2px solid #ece6d6;border-radius:6px;box-shadow:4px 4px 0 rgba(236,230,214,.14)}
+html[data-skin="manga"]:not(#z):not(#y) .hero .big{margin-bottom:14px}
+html[data-skin="manga"]:not(#z):not(#y) .rk-gen>b{font-family:var(--manga);font-weight:400;letter-spacing:0}
+@media (min-width:361px){:root:not(#z):not(#y) .wd2 small{white-space:nowrap;display:block;-webkit-line-clamp:unset;font-size:11px;letter-spacing:-.02em;padding:0;overflow:visible}}
+/* Campo: un mini campo da padel nella scheda di Oggi, con la pallina che entra e rimbalza nel servizio */
+html[data-skin="campo"]:not(#z):not(#y) .hero{position:relative;overflow:hidden}
+html[data-skin="campo"]:not(#z):not(#y) .hero .big{max-width:calc(100% - 104px)}
+html[data-skin="campo"]:not(#z):not(#y) .hero::after{content:"";position:absolute;top:20px;right:18px;width:88px;height:48px;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 88 48' fill='none' stroke='%23f2f7ff' stroke-linecap='round'%3E%3Crect x='2' y='2' width='84' height='44' rx='1.5' stroke-width='1.6' stroke-opacity='.6'/%3E%3Cpath d='M15 2v44M73 2v44M15 24h58' stroke-width='1.2' stroke-opacity='.45'/%3E%3Cpath d='M44 -1v50' stroke-width='2.4' stroke-opacity='.9'/%3E%3C/svg%3E") center/contain no-repeat}
+html[data-skin="campo"]:not(#z):not(#y) .hero::before{content:"";position:absolute;top:31px;right:34px;width:9px;height:9px;border-radius:50%;background:var(--acc,#e4ff3a);box-shadow:0 0 10px rgba(var(--acc-rgb,228,255,58),.7);pointer-events:none;z-index:1}
+@media (prefers-reduced-motion:no-preference){html[data-skin="campo"]:not(#z):not(#y) .hero::before{animation:cpBall .9s cubic-bezier(.3,.7,.4,1) .25s backwards}}
+@keyframes cpBall{0%{translate:-62px 18px;scale:.6;opacity:0}45%{translate:-24px 10px;scale:1;opacity:1}62%{translate:-12px 2px;scale:.85}100%{translate:0 0;scale:1}}
+html[data-skin="campo"]:not(#z):not(#y) :is(.tile,.ctx>*,.tabs button,.wd2,.field,.btn){border-radius:8px}
 </style>
 <!--APP-HEAD-END-->
 </head>
@@ -1526,7 +1582,7 @@ function render(){
   if(tOn)tick();
   wakeSync();
 }
-function go(v){const from=view;view=v;if(v!=="edit"){S.view=v;save()}render();window.scrollTo(0,0);if(from!==v)slideIn((VORD[v]??0)>=(VORD[from]??0)?"in-r":"in-l")}
+function go(v){const from=view;view=v;if(v!=="edit"){S.view=v;save()}render();window.scrollTo(0,0);if(from!==v)slideIn((VORD[v]??0)>=(VORD[from]??0)?"in-r":"in-l");if(from!==v&&S.skin==="campo"){const c=T("court");c.classList.remove("draw");void c.getBoundingClientRect();c.classList.add("draw")}}
 document.querySelectorAll("nav.bar button").forEach(b=>b.onclick=()=>go(b.dataset.v));
 
 /* ================= CONTENUTI: errori comuni, riscaldamento, avvicinamento, fastidio, peso e misure ================= */
