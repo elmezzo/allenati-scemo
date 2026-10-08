@@ -501,7 +501,6 @@ nav.bar .ndot::before{content:"";width:34px;height:3px;border-radius:0 0 3px 3px
 @keyframes goldrim{30%{box-shadow:0 0 0 1.5px rgba(255,214,140,.9),0 0 30px rgba(255,190,90,.45)}}
 /* 5 Vetro vivo: luce che segue il telefono, bordo che gira sull'esercizio attivo, aurora che si scalda con le serie */
 html[data-skin="vetro"]:not([data-skin="notte"]) :is(.card,.ex,.status,details.h){background:radial-gradient(280px 200px at var(--mx) var(--my),rgba(255,255,255,.30),rgba(255,255,255,.08) 45%,transparent 72%),radial-gradient(120% 70% at 0% 0%,rgba(255,255,255,.13),transparent 55%),linear-gradient(160deg,rgba(255,255,255,.09),rgba(255,255,255,.03))}
-@keyframes drift{0%{--mx:8%;--my:6%}50%{--mx:92%;--my:40%}100%{--mx:30%;--my:88%}}
 html[data-skin="vetro"]:not([data-skin="notte"]) :is(.card,.ex:not(.cur),.status,details.h)::before{background:radial-gradient(240px 170px at var(--mx) var(--my),#fff,rgba(255,255,255,.35) 45%,transparent 80%),linear-gradient(140deg,rgba(255,255,255,.35),rgba(255,255,255,.05) 35%,rgba(255,255,255,.02) 60%,rgba(255,120,200,.4));padding:1.6px}
 html[data-skin="vetro"] .ex.cur{outline:none}
 html[data-skin="vetro"]:not([data-skin="notte"]) .ex.cur::before{padding:1.5px;background:conic-gradient(from var(--a),rgba(255,255,255,.1),rgba(255,255,255,.9) 12%,rgba(255,120,200,.8) 22%,rgba(255,255,255,.08) 40%,rgba(255,255,255,.08) 100%)}
@@ -724,14 +723,14 @@ body{overflow-anchor:none}
 .rk-pr{position:relative;overflow:hidden;border-radius:20px;padding:16px 12px 14px;display:flex;flex-direction:column;align-items:center;gap:4px;border:1px solid var(--line);background:radial-gradient(240px 150px at 50% 35%,color-mix(in srgb,var(--pc) 40%,transparent),transparent 70%),var(--field)}
 .rk-pr .f{display:flex;align-items:center;gap:12px;color:var(--dim);font-size:18px}
 .rk-pr .rbd.o{width:40px;height:40px;opacity:.5}
-.rk-pr .rbd.n{width:110px;height:110px;filter:drop-shadow(0 0 20px color-mix(in srgb,var(--pc) 80%,transparent));animation:rkLand .9s cubic-bezier(.2,1.6,.4,1) both}
+.rk-pr .rbd.n{width:110px;height:110px;filter:drop-shadow(0 0 20px color-mix(in srgb,var(--pc) 80%,transparent));animation:rkLand .45s cubic-bezier(.34,1.3,.64,1) both}
 .rk-pr>b{font:400 32px/1 var(--display);letter-spacing:.06em}
 .rk-pr>small{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.12em;text-transform:uppercase}
 .rk-pr .more{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 12px;margin-top:6px;font-size:12px;font-weight:700;color:var(--muted)}
 .rk-pr .more span{display:flex;align-items:center;gap:4px}
 .rk-pr .more svg{width:22px;height:22px}
 .rk-pr::after{content:"";position:absolute;inset:-40% auto -40% -60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.3),transparent);transform:skewX(-18deg);animation:rkBlade 2.8s ease-in-out .6s infinite}
-@keyframes rkLand{0%{transform:scale(.3) rotate(-12deg);opacity:0}100%{transform:none;opacity:1}}
+@keyframes rkLand{0%{transform:scale(.85);opacity:0}100%{transform:none;opacity:1}}
 @keyframes rkBlade{0%{transform:translateX(0) skewX(-18deg)}55%,100%{transform:translateX(475%) skewX(-18deg)}}
 @media (prefers-reduced-motion:reduce){.rk-pr .rbd.n,.rk-pr::after{animation:none}}
 html[data-skin="manga"] .rbd .hx{stroke:#ece6d6;stroke-width:3}
@@ -1122,6 +1121,33 @@ html{scroll-padding-bottom:120px}
 html[data-skin="carbonio"]:not(#z):not(#y) .set .i{opacity:1}
 html[data-skin="carbonio"]:not(#z):not(#y) .tabs button small{opacity:1}
 html[data-skin="carbonio"]:not(#z):not(#y) .exhead .swap{border:1px solid #4d5560;color:#c3cad3}
+/* ===== GIRO 1 VERSO IL 10 (2026-10-08) ===== */
+.sheet-wrap.enter{animation:shBg .2s ease-out}
+.sheet-wrap.enter .sheet{animation:shUp .32s cubic-bezier(.32,.72,0,1)}
+.sheet-wrap.out{animation:shBg .2s ease-in reverse forwards;pointer-events:none}
+.sheet-wrap.out .sheet{transform:translateY(100%);transition:transform .2s cubic-bezier(.4,0,1,1)}
+.sheet{transition:transform .28s cubic-bezier(.32,.72,0,1);max-height:85dvh;touch-action:pan-y}
+.sheet .grab{position:relative;cursor:grab;touch-action:none}
+.sheet .grab::after{content:"";position:absolute;inset:-14px -80px}
+@keyframes shBg{from{background:rgba(0,0,0,0)}}
+@keyframes shUp{from{transform:translateY(100%)}}
+@media (max-width:400px){:root:not(#z) .set .pm{width:28px}:root:not(#z) .set .field input{min-width:3ch}}
+.spec span{white-space:nowrap}
+details.wu .wut{min-width:0}
+html[data-skin="manga"]:not(#z):not(#y) details.wu .wut h3{font-size:clamp(15px,4.8vw,20px)}
+html[data-skin="manga"][data-var="1"]:not(#z):not(#y) .hero .lbl{color:#5a96ff}
+:root:not(#z) .thead{background:color-mix(in srgb,var(--bg) 92%,transparent);-webkit-backdrop-filter:blur(24px) saturate(140%);backdrop-filter:blur(24px) saturate(140%)}
+:root:not(#z) .pgr{color:var(--muted)}
+:root:not(#z) .tabs button small{opacity:.9}
+html[data-skin="campo"]:not(#z) #court{opacity:.14}
+.edx .eds{flex:1;min-width:0;font-size:14px;font-weight:700;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.edd summary{cursor:pointer;font-size:14px;font-weight:700;color:var(--info);min-height:44px;display:flex;align-items:center}
+.edd[open] summary{margin-bottom:6px}
+.edd>.g3,.edd>.checks{margin-top:8px}
+@media (prefers-reduced-motion:reduce){
+  .tick.pop::before,.tick.pop::after,.ex.cur.sw-n,.ex.cur.sw-p,.rk-pr .rbd.n{animation:none!important}
+  .sheet{transition:none}
+}
 </style>
 <!--APP-HEAD-END-->
 </head>
@@ -1184,7 +1210,7 @@ const BUILTIN={
   {id:"a8",n:"Extrarotazione al cavo",s:2,lo:15,hi:15,rir:"2",rest:45,t:"prev",step:5,side:true,note:"Gomito a 90°, braccio lungo il fianco.",eq:"mac"},
   {id:"b9",n:"Estensione del polso",s:2,lo:15,hi:15,rir:"1-2",rest:45,t:"prev",step:1,note:"Discesa lenta. Prevenzione gomito.",eq:"db"}]},
  B:{name:"Upper B",title:"Upper B",sub:"Spalle, dorso e braccia",ex:[
-  {id:"b10",mu:"Deltoidi",n:"Landmine press",s:4,lo:8,hi:10,rir:"1-2",rest:120,t:"comp",step:2.5,oh:true,side:true,note:"Per braccio. Kg = dischi sul bilanciere. Gomito avanti a circa 45°, spingi in alto e in avanti.",eq:"bar"},
+  {id:"b10",mu:"Deltoidi",n:"Landmine press",s:4,lo:8,hi:10,rir:"1-2",rest:120,t:"comp",step:2.5,oh:true,side:true,note:"Per braccio. Kg = dischi sul bilanciere.",eq:"bar"},
   {id:"b2",mu:"Dorso",n:"Lat machine presa neutra",s:3,lo:8,hi:12,rir:"1-2",rest:120,t:"comp",step:5,eq:"mac",strap:true},
   {id:"b3",mu:"Petto",n:"Croci ai cavi dal basso",s:3,lo:10,hi:15,rir:"0-1",rest:75,t:"iso",step:5,eq:"mac"},
   {id:"b4",mu:"Dorso",n:"Pulley basso",s:3,lo:10,hi:12,rir:"1-2",rest:90,t:"comp",step:5,eq:"mac",strap:true},
@@ -1241,7 +1267,7 @@ const ALTS={
  c6:[["french","French press al cavo",{step:5,eq:"mac"}],["kickback","Kickback al cavo",{side:true,step:5,eq:"mac"}],["kickman","Kickback con manubri",{step:1,note:"Kg = un manubrio.",eq:"db"}]],
  c7:[["elastico","Pallof press con elastico",{}],["deadbug","Dead bug con cavo",{step:5,eq:"mac"}]]
 };
-const EQS=[["mac","Macchina o cavo",5],["cavl","Cavo delle alzate",2.5],["bar","Bilanciere o Smith",2.5],["db","Manubri",2],["zav","Zavorra (kettlebell)",2],["altro","Altro",null]];
+const EQS=[["mac","Macchina o cavo",5],["cavl","Cavo delle alzate",2.5],["bar","Bilanciere o Smith",2.5],["db","Manubri",2],["zav","Zavorra (dischi o kettlebell)",2],["altro","Altro",null]];
 const eqOf=e=>e.eq||(e.t==="bw"?"zav":e.step===5?"mac":e.step===2.5?"bar":e.step===2?"db":"altro");
 const TYPES=[["comp","Multiarticolare"],["iso","Isolamento"],["bw","Corpo libero + zavorra"],["prev","Prevenzione (reps fisse)"],["perf","Salti / pliometria"],["nordic","Eccentrico assistito"],["time","Tenuta in secondi"]];
 let PLAN={},GYM_ORDER=[],ALL_EX=[],EX={};
@@ -1405,8 +1431,10 @@ function target(ex){
     const nk=(kg||0)+inc;
     return {kg:nk,reps:Array(ex.s).fill(ex.lo),top,kind:"up",badge:`+${fk(inc)} kg`,msg:easy?`Range chiuso ed era facile: doppio aumento, ${fk(nk)} kg, riparti da ${ex.lo} ripetizioni.`:big?`Arrivato a ${top} ripetizioni: passa a ${fk(nk)} kg e riparti da ${ex.lo}.`:`Tutte le serie al limite alto: ${fk(nk)} kg e riparti da ${ex.lo} ripetizioni.`};
   }
-  if(missTwice&&kg){
+  const sm=a=>a.reduce((t,r)=>t+r,0);
+  if(missTwice&&kg&&!(prev&&sm(reps)>sm(prev))){
     let nk=Math.max(st,roundStep(kg*0.9,st));if(nk>=kg&&kg-st>0)nk=kg-st;
+    if((kg-nk)/kg>0.15)return {kg,reps:pad(reps.map(r=>Math.min(top,r+1)),ex.s,ex.lo),top,kind:"flat",badge:"=",msg:"Stesso carico: il gradino per scendere è troppo grosso. Punta a una ripetizione in più per serie."};
     return {kg:nk,reps:Array(ex.s).fill(ex.lo),top,kind:"down",badge:nk<kg?`-${fk(kg-nk)} kg`:"=",msg:`Due sedute sotto le ${ex.lo} ripetizioni: scendi a ${fk(nk)} kg e ricostruisci.`};
   }
   if(!allIn)return {kg,reps:Array(ex.s).fill(ex.lo),top,kind:"flat",badge:"=",msg:`Stesso carico, obiettivo ${ex.lo} ripetizioni su tutte le serie.`};
@@ -1428,11 +1456,12 @@ function phaseBands(x0,x1){const P=(S.phases||[]).slice().sort((a,b)=>a.d.locale
   P.forEach((p,i)=>{if(!PH[p.ph].col)return;const a=new Date(p.d+"T00:00:00"),b=P[i+1]?new Date(P[i+1].d+"T00:00:00"):new Date(8.6e15);const s0=Math.max(+a,+x0),s1=Math.min(+b,+x1);if(s1>s0)out.push({a:s0,b:s1,ph:p.ph})});return out}
 // Fermo (revisione del ciclo): in massa l'ultima seduta non supera quella di 3 sedute prima; in definizione il massimale cala oltre il 5% in 2 sedute
 function stallBy(ph,v){if(v.length<4)return false;if(ph==="def"){const ref=Math.max(v[2],v[3]);return v[0]<ref*.95&&v[1]<ref*.95}return v[0]<=v[3]}
-function stalled(ex){if(ex.t==="perf")return false;const h=history(ex.id).filter(x=>!x.deload);if(h.length<4)return false;const ph=phaseAt();
+function stalled(ex){if(["perf","time","nordic"].includes(ex.t))return false;const h=history(ex.id).filter(x=>!x.deload);if(h.length<4)return false;const ph=phaseAt();
   if(ph==="def"){const m=s=>Math.max(0,...s.sets[ex.id].map(x=>metricOf(ex,x)));return stallBy(ph,h.slice(0,4).map(m))}
-  // Massa e mantenimento: fermo solo se in 3 sedute non sono saliti né i kg massimi né le ripetizioni totali (salire di carico perdendo ripetizioni non è uno stallo)
-  const kg=s=>Math.max(0,...s.sets[ex.id].map(x=>num(x.kg)||0)),rp=s=>s.sets[ex.id].reduce((t,x)=>t+(num(x.reps)||0),0);
-  return !(kg(h[0])>kg(h[3]))&&!(rp(h[0])>rp(h[3]))}
+  // Massa e mantenimento: fermo solo se in 3 sedute non sono saliti né i kg massimi né il massimale stimato della serie migliore
+  // (salire di carico perdendo qualche ripetizione non è uno stallo; il numero di serie non conta)
+  const kg=s=>Math.max(0,...s.sets[ex.id].map(x=>num(x.kg)||0)),bm=s=>Math.max(0,...s.sets[ex.id].map(x=>metricOf(ex,x)));
+  return !(kg(h[0])>kg(h[3]))&&!(bm(h[0])>bm(h[3])+1e-9)}
 const deloadOn=(d=today())=>!!S.deload&&iso(d)>=S.deload.from&&iso(d)<=S.deload.to;
 function deloadAdvice(){
   if(S.deload||!S.sessions.length)return null;if(S.deloadSnooze&&iso(today())<S.deloadSnooze)return null;
@@ -1519,7 +1548,76 @@ const ERRS={
  "dip alle parallele":["Scendere troppo: fermati con le spalle all'altezza dei gomiti, prima che la spalla tiri davanti.","Spalle che salgono verso le orecchie: spingi le parallele verso il basso e tieni il petto alto."],
  "pressa 45°":["Bacino che si stacca dallo schienale in basso: scendi solo finché resta appoggiato.","Ginocchia bloccate in alto o che cadono verso l'interno: lasciale appena piegate e in linea con i piedi."],
  "hack squat":["Talloni che si staccano: sposta i piedi un po' più avanti sulla pedana.","Ginocchia che cadono verso l'interno: spingile in fuori, in linea con i piedi."],
- "good morning":["Schiena che si arrotonda: scendi solo finché resta piatta.","Ginocchia che si piegano troppo e diventa uno squat: restano appena piegate, si muove il bacino."]
+ "good morning":["Schiena che si arrotonda: scendi solo finché resta piatta.","Ginocchia che si piegano troppo e diventa uno squat: restano appena piegate, si muove il bacino."],
+ "chest press ai cavi in piedi":["Busto che si piega in avanti: piede avanti saldo, busto fermo, spingono solo le braccia.", "Gomiti che scappano dietro la schiena in ritorno: fermati con le mani all'altezza del petto."],
+ "piegamenti zavorrati":["Bacino che cade o sale: stringi glutei e addome, corpo dritto da testa a talloni.", "Gomiti larghi a 90°: tienili a circa 45° dal busto."],
+ "chest press altra macchina (hammer)":["Sedile troppo basso o alto: regolalo con le maniglie all'altezza del petto.", "Scapole che si staccano dallo schienale a fine spinta: restano indietro, spingono solo le braccia."],
+ "panca piana con manubri":["Scendere troppo in basso: fermati prima che la spalla tiri davanti.", "Gomiti larghi a 90°: tienili a 45° dal busto, scapole strette."],
+ "lat machine a un braccio":["Ruotare il busto per tirare: resta frontale, si muove solo il braccio.", "Risalita di colpo: risali lento lasciando allungare il fianco."],
+ "pulldown presa stretta":["Busto che va indietro per tirare: inclinati appena e resta fermo.", "Gomiti che si aprono: restano vicini al busto e scendono verso i fianchi."],
+ "panca inclinata con manubri":["Scendere troppo in basso: fermati prima che la spalla tiri davanti.", "Gomiti larghi a 90°: tienili a 45° dal busto, scapole strette."],
+ "rematore t-bar con appoggio":["Petto che si stacca dal cuscino: resta appoggiato per tutta la serie.", "Gomiti larghi verso l'esterno: tienili vicini ai fianchi."],
+ "rematore manubrio su panca":["Busto che ruota per alzare il peso: spalle e anche restano parallele al pavimento.", "Tirare verso il petto: porta il gomito verso l'anca."],
+ "rematore manubri petto su panca inclinata":["Petto che si stacca dalla panca: resta appoggiato per tutta la serie.", "Spalle che salgono verso le orecchie: tienile basse e tira coi gomiti."],
+ "alzate laterali alla macchina":["Spalle che salgono verso le orecchie: tienile basse, spingi coi gomiti.", "Salire oltre la spalla: fermati quando i gomiti sono all'altezza delle spalle."],
+ "curl al cavo basso":["Gomiti che vanno avanti: restano fermi ai fianchi.", "Busto che dondola: stai dritto, si muovono solo gli avambracci."],
+ "curl bilanciere ez":["Slancio con la schiena: busto fermo, glutei stretti.", "Gomiti che vanno avanti in cima: restano ai fianchi."],
+ "curl manubri in piedi":["Slancio col busto: stai fermo, se dondoli il peso è troppo.", "Discesa a metà: scendi in 2-3 s fino a braccia tese."],
+ "curl a martello":["Polsi che ruotano: palmi sempre uno verso l'altro.", "Gomiti che vanno avanti o busto che dondola: gomiti fermi ai fianchi, busto dritto."],
+ "french press ez su panca":["Gomiti che si aprono: restano stretti e puntati in alto.", "Braccia che si muovono dalla spalla: si piega solo il gomito."],
+ "estensioni manubrio sopra la testa":["Gomiti che si aprono: restano stretti, vicini alla testa.", "Schiena inarcata: addome stretto, schiena contro lo schienale."],
+ "skull crusher con manubri":["Gomiti che si aprono: restano stretti e puntati in alto.", "Braccia che si muovono dalla spalla: si piega solo il gomito."],
+ "extrarotazione con elastico":["Gomito che si stacca dal fianco: tieni l'asciugamano stretto tra gomito e busto.", "Ruotare col busto: busto fermo, si muove solo l'avambraccio."],
+ "extrarotazione da sdraiato con manubrio":["Gomito che si stacca dal fianco: resta attaccato per tutto il movimento.", "Peso troppo alto e movimento a scatti: carico leggero, sali e scendi lento."],
+ "salti laterali sopra un ostacolo":["Ginocchia che cadono verso l'interno all'atterraggio: tienile in linea con i piedi.", "Atterraggio rigido sui talloni: atterra morbido sugli avampiedi, ginocchia piegate."],
+ "lateral bound con arrivo bloccato":["Ginocchio che cade verso l'interno all'arrivo: tienilo sopra il piede.", "Arrivo che non si ferma: blocca 2 s in equilibrio prima di ripartire."],
+ "squat jump":["Atterraggio rigido a gambe tese: atterra morbido piegando anche e ginocchia.", "Ripetizioni di rimbalzo: fermati in equilibrio prima del salto successivo."],
+ "salto in lungo da fermo":["Ginocchia che cadono verso l'interno all'atterraggio: tienile in linea con i piedi.", "Atterraggio sbilanciato in avanti: atterra a ginocchia piegate e resta fermo prima di rialzarti."],
+ "squat al smith":["Piedi sotto il bilanciere: mettili poco avanti, così le ginocchia restano in linea.", "Ginocchia che cadono verso l'interno: spingile in linea con le punte dei piedi."],
+ "goblet squat":["Busto che cade in avanti: manubrio stretto al petto, petto alto.", "Talloni che si staccano: spingi da tutto il piede, peso sui talloni."],
+ "stacco rumeno con manubri":["Schiena che si incurva: scendi solo finché resta dritta.", "Piegare le ginocchia come uno squat: restano appena piegate, va indietro il bacino."],
+ "pull-through al cavo":["Tirare con le braccia: restano tese, il lavoro lo fa il bacino.", "Schiena inarcata in cima: chiudi stringendo i glutei, senza piegarti indietro."],
+ "affondi camminati":["Passo troppo corto: allunga il passo, il ginocchio davanti resta sopra il piede.", "Ginocchio davanti che cade verso l'interno: tienilo in linea con il piede."],
+ "step-up su panca":["Spinta col piede a terra: sali solo con la gamba sopra la panca.", "Ginocchio che cade verso l'interno: tienilo in linea con il piede."],
+ "split squat al smith":["Piedi troppo vicini: allarga il passo così scendi in verticale.", "Spingere col piede dietro: il lavoro lo fa la gamba davanti."],
+ "affondi indietro con manubri":["Passo troppo corto: fai un passo lungo, il ginocchio davanti resta sopra il piede.", "Busto che cade in avanti: stai dritto, spalle sopra il bacino."],
+ "leg curl seduto, discesa in 4 s":["Discesa veloce: conta 4 s fino a gambe quasi tese.", "Bacino che si alza dal sedile: blocca bene il cuscino sopra le cosce."],
+ "glute-ham raise":["Piegarsi alle anche in discesa: corpo dritto dalle ginocchia alla testa.", "Discesa a caduta libera: controlla coi femorali, scendi solo dove reggi."],
+ "adduttori alla macchina":["Apertura troppo ampia all'inizio: parti da dove senti allungare, senza strappi.", "Chiusura di colpo: chiudi controllato e riapri lento."],
+ "copenhagen a leva corta (ginocchio)":["Bacino che cede o ruota: corpo dritto da testa a ginocchio, anche una sopra l'altra.", "Spalla schiacciata: gomito sotto la spalla, spingi via il pavimento."],
+ "calf alla pressa":["Ginocchia che si piegano: restano quasi tese e ferme.", "Mezza ripetizione: scendi sotto il bordo e sali fino in punta, con pausa in cima."],
+ "calf al smith":["Rimbalzo in basso: fermati 1 s con i talloni sotto il rialzo.", "Piegare le ginocchia per spingere: restano tese, lavora solo la caviglia."],
+ "calf a una gamba con manubrio":["Rimbalzo in basso: fermati 1 s con il tallone sotto il gradino.", "Aiutarsi con la mano d'appoggio: serve solo per l'equilibrio, non per tirarti su."],
+ "lancio rotazionale palla medica":["Lanciare con le braccia: la forza parte da anche e piedi che ruotano.", "Schiena che ruota da sola: anche e busto girano insieme."],
+ "woodchop con elastico":["Ruotare solo la schiena: anche e busto ruotano insieme, il piede dietro gira.", "Piegare le braccia per tirare: restano quasi tese, tira col busto."],
+ "woodchop con manubrio":["Ruotare solo la schiena: anche e busto ruotano insieme.", "Schiena che si incurva in basso: piega le ginocchia e tieni la schiena dritta."],
+ "shoulder press alla macchina":["Schiena inarcata: addome stretto, schiena incollata allo schienale.", "Spalle che salgono verso le orecchie in cima: tienile basse, si estendono solo le braccia."],
+ "lento al smith":["Schiena inarcata: addome stretto, schiena contro lo schienale.", "Scendere sotto il mento: fermati al mento, prima che la spalla tiri davanti."],
+ "arnold press":["Schiena inarcata: addome stretto, schiena contro lo schienale.", "Rotazione forzata in basso: ruota solo finché la spalla non tira davanti."],
+ "pulldown a un braccio al cavo":["Ruotare il busto per tirare: resta frontale, si muove solo il braccio.", "Tirare con la mano: pensa a portare il gomito al fianco."],
+ "pullover con manubrio":["Andare troppo dietro la testa: fermati prima che la spalla tiri davanti.", "Gomiti che si piegano e si aprono: tienili appena piegati e fissi."],
+ "rematore alla macchina":["Petto che si stacca dal cuscino: resta appoggiato per tutta la serie.", "Tirare con le braccia: porta i gomiti indietro e stringi le scapole."],
+ "rematore t-bar":["Busto che si alza per tirare: resta a 45° per tutta la serie.", "Schiena che si incurva: petto in fuori, schiena dritta; se cede, togli peso."],
+ "reverse fly alla macchina":["Spalle che salgono verso le orecchie: tienile basse.", "Piegare i gomiti per tirare: restano appena piegati e fissi."],
+ "face pull con elastico":["Tirare verso il collo coi gomiti bassi: gomiti alti, mani alla fronte.", "Busto che va indietro: stai fermo, si muovono solo le braccia."],
+ "reverse fly con manubri a busto flesso":["Busto che si alza per dare slancio: resta quasi orizzontale e fermo.", "Schiena che si incurva: petto in fuori, schiena dritta."],
+ "curl alla macchina":["Ascelle che si staccano dal cuscino: braccio appoggiato per tutta la serie.", "Discesa veloce: scendi in 2-3 s fino a braccia quasi tese."],
+ "curl al cavo":["Gomiti che vanno avanti: restano fermi ai fianchi.", "Slancio col busto: stai dritto, si muovono solo gli avambracci."],
+ "curl scott con manubrio":["Braccio che si stacca dal cuscino in salita: resta appoggiato.", "Discesa a caduta a braccio teso: scendi lento, il gomito è vulnerabile in fondo."],
+ "estensioni al cavo sopra la testa":["Gomiti che si aprono o si abbassano: restano stretti e fermi in alto.", "Schiena inarcata: addome stretto, piede avanti saldo."],
+ "kickback con manubri":["Gomiti che scendono: restano alti e attaccati ai fianchi.", "Slancio con la spalla: si muove solo l'avambraccio."],
+ "estensione del polso con elastico":["Avambraccio che si alza dalla coscia: resta appoggiato.", "Discesa veloce: scendi lento, è la parte che conta."],
+ "flexbar (tyler twist)":["Ritorno veloce: lascia tornare la torsione in 4 s.", "Torcere col braccio della racchetta: torce l'altra mano, la racchetta lavora solo nel ritorno."],
+ "croci ai cavi":["Piegare i gomiti come una spinta: tienili appena piegati e fissi.", "Aprire troppo in ritorno: fermati prima che la spalla tiri davanti."],
+ "chest press leggera alla macchina":["Spalle che salgono verso le orecchie: tienile basse, petto alto.", "Gomiti che tornano oltre il busto: fermati con le mani vicino al petto."],
+ "croci con manubri su panca piana":["Aprire troppo: fermati prima che la spalla tiri davanti.", "Piegare i gomiti come una spinta: tienili appena piegati e fissi."],
+ "croci su panca inclinata con manubri":["Aprire troppo: fermati prima che la spalla tiri davanti.", "Piegare i gomiti come una spinta: tienili appena piegati e fissi."],
+ "pullover alla macchina":["Ritorno troppo indietro: fermati prima che la spalla tiri davanti.", "Schiena che si stacca dallo schienale: resta appoggiato, spingono i gomiti."],
+ "reverse fly ai cavi":["Spalle che salgono verso le orecchie: tienile basse.", "Piegare i gomiti per tirare: restano appena piegati e fissi."],
+ "reverse fly con manubri":["Petto che si stacca dalla panca: resta appoggiato.", "Slancio e peso troppo alto: carico leggero, sali controllato fino alle spalle."],
+ "kickback al cavo":["Gomito che scende: resta alto e attaccato al fianco.", "Slancio con la spalla: si muove solo l'avambraccio."],
+ "pallof press con elastico":["Busto che ruota verso l'ancoraggio: addome stretto, resta frontale.", "Bacino che si sposta: piedi saldi, glutei stretti."],
+ "dead bug con cavo":["Zona lombare che si stacca: scendi con la gamba solo finché resta a terra.", "Braccia che si muovono: restano tese e ferme sopra il petto."]
 };
 // Muscolo preciso nel "?" e, sulla prevenzione, a cosa serve nel padel
 const MUSC={
@@ -1527,7 +1625,7 @@ const MUSC={
  "calf in piedi":"Polpacci","copenhagen plank":"Adduttori (interno coscia) e core","extrarotazione al cavo":"Cuffia dei rotatori (infraspinato e piccolo rotondo)",
  "estensione del polso":"Estensori del polso (avambraccio)","estensione del polso con elastico":"Estensori del polso (avambraccio)","flexbar (tyler twist)":"Estensori del polso e tendini del gomito",
  "skater jump, arrivo bloccato":"Glutei e quadricipiti, in modo esplosivo","box jump":"Quadricipiti, glutei e polpacci, in modo esplosivo",
- "woodchop al cavo":"Obliqui e core","pallof press":"Addome e obliqui (anti-rotazione)","face pull":"Spalla posteriore e muscoli tra le scapole"};
+ "woodchop al cavo":"Obliqui e core","landmine press":"Spalla anteriore e petto alto","pallof press":"Addome e obliqui (anti-rotazione)","face pull":"Spalla posteriore e muscoli tra le scapole"};
 const PWHY={
  "extrarotazione al cavo":"Nel padel protegge la spalla nei colpi sopra la testa.","estensione del polso":"Nel padel protegge il gomito del braccio della racchetta.",
  "estensione del polso con elastico":"Nel padel protegge il gomito del braccio della racchetta.","flexbar (tyler twist)":"Nel padel protegge il gomito del braccio della racchetta.",
@@ -1647,7 +1745,7 @@ function tickFx(g,exId,j,rec,wow){
   if(b&&!RM())popEl(b,"pop");
 }
 // Fine esercizio (ultima serie completa): lama di luce dorata su tutto lo schermo, senza scritte
-function goldEnd(){try{navigator.vibrate&&navigator.vibrate([50,40,50,40,120])}catch(e){}if(RM())return;const slot=document.getElementById("celeSlot");
+function goldEnd(){buzz([50,40,50,40,120]);if(RM())return;const slot=document.getElementById("celeSlot");
   slot.innerHTML=`<div class="gold-end" aria-hidden="true"><i></i></div>`;clearTimeout(celebrate.t);celebrate.t=setTimeout(()=>{slot.innerHTML=""},1500)}
 // Passaggi tra le sezioni
 const VORD={oggi:0,train:1,prog:2,set:3,imp:4,edit:5};
@@ -1777,14 +1875,22 @@ function imgSheet(ex){const how=howOf(ex),k=(ex.n||"").toLowerCase().trim();cons
   openSheet({html:()=>`<h2>${esc(ex.n)}</h2>${mu?`<p class="note"><b>Muscolo:</b> ${esc(mu)}</p>`:""}${PWHY[k]?`<p class="note">${esc(PWHY[k])}</p>`:""}${how?`<div class="how"><p><b>Posizione</b>${esc(how[0])}</p><p><b>Movimento</b>${esc(how[1])}</p></div>`:""}${errOf(ex)?`<div class="errs"><b>Errori da evitare</b><ul>${errOf(ex).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}${ex.note?`<p class="note">${esc(ex.note)}</p>`:""}`,bind:()=>{}})}
 const EN_LBL={low:"Stanco",ok:"Normale",high:"In forma"};
 let sheetN=0;
+// Entrata dal basso con curva tipo iOS, uscita più rapida; la maniglia si trascina giù per chiudere
+function sheetFx(wrap,close){if(!RM()){wrap.classList.add("enter");setTimeout(()=>wrap.classList.remove("enter"),340)}
+  let y0=null,dy=0,t0=0;const sh=()=>wrap.querySelector(".sheet");
+  wrap.addEventListener("pointerdown",e=>{if(!e.target.closest(".grab,.sheet h2"))return;y0=e.clientY;dy=0;t0=Date.now();sh().style.transition="none"});
+  wrap.addEventListener("pointermove",e=>{if(y0==null)return;dy=Math.max(0,e.clientY-y0);sh().style.transform=`translateY(${dy}px)`});
+  const end=()=>{if(y0==null)return;y0=null;const s=sh();s.style.transition="";const v=dy/Math.max(1,Date.now()-t0);if(dy>90||v>.6){close()}else{s.style.transform=""}};
+  wrap.addEventListener("pointerup",end);wrap.addEventListener("pointercancel",end)}
+function sheetOut(wrap){if(RM()||!wrap.isConnected){wrap.remove();return}const s=wrap.querySelector(".sheet");if(s){s.style.transition="";s.style.transform=""}wrap.classList.add("out");setTimeout(()=>wrap.remove(),200)}
 // Esc chiude anche i fogli costruiti a mano (Sostituisci)
-document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;const w=[...document.querySelectorAll(".sheet-wrap")].pop();if(w&&!w.dataset.esc)w.remove()});
+document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;const w=[...document.querySelectorAll(".sheet-wrap:not(.out)")].pop();if(w&&!w.dataset.esc)sheetOut(w)});
 function openSheet(build){
   const wrap=document.createElement("div");wrap.className="sheet-wrap";wrap.dataset.esc=1;const back=document.activeElement,id="sh"+(++sheetN);
   const esc_=e=>{if(e.key==="Escape"&&document.body.lastElementChild===wrap)close()};
-  const close=()=>{wrap.remove();document.removeEventListener("keydown",esc_);try{back&&back.isConnected&&back.focus({preventScroll:true})}catch(e){}};
+  const close=()=>{document.removeEventListener("keydown",esc_);sheetOut(wrap);try{back&&back.isConnected&&back.focus({preventScroll:true})}catch(e){}};
   const draw=()=>{wrap.innerHTML=`<div class="sheet" role="dialog" aria-modal="true" tabindex="-1"><div class="grab"></div>${build.html()}<button class="btn ghost" data-close>Chiudi</button></div>`;const h=wrap.querySelector(".sheet h2");if(h){h.id=id;wrap.firstElementChild.setAttribute("aria-labelledby",id)}wrap.querySelector("[data-close]").onclick=close;build.bind(wrap,draw,close)};
-  wrap.onclick=e=>{if(e.target===wrap)close()};document.body.appendChild(wrap);draw();document.addEventListener("keydown",esc_);
+  wrap.onclick=e=>{if(e.target===wrap)close()};document.body.appendChild(wrap);draw();sheetFx(wrap,close);document.addEventListener("keydown",esc_);
   try{wrap.firstElementChild.focus({preventScroll:true})}catch(e){}
   return close;
 }
@@ -1887,7 +1993,7 @@ function renderTrain(){
     if(dc>=n){
       html=`<button class="xrow done" data-open="${ex.id}"><span class="ck">✓</span><span class="nmw"><span class="nm">${esc(ex.n)}</span>${qmark(ex)}</span><em>${dc}/${n}</em></button>`;doneH.push(html);
       const ef=(dr.eff||{})[ex.id],skip=(dr.effSkip||{})[ex.id];
-      if(!ef&&!skip&&!noEff(ex)&&!mods.has("deload")&&dr.lastDone===ex.id)askH.push(`<div class="ask"><div class="t"><span>Com'era l'ultima serie?</span><button data-effskip="${ex.id}" aria-label="Salta la domanda">✕</button></div><div class="seg">${[["easy","Facile (3+)"],["ok","Giusta"],["hard","Al limite"]].map(([v,l])=>`<button data-ex="${ex.id}" data-eff="${v}">${l}</button>`).join("")}</div></div>`);
+      if(!ef&&!skip&&!noEff(ex)&&!mods.has("deload")&&dr.lastDone===ex.id)askH.push(`<div class="ask"><div class="t"><span>${esc(ex.n)}: com'era l'ultima serie?</span><button data-effskip="${ex.id}" aria-label="Salta la domanda">✕</button></div><div class="seg">${[["easy","Facile (3+)"],["ok","Giusta"],["hard","Al limite"]].map(([v,l])=>`<button data-ex="${ex.id}" data-eff="${v}">${l}</button>`).join("")}</div></div>`);
       return;
     }
     const tg=tgFor(ex,mods),rng=(ex.lo===ex.hi?ex.lo:ex.lo+"-"+ex.hi)+(ex.t==="time"?" s":"");
@@ -1977,9 +2083,9 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   const hasKg=!["perf","nordic","time"].includes(ex.t);
   const lastTxt=last?`Ultima volta (${fmtShort(last.date)}): <b>${last.sets[ex.id].filter(x=>num(x.reps)!=null).map(x=>(num(x.kg)?fk(num(x.kg))+"×":"")+x.reps).join(" · ")}</b>`:"Mai fatto finora.";
   const rng=(ex.lo===ex.hi?ex.lo:ex.lo+"-"+ex.hi)+(ex.t==="time"?" s":"")+(ex.side?" per lato":"");
-  const r0=tg.reps[0]??ex.lo;
+  const r0=tg.reps[0]??ex.lo,rMin=Math.min(...tg.reps.slice(0,setsFor(ex,mods)).map(Number).filter(v=>!isNaN(v)),r0),rMax=Math.max(...tg.reps.slice(0,setsFor(ex,mods)).map(Number).filter(v=>!isNaN(v)),r0),rT=rMin===rMax?String(r0):rMin+"-"+rMax;
   const lk=hasKg&&tg.kind==="up"&&tg.kg>0&&last?Math.max(0,...last.sets[ex.id].map(x=>num(x.kg)||0)):0,cu=lk>0&&lk<tg.kg&&ex.t!=="time"&&ex.t!=="perf";
-  const big=ex.t==="perf"?`${n} × ${ex.lo}${ex.side?" per lato":""}`:ex.t==="time"?`${r0} s`:hasKg&&tg.kg>0?`${fk(tg.kg)} kg × ${r0}`:hasKg&&tg.kg==null?`${n} × ${ex.lo===ex.hi?ex.lo:ex.lo+"-"+ex.hi}`:`${r0} rip`;
+  const big=ex.t==="perf"?`${n} × ${ex.lo}${ex.side?" per lato":""}`:ex.t==="time"?`${r0} s`:hasKg&&tg.kg>0?`${fk(tg.kg)} kg × ${rT}`:hasKg&&tg.kg==null?`${n} × ${ex.lo===ex.hi?ex.lo:ex.lo+"-"+ex.hi}`:`${rT} rip`;
   let sets="",nowSet=false;
   for(let j=0;j<Math.max(n,rows.filter(r=>r.done).length);j++){
     const r=rows[j]||{};
@@ -2101,14 +2207,15 @@ function openSwap(g,baseId){
   const cur=(S.swaps[g+"|"+baseId]&&effEx(g,base).id!==base.id)?S.swaps[g+"|"+baseId].k:null;
   const opts=[{k:"",n:base.n,sub:"Originale della scheda"},...altsOf(base).map(a=>({k:a.k,n:a.n,sub:a.custom?"Aggiunto da te":(a.o.note||TYPES.find(t=>t[0]===(a.o.t||base.t))?.[1]||"")}))];
   const wrap=document.createElement("div");wrap.className="sheet-wrap";
-  wrap.innerHTML=`<div class="sheet" role="dialog" aria-modal="true" aria-label="Sostituisci esercizio"><div class="grab"></div>
-    <h2>Sostituisci</h2><p class="note" style="margin:0">Macchina occupata? Scegli una variante che lavora gli stessi muscoli. Serie e recupero restano quelli della scheda. Ogni variante ha carichi e progressi suoi.</p>
+  wrap.innerHTML=`<div class="sheet" role="dialog" aria-modal="true" aria-label="Cambia esercizio"><div class="grab"></div>
+    <h2>Cambia esercizio</h2><p class="note" style="margin:0">Macchina occupata? Scegli una variante che lavora gli stessi muscoli. Serie e recupero restano quelli della scheda. Ogni variante ha carichi e progressi suoi.</p>
     <div class="seg" id="swScope" style="grid-template-columns:1fr 1fr"><button data-v="today" aria-pressed="${swapScope==="today"}">Solo oggi</button><button data-v="always" aria-pressed="${swapScope==="always"}">Sempre</button></div>
     <div class="opts">${opts.map(o=>`<button class="opt" data-k="${esc(o.k)}" aria-pressed="${(cur||"")===o.k}"><b>${esc(o.n)}</b>${o.sub?`<span>${esc(o.sub)}</span>`:""}</button>`).join("")}</div>
     <div class="q"><span class="lab">Altro esercizio</span><div class="inl"><input id="swNew" placeholder="Es. Panca piana con bilanciere" maxlength="60"><button class="btn hot" id="swAdd" style="padding:12px 14px">Usa</button></div></div>
     <button class="btn ghost" id="swClose">Chiudi</button></div>`;
-  document.body.appendChild(wrap);
-  const close=()=>wrap.remove();
+  const back=document.activeElement;document.body.appendChild(wrap);
+  const close=()=>{sheetOut(wrap);try{back&&back.isConnected&&back.focus({preventScroll:true})}catch(e){}};
+  sheetFx(wrap,close);wrap.firstElementChild.tabIndex=-1;try{wrap.firstElementChild.focus({preventScroll:true})}catch(e){}
   wrap.onclick=e=>{if(e.target===wrap)close()};
   wrap.querySelector("#swClose").onclick=close;
   wrap.querySelectorAll("#swScope button").forEach(b=>b.onclick=()=>{swapScope=b.dataset.v;wrap.querySelectorAll("#swScope button").forEach(x=>x.setAttribute("aria-pressed",x===b))});
@@ -2127,7 +2234,7 @@ function celebrate(kind,info){
   const slot=document.getElementById("celeSlot");
   slot.innerHTML=`<div class="cele ${kind==="pr"?"pr":kind==="fail"?"fail":""}" role="status">${kind==="fail"?tearsHTML():""}<div class="txt">${esc(t)}${kind==="pr"?"!":""}${sub?`<small>${esc(sub)}</small>`:""}</div></div>`;
   if(kind==="fail"&&matchMedia("(prefers-reduced-motion: reduce)").matches)slot.querySelectorAll(".tear").forEach(x=>x.classList.add("st"));
-  try{navigator.vibrate&&navigator.vibrate(kind==="fail"?[300,120,300]:kind==="set"?40:[60,60,120])}catch(e){}
+  buzz(kind==="fail"?[300,120,300]:kind==="set"?40:[60,60,120]);
   clearTimeout(celebrate.t);celebrate.t=setTimeout(()=>{slot.innerHTML=""},kind==="fail"?2350:1550);
 }
 
@@ -2408,7 +2515,7 @@ function rankBind(){
 function rankRedraw(){const c=document.querySelector(".card.rank");if(!c)return;const t=document.createElement("div");t.innerHTML=rankCard();c.replaceWith(t.firstElementChild);rankBind()}
 function rankSheet(k){
   const A=rankAll(),m=A.mus[k];if(!m)return;
-  const row=e=>{const tot=e.sd.k==="w";return `<div class="rk-x">${rBadge(e.r)}<div><b>${esc(e.n)}${e.approx?` <span class="rk-ap" title="Soglia indicativa">≈</span>`:""}</b><small>${RANKS[e.r][0]} ${e.pt} · massimale ${fk(Math.round(e.b.v))} kg${tot?" con il tuo peso":""}, ${fk(Math.round(e.b.v/A.BW*100)/100)}×&nbsp;il&nbsp;peso${e.loose?" · stima meno precisa (oltre 12 rip)":""}</small></div><em>${tot?(e.b.kg?"+"+fk(e.b.kg)+" kg × ":"")+e.b.r+(e.b.kg?"":" rip"):fk(e.b.kg)+" kg × "+e.b.r}</em></div>`};
+  const row=e=>{const tot=e.sd.k==="w";return `<div class="rk-x">${rBadge(e.r)}<div><b>${esc(e.n)}${e.approx?` <span class="rk-ap" title="Soglia indicativa">≈</span>`:""}</b><small>${RANKS[e.r][0]} ${e.pt} · massimale con le rip. in canna ${fk(Math.round(e.b.v))}&nbsp;kg${tot?" con il tuo peso":""}, ${fk(Math.round(e.b.v/A.BW*100)/100)}×&nbsp;il&nbsp;peso${e.loose?" · stima meno precisa (oltre 12 rip)":""}</small></div><em>${tot?(e.b.kg?"+"+fk(e.b.kg)+" kg × ":"")+e.b.r+(e.b.kg?"":" rip"):fk(e.b.kg)+" kg × "+e.b.r}</em></div>`};
   openSheet({html:()=>{
     if(m.none)return `<h2>${m.n}</h2><p class="note" style="margin:0">Nessun esercizio di questo muscolo con carichi registrati nelle ultime 6 settimane.</p>`;
     const nx=m.r<8?RANKS[m.r+1][0]:null,near=m.L.filter(e=>e.need).sort((a,b)=>a.need.pct-b.need.pct).slice(0,2);
@@ -2657,12 +2764,13 @@ function applySkin(){const h=document.documentElement;if(!SKINS.some(x=>x[0]===S
   if(tOn)tick();const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=getComputedStyle(document.documentElement).getPropertyValue("--bg").trim()||"#10151d"}
 
 function legRule(d){
-  const p=S.week[d]||{};if(!PLAN[p.gym]?.legs)return "";
+  const p=S.week[d]||{};if(!PLAN[p.gym])return "";
   const n1=S.week[(d+1)%7]||{},n2=S.week[(d+2)%7]||{};
+  if(!PLAN[p.gym].legs)return n1.padel==="match"&&n2.padel==="match"&&(p.padel||"none")==="none"?`<span class="rule mid">! Partite nei 2 giorni dopo: solo braccia e prevenzione</span>`:"";
   if(p.padel!=="none"&&p.padel)return `<span class="rule bad">✕ Stesso giorno del padel</span>`;
   if(n1.padel==="match")return `<span class="rule bad">✕ Partita il giorno dopo</span>`;
   if(n2.padel==="match")return `<span class="rule mid">! Partita dopo 2 giorni: niente Nordic</span>`;
-  if(n1.padel==="train")return `<span class="rule mid">! Padel il giorno dopo: una serie in meno sugli eccentrici</span>`;
+  if(n1.padel==="train")return `<span class="rule mid">! Padel il giorno dopo: nelle prime 3 settimane una serie in meno sugli eccentrici</span>`;
   return `<span class="rule ok">✓ Lontano da padel e partite</span>`;
 }
 function daySheet(d){
@@ -2703,7 +2811,7 @@ function renderSettings(){
    <p class="note" style="margin:10px 0 0">${phaseStart()?`${PH[phaseAt()].n} dal ${fmtShort(phaseStart()+"T12:00:00")}. `:""}${{massa:"Peso +0,25-0,5% a settimana. Esercizio \"Fermo\" se non migliora in 3 sedute.",def:"Peso −0,5-1% a settimana, avviso se cali più dell'1%. L'obiettivo è tenere i carichi: l'avviso scatta solo se il massimale cala oltre il 5% per 2 sedute.",mant:"Peso stabile, ±0,25% a settimana. Progressione come in massa."}[phaseAt()]} Cambia anche la revisione del ciclo e lo sfondo dei grafici. L'app non tocca la dieta.</p></section>
   <section class="card"><h3>Durante l'allenamento</h3>
    <div class="tgl"><div><b>Schermo sempre acceso</b><small>Dalla prima serie fino a quando salvi la seduta.${"wakeLock" in navigator?"":" Questo browser non lo permette."}</small></div><button role="switch" data-tg="awake" aria-checked="${S.awake!==false}" aria-label="Schermo sempre acceso"></button></div>
-   <div class="tgl"><div><b>Suono a fine recupero</b><small>Tre bip. Con il tasto silenzioso attivo l'iPhone non lo fa sentire, a meno che non attivi l'opzione qui sotto.</small></div><button role="switch" data-tg="sound" aria-checked="${S.sound!==false}" aria-label="Suono a fine recupero"></button></div>
+   <div class="tgl"><div><b>Suono a fine recupero</b><small>Tre bip. Su iPhone la fine del recupero non vibra: si sente solo il suono. Con il tasto silenzioso attivo l'iPhone non lo fa sentire, a meno che non attivi l'opzione qui sotto.</small></div><button role="switch" data-tg="sound" aria-checked="${S.sound!==false}" aria-label="Suono a fine recupero"></button></div>
    ${S.sound!==false?`<div class="tgl"><div><b>Bip anche col silenzioso</b><small>Si sente anche con il tasto silenzioso, ma di solito mette in pausa la musica.</small></div><button role="switch" data-tgf="loud" aria-checked="${!!S.loud}" aria-label="Bip anche col silenzioso"></button></div>`:""}
    <div class="tgl"><div><b>Recupero adattivo</b><small>30 s in più dopo una serie sotto le ripetizioni o segnata "Al limite" su un multiarticolare.</small></div><button role="switch" data-tg="adrest" aria-checked="${S.adrest!==false}" aria-label="Recupero adattivo"></button></div>
   </section>
@@ -2754,6 +2862,7 @@ function renderSettings(){
 
 /* ================= EDITOR PIANI ================= */
 function blankEx(){return {id:null,n:"",s:3,lo:8,hi:12,rir:"1-2",rest:90,t:"comp",step:5,eq:"mac",side:false,oh:false,ecc:false,ss:"",note:""}}
+const edSum=e=>`${e.s}×${e.lo===e.hi?e.lo:e.lo+"-"+e.hi}${e.t==="time"?" s":""} · ${e.rest||0} s · ${({mac:"Macchina",cavl:"Cavo alzate",bar:"Bilanciere",db:"Manubri",zav:"Zavorra"})[eqOf(e)]||"Altro"}`;
 function renderEditor(){
   const E=editPlan;
   const lib=Object.keys(BUILTIN).map(k=>`<optgroup label="${esc(BUILTIN[k].name)}">${BUILTIN[k].ex.map(e=>`<option value="${e.id}">${esc(e.n)}</option>${altsOf(e).filter(a=>!a.custom).map(a=>`<option value="${e.id}~${a.k}">  ↳ ${esc(a.n)}</option>`).join("")}`).join("")}</optgroup>`).join("");
@@ -2764,8 +2873,10 @@ function renderEditor(){
     <div class="checks"><label><input type="checkbox" id="pLegs" ${E.legs?"checked":""}> Giorno gambe pesante (l'app lo tiene lontano da padel e partite)</label></div>
   </section>
   <div style="display:flex;flex-direction:column;gap:10px">${E.ex.map((e,i)=>`<div class="edx" data-i="${i}">
-    <div class="top"><b>${i+1}</b><input data-f="n" value="${esc(e.n)}" placeholder="Nome esercizio" maxlength="60" aria-label="Nome esercizio ${i+1}">
+    <div class="top"><b>${i+1}</b><span class="eds">${esc(edSum(e))}</span>
       <button class="sbtn" data-mv="-1" aria-label="Sposta su" ${i===0?"disabled":""}>↑</button><button class="sbtn" data-mv="1" aria-label="Sposta giù" ${i===E.ex.length-1?"disabled":""}>↓</button><button class="sbtn danger" data-rm aria-label="Elimina esercizio">✕</button></div>
+    <input data-f="n" value="${esc(e.n)}" placeholder="Nome esercizio" maxlength="60" aria-label="Nome esercizio ${i+1}">
+    <details class="edd" data-more="ed${i}" ${moreOpen.has("ed"+i)||!e.n?"open":""}><summary>Serie, recupero e attrezzo</summary>
     <div class="g3">
       <label>Serie<input data-f="s" inputmode="numeric" value="${e.s}"></label>
       <label>Rip. min${e.t==="time"?" (s)":""}<input data-f="lo" inputmode="numeric" value="${e.lo}"></label>
@@ -2778,7 +2889,7 @@ function renderEditor(){
     <div class="g3" style="grid-template-columns:1fr"><label>Muscolo<select data-f="mu"><option value="">Nessuno (prevenzione, salti)</option>${MUSCLES.map(m=>`<option value="${m}" ${e.mu===m?"selected":""}>${muLbl(m)}</option>`).join("")}</select></label></div>
     <div class="g3" style="grid-template-columns:2fr 1fr"><label>Tipo<select data-f="t">${TYPES.map(([v,l])=>`<option value="${v}" ${e.t===v?"selected":""}>${l}</option>`).join("")}</select></label><label>Superserie<input data-f="ss" value="${esc(e.ss||"")}" maxlength="3" placeholder="—"></label></div>
     <div class="checks"><label><input type="checkbox" data-f="side" ${e.side?"checked":""}> Per lato</label><label><input type="checkbox" data-f="oh" ${e.oh?"checked":""}> Spinta sopra la testa</label><label><input type="checkbox" data-f="ecc" ${e.ecc?"checked":""}> Eccentrico pesante</label></div>
-  </div>`).join("")}</div>
+  </details></div>`).join("")}</div>
   <section class="card ed">
     <label>Aggiungi dalla scheda<select id="fromLib"><option value="">Scegli un esercizio…</option>${lib}</select></label>
     <button class="btn" id="addBlank">Aggiungi esercizio vuoto</button>
@@ -2795,6 +2906,7 @@ function renderEditor(){
       else if(f==="step")e[f]=num(inp.value)||2.5;
       else e[f]=inp.value;
       if(f==="eq"){const q=EQS.find(x=>x[0]===inp.value);if(q&&q[2])e.step=q[2]}
+      const sm=row.querySelector(".eds");if(sm)sm.textContent=edSum(e);
       if(f==="t"||f==="eq")renderEditor()};inp.oninput=h;inp.onchange=h});
     row.querySelectorAll("[data-mv]").forEach(b=>b.onclick=()=>{const j=i+ +b.dataset.mv;[E.ex[i],E.ex[j]]=[E.ex[j],E.ex[i]];renderEditor()});
     row.querySelector("[data-rm]").onclick=()=>{E.ex.splice(i,1);renderEditor()};
