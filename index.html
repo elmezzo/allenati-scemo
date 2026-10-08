@@ -1326,6 +1326,17 @@ html[data-skin="campo"]:not(#z):not(#y){--go:var(--acc)}
 html[data-skin="campo"]:not(#z):not(#y) :is(details.mn>summary,p.note,p.grp,.back){background:color-mix(in srgb,var(--bg) 80%,transparent)}
 html[data-skin="campo"]:not(#z):not(#y) :is(.card,.ex,.status,details.h,.banner,.sheet) :is(p.note,p.grp){background:none}
 html[data-skin="carbonio"]:not(#z):not(#y) .wu li em{color:#c3cad2}
+/* Giro 8: icone di palestra, padel e partita sempre di tre colori diversi */
+html[data-skin="vetro"][data-var="1"]:not(#z):not(#y){--match:#ffc35c}
+html[data-skin="eclisse"][data-var="2"]:not(#z):not(#y){--match:#ffc35c}
+html[data-skin="carbonio"][data-var="2"]:not(#z):not(#y){--pad:#c9a8ff;--match:#ffc35c}
+html[data-skin="manga"][data-var="1"]:not(#z):not(#y){--pad:#7fe6ff}
+html[data-skin="manga"][data-var="2"]:not(#z):not(#y){--match:#c9a8ff;--pad:#7fe6ff}
+html[data-skin="campo"]:not(#z):not(#y) details.mn>summary{border:1px solid rgba(242,247,255,.18)}
+html[data-skin="vetro"][data-var="2"]:not(#z):not(#y){--pad:#c3a6ff;--match:#ffc35c}
+html[data-skin="eclisse"][data-var="2"]:not(#z):not(#y){--pad:#6ff0c8}
+html[data-skin="manga"][data-var="1"]:not(#z):not(#y){--pad:#ff8fd0}
+html[data-skin="manga"]:not([data-var="1"]):not([data-var="2"]):not(#z):not(#y){--pad:#7fe6ff;--match:#c9a8ff}
 </style>
 <!--APP-HEAD-END-->
 </head>
