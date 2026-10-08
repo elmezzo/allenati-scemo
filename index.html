@@ -373,7 +373,8 @@ html[data-skin="campo"]{--pad:#7fe6ff;--match:#ffd36b}
 .banner b{color:var(--adapt);font-size:14px}
 .banner button{border:0;background:transparent;color:var(--adapt);font-weight:800;font-size:14px;padding:8px 6px;min-height:44px;white-space:nowrap}
 .wk{display:grid!important;grid-template-columns:repeat(7,1fr);gap:4px!important;padding:10px 8px!important}
-.wd2{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 0;border-radius:12px;min-width:0}
+.wd2{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 0;border-radius:12px;min-width:0;font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:scale 160ms var(--ease-out,ease-out)}
+.wd2:active{scale:.97}
 .wd2.t{background:var(--card-2);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--hot) 70%,transparent)}
 .wd2 b{font-size:12px;font-weight:800;color:var(--muted)}
 .wd2.t b{color:var(--fg)}
@@ -1148,7 +1149,7 @@ const BUILTIN={
   {id:"b4",mu:"Dorso",n:"Pulley basso",s:3,lo:10,hi:12,rir:"1-2",rest:90,t:"comp",step:5,eq:"mac",strap:true},
   {id:"b5",mu:"Deltoidi",n:"Alzate laterali manubri",s:4,lo:12,hi:20,rir:"0-1",rest:60,t:"iso",step:1,eq:"db"},
   {id:"b6",mu:"Deltoidi",n:"Face pull",s:3,lo:12,hi:15,rir:"1-2",rest:60,t:"iso",step:5,eq:"mac"},
-  {id:"b7",mu:"Bicipiti",n:"Curl panca Scott",s:3,lo:10,hi:12,rir:"0-1",rest:0,t:"iso",step:2,ss:"7",eq:"db"},
+  {id:"b7",mu:"Bicipiti",n:"Curl Scott con manubri",s:3,lo:10,hi:12,rir:"0-1",rest:0,t:"iso",step:2,ss:"7",note:"Kg = un manubrio.",eq:"db"},
   {id:"b8",mu:"Tricipiti",n:"Pushdown o dip alla macchina",s:3,lo:10,hi:15,rir:"0-1",rest:75,t:"iso",step:5,ss:"7",eq:"mac"}]},
  C:{name:"Upper C",title:"Upper C",sub:"Pump, niente spinte sopra la testa",ex:[
   {id:"c1",mu:"Petto",n:"Butterfly alla macchina",s:3,lo:12,hi:15,rir:"1-2",rest:75,t:"iso",step:5,note:"Gomiti non oltre la linea del corpo.",eq:"mac"},
@@ -1234,7 +1235,7 @@ const PADEL_LBL={none:"Niente",train:"Allenamento",match:"Partita"};
 const KEY="allenati-scemo.v1";
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.sessions)return s}catch(e){}return {sessions:[],draft:{},week:DEFAULT_WEEK,overrides:{},energy:{},view:"oggi",gym:null}}
 let S=load();
-S.week=S.week||DEFAULT_WEEK;S.overrides=S.overrides||{};S.energy=S.energy||{};S.draft=S.draft||{};S.plans=S.plans||{};S.swaps=S.swaps||{};S.customAlts=S.customAlts||{};S.archive=S.archive||[];S.body=S.body||[];S.pain=S.pain||{};for(const P of Object.values(S.plans))for(const e of P.ex||[])if(/^Alzate laterali al cavo/i.test(e.n||"")&&(e.eq||"mac")==="mac"){e.eq="cavl";e.step=2.5}
+S.week=S.week||DEFAULT_WEEK;S.overrides=S.overrides||{};S.energy=S.energy||{};S.draft=S.draft||{};S.plans=S.plans||{};S.swaps=S.swaps||{};S.customAlts=S.customAlts||{};S.archive=S.archive||[];S.body=S.body||[];S.pain=S.pain||{};for(const P of Object.values(S.plans))for(const e of P.ex||[])if(/^Alzate laterali al cavo/i.test(e.n||"")&&(e.eq||"mac")==="mac"){e.eq="cavl";e.step=2.5}for(const P of Object.values(S.plans))for(const e of P.ex||[])if(e.n==="Curl panca Scott"&&e.eq==="db"){e.n="Curl Scott con manubri";e.note=e.note||"Kg = un manubrio."}
 if(S.deload){const t=new Date();t.setMinutes(t.getMinutes()-t.getTimezoneOffset());if(t.toISOString().slice(0,10)>S.deload.to){S.lastDeload=S.deload.to;delete S.deload}}
 rebuild();
 function archivePlan(key,why){if(!PLAN[key])return;S.archive.unshift({id:"v"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),key,at:new Date().toISOString(),why,plan:JSON.parse(JSON.stringify(PLAN[key]))});S.archive=S.archive.slice(0,60)}
@@ -1276,8 +1277,10 @@ function assess(d){
       if(PLAN.C){r.notes.push("Oggi puoi fare l'Upper C o riposare.");r.gymAlt="C"}
     }else if(t2.padel==="match"){
       say("adapt","Partita dopodomani: gambe sì, ma senza Nordic e con una serie in meno sugli esercizi eccentrici pesanti (es. stacco rumeno).");r.mods.add("noEcc");
+    }else if(t1.padel==="train"&&earlyPhase(d)){
+      say("adapt","Domani padel, e sei nelle prime 3 settimane: una serie in meno sugli esercizi eccentrici pesanti (stacco rumeno, Nordic) per arrivare in campo meno indolenzito.");r.mods.add("noEccLight");
     }else if(t1.padel==="train"){
-      say("adapt","Domani padel: una serie in meno sugli esercizi eccentrici pesanti (stacco rumeno, Nordic) per arrivare in campo meno indolenzito.");r.mods.add("noEccLight");
+      say("go","Domani padel: seduta completa.");
     }else say("go","Giornata libera da padel e nessuna partita nelle prossime 48 h: seduta completa.");
   }else if(p.gym in PLAN){
     if(p.padel==="match"){say("adapt","Giorno di partita: palestra dopo la partita e solo se ti senti fresco. Una serie in meno su tutto.");r.mods.add("light")}
@@ -1372,6 +1375,8 @@ function tgFor(ex,mods){const t=target(ex);if(!mods.has("deload")||["perf","time
 /* Fase: massa (predefinita), definizione, mantenimento. Cambia fascia di peso, avviso "Fermo" e analisi */
 const PH={massa:{n:"Massa",lo:.25,hi:.5,src:"Iraki 2019",col:""},def:{n:"Definizione",lo:-1,hi:-.5,src:"Helms 2014, Garthe 2011",col:"var(--adapt)"},mant:{n:"Mantenimento",lo:-.25,hi:.25,src:"regola pratica",col:"var(--muted)"}};
 function phaseAt(d){const k=typeof d==="string"?d:iso(d||today());let ph="massa";for(const x of (S.phases||[]).slice().sort((a,b)=>a.d.localeCompare(b.d)))if(x.d<=k)ph=x.ph;return ph}
+// Prime 3 settimane della fase (o dalla prima seduta): il taglio sugli eccentrici prima del padel vale solo qui, poi le gambe sono abituate
+function earlyPhase(d){const st=phaseStart()||(S.sessions.map(x=>iso(x.date)).sort()[0]);return !st||(d-new Date(st+"T00:00:00"))<21*864e5}
 function phaseStart(){const P=(S.phases||[]).slice().sort((a,b)=>a.d.localeCompare(b.d)),cur=phaseAt();let st=null;for(const x of P){if(x.d>iso(today()))break;if(x.ph===cur){if(!st)st=x.d}else st=null}return st}
 function setPhase(ph){S.phases=(S.phases||[]).filter(x=>x.d!==iso(today()));if(phaseAt()!==ph||!S.phases.length)S.phases.push({d:iso(today()),ph});save()}
 function phaseBands(x0,x1){const P=(S.phases||[]).slice().sort((a,b)=>a.d.localeCompare(b.d)),out=[];
@@ -1450,7 +1455,7 @@ const ERRS={
  "croci ai cavi dal basso":["Piegare e stendere i gomiti: restano fissi, appena piegati.","Scendere troppo dietro il corpo: fermati prima che la spalla tiri."],
  "pulley basso":["Dondolare il busto: resta dritto, si muovono solo le braccia.","Spalle che vanno avanti al ritorno: petto alto per tutta la serie."],
  "face pull":["Tirare verso il petto: la corda arriva all'altezza degli occhi.","Gomiti bassi: tienili alti, all'altezza delle spalle."],
- "curl panca scott":["Gomiti che si sollevano dal cuscino.","Stendere di scatto in basso: rallenta negli ultimi centimetri."],
+ "curl scott con manubri":["Gomiti che si sollevano dal cuscino: tieni le braccia appoggiate fino in fondo.","Stendere di scatto in basso: rallenta negli ultimi centimetri."],
  "pushdown o dip alla macchina":["Gomiti che si muovono avanti e indietro: restano fermi ai fianchi.","Spingere col peso del corpo: busto fermo."],
  "pushdown al cavo":["Gomiti che si staccano dai fianchi.","Busto che si piega sopra il cavo per spingere."],
  "pushdown con corda":["Gomiti che si staccano dai fianchi.","Non aprire la corda in basso: allarga le mani a fine spinta."],
@@ -1613,7 +1618,7 @@ const HOW={
  "croci ai cavi dal basso":["In piedi tra due cavi bassi, una maniglia per mano, braccia in basso e aperte, gomiti appena piegati.", "Porta le mani in alto e davanti fino all'altezza del petto alto, gomiti fermi; torna lento."],
  "pulley basso":["Seduto, piedi sulla pedana, ginocchia appena piegate, busto dritto, braccia tese in avanti.", "Tira la maniglia all'ombelico portando i gomiti indietro e stringendo le scapole; torna allungando le braccia senza piegarti."],
  "face pull":["Cavo all'altezza degli occhi, corda presa dall'alto, un passo indietro, braccia tese in avanti.", "Tira la corda verso gli occhi aprendo le mani ai lati della testa, gomiti alti; torna lento."],
- "curl panca scott":["Seduto alla panca Scott, ascelle sul bordo, dietro delle braccia appoggiato sul cuscino, bilanciere EZ in mano.", "Piega i gomiti portando il bilanciere verso le spalle; scendi lento fino a braccia quasi tese."],
+ "curl scott con manubri":["Seduto alla panca Scott, ascelle sul bordo, dietro delle braccia appoggiato sul cuscino, un manubrio per mano.", "Piega i gomiti portando i manubri verso le spalle; scendi in 2-3 s fino a braccia quasi tese."],
  "pushdown o dip alla macchina":["Seduto alla dip machine, schiena allo schienale, maniglie ai lati del busto all'altezza del petto.", "Spingi in basso fino a braccia tese lungo i fianchi; torna lento fino a gomiti a 90°."],
  "pushdown al cavo":["In piedi davanti al cavo alto, gomiti ai fianchi, avambracci paralleli al pavimento.", "Stendi le braccia verso il basso muovendo solo gli avambracci; torna fino a gomiti a 90°."],
  "pushdown con corda":["In piedi davanti al cavo alto con la corda, gomiti ai fianchi, avambracci paralleli al pavimento.", "Stendi le braccia e in fondo apri la corda ai lati delle cosce; torna fino a gomiti a 90°."],
@@ -1732,7 +1737,7 @@ function renderToday(){
   const runG=hasGym&&!doneS&&S.draft&&S.draft[a.gym]?a.gym:null;let runN=0,runT=0;
   if(runG){const L=trainList(runG,trainMods(runG));for(const {ex} of L){const n=setsFor(ex,trainMods(runG));runT+=n;runN+=Math.min(n,doneCount(runG,ex.id))}}
   const doneSt=doneS?sessStats(doneS):null,doneAt=doneS?new Date(doneS.date).toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"}):"";
-  const week=[...Array(7)].map((_,i)=>{const x=addDays(d,i),p=dayPlan(x);return `<div class="wd2 ${i===0?"t":""}"><b>${WD[x.getDay()]}</b><span class="ics">${i===0&&doneS?dayIcons(p).replace(I("gym"),`<b class="dk" aria-label="Fatta">✓</b>`):dayIcons(p)}</span><small>${p.gym in PLAN?esc(PLAN[p.gym].name):p.padel==="match"?"Partita":p.padel==="train"?"Padel":"Riposo"}</small></div>`}).join("");
+  const week=[...Array(7)].map((_,i)=>{const x=addDays(d,i),p=dayPlan(x);return `<button class="wd2 ${i===0?"t":""}" data-wd="${i}" aria-label="${esc(cap(WD_LONG[x.getDay()]))}: cambia il padel"><b>${WD[x.getDay()]}</b><span class="ics">${i===0&&doneS?dayIcons(p).replace(I("gym"),`<b class="dk" aria-label="Fatta">✓</b>`):dayIcons(p)}</span><small>${p.gym in PLAN?esc(PLAN[p.gym].name):p.padel==="match"?"Partita":p.padel==="train"?"Padel":"Riposo"}</small></button>`}).join("");
   let dl="";
   if(deloadOn())dl=`<div class="banner">${I("bolt")}<div><b>Scarico in corso</b><span>Fino a ${fmtShort(S.deload.to)}: metà serie, stessi carichi, 3-4 in canna.</span></div><button id="endDl">Termina</button></div>`;
   else{const w=deloadAdvice();if(w)dl=`<div class="banner">${I("bolt")}<div><b>Scarico consigliato</b><span>${esc(cap(w.join(" e ")))}.</span></div><button id="startDl">Inizia</button><button id="snoozeDl">Non ora</button></div>`}
@@ -1766,6 +1771,7 @@ function renderToday(){
   const setO=(day,field,v)=>{const kk=iso(day);S.overrides[kk]={...(S.overrides[kk]||{}),[field]:v};save();renderToday()};
   const padOpts=[{v:"none",l:"Niente"},{v:"train",l:"Allenamento"},{v:"match",l:"Partita"}];
   document.getElementById("cPad").onclick=()=>pickSheet("Padel oggi",padOpts,a.padel,v=>setO(d,"padel",v));
+  document.querySelectorAll("[data-wd]").forEach(b=>b.onclick=()=>{const x=addDays(d,+b.dataset.wd);pickSheet(`Padel ${WD_LONG[x.getDay()]} ${x.getDate()}`,padOpts,dayPlan(x).padel,v=>setO(x,"padel",v))});
   document.getElementById("cTom").onclick=()=>pickSheet("Padel domani",padOpts,tm.padel,v=>setO(addDays(d,1),"padel",v));
   document.getElementById("cEn").onclick=()=>pickSheet("Come ti senti",[{v:"low",l:"Stanco",sub:"Stessi carichi, una serie in meno per esercizio"},{v:"ok",l:"Normale"},{v:"high",l:"Carico"}],a.energy,v=>{S.energy[k]=v;save();renderToday()});
   const fg=document.getElementById("freeGo");if(fg)fg.onclick=()=>{if(PLAN.LIB&&S.draft.LIB){gymSel="LIB";go("train")}else freeSheet()};
@@ -2137,6 +2143,7 @@ reverse fly ai cavi|spalle|m||cable-reverse-fly|1,6,17,32,51,2,8,20,36,56,3,10,2
 reverse fly con manubri|spalle|d||dumbbell-reverse-fly|2,6,13,23,35,2,7,15,26,39,3,9,17,29,42,4,10,19,31,45
 reverse fly con manubri a busto flesso|spalle|d||dumbbell-reverse-fly|2,6,13,23,35,2,7,15,26,39,3,9,17,29,42,4,10,19,31,45
 curl panca inclinata|bicipiti|d||incline-dumbbell-curl|7,10,15,21,27,8,12,18,24,30,10,14,20,26,33,11,16,22,28,36
+curl scott con manubri|bicipiti|d||one-arm-dumbbell-preacher-curl|6,11,16,24,32,8,13,19,27,35,9,15,21,30,39,11,17,24,32,42
 curl panca scott|bicipiti|d||preacher-curl|14,23,35,50,66,17,27,40,56,72,20,31,45,61,78,23,35,49,66,84
 curl scott con manubrio|bicipiti|d||one-arm-dumbbell-preacher-curl|6,11,16,24,32,8,13,19,27,35,9,15,21,30,39,11,17,24,32,42
 curl al cavo dietro la schiena|bicipiti|m|p|one-arm-cable-bicep-curl|4,10,20,33,49,6,13,23,37,53,7,15,26,41,58,8,17,29,44,61
