@@ -1162,6 +1162,7 @@ html[data-skin="vetro"]:not(#z) .rest:not(.over) :is(.tv,.tl){color:var(--fg)}
 :root:not(#z) .xrow .nm{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 :root:not(#z):not(#y) .wd2 small{padding:0 4px}
 @media (max-width:360px){:root:not(#z):not(#y) .wd2 small{font-size:11px;padding:0;letter-spacing:-.02em}}
+@media (max-width:340px){:root:not(#z) .wk{padding-inline:4px!important;gap:2px!important}}
 </style>
 <!--APP-HEAD-END-->
 </head>
@@ -1454,6 +1455,7 @@ function target(ex){
   const sm=a=>a.reduce((t,r)=>t+r,0);
   if(missTwice&&kg&&!(prev&&prev.length&&sm(reps)/reps.length>sm(prev)/prev.length)){
     let nk=Math.max(st,roundStep(kg*0.9,st));if(nk>=kg&&kg-st>0)nk=kg-st;
+    if(ex.t==="bw"&&nk>=kg)return {kg:0,reps:Array(ex.s).fill(ex.lo),top,kind:"down",badge:`-${fk(kg)} kg`,msg:`Due sedute sotto le ${ex.lo} ripetizioni: togli la zavorra e ricostruisci.`};
     if(ex.t!=="bw"&&(kg-nk)/kg>0.15)return {kg,reps:pad(reps.map(r=>Math.min(top,r+1)),ex.s,ex.lo),top,kind:"up",badge:"+1 rip",msg:`Stesso carico: scendere di un gradino sarebbe troppo. Una ripetizione in più per serie, finché arrivi a ${ex.lo}.`};
     return {kg:nk,reps:Array(ex.s).fill(ex.lo),top,kind:"down",badge:nk<kg?`-${fk(kg-nk)} kg`:"=",msg:`Due sedute sotto le ${ex.lo} ripetizioni: scendi a ${fk(nk)} kg e ricostruisci.`};
   }
@@ -2856,7 +2858,7 @@ function renderSettings(){
     <li>Ripetizioni prima, carico poi: +1 ripetizione per serie finché chiudi tutto al limite alto del range, poi aumenta il carico e riparti dal basso. L'aumento segue l'attrezzo: +5 kg macchine e cavi (pacco pesi), +2,5 kg bilanciere e Smith, +1-2 kg manubri e zavorra con kettlebell. Sui multiarticolari pesanti, se il 2,5% (parte alta) o il 5% (gambe) del carico è più del gradino, sale di quello, arrotondato al gradino.</li>
     <li>Dopo l'ultima serie puoi dire com'era. Facile: due ripetizioni in più invece di una, oppure aumento doppio se resta entro il 10% del carico. Al limite su un multiarticolare a fine range: il carico resta fermo finché non chiudi con le ripetizioni in canna previste.</li>
     <li>Isolamento e prevenzione con un gradino grosso rispetto al carico (oltre il 15%, es. extrarotazione da 5 a 10 kg): prima porti le ripetizioni fino a 5 oltre il range, poi sali di peso.</li>
-    <li>Due sedute di fila sotto il minimo del range e ripetizioni medie per serie non salite: -10% e riparti dal basso. Se il -10% vuol dire scendere più del 15% (gradino grosso), carico fermo e una ripetizione in più per serie.</li>
+    <li>Due sedute di fila sotto il minimo del range e ripetizioni medie per serie non salite: -10% e riparti dal basso. Se il -10% vuol dire scendere più del 15% (gradino grosso), carico fermo e una ripetizione in più per serie. Con la zavorra si scende comunque.</li>
     <li>Esercizio fermo (né kg né massimale stimato saliti in 3 sedute): prova una variante o togli una serie per due settimane.</li>
     <li>Salti: ripetizioni fisse, si progredisce in altezza o distanza. Nordic: meno aiuto dall'elastico. Copenhagen: +5 s fino a 30, poi versione più dura.</li>
     <li>Gambe mai nello stesso giorno del padel e mai il giorno prima di una partita. Partita dopo 2 giorni: niente Nordic e una serie in meno sugli eccentrici.</li>
