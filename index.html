@@ -1102,7 +1102,7 @@ html[data-skin="eclisse"]:not(#z) .hero::before{filter:drop-shadow(0 0 16px rgba
 .ex .ask{margin-top:2px}
 .spec{margin:0;font-size:14px;font-weight:700;color:var(--muted);line-height:1.5}
 .spec span{color:var(--fg)}.spec span.ad{color:var(--info)}.spec i{font-style:normal}
-details.more summary span{font-weight:600;font-size:12px;opacity:.8;margin-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+details.more summary span{font-weight:600;font-size:12px;margin-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 details.more[open] summary span{display:none}
 details.more > div > .lnk,details.more > div > .painb{align-self:flex-start}
 :root:not(#z) .wd2 small{padding:0;white-space:normal;text-align:center;line-height:1.15;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;text-overflow:clip}
@@ -1163,6 +1163,11 @@ html[data-skin="vetro"]:not(#z) .rest:not(.over) :is(.tv,.tl){color:var(--fg)}
 @media (max-width:360px){:root:not(#z):not(#y) .wd2 small{font-size:11px;padding:0;letter-spacing:-.02em}}
 @media (max-width:340px){:root:not(#z) .wk{padding-inline:4px!important;gap:2px!important}}
 /* ===== STILI VERSO IL 10 (2026-10-08) ===== */
+/* Colore base esplicito dove la variante 0 non lo dichiarava (serve alle regole nuove) */
+html[data-skin="carbonio"]:not([data-var="1"]):not([data-var="2"]){--acc:#ffb000;--acc-rgb:255,176,0}
+html[data-skin="campo"]{--acc:#e4ff3a;--acc-rgb:228,255,58}
+html[data-skin="manga"]:not([data-var="1"]):not([data-var="2"]){--acc:#ff2340;--acc-rgb:255,35,64}
+
 @property --p{syntax:'<number>';inherits:true;initial-value:0}
 html{transition:--p .5s var(--ease-out)}
 /* Tutti: recupero nel colore dello stile, numeri grandi, un solo colore per gli avvisi */
@@ -1219,6 +1224,30 @@ html[data-skin="campo"]:not(#z):not(#y) .hero::before{content:"";position:absolu
 @media (prefers-reduced-motion:no-preference){html[data-skin="campo"]:not(#z):not(#y) .hero::before{animation:cpBall .9s cubic-bezier(.3,.7,.4,1) .25s backwards}}
 @keyframes cpBall{0%{translate:-62px 18px;scale:.6;opacity:0}45%{translate:-24px 10px;scale:1;opacity:1}62%{translate:-12px 2px;scale:.85}100%{translate:0 0;scale:1}}
 html[data-skin="campo"]:not(#z):not(#y) :is(.tile,.ctx>*,.tabs button,.wd2,.field,.btn){border-radius:8px}
+/* Giro 2 */
+html[data-skin="vetro"]:not(#z):not(#y) .rest:not(.over){background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.035));border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
+html[data-skin="vetro"]:not(#z):not(#y) div.timer:not(.over){background:rgba(22,18,48,.9)}
+html[data-skin="vetro"][data-var="1"]:not(#z):not(#y){--pad:#9fb4ff}
+html[data-skin="eclisse"]:not(#z):not(#y) .rest .rr{width:84px;height:84px}
+html[data-skin="eclisse"]:not(#z):not(#y) .rest .rr .tv{font-size:25px;letter-spacing:-.03em}
+html[data-skin="eclisse"]:not(#z):not(#y) .dayr .d{font-size:21px;letter-spacing:0}
+html[data-skin="eclisse"]:not(#z):not(#y) .rest:not(.over){background:linear-gradient(180deg,rgba(var(--cor-rgb),.08),rgba(var(--cor-rgb),.03));border:1px solid rgba(var(--cor-rgb),.22);box-shadow:inset 0 1px 0 rgba(var(--cor-rgb),.3)}
+html[data-skin="eclisse"]:not(#z):not(#y) .timer:not(.over){box-shadow:0 0 0 1px rgba(var(--acc-rgb),.55),0 10px 30px rgba(0,0,0,.6)}
+html[data-skin="carbonio"]:not(#z):not(#y) :is(.timer .tr,.rest .rr) .seg7 svg{height:.95em}
+html[data-skin="carbonio"]:not(#z):not(#y) .seg7 .off{fill:rgba(var(--acc-rgb),.04)}
+html[data-skin="carbonio"]:not(#z):not(#y) .tgt .seg7+.lu{vertical-align:.1em}
+html[data-skin="carbonio"][data-var="1"]:not(#z):not(#y){--info:#ffc27a}
+html[data-skin="campo"]:not(#z):not(#y) :is(details.mn>summary,p.grp,p.note,.head p){text-shadow:0 0 3px var(--bg),0 0 8px var(--bg),0 0 14px var(--bg)}
+html[data-skin="campo"]:not(#z):not(#y) div.timer:not(.over){background:color-mix(in srgb,var(--card) 90%,var(--acc));color:var(--fg);border:1.5px solid var(--acc)}
+html[data-skin="campo"]:not(#z):not(#y) div.timer:not(.over) .ra{stroke:var(--acc);filter:none}
+html[data-skin="campo"]:not(#z):not(#y) div.timer:not(.over) button{color:var(--acc);border-color:color-mix(in srgb,var(--acc) 60%,transparent);background:transparent}
+html[data-skin="campo"]:not(#z):not(#y) div.timer:not(.over) .l{color:var(--fg)}
+html[data-skin="campo"][data-var="2"]:not(#z):not(#y){--go:#b6ffcf}
+@keyframes cpBall{0%{translate:-62px 18px;scale:.6;opacity:0}45%{translate:-24px 10px;scale:1;opacity:1}62%{translate:-12px 2px;scale:1.14 .82}100%{translate:0 0;scale:1}}
+html[data-skin="manga"]:not(#z):not(#y) .tgt b{letter-spacing:-.05em;font-kerning:normal}
+html[data-skin="manga"]:not(#z):not(#y) select{border:2px solid var(--fg);border-radius:6px;box-shadow:3px 3px 0 rgba(236,230,214,.14)}
+html[data-skin="manga"]:not(#z):not(#y) .hero{box-shadow:5px 5px 0 var(--acc,#ff2340)}
+html[data-skin="manga"]:not(#z):not(#y) .tgt b{font:800 30px/1 "Manrope",system-ui,sans-serif;letter-spacing:-.02em;font-variant-numeric:proportional-nums;text-shadow:2px 2px 0 var(--acc)}
 </style>
 <!--APP-HEAD-END-->
 </head>
@@ -1798,13 +1827,13 @@ function popEl(el,c,ms){el.classList.remove(c);void el.offsetWidth;el.classList.
 function blade(el){if(RM()||!el)return;if(getComputedStyle(el).position==="static")el.style.position="relative";const b=document.createElement("i");b.className="blade";b.setAttribute("aria-hidden","true");el.appendChild(b);popEl(el,"recgo",1600);setTimeout(()=>b.remove(),1300)}
 // Display a 7 segmenti (stile Carbonio)
 const SEG={a:[4,0,12,3],b:[16.5,3.5,3,13],c:[16.5,19.5,3,13],d:[4,33,12,3],e:[.5,19.5,3,13],f:[.5,3.5,3,13],g:[4,16.5,12,3]};
-const SEGMAP={"+":"g","0":"abcdef","1":"bc","2":"abged","3":"abgcd","4":"fgbc","5":"afgcd","6":"afgedc","7":"abc","8":"abcdefg","9":"abcdfg"};
+const SEGMAP={"+":"g","-":"g","0":"abcdef","1":"bc","2":"abged","3":"abgcd","4":"fgbc","5":"afgcd","6":"afgedc","7":"abc","8":"abcdefg","9":"abcdfg"};
 function segSVG(str){let x=0,p="";for(const ch of str){
     if(ch===":"){p+=`<rect class="on" x="${x+1}" y="10" width="3.2" height="3.2" rx="1"/><rect class="on" x="${x+1}" y="23" width="3.2" height="3.2" rx="1"/>`;x+=7;continue}
     if(ch===","){p+=`<rect class="on" x="${x}" y="32" width="3.4" height="4" rx="1"/>`;x+=6;continue}
     const on=SEGMAP[ch]||"";p+=`<g transform="translate(${x} 0) skewX(-6)">`+Object.entries(SEG).map(([k,[sx,sy,w,h]])=>`<rect class="${on.includes(k)?"on":"off"}" x="${sx}" y="${sy}" width="${w}" height="${h}" rx="1.3"/>`).join("")+`</g>`;x+=24}
   return `<svg viewBox="-2 -1 ${x+2} 38" aria-hidden="true">${p}</svg>`}
-function setNum(el,txt){if(!el)return;if(skinNow()==="carbonio"){if(el.dataset.t===txt&&el.querySelector(".seg7"))return;el.dataset.t=txt;el.innerHTML=`<span class="sr">${esc(txt)}</span>`+txt.replace(/([0-9:,]+)|([^0-9:,]+)/g,(m,d,o)=>d?`<span class="seg7">${segSVG(d)}</span>`:`<span class="lu" aria-hidden="true">${esc(o)}</span>`)}else{delete el.dataset.t;el.textContent=txt}}
+function setNum(el,txt){if(!el)return;if(skinNow()==="carbonio"){if(el.dataset.t===txt&&el.querySelector(".seg7"))return;el.dataset.t=txt;el.innerHTML=`<span class="sr">${esc(txt)}</span>`+txt.replace(/([0-9:,\-]+)|([^0-9:,\-]+)/g,(m,d,o)=>d?`<span class="seg7">${segSVG(d)}</span>`:`<span class="lu" aria-hidden="true">${esc(o)}</span>`)}else{delete el.dataset.t;el.textContent=txt}}
 function ledify(){if(skinNow()!=="carbonio")return;app.querySelectorAll(".tgt b,.kpi b").forEach(b=>{if(!b.querySelector(".seg7"))setNum(b,b.textContent)})}
 // Il carico della prossima volta sale contando, una volta al giorno per esercizio
 const lastPct={},counted=new Set(),recShown=new Set();
