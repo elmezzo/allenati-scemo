@@ -1418,12 +1418,16 @@ function target(ex){
   const reps=sets.map(x=>num(x.reps));
   const kgs=sets.map(x=>num(x.kg)).filter(v=>v!=null);
   const kg=kgs.length?Math.max(...kgs):null;
-  const full=sets.length>=ex.s;
+  // Range chiuso = tutte le serie previste quel giorno (anche se ridotte da padel, energia o partita) al carico più alto
+  let lm=last.mods;if(!lm){try{lm=[...assess(new Date(last.date)).mods]}catch(e){lm=null}}
+  const planned=Math.max(1,lm?setsFor(ex,new Set(lm)):ex.s);
+  const heavy=kg!=null?sets.filter(x=>num(x.kg)===kg):sets,hReps=heavy.map(x=>num(x.reps));
+  const full=heavy.length>=planned;
   const st=ex.step||2.5;
   // Isolamento e prevenzione con un gradino grosso rispetto al carico (>15%, es. extrarotazione 5 → 10 kg): prima si va oltre il range con le ripetizioni
   const big=(ex.t==="iso"||ex.t==="prev")&&kg>0&&st/kg>0.15;
   const top=big?Math.min(30,ex.hi+5):ex.hi;
-  const allTop=full&&reps.every(r=>r>=top);
+  const allTop=full&&hReps.every(r=>r>=top);
   const allIn=reps.every(r=>r>=ex.lo);
   const prev=h[1]?h[1].sets[ex.id].filter(x=>num(x.reps)!=null).map(x=>num(x.reps)):null;
   const missTwice=!allIn&&prev&&prev.some(r=>r<ex.lo);
@@ -2130,7 +2134,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   return `<article class="ex cur ${ssP.length?"ss":""}" data-ex="${ex.id}">
     <div class="exhead"><h3>${esc(ex.n)}${(howOf(ex)||errOf(ex)||ex.note)?(IMGEX[ex.id]=ex,`<button class="qm" data-img="${ex.id}" aria-label="Come si fa: ${esc(ex.n)}">?</button>`):""}</h3><button class="swap" data-base="${base.id}" aria-label="Sostituisci ${esc(ex.n)}">⇄ Cambia</button></div>
     <div class="tgt"><b${cu?` data-cu="${lk}|${tg.kg}|${esc(" kg × "+r0)}|${ex.id}"`:""}>${big}</b>${tg.badge?`<small class="${tg.kind}">${esc(tg.badge)}</small>`:""}</div>
-    <p class="prog ${tg.kind}"><span>${esc(tg.msg)}</span></p>${dr.nextNote&&dr.nextNote.ex===ex.id?`<p class="prog down"><span>${esc(dr.nextNote.txt)}</span></p>`:""}
+    ${dr.nextNote&&dr.nextNote.ex===ex.id?`<p class="prog down"><span>${esc(dr.nextNote.txt)}</span></p>`:`<p class="prog ${tg.kind}"><span>${esc(tg.msg)}</span></p>`}
     <p class="spec">${spec.join("<i> · </i>")}</p>
     ${chips.length?`<div class="chips">${chips.join("")}</div>`:""}
     ${hasKg&&setupOf(ex)?setupHTML(ex):""}
@@ -2175,7 +2179,7 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;audioUnlock();
     const kNow=num(r.kg),nx=(dd.ex[exId]||[])[j+1];
     if(fail&&kNow>0&&got<ex.lo-2&&j+1<n&&!(nx&&nx.done)&&!["perf","time","nordic"].includes(ex.t)){const st=ex.step||2.5;let nk=Math.max(st,roundStep(kNow*0.9,st));if(nk>=kNow&&kNow-st>0)nk=kNow-st;
       if(nk<kNow){const old={};for(let k=j+1;k<n;k++){const c=cell(g,exId,k);if(!c.done){old[k]=c.kg;c.kg=fk(nk)}}
-        dd.nextNote={ex:exId,j,old,txt:`Prossime serie: ${fk(nk)} kg, il ${Math.round((kNow-nk)/kNow*100)}% in meno. Puoi cambiarlo.`}}}
+        dd.nextNote={ex:exId,j,old,txt:`${n-j-1>1?"Prossime serie":"Prossima serie"}: ${fk(nk)} kg, il ${Math.round((kNow-nk)/kNow*100)}% in meno. Puoi cambiarlo.`}}}
     save();
     // Recupero adattivo: serie sotto le ripetizioni su un multiarticolare = 30 s in più
     const plus=fail&&ex.t==="comp"&&S.adrest!==false?30:0;
