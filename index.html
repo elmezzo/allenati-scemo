@@ -1148,6 +1148,13 @@ html[data-skin="campo"]:not(#z) #court{opacity:.14}
   .tick.pop::before,.tick.pop::after,.ex.cur.sw-n,.ex.cur.sw-p,.rk-pr .rbd.n{animation:none!important}
   .sheet{transition:none}
 }
+.rule{display:inline-flex;align-items:center;gap:4px}
+.rule .ic{width:14px;height:14px;flex:none}
+:root:not(#z) .thead{background:color-mix(in srgb,var(--bg) 97%,transparent)}
+.field input{text-align:center}
+:root:not(#z) .banner button.sec{color:var(--muted);font-weight:600}
+html[data-skin="vetro"]:not(#z) .rest:not(.over) :is(.tv,.tl){color:var(--fg)}
+.sheet h2{touch-action:none}
 </style>
 <!--APP-HEAD-END-->
 </head>
@@ -1171,6 +1178,7 @@ html[data-skin="campo"]:not(#z) #court{opacity:.14}
   <symbol id="i-gym" viewBox="0 0 24 24"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></symbol>
   <symbol id="i-bed" viewBox="0 0 24 24"><path d="M3 18V7M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="1.6"/></symbol>
   <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3 5 14h6l-1 7 8-11h-6z"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4.5M12 17v.4"/></symbol>
   <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
   <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
   <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></symbol>
@@ -1210,7 +1218,7 @@ const BUILTIN={
   {id:"a8",n:"Extrarotazione al cavo",s:2,lo:15,hi:15,rir:"2",rest:45,t:"prev",step:5,side:true,note:"Gomito a 90°, braccio lungo il fianco.",eq:"mac"},
   {id:"b9",n:"Estensione del polso",s:2,lo:15,hi:15,rir:"1-2",rest:45,t:"prev",step:1,note:"Discesa lenta. Prevenzione gomito.",eq:"db"}]},
  B:{name:"Upper B",title:"Upper B",sub:"Spalle, dorso e braccia",ex:[
-  {id:"b10",mu:"Deltoidi",n:"Landmine press",s:4,lo:8,hi:10,rir:"1-2",rest:120,t:"comp",step:2.5,oh:true,side:true,note:"Per braccio. Kg = dischi sul bilanciere.",eq:"bar"},
+  {id:"b10",mu:"Deltoidi",n:"Landmine press",s:4,lo:8,hi:10,rir:"1-2",rest:120,t:"comp",step:2.5,oh:true,side:true,note:"Kg = dischi caricati sul bilanciere (non il bilanciere).",eq:"bar"},
   {id:"b2",mu:"Dorso",n:"Lat machine presa neutra",s:3,lo:8,hi:12,rir:"1-2",rest:120,t:"comp",step:5,eq:"mac",strap:true},
   {id:"b3",mu:"Petto",n:"Croci ai cavi dal basso",s:3,lo:10,hi:15,rir:"0-1",rest:75,t:"iso",step:5,eq:"mac"},
   {id:"b4",mu:"Dorso",n:"Pulley basso",s:3,lo:10,hi:12,rir:"1-2",rest:90,t:"comp",step:5,eq:"mac",strap:true},
@@ -1249,7 +1257,7 @@ const ALTS={
  g7:[["adduttori","Adduttori alla macchina",{t:"iso",lo:12,hi:15,step:5,side:false,eq:"mac"}],["copbreve","Copenhagen a leva corta (ginocchio)",{}]],
  g8:[["pressa","Calf alla pressa",{step:5,eq:"mac"}],["smith","Calf al Smith",{step:2.5,eq:"bar"}],["mono","Calf a una gamba con manubrio",{side:true,step:2,eq:"db"}]],
  g9:[["palla","Lancio rotazionale palla medica",{t:"perf"}],["elastico","Woodchop con elastico",{}],["manubrio","Woodchop con manubrio",{step:2,note:"Kg = un manubrio.",eq:"db"}]],
- b10:[["manubri","Lento manubri seduto",{side:false,lo:6,hi:10,step:2,note:"Kg = un manubrio.",eq:"db"}],["macchina","Shoulder press alla macchina",{side:false,step:5,eq:"mac"}],["smith","Lento al Smith",{side:false,step:2.5,eq:"bar"}],["arnold","Arnold press",{side:false,step:2,note:"Kg = un manubrio.",eq:"db"}]],
+ b10:[["macchina","Shoulder press alla macchina",{side:false,step:5,note:"Presa neutra se c'è.",eq:"mac"}],["manubri","Lento manubri seduto",{side:false,lo:6,hi:10,step:2,note:"Kg = un manubrio. Presa neutra.",eq:"db"}],["smith","Lento al Smith",{side:false,step:2.5,eq:"bar"}],["arnold","Arnold press",{side:false,step:2,note:"Kg = un manubrio. Da evitare se la spalla tira.",eq:"db"}]],
  b1:[["macchina","Shoulder press alla macchina",{step:5,eq:"mac"}],["landmine","Landmine press",{side:true,step:2.5,eq:"bar"}],["smith","Lento al Smith",{step:2.5,eq:"bar"}],["arnold","Arnold press",{step:2,note:"Kg = un manubrio.",eq:"db"}]],
  b2:[["trazioni","Trazioni presa neutra",{t:"bw",note:"Kg = zavorra.",step:2,eq:"zav"}],["mono","Pulldown a un braccio al cavo",{side:true,step:5,eq:"mac"}],["larga","Lat machine presa larga",{step:5,eq:"mac"}],["pullover","Pullover con manubrio",{t:"iso",lo:10,hi:12,step:2,note:"Un manubrio tenuto con due mani.",eq:"db"}]],
  b3:[["butterfly","Butterfly alla macchina",{step:5,eq:"mac"}],["cpinc","Chest press inclinata alla macchina",{t:"comp",lo:8,hi:12,step:5,eq:"mac"}],["crociman","Croci su panca inclinata con manubri",{step:2,note:"Kg = un manubrio. Gomiti a 45°, fermati prima che la spalla tiri.",eq:"db"}],["incman","Panca inclinata con manubri",{t:"comp",lo:8,hi:12,step:2,note:"Kg = un manubrio. Gomiti a 45°, fermati prima che la spalla tiri.",eq:"db"}]],
@@ -1434,7 +1442,7 @@ function target(ex){
   const sm=a=>a.reduce((t,r)=>t+r,0);
   if(missTwice&&kg&&!(prev&&sm(reps)>sm(prev))){
     let nk=Math.max(st,roundStep(kg*0.9,st));if(nk>=kg&&kg-st>0)nk=kg-st;
-    if((kg-nk)/kg>0.15)return {kg,reps:pad(reps.map(r=>Math.min(top,r+1)),ex.s,ex.lo),top,kind:"flat",badge:"=",msg:"Stesso carico: il gradino per scendere è troppo grosso. Punta a una ripetizione in più per serie."};
+    if((kg-nk)/kg>0.15)return {kg,reps:pad(reps.map(r=>Math.min(top,r+1)),ex.s,ex.lo),top,kind:"up",badge:"+1 rip",msg:"Stesso carico: scendere di un gradino sarebbe troppo. Punta a una ripetizione in più per serie."};
     return {kg:nk,reps:Array(ex.s).fill(ex.lo),top,kind:"down",badge:nk<kg?`-${fk(kg-nk)} kg`:"=",msg:`Due sedute sotto le ${ex.lo} ripetizioni: scendi a ${fk(nk)} kg e ricostruisci.`};
   }
   if(!allIn)return {kg,reps:Array(ex.s).fill(ex.lo),top,kind:"flat",badge:"=",msg:`Stesso carico, obiettivo ${ex.lo} ripetizioni su tutte le serie.`};
@@ -1877,10 +1885,10 @@ const EN_LBL={low:"Stanco",ok:"Normale",high:"In forma"};
 let sheetN=0;
 // Entrata dal basso con curva tipo iOS, uscita più rapida; la maniglia si trascina giù per chiudere
 function sheetFx(wrap,close){if(!RM()){wrap.classList.add("enter");setTimeout(()=>wrap.classList.remove("enter"),340)}
-  let y0=null,dy=0,t0=0;const sh=()=>wrap.querySelector(".sheet");
-  wrap.addEventListener("pointerdown",e=>{if(!e.target.closest(".grab,.sheet h2"))return;y0=e.clientY;dy=0;t0=Date.now();sh().style.transition="none"});
-  wrap.addEventListener("pointermove",e=>{if(y0==null)return;dy=Math.max(0,e.clientY-y0);sh().style.transform=`translateY(${dy}px)`});
-  const end=()=>{if(y0==null)return;y0=null;const s=sh();s.style.transition="";const v=dy/Math.max(1,Date.now()-t0);if(dy>90||v>.6){close()}else{s.style.transform=""}};
+  let y0=null,dy=0,pts=[];const sh=()=>wrap.querySelector(".sheet");
+  wrap.addEventListener("pointerdown",e=>{if(!e.target.closest(".grab,.sheet h2")||sh().scrollTop>0)return;y0=e.clientY;dy=0;pts=[[e.clientY,performance.now()]];sh().style.transition="none";try{e.target.setPointerCapture(e.pointerId)}catch(_){}});
+  wrap.addEventListener("pointermove",e=>{if(y0==null)return;const raw=e.clientY-y0;dy=raw<0?raw*.2:raw;const t=performance.now();pts.push([e.clientY,t]);while(pts.length>2&&t-pts[0][1]>80)pts.shift();sh().style.transform=`translateY(${dy}px)`});
+  const end=()=>{if(y0==null)return;y0=null;const s=sh();s.style.transition="";const a=pts[0],b=pts[pts.length-1],v=b&&a&&b[1]>a[1]?(b[0]-a[0])/(b[1]-a[1]):0;if(dy>90||(v>.5&&dy>10)){close()}else{s.style.transform=""}};
   wrap.addEventListener("pointerup",end);wrap.addEventListener("pointercancel",end)}
 function sheetOut(wrap){if(RM()||!wrap.isConnected){wrap.remove();return}const s=wrap.querySelector(".sheet");if(s){s.style.transition="";s.style.transform=""}wrap.classList.add("out");setTimeout(()=>wrap.remove(),200)}
 // Esc chiude anche i fogli costruiti a mano (Sostituisci)
@@ -1918,8 +1926,8 @@ function renderToday(){
   const week=[...Array(7)].map((_,i)=>{const x=addDays(d,i),p=dayPlan(x);return `<button class="wd2 ${i===0?"t":""}" data-wd="${i}" aria-label="${esc(cap(WD_LONG[x.getDay()]))}: cambia il padel"><b>${WD[x.getDay()]}</b><span class="ics">${i===0&&doneS?dayIcons(p).replace(I("gym"),`<b class="dk" aria-label="Fatta">✓</b>`):dayIcons(p)}</span><small>${p.gym in PLAN?esc(PLAN[p.gym].name):p.padel==="match"?"Partita":p.padel==="train"?"Padel":"Riposo"}</small></button>`}).join("");
   let dl="";
   if(deloadOn())dl=`<div class="banner">${I("bolt")}<div><b>Scarico in corso</b><span>Fino a ${fmtShort(S.deload.to)}: metà serie, stessi carichi, 3-4 in canna.</span></div><button id="endDl">Termina</button></div>`;
-  else{const w=deloadAdvice();if(w)dl=`<div class="banner">${I("bolt")}<div><b>Scarico consigliato</b><span>${esc(cap(w.join(" e ")))}.</span></div><button id="startDl">Avvia scarico</button><button id="snoozeDl">Non ora</button></div>`}
-  const bk=backupDue();if(bk)dl+=`<div class="banner bk">${I("info")}<div><b>Salva un backup</b><span>${bk.never?`${bk.n} sedute salvate solo su questo telefono, mai copiate.`:`Ultimo backup ${bk.days} giorni fa.`} Se cancelli l'app o cambi telefono le perdi.</span></div><button id="bkNow">Salva</button><button id="bkLater">Non ora</button></div>`;
+  else{const w=deloadAdvice();if(w)dl=`<div class="banner">${I("bolt")}<div><b>Scarico consigliato</b><span>${esc(cap(w.join(" e ")))}.</span></div><button id="startDl">Avvia scarico</button><button id="snoozeDl" class="sec">Non ora</button></div>`}
+  const bk=backupDue();if(bk)dl+=`<div class="banner bk">${I("info")}<div><b>Salva un backup</b><span>${bk.never?`${bk.n} sedute salvate solo su questo telefono, mai copiate.`:`Ultimo backup ${bk.days} giorni fa.`} Se cancelli l'app o cambi telefono le perdi.</span></div><button id="bkNow">Salva</button><button id="bkLater" class="sec">Non ora</button></div>`;
   app.innerHTML=`
   <header class="head"><span class="today-d">${esc(cap(WD_LONG[d.getDay()]))} ${d.getDate()} ${d.toLocaleDateString("it-IT",{month:"long"})}${phaseStart()?` · ${PH[phaseAt()].n} settimana ${Math.floor((d-new Date(phaseStart()+"T00:00:00"))/(7*864e5))+1}`:""}</span></header>
   ${doneS?`<section class="card hero done" aria-live="polite">
@@ -2037,7 +2045,7 @@ function renderTrain(){
   const rs=document.querySelector("#restIn [data-ts]");if(rs)rs.onclick=stopTimer;
   const tb=document.querySelector('.tabs button[aria-pressed="true"]');if(tb)tb.scrollIntoView({block:"nearest",inline:"center"});
   const fb=document.getElementById("finish");fb.onclick=()=>{const miss=tot-dn;
-    if(miss>0&&fb.dataset.arm!=="1"){fb.dataset.arm="1";fb.textContent=`Mancano ${miss} ${miss===1?"serie":"serie"}: tocca di nuovo per salvare`;clearTimeout(fb.t);fb.t=setTimeout(()=>{fb.dataset.arm="";fb.textContent="Termina e salva"},4000);return}
+    if(miss>0&&fb.dataset.arm!=="1"){fb.dataset.arm="1";fb.textContent=`Mancano ${miss} serie · tocca ancora`;clearTimeout(fb.t);fb.t=setTimeout(()=>{fb.dataset.arm="";fb.textContent="Termina e salva"},4000);return}
     finish(g,mods)};
   const sv=document.getElementById("seeSv");if(sv)sv.onclick=()=>summarySheet(svd);
   const c=document.getElementById("clear");c.onclick=()=>{if(c.dataset.arm!=="1"){c.dataset.arm="1";c.textContent="Tocca di nuovo per svuotare";setTimeout(()=>{c.dataset.arm="";c.textContent="Svuota la seduta"},3500);return}delete S.draft[g];openEx[g]=null;save();renderTrain()};
@@ -2108,7 +2116,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   if(rir&&/\d/.test(rir))spec.push(`<span${rir!==ex.rir?' class="ad"':""}>${esc(rir)}&nbsp;in&nbsp;canna</span>`);
   spec.push(`<span>${ex.rest?(ex.rest>=120?fk(ex.rest/60)+"&nbsp;min":ex.rest+"&nbsp;s"):"Subito il prossimo"}</span>`);
   if(mods.has("prePadel")&&ex.strap)chips.push(`<span class="chip adapt">Fasce da polso: risparmi la presa per il padel</span>`);
-  if(tg.top&&tg.top>ex.hi&&!mods.has("deload"))chips.push(`<span class="chip hot">Fino a ${tg.top} rip</span>`);
+  if(tg.top&&tg.top>ex.hi&&!mods.has("deload"))chips.push(`<span class="chip hot">Range esteso fino a ${tg.top}: il prossimo gradino è il ${Math.round((ex.step||2.5)/Math.max(1,tg.kg||lastKg(ex)||1)*100)}%</span>`);
   const stallTxt=!mods.has("deload")&&stalled(ex)?(phaseAt()==="def"?`<p class="prog down"><span>In calo</span><span>Massimale sotto del 5% nelle ultime 2 sedute. In definizione basta tenere i carichi: se continua togli una serie o fai lo scarico.</span></p>`:`<p class="prog down"><span>Fermo</span><span>Nessun miglioramento nelle ultime 3 sedute: prova una variante con ⇄ Cambia o togli una serie per due settimane.</span></p>`):"";
   const over=tOn&&tEnd<=Date.now();
   const rest=withRest&&tOn?`<div class="rest ${over?"over":""}" id="restIn" role="timer"><span class="rr"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rk" cx="32" cy="32" r="28"/><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg><b class="tv"></b></span><span class="tl" aria-live="assertive">${over?"Recupero finito":"Recupero"+(tPlus?" · +"+tPlus+"\u00a0s":"")}</span><button data-tp>+15 s</button><button data-ts>Chiudi</button></div>`:"";
@@ -2205,7 +2213,7 @@ let swapScope="today";
 function openSwap(g,baseId){
   const base=PLAN[g].ex.find(e=>e.id===baseId);if(!base)return;
   const cur=(S.swaps[g+"|"+baseId]&&effEx(g,base).id!==base.id)?S.swaps[g+"|"+baseId].k:null;
-  const opts=[{k:"",n:base.n,sub:"Originale della scheda"},...altsOf(base).map(a=>({k:a.k,n:a.n,sub:a.custom?"Aggiunto da te":(a.o.note||TYPES.find(t=>t[0]===(a.o.t||base.t))?.[1]||"")}))];
+  const opts=[{k:"",n:base.n,sub:"Originale della scheda"},...altsOf(base).map(a=>({k:a.k,n:a.n,sub:a.custom?"Aggiunto da te":[TYPES.find(t=>t[0]===(a.o.t||base.t))?.[1],a.o.note].filter(Boolean).join(" · ")}))];
   const wrap=document.createElement("div");wrap.className="sheet-wrap";
   wrap.innerHTML=`<div class="sheet" role="dialog" aria-modal="true" aria-label="Cambia esercizio"><div class="grab"></div>
     <h2>Cambia esercizio</h2><p class="note" style="margin:0">Macchina occupata? Scegli una variante che lavora gli stessi muscoli. Serie e recupero restano quelli della scheda. Ogni variante ha carichi e progressi suoi.</p>
@@ -2766,11 +2774,11 @@ function applySkin(){const h=document.documentElement;if(!SKINS.some(x=>x[0]===S
 function legRule(d){
   const p=S.week[d]||{};if(!PLAN[p.gym])return "";
   const n1=S.week[(d+1)%7]||{},n2=S.week[(d+2)%7]||{};
-  if(!PLAN[p.gym].legs)return n1.padel==="match"&&n2.padel==="match"&&(p.padel||"none")==="none"?`<span class="rule mid">! Partite nei 2 giorni dopo: solo braccia e prevenzione</span>`:"";
+  if(!PLAN[p.gym].legs)return n1.padel==="match"&&n2.padel==="match"&&(p.padel||"none")==="none"?`<span class="rule mid">${I("warn")}Partite nei 2 giorni dopo: solo braccia e prevenzione</span>`:"";
   if(p.padel!=="none"&&p.padel)return `<span class="rule bad">✕ Stesso giorno del padel</span>`;
   if(n1.padel==="match")return `<span class="rule bad">✕ Partita il giorno dopo</span>`;
-  if(n2.padel==="match")return `<span class="rule mid">! Partita dopo 2 giorni: niente Nordic</span>`;
-  if(n1.padel==="train")return `<span class="rule mid">! Padel il giorno dopo: nelle prime 3 settimane una serie in meno sugli eccentrici</span>`;
+  if(n2.padel==="match")return `<span class="rule mid">${I("warn")}Partita dopo 2 giorni: niente Nordic</span>`;
+  if(n1.padel==="train")return earlyPhase(addDays(today(),(d-today().getDay()+7)%7))?`<span class="rule mid">${I("warn")}Padel il giorno dopo: nelle prime 3 settimane una serie in meno sugli eccentrici</span>`:`<span class="rule ok">✓ Padel il giorno dopo: seduta completa</span>`;
   return `<span class="rule ok">✓ Lontano da padel e partite</span>`;
 }
 function daySheet(d){
@@ -2822,15 +2830,16 @@ function renderSettings(){
     <li>Ripetizioni prima, carico poi: +1 ripetizione per serie finché chiudi tutto al limite alto del range, poi aumenta il carico e riparti dal basso. L'aumento segue l'attrezzo: +5 kg macchine e cavi (pacco pesi), +2,5 kg bilanciere e Smith, +2 kg manubri e zavorra con kettlebell. Sui multiarticolari pesanti, se il 2,5% (parte alta) o il 5% (gambe) del carico è più del gradino, sale di quello, arrotondato al gradino.</li>
     <li>Dopo l'ultima serie puoi dire com'era. Facile: due ripetizioni in più invece di una, oppure aumento doppio se resta entro il 10% del carico. Al limite su un multiarticolare a fine range: il carico resta fermo finché non chiudi con le ripetizioni in canna previste.</li>
     <li>Isolamento e prevenzione con un gradino grosso rispetto al carico (oltre il 15%, es. extrarotazione da 5 a 10 kg): prima porti le ripetizioni fino a 5 oltre il range, poi sali di peso.</li>
-    <li>Due sedute di fila sotto il minimo del range: -10% e ricostruisci.</li>
-    <li>Esercizio fermo da 3 sedute: l'app propone una variante o una serie in meno.</li>
+    <li>Due sedute di fila sotto il minimo del range e ripetizioni totali non salite: -10% e riparti dal basso. Se il -10% vuol dire scendere più del 15% (gradino grosso), carico fermo e una ripetizione in più per serie.</li>
+    <li>Esercizio fermo (né kg né massimale stimato saliti in 3 sedute): prova una variante o togli una serie per due settimane.</li>
     <li>Salti: ripetizioni fisse, si progredisce in altezza o distanza. Nordic: meno aiuto dall'elastico. Copenhagen: +5 s fino a 30, poi versione più dura.</li>
     <li>Gambe mai nello stesso giorno del padel e mai il giorno prima di una partita.</li>
+    <li>Venerdì prima di due partite (sabato e domenica): solo braccia, Copenhagen, cuffia e polso.</li>
     <li>Padel e palestra nello stesso giorno: una serie in meno sulle spinte sopra la testa. Giorno di partita o energia bassa: una serie in meno su tutto.</li>
     <li>Scarico quando serve, non a calendario: l'app lo propone dopo 6 settimane senza scarico o con 3+ esercizi fermi. Serie dimezzate, stessi carichi, 3-4 in canna. Le sedute di scarico non contano per la progressione.</li>
    </ul></section>
   <section class="card"><h3>Backup</h3><p class="note" style="margin:0">I dati stanno solo su questo telefono. Salva un backup ogni tanto.</p>
-   <div class="row"><button class="btn" id="exp">Esporta backup</button><label class="btn" style="text-align:center">Importa backup <small>(sostituisce i dati attuali)</small><input type="file" id="imp" accept="application/json" hidden></label></div>
+   <div class="row"><button class="btn" id="exp">Esporta backup</button><label class="btn" style="flex-direction:column;gap:2px;text-align:center">Importa backup<small style="font-size:12px;font-weight:500;opacity:.75">sostituisce i dati attuali</small><input type="file" id="imp" accept="application/json" hidden></label></div>
    <button class="btn danger" id="wipe">Cancella tutti i dati</button><p class="msg" id="bmsg" aria-live="polite"></p></section>`;
   document.getElementById("back").onclick=()=>go("set");
   document.querySelectorAll("#segOrd button").forEach(b=>b.onclick=()=>{S.order=b.dataset.v;save();renderSettings()});
