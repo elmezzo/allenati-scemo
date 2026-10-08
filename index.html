@@ -1155,6 +1155,9 @@ html[data-skin="campo"]:not(#z) #court{opacity:.14}
 :root:not(#z) .banner button.sec{color:var(--muted);font-weight:600}
 html[data-skin="vetro"]:not(#z) .rest:not(.over) :is(.tv,.tl){color:var(--fg)}
 .sheet h2{touch-action:none}
+.sheet .grab{flex:none}
+:root:not(#z) .wd2 .ics{min-height:54px;justify-content:center}
+.ctx button{justify-content:space-between}
 </style>
 <!--APP-HEAD-END-->
 </head>
@@ -1442,7 +1445,7 @@ function target(ex){
   const sm=a=>a.reduce((t,r)=>t+r,0);
   if(missTwice&&kg&&!(prev&&sm(reps)>sm(prev))){
     let nk=Math.max(st,roundStep(kg*0.9,st));if(nk>=kg&&kg-st>0)nk=kg-st;
-    if((kg-nk)/kg>0.15)return {kg,reps:pad(reps.map(r=>Math.min(top,r+1)),ex.s,ex.lo),top,kind:"up",badge:"+1 rip",msg:"Stesso carico: scendere di un gradino sarebbe troppo. Punta a una ripetizione in più per serie."};
+    if((kg-nk)/kg>0.15)return {kg,reps:pad(reps.map(r=>Math.min(top,r+1)),ex.s,ex.lo),top,kind:"up",badge:"+1 rip",msg:`Stesso carico: scendere di un gradino sarebbe troppo. Una ripetizione in più per serie, finché arrivi a ${ex.lo}.`};
     return {kg:nk,reps:Array(ex.s).fill(ex.lo),top,kind:"down",badge:nk<kg?`-${fk(kg-nk)} kg`:"=",msg:`Due sedute sotto le ${ex.lo} ripetizioni: scendi a ${fk(nk)} kg e ricostruisci.`};
   }
   if(!allIn)return {kg,reps:Array(ex.s).fill(ex.lo),top,kind:"flat",badge:"=",msg:`Stesso carico, obiettivo ${ex.lo} ripetizioni su tutte le serie.`};
@@ -2116,14 +2119,14 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   if(rir&&/\d/.test(rir))spec.push(`<span${rir!==ex.rir?' class="ad"':""}>${esc(rir)}&nbsp;in&nbsp;canna</span>`);
   spec.push(`<span>${ex.rest?(ex.rest>=120?fk(ex.rest/60)+"&nbsp;min":ex.rest+"&nbsp;s"):"Subito il prossimo"}</span>`);
   if(mods.has("prePadel")&&ex.strap)chips.push(`<span class="chip adapt">Fasce da polso: risparmi la presa per il padel</span>`);
-  if(tg.top&&tg.top>ex.hi&&!mods.has("deload"))chips.push(`<span class="chip hot">Range esteso fino a ${tg.top}: il prossimo gradino è il ${Math.round((ex.step||2.5)/Math.max(1,tg.kg||lastKg(ex)||1)*100)}%</span>`);
+  if(tg.top&&tg.top>ex.hi&&!mods.has("deload")&&tg.reps.every(r=>r>=ex.lo))chips.push(`<span class="chip hot">Range esteso fino a ${tg.top}: il prossimo gradino è il ${Math.round((ex.step||2.5)/Math.max(1,tg.kg||lastKg(ex)||1)*100)}%</span>`);
   const stallTxt=!mods.has("deload")&&stalled(ex)?(phaseAt()==="def"?`<p class="prog down"><span>In calo</span><span>Massimale sotto del 5% nelle ultime 2 sedute. In definizione basta tenere i carichi: se continua togli una serie o fai lo scarico.</span></p>`:`<p class="prog down"><span>Fermo</span><span>Nessun miglioramento nelle ultime 3 sedute: prova una variante con ⇄ Cambia o togli una serie per due settimane.</span></p>`):"";
   const over=tOn&&tEnd<=Date.now();
   const rest=withRest&&tOn?`<div class="rest ${over?"over":""}" id="restIn" role="timer"><span class="rr"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rk" cx="32" cy="32" r="28"/><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg><b class="tv"></b></span><span class="tl" aria-live="assertive">${over?"Recupero finito":"Recupero"+(tPlus?" · +"+tPlus+"\u00a0s":"")}</span><button data-tp>+15 s</button><button data-ts>Chiudi</button></div>`:"";
   return `<article class="ex cur ${ssP.length?"ss":""}" data-ex="${ex.id}">
     <div class="exhead"><h3>${esc(ex.n)}${(howOf(ex)||errOf(ex)||ex.note)?(IMGEX[ex.id]=ex,`<button class="qm" data-img="${ex.id}" aria-label="Come si fa: ${esc(ex.n)}">?</button>`):""}</h3><button class="swap" data-base="${base.id}" aria-label="Sostituisci ${esc(ex.n)}">⇄ Cambia</button></div>
     <div class="tgt"><b${cu?` data-cu="${lk}|${tg.kg}|${esc(" kg × "+r0)}|${ex.id}"`:""}>${big}</b>${tg.badge?`<small class="${tg.kind}">${esc(tg.badge)}</small>`:""}</div>
-    <p class="prog ${tg.kind}"><span>${esc(tg.msg)}</span></p>
+    <p class="prog ${tg.kind}"><span>${esc(tg.msg)}</span></p>${dr.nextNote&&dr.nextNote.ex===ex.id?`<p class="prog down"><span>${esc(dr.nextNote.txt)}</span></p>`:""}
     <p class="spec">${spec.join("<i> · </i>")}</p>
     ${chips.length?`<div class="chips">${chips.join("")}</div>`:""}
     ${hasKg&&setupOf(ex)?setupHTML(ex):""}
@@ -2161,6 +2164,12 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;audioUnlock();
     const want=num(tgFor(ex,mods).reps[j]??ex.lo),got=num(r.reps);
     const fail=ex.t!=="perf"&&want!=null&&got!=null&&got<want;
     if(fail)celebrate("fail");else if(doneN>=n)goldEnd();else buzz(40)
+    // Serie molto sotto il minimo (3+ ripetizioni): la prossima parte già con il 10% in meno, sempre modificabile
+    if(dd.nextNote&&dd.nextNote.ex===exId)delete dd.nextNote;
+    const kNow=num(r.kg),nx=(dd.ex[exId]||[])[j+1];
+    if(fail&&kNow>0&&got<ex.lo-2&&j+1<n&&!(nx&&nx.done)&&!["perf","time","nordic"].includes(ex.t)){const st=ex.step||2.5;let nk=Math.max(st,roundStep(kNow*0.9,st));if(nk>=kNow&&kNow-st>0)nk=kNow-st;
+      if(nk<kNow){cell(g,exId,j+1).kg=fk(nk);dd.nextNote={ex:exId,txt:`Prossima serie: ${fk(nk)} kg, il 10% in meno. Puoi cambiarlo.`}}}
+    save();
     // Recupero adattivo: serie sotto le ripetizioni su un multiarticolare = 30 s in più
     const plus=fail&&ex.t==="comp"&&S.adrest!==false?30:0;
     if(restS&&!sessionDone)startTimer(restS+plus,ex.n,plus);
