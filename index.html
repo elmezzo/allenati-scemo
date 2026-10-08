@@ -1296,7 +1296,7 @@ html[data-skin="manga"]:not(#z):not(#y) .rest:not(.over) button{border-color:var
 html[data-skin="manga"]:not(#z):not(#y) .rk-gen>b{margin-bottom:4px}
 /* Oro di fine esercizio: si anima solo l'opacità */
 .gold-end{animation:none;box-shadow:none}
-.gold-end::before{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 3px rgba(255,214,140,.85),inset 0 0 60px rgba(255,190,90,.3),inset 0 0 120px rgba(var(--acc-rgb,255,190,90),.28);opacity:0;animation:goldglow 1.4s ease-out forwards}
+.gold-end::before{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 3px rgba(255,214,140,.85),inset 0 0 60px rgba(255,190,90,.3),inset 0 0 120px rgba(255,190,90,.28);opacity:0;animation:goldglow 1.4s ease-out forwards}
 @keyframes goldglow{25%{opacity:1}100%{opacity:0}}
 /* Giro 5 */
 :root:not(#z):not(#y) .kpi .pill{align-self:center}
@@ -1312,7 +1312,6 @@ html[data-skin="manga"]:not(#z):not(#y) .gold-end i{background:repeating-linear-
 html[data-skin="manga"]:not(#z):not(#y) .gold-end::before{box-shadow:inset 0 0 0 4px #ffd65a}
 html[data-skin="manga"][data-var="2"]:not(#z):not(#y) .tabs button[aria-pressed="true"]{background:#1a191e;border-color:var(--acc);color:var(--acc);box-shadow:3px 3px 0 var(--acc)}
 /* Giro 6 */
-.gold-end::before{box-shadow:inset 0 0 0 3px rgba(255,214,140,.85),inset 0 0 60px rgba(255,190,90,.3),inset 0 0 120px rgba(255,190,90,.28)}
 html[data-skin="manga"]:not(#z):not(#y) .gold-end::before{box-shadow:inset 0 0 0 4px #ffd65a}
 html[data-skin="campo"]:not(#z):not(#y) .back{background:color-mix(in srgb,var(--bg) 70%,transparent);border-radius:6px;padding-inline:8px;margin-inline:-8px;width:fit-content}
 html[data-skin="campo"]:not(#z):not(#y) :is(details.mn>summary,p.note,p.grp){background:color-mix(in srgb,var(--bg) 70%,transparent)}
@@ -1320,6 +1319,13 @@ html[data-skin="campo"]:not(#z):not(#y) :is(.card,.ex,.status,details.h,.banner,
 html[data-skin="campo"]:not(#z):not(#y) .wu .wub .btn:not(.ghost){background:var(--acc);color:#10140a;border-color:transparent}
 html[data-skin="manga"]:not(#z):not(#y) .rest:not(.over){background:#1a191e}
 html[data-skin="manga"][data-var="1"]:not(#z):not(#y) .tgt b{text-shadow:1.5px 1.5px 0 rgba(var(--acc-rgb),.75)}
+/* Giro 7 */
+html[data-skin="eclisse"]:not(#z):not(#y) .wu .wub .btn:not(.ghost){background:color-mix(in srgb,var(--fg) 14%,transparent);color:var(--fg);border-color:rgba(var(--cor-rgb),.35)}
+html[data-skin="campo"]:not(#z):not(#y) #court{-webkit-mask-image:linear-gradient(transparent 0 92px,#000 136px);mask-image:linear-gradient(transparent 0 92px,#000 136px)}
+html[data-skin="campo"]:not(#z):not(#y){--go:var(--acc)}
+html[data-skin="campo"]:not(#z):not(#y) :is(details.mn>summary,p.note,p.grp,.back){background:color-mix(in srgb,var(--bg) 80%,transparent)}
+html[data-skin="campo"]:not(#z):not(#y) :is(.card,.ex,.status,details.h,.banner,.sheet) :is(p.note,p.grp){background:none}
+html[data-skin="carbonio"]:not(#z):not(#y) .wu li em{color:#c3cad2}
 </style>
 <!--APP-HEAD-END-->
 </head>
