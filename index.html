@@ -1520,6 +1520,32 @@ html[data-skin="lavagna"]:not(#z):not(#y) .wd2.t::before{content:"";position:abs
 html[data-skin="lavagna"]:not(#z):not(#y) nav.bar .ndot::before{width:30px;height:3px;border-radius:0;background:var(--acc);box-shadow:none;filter:url(#chalkb)}
 html[data-skin="lavagna"]:not(#z):not(#y) :is(.timer,.rest) button:not(#q)::before{border-color:rgba(var(--acc-rgb),.7)}
 html[data-skin="lavagna"]:not(#z):not(#y) .rk-fig .rk-mz .mz{filter:saturate(.4) brightness(1.25)}
+
+/* tenuta a tempo */
+.hold{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;border:0;border-radius:10px;background:var(--hot);color:var(--hot-ink);font-weight:800;font-size:15px;touch-action:manipulation}
+.hold svg{width:14px;height:14px;fill:currentColor;stroke:none}
+.set:not(.now) .hold{background:transparent;color:var(--fg);box-shadow:inset 0 0 0 1.5px var(--line)}
+.hold-ov{position:fixed;inset:0;z-index:60;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:calc(env(safe-area-inset-top,0px) + 20px) 20px calc(env(safe-area-inset-bottom,0px) + 24px);text-align:center}
+.hold-ov[hidden]{display:none}
+body.ho-on{overflow:hidden}
+.ho-top{display:flex;flex-direction:column;gap:4px}
+.ho-top b{font:400 30px/1.05 var(--display);color:var(--fg);text-wrap:balance}
+.ho-top span{font-size:15px;font-weight:700;color:var(--muted)}
+.ho-ring{position:relative;width:min(78vw,340px);aspect-ratio:1;max-width:100%;color:var(--hot);display:grid;place-items:center}
+.ho-ring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.ho-ring .ra{stroke-width:4;transition:stroke-dashoffset .1s linear}
+.ho-ring .rk{stroke-width:4}
+.ho-t{position:relative;font:400 clamp(96px,32vw,150px)/1 var(--display);font-variant-numeric:tabular-nums;color:var(--fg)}
+.hold-ov:not([data-ph="hold"]) .ho-t{color:var(--muted)}
+.hold-ov:not([data-ph="hold"]) .ra{opacity:0}
+.hold-ov.soon .ho-ring{color:var(--adapt)}
+.hold-ov.soon .ho-t{color:var(--adapt)}
+.ho-msg{margin:0;font-size:17px;font-weight:700;color:var(--fg);min-height:1.45em}
+.ho-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:min(100%,420px)}
+@media (prefers-reduced-motion:no-preference){.hold-ov.soon .ho-t{animation:hoPulse 1s ease-in-out infinite}}
+@keyframes hoPulse{50%{transform:scale(1.06)}}
+html[data-skin="lavagna"] .ho-ring .ra{filter:url(#chalk)}
+html[data-skin="lavagna"] .ho-ring .rk{stroke-dasharray:3 4;opacity:.2}
 </style>
 <!--APP-HEAD-END-->
 </head>
@@ -1533,6 +1559,12 @@ html[data-skin="lavagna"]:not(#z):not(#y) .rk-fig .rk-mz .mz{filter:saturate(.4)
   <button id="tplus">+15 s</button>
   <button id="tstop">Chiudi</button>
 </div>
+<div class="hold-ov" id="holdOv" hidden role="dialog" aria-modal="true" aria-labelledby="hoName">
+  <div class="ho-top"><b id="hoName"></b><span id="hoSub"></span></div>
+  <div class="ho-ring"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rk" cx="32" cy="32" r="28"/><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg><span class="ho-t" id="hoT" role="timer" aria-live="off">0</span></div>
+  <p class="ho-msg" id="hoMsg" aria-live="assertive"></p>
+  <div class="ho-btns"><button class="btn hot" id="hoStop">Ferma e segna</button><button class="btn" id="hoX">Annulla</button></div>
+</div>
 <div id="celeSlot"></div>
 <div id="aurw" aria-hidden="true"></div>
 <svg id="court" viewBox="0 0 120 220" aria-hidden="true"><path class="ln" pathLength="1" d="M10 10 H110 V210 H10 Z"/><path class="ln net" pathLength="1" d="M4 110 H116"/><path class="ln" pathLength="1" d="M10 40.5 H110"/><path class="ln" pathLength="1" d="M10 179.5 H110"/><path class="ln" pathLength="1" d="M60 40.5 V179.5"/></svg>
@@ -1540,6 +1572,7 @@ html[data-skin="lavagna"]:not(#z):not(#y) .rk-fig .rk-mz .mz{filter:saturate(.4)
   <defs><linearGradient id="rgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff9a5a"/><stop offset=".7" style="stop-color:var(--acc,#ff4f9a)"/><stop offset="1" stop-color="#c34dff"/></linearGradient><filter id="chalk" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="2" seed="4" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="3.5" xChannelSelector="R" yChannelSelector="G" result="d"/><feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="1" seed="9" result="g"/><feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2.6 0 0 0 1.9" result="m"/><feComposite in="d" in2="m" operator="in"/></filter><filter id="chalkb" x="-3%" y="-8%" width="106%" height="116%"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="2" seed="11" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="4" xChannelSelector="R" yChannelSelector="G" result="d"/><feTurbulence type="fractalNoise" baseFrequency="1.3" numOctaves="1" seed="5" result="g"/><feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -1.4 0 0 0 1.75" result="m"/><feComposite in="d" in2="m" operator="in"/></filter></defs>
   <symbol id="i-rac" viewBox="0 0 24 24"><circle cx="9.5" cy="9.5" r="6.8"/><path d="m14.3 14.3 1.9 1.9"/><path d="m15.4 18.2 2.8-2.8 3.9 3.9-2.8 2.8z"/><circle cx="7.4" cy="8" r=".75"/><circle cx="11.6" cy="8" r=".75"/><circle cx="9.5" cy="11.4" r=".75"/></symbol>
   <symbol id="i-cup" viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 0 1-10 0V4zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4M12 13v4M8 21h8M10 17h4v4h-4z"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></symbol>
   <symbol id="i-gym" viewBox="0 0 24 24"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></symbol>
   <symbol id="i-bed" viewBox="0 0 24 24"><path d="M3 18V7M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="1.6"/></symbol>
   <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3 5 14h6l-1 7 8-11h-6z"/></symbol>
@@ -2398,6 +2431,7 @@ function renderTrain(){
   document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{gymSel=b.dataset.k;S.gym=gymSel;save();renderTrain()});
   document.querySelectorAll("#exs input").forEach(i=>i.oninput=()=>{const v=i.dataset.f==="kg"?i.value.replace(/[^\d.,]/g,""):i.value.replace(/\D/g,"").slice(0,3);if(v!==i.value)i.value=v;cell(g,i.dataset.ex,+i.dataset.j)[i.dataset.f]=v.trim();save()});
   document.querySelectorAll("#exs .tick").forEach(b=>b.onclick=()=>toggleSet(g,b.dataset.ex,+b.dataset.j,mods));
+  document.querySelectorAll("#exs .hold").forEach(b=>b.onclick=()=>holdStart(g,b.dataset.ex,+b.dataset.j,mods));
   document.querySelectorAll("#exs [data-pm]").forEach(b=>b.onclick=e=>{e.preventDefault();const inp=b.parentElement.querySelector("input"),f=b.dataset.pm,d=+b.dataset.d,ex=exById(b.dataset.ex);let v=num(inp.value)||0;
     if(f==="kg"){v=Math.max(0,Math.round((v+d*(ex.step||2.5))*100)/100);inp.value=fk(v)}else{v=Math.max(0,Math.round(v)+d*(ex.t==="time"?5:1));inp.value=String(v)}
     cell(g,b.dataset.ex,+b.dataset.j)[f]=inp.value;save();buzz(8)});
@@ -2476,7 +2510,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
     const rpV=r.reps!=null?r.reps:String(tg.reps[j]??ex.lo);
     const pm=(f,d)=>r.done?"":`<button class="pm" data-pm="${f}" data-d="${d}" data-ex="${ex.id}" data-j="${j}" aria-label="${d>0?"Più":"Meno"} ${f==="kg"?"kg":unit}, serie ${j+1}">${d>0?"+":"−"}</button>`,fw=r.done?"label":"div";
     sets+=`<div class="set ${r.done?"done":""} ${now?"now":""}"><span class="i">${j+1}</span>
-      ${hasKg?`<${fw} class="field ${r.done?"":"pmf"}">${pm("kg",-1)}<input inputmode="decimal" value="${esc(kgV)}" placeholder="kg" data-ex="${ex.id}" data-j="${j}" data-f="kg" aria-label="Kg serie ${j+1}"><span>kg</span>${pm("kg",1)}</${fw}>`:`<span class="bw">${ex.t==="nordic"?"elastico":ex.t==="time"?"tenuta":"salto"}</span>`}
+      ${hasKg?`<${fw} class="field ${r.done?"":"pmf"}">${pm("kg",-1)}<input inputmode="decimal" value="${esc(kgV)}" placeholder="kg" data-ex="${ex.id}" data-j="${j}" data-f="kg" aria-label="Kg serie ${j+1}"><span>kg</span>${pm("kg",1)}</${fw}>`:(ex.t==="time"&&!r.done?`<button class="hold" data-ex="${ex.id}" data-j="${j}" aria-label="Avvia il cronometro della tenuta, serie ${j+1}">${I("play")}Via</button>`:`<span class="bw">${ex.t==="nordic"?"elastico":ex.t==="time"?"tenuta":"salto"}</span>`)}
       <${fw} class="field ${r.done?"":"pmf"}">${pm("reps",-1)}<input inputmode="numeric" value="${esc(rpV)}" data-ex="${ex.id}" data-j="${j}" data-f="reps" aria-label="${unit} serie ${j+1}"><span>${unit}</span>${pm("reps",1)}</${fw}>
       <button class="tick" data-ex="${ex.id}" data-j="${j}" aria-pressed="${!!r.done}" aria-label="Serie ${j+1} fatta">✓</button></div>`;
   }
@@ -2637,9 +2671,49 @@ function buzz(ms){try{if(navigator.vibrate){navigator.vibrate(ms);return}
   if(!hapL){hapL=document.createElement("label");hapL.setAttribute("aria-hidden","true");hapL.style.cssText="position:fixed;left:-200px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none";hapL.innerHTML='<input type="checkbox" switch tabindex="-1">';document.body.appendChild(hapL)}
   hapL.click()}catch(e){}}
 
+
 /* ================= TIMER ================= */
 let tEnd=0,tInt=null,tOn=false,tTot=60,tWarn=false,tLbl="";const T=id=>document.getElementById(id);
 let tPlus=0;
+/* ================= TENUTA A TEMPO (plank e simili) ================= */
+// Cronometro grande a schermo intero: 3 s per mettersi in posizione, poi il conto alla rovescia dei secondi da tenere.
+// Esercizi per lato: dopo il primo lato 5 s per girarsi, poi il secondo. A fine tenuta segna la serie da solo.
+let H=null;
+function blip(f,dur){if(S.sound===false||!actx)return;try{const t=actx.currentTime+.01,o=actx.createOscillator(),gn=actx.createGain();o.type="sine";o.frequency.value=f;gn.gain.setValueAtTime(.0001,t);gn.gain.exponentialRampToValueAtTime(.35,t+.02);gn.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(gn);gn.connect(actx.destination);o.start(t);o.stop(t+dur+.05)}catch(e){}}
+function holdStart(g,exId,j,mods){audioUnlock();wakeOn();
+  const ex=PLAN[g].ex.map(e=>effEx(g,e)).find(e=>e.id===exId)||exById(exId);
+  const inp=document.querySelector(`#exs input[data-ex="${exId}"][data-j="${j}"][data-f="reps"]`);
+  const target=Math.max(5,num(inp&&inp.value)||num(tgFor(ex,mods).reps[j])||ex.lo);
+  H={g,exId,j,mods,ex,target,sides:ex.side?2:1,side:0,held:[],phase:"prep",end:Date.now()+3000,last:-1,back:document.activeElement};
+  T("hoName").textContent=ex.n;T("holdOv").hidden=false;document.body.classList.add("ho-on");T("hoStop").focus({preventScroll:true});
+  buzz(20);holdLoop();H.int=setInterval(holdLoop,100)}
+function holdSub(){const s=H.sides>1?(H.side?" · secondo lato":" · primo lato"):"";return `Serie ${H.j+1} · ${H.target} s${s}`}
+function holdLoop(){if(!H)return;const ov=T("holdOv"),now=Date.now(),left=Math.max(0,Math.ceil((H.end-now)/1000)),ra=ov.querySelector(".ra");
+  T("hoSub").textContent=holdSub();ov.dataset.ph=H.phase;
+  if(H.phase==="hold"){const tot=H.target*1000,fr=Math.min(1,Math.max(0,(H.end-now)/tot));ra.style.strokeDashoffset=String(100-fr*100);T("hoT").textContent=left;ov.classList.toggle("soon",left<=3&&left>0);
+    T("hoMsg").textContent="Tieni la posizione";
+    if(left!==H.last&&left<=3&&left>0){blip(660,.12)}
+  }else{ra.style.strokeDashoffset="100";T("hoT").textContent=left;ov.classList.remove("soon");T("hoMsg").textContent=H.phase==="prep"?"Mettiti in posizione":"Cambia lato";
+    if(left!==H.last&&left>0)blip(520,.08)}
+  H.last=left;
+  if(now<H.end)return;
+  if(H.phase!=="hold"){H.phase="hold";H.end=now+H.target*1000;H.t0=now;H.last=-1;buzz(30);blip(990,.25);return}
+  H.held[H.side]=H.target;
+  if(H.side+1<H.sides){H.side++;H.phase="switch";H.end=now+5000;H.last=-1;buzz(40);beep();return}
+  beep();holdFinish()}
+function holdFinish(){if(!H)return;const h=H;clearInterval(h.int);H=null;
+  const ov=T("holdOv");ov.hidden=true;ov.classList.remove("soon");document.body.classList.remove("ho-on");
+  const vals=h.held.filter(v=>v!=null),sec=vals.length?Math.min(...vals):0;
+  if(sec<1){h.back&&h.back.focus&&h.back.focus({preventScroll:true});return}
+  const c=cell(h.g,h.exId,h.j);c.reps=String(sec);save();
+  const inp=document.querySelector(`#exs input[data-ex="${h.exId}"][data-j="${h.j}"][data-f="reps"]`);if(inp)inp.value=String(sec);
+  if(!c.done)toggleSet(h.g,h.exId,h.j,h.mods)}
+function holdStop(){if(!H)return;if(H.phase==="hold"){const s=Math.floor((Date.now()-H.t0)/1000);H.held[H.side]=s}holdFinish()}
+function holdCancel(){if(!H)return;H.held=[];holdFinish()}
+T("hoStop").onclick=holdStop;T("hoX").onclick=holdCancel;
+document.addEventListener("keydown",e=>{if(H&&e.key==="Escape"){e.preventDefault();holdCancel()}});
+document.addEventListener("visibilitychange",()=>{if(H&&document.visibilityState==="visible")holdLoop()});
+
 function startTimer(sec,label,plus,end){tPlus=plus||0;tLbl=label;tEnd=end||Date.now()+sec*1000;tTot=sec;S.timer={end:tEnd,tot:sec,lbl:label,plus:tPlus};save();tWarn=sec<=10;tOn=true;T("tlbl").textContent="Recupero · "+label+(tPlus?" · +"+tPlus+"\u00a0s":"");T("timer").classList.remove("over");clearInterval(tInt);tick();tInt=setInterval(tick,250)}
 function tick(){if(!tOn)return;const left=Math.round((tEnd-Date.now())/1000),a=Math.abs(left),txt=(left<0?"+":"")+Math.floor(a/60)+":"+String(a%60).padStart(2,"0");
   setNum(T("tval"),txt);const inl=document.getElementById("restIn");if(inl)setNum(inl.querySelector(".tv"),txt);
