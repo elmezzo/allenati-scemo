@@ -1379,9 +1379,9 @@ html[data-skin="lavagna"]:not(#z):not(#y) body{background:#1d2521}
 html[data-skin="lavagna"]:not(#z):not(#y) body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:1;filter:none;animation:none;
   background:
    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .7 -.33'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"),
-   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 800' preserveAspectRatio='xMidYMid slice'%3E%3Cg fill='none' stroke='%23eeece4' stroke-opacity='.075' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M70 120 L330 118 L332 690 L68 692 Z'/%3E%3Cpath d='M60 405 L340 403' stroke-dasharray='10 8'/%3E%3Cpath d='M70 205 L331 203 M69 605 L332 607 M200 205 L200 605'/%3E%3Cpath d='M120 300 l22 22 m0 -22 l-22 22 M260 470 l22 22 m0 -22 l-22 22'/%3E%3Ccircle cx='140' cy='520' r='13'/%3E%3Ccircle cx='265' cy='290' r='13'/%3E%3Cpath d='M150 335 C180 380 230 380 250 440' /%3E%3Cpath d='M240 428 l11 14 l4 -17'/%3E%3C/g%3E%3C/svg%3E") center/cover no-repeat,
-   radial-gradient(55% 22% at 22% 14%,rgba(255,255,255,.045),transparent 70%),
-   radial-gradient(60% 18% at 80% 62%,rgba(255,255,255,.035),transparent 70%),
+   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 800' preserveAspectRatio='xMidYMid slice'%3E%3Cg fill='none' stroke='%23eeece4' stroke-opacity='.11' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M70 120 L330 118 L332 690 L68 692 Z'/%3E%3Cpath d='M60 405 L340 403' stroke-dasharray='10 8'/%3E%3Cpath d='M70 205 L331 203 M69 605 L332 607 M200 205 L200 605'/%3E%3Cpath d='M120 300 l22 22 m0 -22 l-22 22 M260 470 l22 22 m0 -22 l-22 22'/%3E%3Ccircle cx='140' cy='520' r='13'/%3E%3Ccircle cx='265' cy='290' r='13'/%3E%3Cpath d='M150 335 C180 380 230 380 250 440' /%3E%3Cpath d='M240 428 l11 14 l4 -17'/%3E%3C/g%3E%3C/svg%3E") center/cover no-repeat,
+   radial-gradient(48% 14% at 24% 15%,rgba(255,255,255,.07),transparent 70%),
+   radial-gradient(55% 12% at 78% 63%,rgba(255,255,255,.055),transparent 70%),
    radial-gradient(120% 70% at 50% 0%,#232c27,#1a211d 70%)}
 /* polvere di gesso che galleggia piano */
 html[data-skin="lavagna"]:not(#z):not(#y)::after{content:"";position:fixed;inset:-10% 0 0;z-index:-1;pointer-events:none;
@@ -1452,6 +1452,35 @@ html[data-skin="lavagna"] .rbd :is(.hx,.wg,.cr){fill:rgba(29,37,33,.85);stroke:c
 html[data-skin="lavagna"] .rbd .in{fill:none;stroke:currentColor;stroke-opacity:.45;stroke-dasharray:3 3}
 html[data-skin="lavagna"] .rbd .gl,html[data-skin="lavagna"] .rbd circle{fill:currentColor}
 html[data-skin="lavagna"] .rbd .gs{display:none}
+/* Lavagna, giro 2 */
+html[data-skin="lavagna"]:not(#z):not(#y) div.timer:not(.over){color:var(--fg)}
+html[data-skin="lavagna"]:not(#z):not(#y) div.timer:not(.over) .l{color:var(--fg)}
+html[data-skin="lavagna"]:not(#z):not(#y) :is(.timer .tr .t,.rest .rr .tv){font:800 22px/1 "Manrope",system-ui,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.02em;color:var(--chalk)}
+html[data-skin="lavagna"]:not(#z):not(#y) .rest .rr .tv{font-size:24px}
+html[data-skin="lavagna"]:not(#z):not(#y) .timer .tr .t{font-size:20px}
+html[data-skin="lavagna"]:not(#z):not(#y) .rk-fig .rk-gl{display:none}
+html[data-skin="lavagna"]:not(#z):not(#y) .rk-fig .rk-mz{filter:url(#chalk)}
+html[data-skin="lavagna"]:not(#z):not(#y) .rk-fig .rk-mz>g{stroke:rgba(var(--chalk-rgb),.75);stroke-width:1.1}
+html[data-skin="lavagna"]:not(#z):not(#y) .rk-fig svg{-webkit-mask:repeating-linear-gradient(-55deg,#000 0 2.4px,rgba(0,0,0,.6) 2.4px 4.2px);mask:repeating-linear-gradient(-55deg,#000 0 2.4px,rgba(0,0,0,.6) 2.4px 4.2px)}
+html[data-skin="lavagna"]:not(#z):not(#y) .rk-bar{background:transparent;border:1.4px solid rgba(var(--chalk-rgb),.3);border-radius:3px}
+html[data-skin="lavagna"]:not(#z):not(#y) .rk-bar i{border-radius:0;box-shadow:none;background:repeating-linear-gradient(-62deg,var(--acc) 0 2.5px,transparent 2.5px 5px)}
+html[data-skin="lavagna"]:not(#z):not(#y) .pill{background:transparent;box-shadow:inset 0 0 0 1.5px currentColor;border-radius:5px}
+html[data-skin="lavagna"]:not(#z):not(#y) .seg{background:transparent;border:1.4px solid rgba(var(--chalk-rgb),.25);border-radius:6px}
+html[data-skin="lavagna"]:not(#z):not(#y) .seg button{border-radius:4px}
+html[data-skin="lavagna"]:not(#z):not(#y) .seg button[aria-pressed="true"]{background:rgba(var(--acc-rgb),.12);color:var(--fg);box-shadow:inset 0 0 0 1.6px var(--acc)}
+html[data-skin="lavagna"]:not(#z):not(#y) :is(.tile,.dayr,.xrow,.ctx button,.tabs button,.pitem,.opt){border-radius:7px 4px 8px 5px}
+/* serie: si scrive sulla riga, + e − sono segni di gesso */
+html[data-skin="lavagna"]:not(#z):not(#y) .set .field,html[data-skin="lavagna"]:not(#z):not(#y) .set .field.pmf{background:transparent;border:0;border-bottom:2px solid rgba(var(--chalk-rgb),.4);border-radius:0;box-shadow:none;outline:0}
+html[data-skin="lavagna"]:not(#z):not(#y) .set .field:focus-within{border-bottom-color:var(--acc)}
+html[data-skin="lavagna"]:not(#z):not(#y) .set.done .field{border-bottom-color:rgba(var(--chalk-rgb),.2);opacity:.8}
+html[data-skin="lavagna"]:not(#z):not(#y) .pm{background:none;color:var(--muted);font-family:var(--display);font-size:22px}
+/* spunta fatta: segno di gesso nel colore della variante */
+html[data-skin="lavagna"]:not(#z):not(#y) button.tick[aria-pressed="true"]{background:transparent!important;color:var(--acc)!important;box-shadow:none!important;border:2px solid var(--acc);font-size:21px}
+/* primo bottone: tratteggio che si vede */
+html[data-skin="lavagna"]:not(#z):not(#y) button.btn.hot,html[data-skin="lavagna"]:not(#z):not(#y) .btn.hot{background:repeating-linear-gradient(-55deg,var(--acc) 0 3.5px,rgba(var(--acc-rgb),.74) 3.5px 6.5px)}
+/* mensola di legno dei gessetti */
+html[data-skin="lavagna"]:not(#z):not(#y) nav.bar{background:linear-gradient(#5b412a,#4a3422 3px,#3a291b 9px,#241a12 11px,#171d1a 11px);padding-top:11px}
+html[data-skin="lavagna"]:not(#z):not(#y) nav.bar button[aria-current="page"]::before,html[data-skin="lavagna"]:not(#z):not(#y) nav.bar button[aria-current="page"]::after{background:var(--acc);border-radius:2px;filter:url(#chalk)}
 </style>
 <!--APP-HEAD-END-->
 </head>
