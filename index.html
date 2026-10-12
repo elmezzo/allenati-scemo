@@ -15,7 +15,7 @@
 <title>Allenati Scemo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Big+Shoulders+Display:wght@700;800&family=Manrope:wght@400;500;600;700;800&family=Dela+Gothic+One&family=Syne:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Big+Shoulders+Display:wght@700;800&family=Cabin+Sketch:wght@400;700&family=Manrope:wght@400;500;600;700;800&family=Dela+Gothic+One&family=Syne:wght@600;700;800&display=swap">
 <style>
 /* Layout: app a schermo intero da telefono, scuro per scelta (stile "Notte"). Header con giorno, contenuto scorrevole, timer sopra la barra di navigazione in basso. */
 :root{
@@ -1364,6 +1364,94 @@ html[data-skin="vetro"]:not(#z):not(#y):not(#x) :is(h1,h2,h3,.hero .big,.tgt b,.
 html[data-skin="vetro"]:not(#z):not(#y):not(#x) .btn.hot{background:var(--acc);box-shadow:none;border-radius:12px}
 html[data-skin="vetro"]:not(#z):not(#y):not(#x) .btn.hot::before,html[data-skin="vetro"]:not(#z):not(#y):not(#x) .btn.hot::after{display:none}
 html[data-skin="vetro"]:not(#z):not(#y):not(#x) body::before{background:radial-gradient(60% 55% at 50% 0%,rgba(235,240,255,.22),transparent 70%),radial-gradient(35% 35% at 50% 0%,rgba(var(--acc-rgb),.16),transparent 70%)}
+/* ===== STILE LAVAGNA (2026-10-12): gesso su ardesia, la lavagna del coach ===== */
+html[data-skin="lavagna"]{color-scheme:dark;--bg:#1d2521;--card:#222b26;--card-2:#28322c;--field:#19201c;--line:rgba(236,234,224,.2);--fg:#eeece4;--muted:#c6c9bf;--dim:#b0b4a9;
+  --chalk:#eeece4;--chalk-rgb:238,236,228;--acc:#ffd84d;--acc-rgb:255,216,77;--hot:var(--acc);--hot-ink:#1d2521;
+  --pad:#7fd0ff;--match:#ff94bd;--info:#7fd0ff;--go:#9fe6a0;--stop:#ff8a80;--adapt:#ffb366;
+  --grad:linear-gradient(var(--acc),var(--acc));--glow:rgba(0,0,0,0);--hl:rgba(255,255,255,.05);
+  --cardbg:rgba(27,34,30,.6);--tilebg:rgba(30,38,33,.6);--title:linear-gradient(var(--chalk),var(--chalk));--navbg:#171d1a;
+  --display:"Cabin Sketch","Bebas Neue",sans-serif}
+html[data-skin="lavagna"][data-var="1"]{--acc:#7fd0ff;--acc-rgb:127,208,255;--pad:#ffd84d;--match:#ff94bd;--info:#ffd84d}
+html[data-skin="lavagna"][data-var="2"]{--acc:#ff94bd;--acc-rgb:255,148,189;--pad:#7fd0ff;--match:#ffd84d;--info:#7fd0ff}
+html[data-skin="lavagna"]:not(#z):not(#y){--hot:var(--acc);--grad:linear-gradient(var(--acc),var(--acc))}
+html[data-skin="lavagna"]:not(#z):not(#y) body{background:#1d2521}
+/* la lavagna: ardesia con grana, ditate di cancellino e uno schema di gioco mezzo cancellato */
+html[data-skin="lavagna"]:not(#z):not(#y) body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:1;filter:none;animation:none;
+  background:
+   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .7 -.33'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"),
+   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 800' preserveAspectRatio='xMidYMid slice'%3E%3Cg fill='none' stroke='%23eeece4' stroke-opacity='.075' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M70 120 L330 118 L332 690 L68 692 Z'/%3E%3Cpath d='M60 405 L340 403' stroke-dasharray='10 8'/%3E%3Cpath d='M70 205 L331 203 M69 605 L332 607 M200 205 L200 605'/%3E%3Cpath d='M120 300 l22 22 m0 -22 l-22 22 M260 470 l22 22 m0 -22 l-22 22'/%3E%3Ccircle cx='140' cy='520' r='13'/%3E%3Ccircle cx='265' cy='290' r='13'/%3E%3Cpath d='M150 335 C180 380 230 380 250 440' /%3E%3Cpath d='M240 428 l11 14 l4 -17'/%3E%3C/g%3E%3C/svg%3E") center/cover no-repeat,
+   radial-gradient(55% 22% at 22% 14%,rgba(255,255,255,.045),transparent 70%),
+   radial-gradient(60% 18% at 80% 62%,rgba(255,255,255,.035),transparent 70%),
+   radial-gradient(120% 70% at 50% 0%,#232c27,#1a211d 70%)}
+/* polvere di gesso che galleggia piano */
+html[data-skin="lavagna"]:not(#z):not(#y)::after{content:"";position:fixed;inset:-10% 0 0;z-index:-1;pointer-events:none;
+  background:radial-gradient(1.4px 1.4px at 12% 22%,rgba(255,255,255,.35) 50%,transparent 52%),radial-gradient(1px 1px at 68% 14%,rgba(255,255,255,.3) 50%,transparent 52%),radial-gradient(1.6px 1.6px at 84% 48%,rgba(255,255,255,.25) 50%,transparent 52%),radial-gradient(1px 1px at 33% 61%,rgba(255,255,255,.3) 50%,transparent 52%),radial-gradient(1.3px 1.3px at 52% 84%,rgba(255,255,255,.28) 50%,transparent 52%),radial-gradient(1px 1px at 8% 77%,rgba(255,255,255,.3) 50%,transparent 52%),radial-gradient(1.2px 1.2px at 91% 91%,rgba(255,255,255,.25) 50%,transparent 52%)}
+@media (prefers-reduced-motion:no-preference){html[data-skin="lavagna"]:not(#z):not(#y)::after{animation:lvDust 26s ease-in-out infinite alternate}}
+@keyframes lvDust{from{transform:translateY(0)}to{transform:translateY(5%) translateX(1.5%)}}
+
+/* tipografia: titoli e numeri scritti col gesso */
+html[data-skin="lavagna"]:not(#z):not(#y) :is(h1,h2,h3,.hero .big,.tgt b,.kpi b,.timer .t,.rest .tv,.dayr .d,.set .i,.tile b,.pitem b,details.h summary b,.edx .top b){font-family:var(--display);font-weight:700;letter-spacing:.005em;color:var(--chalk);background:none;-webkit-text-fill-color:currentColor;text-shadow:none}
+html[data-skin="lavagna"]:not(#z):not(#y) :is(.hero .lbl,.kicker){color:var(--acc);letter-spacing:.14em}
+html[data-skin="lavagna"]:not(#z):not(#y) .hero div.big{display:block;width:fit-content;padding-bottom:6px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 10' preserveAspectRatio='none'%3E%3Cpath d='M3 6 C40 2 80 9 120 5 S180 3 197 6' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E") left bottom/100% 9px no-repeat;-webkit-background-clip:border-box;background-clip:border-box}
+html[data-skin="lavagna"]:not(#z):not(#y) .hero .big{-webkit-mask:none}
+html[data-skin="lavagna"]:not(#z):not(#y) .tgt b{color:var(--chalk)}
+
+/* riquadri disegnati a mano */
+html[data-skin="lavagna"]:not(#z):not(#y) :is(.card,.ex,.status,details.h,.hero,.banner){position:relative;background:var(--cardbg);border:0;border-radius:6px;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+html[data-skin="lavagna"]:not(#z):not(#y) :is(.card,.ex,.status,details.h,.hero,.banner)::before{display:none}
+html[data-skin="lavagna"]:not(#z):not(#y) :is(.card,.ex,.status,details.h,.hero,.banner)::after{content:"";position:absolute;inset:0;border:1.8px solid rgba(var(--chalk-rgb),.42);border-radius:7px 4px 8px 5px;pointer-events:none;filter:url(#chalk);animation:none;background:none;opacity:1;transform:none;box-shadow:none}
+html[data-skin="lavagna"]:not(#z):not(#y) .ex.cur::after{border:2.4px solid var(--acc);border-color:rgba(var(--acc-rgb),.95)}
+html[data-skin="lavagna"]:not(#z):not(#y) .hero::after{border-width:2.2px;border-color:rgba(var(--chalk-rgb),.55)}
+html[data-skin="lavagna"]:not(#z):not(#y) :is(.ctx button,.xrow,.dayr,.tile,.gear,.pitem,.opt,.edx,.arx,.tabs button){background:rgba(34,43,38,.75);border:1.4px solid rgba(var(--chalk-rgb),.2);border-radius:5px;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+html[data-skin="lavagna"]:not(#z):not(#y) .tabs button[aria-pressed="true"]{border-color:var(--acc);color:var(--fg);background:rgba(var(--acc-rgb),.1)}
+html[data-skin="lavagna"]:not(#z):not(#y) .tabs button[aria-pressed="true"] *{color:inherit}
+/* campi: si scrive sulla riga */
+html[data-skin="lavagna"]:not(#z):not(#y) :is(.field,select,.inl input,.edx input,.edx select,.ed input,.ed select){background:rgba(0,0,0,.16);border:0;border-bottom:2px solid rgba(var(--chalk-rgb),.38);border-radius:4px 4px 0 0;box-shadow:none}
+html[data-skin="lavagna"]:not(#z):not(#y) .set.done .field{border-bottom-color:rgba(159,230,160,.6);opacity:.85}
+
+/* bottoni: quello principale è colorato a tratteggio col gesso */
+html[data-skin="lavagna"]:not(#z):not(#y) button.btn.hot,html[data-skin="lavagna"]:not(#z):not(#y) .btn.hot{background:repeating-linear-gradient(-62deg,var(--acc) 0 3px,rgba(var(--acc-rgb),.82) 3px 4.5px);color:var(--hot-ink);border:0;border-radius:6px 4px 7px 5px;box-shadow:none;text-shadow:none}
+html[data-skin="lavagna"]:not(#z):not(#y) .btn.hot::after,html[data-skin="lavagna"]:not(#z):not(#y) .btn.hot::before{display:none;animation:none}
+html[data-skin="lavagna"]:not(#z):not(#y) .btn:not(.hot){background:transparent;border:1.6px solid rgba(var(--chalk-rgb),.38);border-radius:6px 4px 7px 5px;box-shadow:none;color:var(--fg)}
+html[data-skin="lavagna"]:not(#z):not(#y) .btn.danger{border-color:rgba(255,138,128,.6);color:var(--stop)}
+html[data-skin="lavagna"]:not(#z):not(#y) .chip{background:transparent;border:1.4px solid currentColor;border-radius:5px}
+
+/* spunta: casella a gesso, e quando la segni una sbuffata di polvere */
+html[data-skin="lavagna"]:not(#z):not(#y) .tick{position:relative;background:transparent;border:1.6px solid rgba(var(--chalk-rgb),.3);border-radius:6px 4px 6px 4px;color:var(--dim)}
+html[data-skin="lavagna"]:not(#z):not(#y) .tick.pop{animation:lvTick .3s var(--ease-out)}
+html[data-skin="lavagna"]:not(#z):not(#y) .tick.pop::after{content:"";position:absolute;inset:-14px;border-radius:50%;pointer-events:none;border:0;box-shadow:none;
+  background:radial-gradient(2px 2px at 20% 30%,rgba(255,255,255,.9) 50%,transparent 55%),radial-gradient(1.6px 1.6px at 78% 22%,rgba(255,255,255,.8) 50%,transparent 55%),radial-gradient(2.2px 2.2px at 85% 70%,rgba(255,255,255,.85) 50%,transparent 55%),radial-gradient(1.5px 1.5px at 30% 82%,rgba(255,255,255,.8) 50%,transparent 55%),radial-gradient(1.8px 1.8px at 50% 8%,rgba(255,255,255,.7) 50%,transparent 55%),radial-gradient(1.4px 1.4px at 6% 55%,rgba(255,255,255,.7) 50%,transparent 55%),radial-gradient(1.6px 1.6px at 96% 45%,rgba(255,255,255,.7) 50%,transparent 55%),radial-gradient(40% 40% at 50% 50%,rgba(255,255,255,.18),transparent 70%);
+  animation:lvPuff .5s var(--ease-out) forwards}
+@keyframes lvTick{from{transform:scale(.9)}to{transform:scale(1)}}
+@keyframes lvPuff{from{opacity:1;transform:scale(.6)}to{opacity:0;transform:scale(1.25)}}
+
+/* timer: anello tracciato col gesso */
+html[data-skin="lavagna"]:not(#z):not(#y) :is(.timer,.rest):not(.over) .ra{stroke:var(--acc);filter:url(#chalk)}
+html[data-skin="lavagna"]:not(#z):not(#y) :is(.timer,.rest) .rk{stroke:var(--chalk);opacity:.16;stroke-dasharray:3 4}
+html[data-skin="lavagna"]:not(#z):not(#y) div.timer:not(.over){background:#1a211d;border:1.8px solid rgba(var(--chalk-rgb),.38);border-radius:8px 5px 9px 6px;box-shadow:0 14px 30px -12px rgba(0,0,0,.8);-webkit-backdrop-filter:none;backdrop-filter:none}
+html[data-skin="lavagna"]:not(#z):not(#y) .rest:not(.over){background:rgba(255,255,255,.03);border:1.6px solid rgba(var(--chalk-rgb),.3);border-radius:6px;box-shadow:none}
+html[data-skin="lavagna"]:not(#z):not(#y) :is(.timer,.rest):not(.over) button{background:transparent;border:1.4px solid rgba(var(--acc-rgb),.7);color:var(--acc);border-radius:5px}
+
+/* barra di avanzamento: tratteggio */
+html[data-skin="lavagna"]:not(#z):not(#y) .pbar{background:transparent;border:1.4px solid rgba(var(--chalk-rgb),.28);border-radius:3px;height:8px}
+html[data-skin="lavagna"]:not(#z):not(#y) .pbar i{border-radius:0;background:repeating-linear-gradient(-62deg,var(--acc) 0 2.5px,transparent 2.5px 5px)}
+
+/* intestazione e barra: la cornice di legno con la mensola dei gessetti */
+html[data-skin="lavagna"]:not(#z):not(#y) .thead{background:#1d2521;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:0 1.5px 0 rgba(var(--chalk-rgb),.14)}
+html[data-skin="lavagna"]:not(#z):not(#y) nav.bar{background:linear-gradient(#4b3624,#3a2a1c 5px,#171d1a 5px);border-top:0;padding-top:5px;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:0 -6px 18px rgba(0,0,0,.35)}
+html[data-skin="lavagna"]:not(#z):not(#y) nav.bar button{color:var(--muted);background:none}
+html[data-skin="lavagna"]:not(#z):not(#y) nav.bar button[aria-current="page"]{color:var(--acc);background:none}
+html[data-skin="lavagna"]:not(#z):not(#y) nav.bar button[aria-current="page"] svg{filter:none;stroke:var(--acc)}
+html[data-skin="lavagna"]:not(#z):not(#y) .sheet{background:#202925;border-top:2px solid rgba(var(--chalk-rgb),.3);-webkit-backdrop-filter:none;backdrop-filter:none}
+html[data-skin="lavagna"]:not(#z):not(#y) #aurw{background:radial-gradient(70% 35% at 50% 100%,rgba(var(--acc-rgb),.16),transparent 70%);opacity:calc(var(--p,0) * .8)}
+html[data-skin="lavagna"]:not(#z):not(#y) #court{display:none}
+html[data-skin="lavagna"]:not(#z):not(#y) .rest .rr .tv{font-size:25px;letter-spacing:-.02em}
+html[data-skin="lavagna"]:not(#z):not(#y) .timer .tr .t{font-size:21px;letter-spacing:-.02em}
+/* stemmi del rango disegnati col gesso */
+html[data-skin="lavagna"] .rbd :is(.hx,.wg,.cr){fill:rgba(29,37,33,.85);stroke:currentColor;stroke-width:2.6;filter:url(#chalk)}
+html[data-skin="lavagna"] .rbd .in{fill:none;stroke:currentColor;stroke-opacity:.45;stroke-dasharray:3 3}
+html[data-skin="lavagna"] .rbd .gl,html[data-skin="lavagna"] .rbd circle{fill:currentColor}
+html[data-skin="lavagna"] .rbd .gs{display:none}
 </style>
 <!--APP-HEAD-END-->
 </head>
@@ -1381,7 +1469,7 @@ html[data-skin="vetro"]:not(#z):not(#y):not(#x) body::before{background:radial-g
 <div id="aurw" aria-hidden="true"></div>
 <svg id="court" viewBox="0 0 120 220" aria-hidden="true"><path class="ln" pathLength="1" d="M10 10 H110 V210 H10 Z"/><path class="ln net" pathLength="1" d="M4 110 H116"/><path class="ln" pathLength="1" d="M10 40.5 H110"/><path class="ln" pathLength="1" d="M10 179.5 H110"/><path class="ln" pathLength="1" d="M60 40.5 V179.5"/></svg>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <defs><linearGradient id="rgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff9a5a"/><stop offset=".7" style="stop-color:var(--acc,#ff4f9a)"/><stop offset="1" stop-color="#c34dff"/></linearGradient></defs>
+  <defs><linearGradient id="rgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff9a5a"/><stop offset=".7" style="stop-color:var(--acc,#ff4f9a)"/><stop offset="1" stop-color="#c34dff"/></linearGradient><filter id="chalk" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="2" seed="4" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="3.5" xChannelSelector="R" yChannelSelector="G" result="d"/><feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="1" seed="9" result="g"/><feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2.6 0 0 0 1.9" result="m"/><feComposite in="d" in2="m" operator="in"/></filter></defs>
   <symbol id="i-rac" viewBox="0 0 24 24"><circle cx="9.5" cy="9.5" r="6.8"/><path d="m14.3 14.3 1.9 1.9"/><path d="m15.4 18.2 2.8-2.8 3.9 3.9-2.8 2.8z"/><circle cx="7.4" cy="8" r=".75"/><circle cx="11.6" cy="8" r=".75"/><circle cx="9.5" cy="11.4" r=".75"/></symbol>
   <symbol id="i-cup" viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 0 1-10 0V4zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4M12 13v4M8 21h8M10 17h4v4h-4z"/></symbol>
   <symbol id="i-gym" viewBox="0 0 24 24"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></symbol>
@@ -2991,8 +3079,9 @@ function barChart(el,data){
 }
 
 /* ================= WEEK / SETTINGS ================= */
-const SKINS=[["vetro","Vetro","linear-gradient(135deg,#ff7d66 45%,#4b46b8 55%)"],["carbonio","Carbonio","repeating-linear-gradient(45deg,#2a2f36 0 3px,#14171b 3px 6px),#ffb000"],["campo","Campo","linear-gradient(135deg,#12306a 50%,#e4ff3a 50%)"],["manga","Manga","radial-gradient(circle,rgba(255,255,255,.35) 1.1px,transparent 1.5px) 0 0/6px 6px,linear-gradient(135deg,#1a191e 58%,#ff2340 58%)"],["eclisse","Eclisse","radial-gradient(circle at 50% 50%,#040406 0 34%,#fffaf2 36%,#ff5277 48%,#040406 66%)"]];
+const SKINS=[["vetro","Vetro","linear-gradient(135deg,#ff7d66 45%,#4b46b8 55%)"],["carbonio","Carbonio","repeating-linear-gradient(45deg,#2a2f36 0 3px,#14171b 3px 6px),#ffb000"],["campo","Campo","linear-gradient(135deg,#12306a 50%,#e4ff3a 50%)"],["manga","Manga","radial-gradient(circle,rgba(255,255,255,.35) 1.1px,transparent 1.5px) 0 0/6px 6px,linear-gradient(135deg,#1a191e 58%,#ff2340 58%)"],["lavagna","Lavagna","linear-gradient(135deg,#1d2521 55%,#ffd84d 55%)"],["eclisse","Eclisse","radial-gradient(circle at 50% 50%,#040406 0 34%,#fffaf2 36%,#ff5277 48%,#040406 66%)"]];
 const SKVARS={vetro:[["Viola","linear-gradient(135deg,#ff7d66 45%,#4b46b8 55%)"],["Oceano","linear-gradient(135deg,#5cc8ff 45%,#3b3fa8 55%)"],["Smeraldo","linear-gradient(135deg,#3fe0b0 45%,#1d4f8a 55%)"]],
+ lavagna:[["Giallo","linear-gradient(135deg,#1d2521 55%,#ffd84d 55%)"],["Azzurro","linear-gradient(135deg,#1d2521 55%,#7fd0ff 55%)"],["Rosa","linear-gradient(135deg,#1d2521 55%,#ff94bd 55%)"]],
  eclisse:[["Rosa","radial-gradient(circle,#040406 0 34%,#fffaf2 36%,#ff5277 50%,#040406 68%)"],["Oro","radial-gradient(circle,#050403 0 34%,#fff1d2 36%,#ffb347 50%,#050403 68%)"],["Plasma","radial-gradient(circle,#02040a 0 34%,#e2f4ff 36%,#8f7bff 50%,#02040a 68%)"]],
  carbonio:[["Ambra","radial-gradient(circle,#ffd257,#ffb000 60%,#14171b 62%)"],["Rosso","radial-gradient(circle,#ff9a90,#ff3b30 60%,#14171b 62%)"],["Ciano","radial-gradient(circle,#a6f6ff,#19e3ff 60%,#14171b 62%)"]],
  campo:[["Cemento","linear-gradient(135deg,#12306a 55%,#e4ff3a 55%)"],["Terra rossa","linear-gradient(135deg,#a8441f 55%,#e4ff3a 55%)"],["Erba","linear-gradient(135deg,#1f6a38 55%,#e4ff3a 55%)"]],
