@@ -1481,6 +1481,25 @@ html[data-skin="lavagna"]:not(#z):not(#y) button.btn.hot,html[data-skin="lavagna
 /* mensola di legno dei gessetti */
 html[data-skin="lavagna"]:not(#z):not(#y) nav.bar{background:linear-gradient(#5b412a,#4a3422 3px,#3a291b 9px,#241a12 11px,#171d1a 11px);padding-top:11px}
 html[data-skin="lavagna"]:not(#z):not(#y) nav.bar button[aria-current="page"]::before,html[data-skin="lavagna"]:not(#z):not(#y) nav.bar button[aria-current="page"]::after{background:var(--acc);border-radius:2px;filter:url(#chalk)}
+/* Lavagna, giro 3 */
+html[data-skin="lavagna"]{--rk-n:rgba(238,236,228,.07);--rk-c:rgba(238,236,228,.09);--rk-0:rgba(238,236,228,.04)}
+html[data-skin="lavagna"]:not(#z):not(#y) .rk-fig .rk-mz .mz{filter:saturate(.55) brightness(1.22)}
+html[data-skin="lavagna"]:not(#z):not(#y) .rk-fig .rk-mz .mz.sel{stroke:var(--acc);stroke-width:1.8}
+html[data-skin="lavagna"]:not(#z):not(#y) :is(.tile,.dayr,.xrow,.pitem,.opt,.ctx button,.tabs button,.sbtn,.btn:not(.hot),div.timer:not(.over),.rest:not(.over),.seg,.rk-seg){position:relative;border-color:transparent!important;box-shadow:none}
+html[data-skin="lavagna"]:not(#z):not(#y) div.timer:not(.over){position:fixed;background:#1c2420;border-radius:5px}
+html[data-skin="lavagna"]:not(#z):not(#y) :is(.tile,.dayr,.xrow,.pitem,.opt,.ctx button,.tabs button,.sbtn,.btn:not(.hot),div.timer:not(.over),.rest:not(.over),.seg,.rk-seg)::after{content:"";position:absolute;inset:0;border:1.6px solid rgba(var(--chalk-rgb),.3);border-radius:6px 3px 7px 4px;pointer-events:none;filter:url(#chalk)}
+html[data-skin="lavagna"]:not(#z):not(#y) :is(div.timer:not(.over),.rest:not(.over))::after{border-color:rgba(var(--chalk-rgb),.42);border-width:1.8px}
+html[data-skin="lavagna"]:not(#z):not(#y) .rest:not(.over){background:#1c2420;border-radius:5px}
+html[data-skin="lavagna"]:not(#z):not(#y) :is(.tabs button[aria-pressed="true"],.dayr.today,.dayr[aria-current])::after{border-color:var(--acc)}
+html[data-skin="lavagna"]:not(#z):not(#y) .btn.danger::after{border-color:rgba(255,138,128,.6)}
+html[data-skin="lavagna"]:not(#z):not(#y) .rk-seg{background:transparent;border-radius:6px}
+html[data-skin="lavagna"]:not(#z):not(#y) .rk-seg button{border-radius:4px}
+html[data-skin="lavagna"]:not(#z):not(#y) .rk-seg button[aria-pressed="true"]{background:rgba(var(--acc-rgb),.14);color:var(--fg)}
+html[data-skin="lavagna"]:not(#z):not(#y) .seg button[aria-pressed="true"]{box-shadow:none;background:repeating-linear-gradient(-55deg,rgba(var(--acc-rgb),.22) 0 3px,rgba(var(--acc-rgb),.08) 3px 6px);outline:1.6px solid rgba(var(--acc-rgb),.8);outline-offset:-1.6px}
+html[data-skin="lavagna"]:not(#z):not(#y) .set.now .field{border-color:transparent!important;border-bottom-color:rgba(var(--chalk-rgb),.7)!important;box-shadow:none!important}
+html[data-skin="lavagna"]:not(#z):not(#y) .pm{font-family:"Manrope",system-ui,sans-serif;font-weight:700;font-size:20px;color:var(--muted)}
+html[data-skin="lavagna"]:not(#z):not(#y) button.btn.hot,html[data-skin="lavagna"]:not(#z):not(#y) .btn.hot{border-radius:3px 6px 4px 5px}
+html[data-skin="lavagna"]:not(#z):not(#y) nav.bar{background:linear-gradient(#7a5a3c,#5b412a 1px,#4a3422 4px,#3a291b 9px,#241a12 11px,#171d1a 11px)}
 </style>
 <!--APP-HEAD-END-->
 </head>
