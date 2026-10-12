@@ -1623,7 +1623,7 @@ const BUILTIN={
   {id:"b5",mu:"Deltoidi",n:"Alzate laterali manubri",s:4,lo:12,hi:20,rir:"0-1",rest:60,t:"iso",step:1,eq:"db"},
   {id:"b6",mu:"Deltoidi",n:"Face pull",s:3,lo:12,hi:15,rir:"1-2",rest:60,t:"iso",step:5,eq:"mac"},
   {id:"b7",mu:"Bicipiti",n:"Curl Scott con manubri",s:3,lo:10,hi:12,rir:"0-1",rest:0,t:"iso",step:2,ss:"7",note:"Kg = un manubrio.",eq:"db"},
-  {id:"b8",mu:"Tricipiti",n:"Pushdown o dip alla macchina",s:3,lo:10,hi:15,rir:"0-1",rest:75,t:"iso",step:5,ss:"7",eq:"mac"}]},
+  {id:"b8",mu:"Tricipiti",n:"Pushdown con corda",s:3,lo:10,hi:15,rir:"0-1",rest:75,t:"iso",step:5,ss:"7",eq:"mac"}]},
  C:{name:"Upper C",title:"Upper C",sub:"Pump, niente spinte sopra la testa",ex:[
   {id:"c1",mu:"Petto",n:"Butterfly alla macchina",s:3,lo:12,hi:15,rir:"1-2",rest:75,t:"iso",step:5,note:"Gomiti non oltre la linea del corpo.",eq:"mac"},
   {id:"c2",mu:"Dorso",n:"Pullover al cavo",s:3,lo:12,hi:15,rir:"1-2",rest:75,t:"iso",step:5,eq:"mac"},
@@ -1663,7 +1663,7 @@ const ALTS={
  b5:[["cavo","Alzate laterali al cavo",{step:2.5,eq:"cavl"}],["macchina","Alzate laterali alla macchina",{step:5,eq:"mac"}]],
  b6:[["reverse","Reverse fly alla macchina",{step:5,eq:"mac"}],["elastico","Face pull con elastico",{}],["manubri","Reverse fly con manubri a busto flesso",{step:1,note:"Kg = un manubrio.",eq:"db"}]],
  b7:[["macchina","Curl alla macchina",{step:5,eq:"mac"}],["cavo","Curl al cavo",{step:5,eq:"mac"}],["ez","Curl bilanciere EZ",{step:2.5,eq:"bar"}],["manubrio","Curl Scott con manubrio",{side:true,step:2,note:"Kg = un manubrio.",eq:"db"}],["martello","Curl a martello",{step:2,note:"Kg = un manubrio.",eq:"db"}]],
- b8:[["corda","Pushdown con corda",{step:5,eq:"mac"}],["dip","Dip alle parallele",{t:"bw",note:"Kg = zavorra.",step:2,eq:"zav"}],["sopra","Estensioni al cavo sopra la testa",{step:5,eq:"mac"}],["kickman","Kickback con manubri",{t:"iso",step:1,note:"Kg = un manubrio.",eq:"db"}],["skull","Skull crusher con manubri",{step:2,note:"Kg = un manubrio.",eq:"db"}]],
+ b8:[["barra","Pushdown al cavo",{step:5,eq:"mac"}],["dip","Dip alle parallele",{t:"bw",note:"Kg = zavorra.",step:2,eq:"zav"}],["sopra","Estensioni al cavo sopra la testa",{step:5,eq:"mac"}],["kickman","Kickback con manubri",{t:"iso",step:1,note:"Kg = un manubrio.",eq:"db"}],["skull","Skull crusher con manubri",{step:2,note:"Kg = un manubrio.",eq:"db"}]],
  b9:[["elastico","Estensione del polso con elastico",{}],["flexbar","Flexbar (Tyler twist)",{}]],
  c1:[["croci","Croci ai cavi",{step:5,eq:"mac"}],["cp","Chest press leggera alla macchina",{step:5,eq:"mac"}],["crociman","Croci con manubri su panca piana",{step:2,note:"Kg = un manubrio. Gomiti a 45°, fermati prima che la spalla tiri.",eq:"db"}]],
  c2:[["macchina","Pullover alla macchina",{step:5,eq:"mac"}],["manubrio","Pullover con manubrio",{step:2,eq:"db"}]],
@@ -1796,7 +1796,15 @@ function setsFor(ex,mods){
    Isolamento con gradino >15% del carico: range esteso fino a +5 rip prima del salto.
    Due sedute di fila sotto il minimo del range = -10% e si riparte dal basso. Sedute di scarico escluse.
    Pliometria: reps fisse, si progredisce in qualità (altezza/distanza), mai in volume. */
-function history(exId){return S.sessions.filter(s=>s.sets&&s.sets[exId]&&s.sets[exId].some(x=>num(x.reps)!=null)).sort((a,b)=>b.date.localeCompare(a.date))}
+// Stesso esercizio in giorni diversi (es. alzate laterali al cavo in Upper A e Upper C): storico, carichi e record in comune.
+// Due esercizi sono lo stesso se hanno lo stesso nome; ogni giorno tiene però il suo range di ripetizioni.
+const nmKey=n=>String(n||"").toLowerCase().replace(/\s+/g," ").trim();
+let famC={k:"",m:null};
+function famIds(id){const k=S.sessions.length+"|"+ALL_EX.length;
+  if(famC.k!==k){const m=new Map(),add=i=>{const n=nmKey(exName(i));if(!m.has(n))m.set(n,new Set());m.get(n).add(i)};Object.keys(EX).forEach(add);S.sessions.forEach(x=>x.sets&&Object.keys(x.sets).forEach(add));famC={k,m}}
+  const f=famC.m.get(nmKey(exName(id)));return f&&f.has(id)?[id,...[...f].filter(i=>i!==id)]:[id]}
+const okSets=a=>a&&a.some(x=>num(x.reps)!=null);
+function history(exId){const F=famIds(exId);return S.sessions.map(s=>{if(!s.sets)return null;if(okSets(s.sets[exId]))return s;const f=F.find(i=>okSets(s.sets[i]));return f?{...s,sets:{...s.sets,[exId]:s.sets[f]},from:f}:null}).filter(Boolean).sort((a,b)=>b.date.localeCompare(a.date))}
 const roundStep=(x,st)=>Math.round(x/st)*st;
 function target(ex){
   const h=history(ex.id).filter(x=>!x.deload),last=h[0];
@@ -1805,6 +1813,14 @@ function target(ex){
   if(ex.t==="perf"){const th=/lancio|palla/i.test(ex.n);return {...base,msg:last?(th?"Stesse ripetizioni. Se ogni lancio è stato esplosivo fino all'ultimo, usa una palla più pesante.":"Stesse ripetizioni. Se gli atterraggi sono stati puliti, alza il box o allunga il salto."):(th?"Ripetizioni fisse: conta la velocità di ogni lancio.":"Ripetizioni fisse: conta la qualità di ogni salto.")}}
   if(!last)return base;
   const eff=(last.eff||{})[ex.id];
+  // Ultima volta fatto in un altro giorno con un altro range (es. 12-15 in Upper A, 15-20 in Upper C): carico ricalcolato dal massimale stimato
+  const fx=last.from&&EX[last.from];
+  if(fx&&(fx.lo!==ex.lo||fx.hi!==ex.hi)&&!["time","perf","nordic","bw"].includes(ex.t)){
+    const ls=last.sets[ex.id].filter(x=>num(x.reps)!=null&&num(x.kg)>0);
+    if(ls.length){const st=ex.step||2.5,lk=Math.max(...ls.map(x=>num(x.kg))),best=Math.max(...ls.map(x=>e1rm(num(x.kg),num(x.reps))));
+      let k=Math.max(st,roundStep(best/(1+ex.lo/30),st));if(ex.lo>fx.lo)k=Math.min(k,lk);
+      const dn=PLAN[last.day]?PLAN[last.day].name:"un altro giorno";
+      return {kg:k,reps:Array(ex.s).fill(ex.lo),kind:"flat",badge:"",msg:`Ultima volta in ${dn} (${fk(lk)} kg, range ${fx.lo}-${fx.hi}): qui il range è ${rr}, carico ricalcolato.`}}}
   const sets=last.sets[ex.id].filter(x=>num(x.reps)!=null);
   const reps=sets.map(x=>num(x.reps));
   const kgs=sets.map(x=>num(x.kg)).filter(v=>v!=null);
@@ -1893,7 +1909,7 @@ function pad(a,n,fill){const r=a.slice(0,n);while(r.length<n)r.push(fill??r[r.le
 const e1rm=(kg,r)=>kg*(1+r/30);
 function bestMetric(exId,excludeId){
   const ex=EX[exId];let best=0;
-  for(const s of S.sessions){if(s.id===excludeId)continue;for(const x of (s.sets[exId]||[])){const v=metricOf(ex,x);if(v>best)best=v}}
+  const F=famIds(exId);for(const s of S.sessions){if(s.id===excludeId)continue;for(const fid of F)for(const x of (s.sets[fid]||[])){const v=metricOf(ex,x);if(v>best)best=v}}
   return best;
 }
 function metricOf(ex,x){const r=num(x.reps),k=num(x.kg);if(r==null)return 0;if(k&&k>0&&ex.t!=="time"&&ex.t!=="perf"&&ex.t!=="nordic")return e1rm(k,r);return r}
@@ -1947,7 +1963,6 @@ const ERRS={
  "pulley basso":["Dondolare il busto: resta dritto, si muovono solo le braccia.","Spalle che vanno avanti al ritorno: petto alto per tutta la serie."],
  "face pull":["Tirare verso il petto: la corda arriva all'altezza degli occhi.","Gomiti bassi: tienili alti, all'altezza delle spalle."],
  "curl scott con manubri":["Gomiti che si sollevano dal cuscino: tieni le braccia appoggiate fino in fondo.","Stendere di scatto in basso: rallenta negli ultimi centimetri."],
- "pushdown o dip alla macchina":["Gomiti che si muovono avanti e indietro: restano fermi ai fianchi.","Spingere col peso del corpo: busto fermo."],
  "pushdown al cavo":["Gomiti che si staccano dai fianchi: tienili fermi, si muove solo l'avambraccio.","Busto che si piega sopra il cavo per spingere: resta dritto e usa meno peso."],
  "pushdown con corda":["Gomiti che si staccano dai fianchi: tienili fermi, si muove solo l'avambraccio.","Non aprire la corda in basso: allarga le mani a fine spinta."],
  "butterfly alla macchina":["Gomiti oltre la linea del corpo: fermati prima che la spalla tiri.","Spalle che si staccano dallo schienale: tienile appoggiate per tutta la serie."],
@@ -2153,7 +2168,7 @@ function trainFx(g,pct){
   app.querySelectorAll(".tgt b[data-cu]").forEach(b=>{const [a,z,rest,id]=b.dataset.cu.split("|");const k=g+id+iso(today());if(counted.has(k))return;counted.add(k);countUp(b,+a,+z,rest)});
 }
 function isRecord(g,ex,exId,j,r){if(noEff(ex)||!history(exId).length)return false;const v=metricOf(ex,r);if(!(v>0))return false;
-  let best=0;for(const s of S.sessions)for(const x of (s.sets[exId]||[]))best=Math.max(best,metricOf(ex,x));
+  let best=0;const F=famIds(exId);for(const s of S.sessions)for(const fid of F)for(const x of (s.sets[fid]||[]))best=Math.max(best,metricOf(ex,x));
   (draftFor(g).ex[exId]||[]).forEach((x,i)=>{if(i!==j&&x.done)best=Math.max(best,metricOf(ex,x))});return v>best+1e-9}
 function tickFx(g,exId,j,rec,wow){
   const b=document.querySelector(`#exs .tick[data-ex="${exId}"][data-j="${j}"]`)||document.querySelector(`#exs .xrow[data-open="${exId}"] .ck`);
@@ -2197,7 +2212,6 @@ const HOW={
  "pulley basso":["Seduto, piedi sulla pedana, ginocchia appena piegate, busto dritto, braccia tese in avanti.", "Tira la maniglia all'ombelico portando i gomiti indietro e stringendo le scapole; torna allungando le braccia senza piegarti."],
  "face pull":["Cavo all'altezza degli occhi, corda presa dall'alto, un passo indietro, braccia tese in avanti.", "Tira la corda verso gli occhi aprendo le mani ai lati della testa, gomiti alti; torna lento."],
  "curl scott con manubri":["Seduto alla panca Scott, ascelle sul bordo, dietro delle braccia appoggiato sul cuscino, un manubrio per mano.", "Piega i gomiti portando i manubri verso le spalle; scendi in 2-3 s fino a braccia quasi tese."],
- "pushdown o dip alla macchina":["Seduto alla dip machine, schiena allo schienale, maniglie ai lati del busto all'altezza del petto.", "Spingi in basso fino a braccia tese lungo i fianchi; torna lento fino a gomiti a 90°."],
  "pushdown al cavo":["In piedi davanti al cavo alto, gomiti ai fianchi, avambracci paralleli al pavimento.", "Stendi le braccia verso il basso muovendo solo gli avambracci; torna fino a gomiti a 90°."],
  "pushdown con corda":["In piedi davanti al cavo alto con la corda, gomiti ai fianchi, avambracci paralleli al pavimento.", "Stendi le braccia e in fondo apri la corda ai lati delle cosce; torna fino a gomiti a 90°."],
  "butterfly alla macchina":["Seduto, schiena allo schienale, maniglie aperte all'altezza del petto, gomiti appena piegati.", "Chiudi le braccia davanti al petto finché le mani si avvicinano; torna lento fino a gomiti in linea col corpo, non oltre."],
@@ -2497,7 +2511,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   const rows=dr.ex[ex.id]||[];
   const unit=ex.t==="time"?"s":"rip";
   const hasKg=!["perf","nordic","time"].includes(ex.t);
-  const lastTxt=last?`Ultima volta (${fmtShort(last.date)}): <b>${last.sets[ex.id].filter(x=>num(x.reps)!=null).map(x=>(num(x.kg)?fk(num(x.kg))+"×":"")+x.reps).join(" · ")}</b>`:"Mai fatto finora.";
+  const lastTxt=last?`Ultima volta (${fmtShort(last.date)}${last.day&&last.day!==g&&PLAN[last.day]?", "+esc(PLAN[last.day].name):""}): <b>${last.sets[ex.id].filter(x=>num(x.reps)!=null).map(x=>(num(x.kg)?fk(num(x.kg))+"×":"")+x.reps).join(" · ")}</b>`:"Mai fatto finora.";
   const rng=(ex.lo===ex.hi?ex.lo:ex.lo+"-"+ex.hi)+(ex.t==="time"?" s":"")+(ex.side?" per lato":"");
   const r0=tg.reps[0]??ex.lo,rMin=Math.min(...tg.reps.slice(0,setsFor(ex,mods)).map(Number).filter(v=>!isNaN(v)),r0),rMax=Math.max(...tg.reps.slice(0,setsFor(ex,mods)).map(Number).filter(v=>!isNaN(v)),r0),rT=rMin===rMax?String(r0):rMin+"-"+rMax;
   const lk=hasKg&&tg.kind==="up"&&tg.kg>0&&last?Math.max(0,...last.sets[ex.id].map(x=>num(x.kg)||0)):0,cu=lk>0&&lk<tg.kg&&ex.t!=="time"&&ex.t!=="perf";
@@ -2806,7 +2820,6 @@ estensioni manubrio sopra la testa|tricipiti|d||dumbbell-tricep-extension|3,8,16
 skull crusher con manubri|tricipiti|d||lying-dumbbell-tricep-extension|4,8,15,24,34,5,10,18,28,39,7,12,21,31,42,8,14,23,34,46
 pushdown al cavo|tricipiti|m||tricep-pushdown|14,26,43,64,89,18,31,50,73,98,22,36,56,80,107,25,41,62,87,115
 pushdown con corda|tricipiti|m||tricep-rope-pushdown|11,21,35,53,74,14,26,41,60,82,17,30,46,66,89,20,34,51,72,96
-pushdown o dip alla macchina|tricipiti|m||seated-dip-machine|41,63,90,123,159,49,72,102,136,174,56,81,112,149,188,63,90,122,160,201
 dip alle parallele|tricipiti,petto|w||dips|62,80,100,126,152,74.7,93.3,116.7,144.7,172.7,88,106.7,133.3,162.7,192,102,120,147,177,210
 squat bilanciere|quadricipiti,glutei|b||squat|49,71,98,129,162,62,86,116,149,185,75,101,132,168,206,87,115,148,186,226
 squat al smith|quadricipiti,glutei|m||smith-machine-squat|37,60,89,124,163,47,72,104,142,183,57,84,118,158,202,66,95,131,173,219
@@ -3104,7 +3117,8 @@ function reviewSheet(c){const R=buildReview(c);if(!R)return;openSheet({html:()=>
 function reviewCard(){const C=S.cycles||[];if(!C.length)return "";const c=C[C.length-1];if(!buildReview(c))return "";
   return `<section class="card rvc"><div><h3>Revisione del ciclo</h3><span class="cap">Dal ${fmtShort(c.from+"T12:00:00")} al ${fmtShort(c.to+"T12:00:00")}</span></div><button class="sbtn" id="rvOpen">Apri</button></section>`}
 function renderProg(){
-  const seen=[...new Set(S.sessions.flatMap(s=>Object.keys(s.sets||{})))].filter(id=>history(id).length);
+  const seen=[...new Map([...new Set(S.sessions.slice().sort((a,b)=>b.date.localeCompare(a.date)).flatMap(s=>Object.keys(s.sets||{})))].filter(id=>history(id).length).reverse().map(id=>[nmKey(exName(id)),id])).values()];
+  if(progEx&&!seen.includes(progEx)){const al=seen.find(id=>nmKey(exName(id))===nmKey(exName(progEx)));if(al)progEx=al}
   const done=seen.map(exById);
   if(!S.sessions.length){
     app.innerHTML=`<header class="head"><h1>Progressi</h1></header>
