@@ -793,6 +793,17 @@ html[data-skin="campo"] .rbd .gs{opacity:.5}
 .myo .mc{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
 .myo .mv{min-width:36px;height:36px;display:grid;place-items:center;border-radius:10px;background:var(--card-2);font-weight:800;font-variant-numeric:tabular-nums}
 .myo .mi{width:64px}.myo .mi input{text-align:center}.myo .mt{width:44px}.myo .mdone{font-size:14px;color:var(--muted);font-weight:600}
+.ex.cur{position:relative;isolation:isolate}
+.ex.cur>.fl{position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none}
+.ex.cur>.fp{background:linear-gradient(135deg,color-mix(in srgb,var(--go) 20%,transparent),color-mix(in srgb,var(--go) 9%,transparent));clip-path:polygon(0 0,calc(var(--f)*200%) 0,0 calc(var(--f)*200%))}
+.ex.cur>.fp.grow{animation:flGrow .42s cubic-bezier(.23,1,.32,1)}
+@keyframes flGrow{from{clip-path:polygon(0 0,calc(var(--f0)*200%) 0,0 calc(var(--f0)*200%))}to{clip-path:polygon(0 0,calc(var(--f)*200%) 0,0 calc(var(--f)*200%))}}
+.ex.cur>.fg{background:linear-gradient(135deg,rgba(255,226,140,.42),rgba(232,170,52,.3) 55%,rgba(196,128,24,.38));clip-path:polygon(0 0,200% 0,0 200%);animation:flGold .68s cubic-bezier(.23,1,.32,1) both}
+.ex.cur>.fg::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,transparent 35%,rgba(255,250,225,.55) 50%,transparent 65%);background-size:300% 300%;animation:flShine .9s .25s cubic-bezier(.23,1,.32,1) both}
+@keyframes flGold{from{clip-path:polygon(0 0,0 0,0 0)}to{clip-path:polygon(0 0,200% 0,0 200%)}}
+@keyframes flShine{from{background-position:100% 100%;opacity:1}to{background-position:0 0;opacity:0}}
+.ex.cur.gold{outline-color:#e8b440!important;box-shadow:0 0 0 1px rgba(255,214,120,.5),0 10px 34px rgba(232,170,52,.28)}
+@media (prefers-reduced-motion:reduce){.ex.cur>.fp.grow,.ex.cur>.fg,.ex.cur>.fg::after{animation:none}.ex.cur>.fg::after{display:none}}
 .stn-s{display:block;font-size:12px;font-weight:600;opacity:.75;margin-top:2px}.eqmx{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:14px;font-weight:600}.eqmx input{width:84px;min-height:44px;text-align:center}.eqf{display:grid;gap:6px;margin:12px 0 4px}.eqf b{font-size:14px}.eqf small{color:var(--muted);font-size:12px;line-height:1.4}.eqseg button{padding:10px 2px;font-size:13px;min-height:44px}
 .setup{display:flex;gap:8px;align-items:baseline;width:100%;text-align:left;border:1px dashed var(--line);background:none;border-radius:12px;padding:8px 11px;color:var(--muted);font-size:14px;font-weight:600}
 .setup.has{border-style:solid;background:var(--field);color:var(--fg)}
@@ -2216,7 +2227,7 @@ function tickFx(g,exId,j,rec,wow){
   if(b&&!RM())popEl(b,"pop");
 }
 // Fine esercizio (ultima serie completa): lama di luce dorata su tutto lo schermo, senza scritte
-function goldEnd(){buzz([50,40,50,40,120]);if(RM())return;const slot=document.getElementById("celeSlot");
+function goldEnd(card){buzz([50,40,50,40,120]);if(RM()||card)return;const slot=document.getElementById("celeSlot");
   slot.innerHTML=`<div class="gold-end" aria-hidden="true"><i></i></div>`;clearTimeout(celebrate.t);celebrate.t=setTimeout(()=>{slot.innerHTML=""},1500)}
 // Passaggi tra le sezioni
 const VORD={oggi:0,train:1,prog:2,set:3,imp:4,edit:5};
@@ -2457,7 +2468,7 @@ function renderTrain(){
   const pct=tot?Math.round(dn/tot*100):0,mins=dr.start?Math.floor((Date.now()-dr.start)/60000):0;
   if(openEx[g]&&!L.some(x=>x.ex.id===openEx[g]))openEx[g]=null;
   const first=L.find(x=>!exDone(g,x.ex,mods));
-  const curId=openEx[g]||first?.ex.id;const curIt=L.find(x=>x.ex.id===curId);
+  const curId=(goldHold&&goldHold.g===g?goldHold.ex:null)||openEx[g]||first?.ex.id;const curIt=L.find(x=>x.ex.id===curId);
   const open=new Set(curId?[curId]:[]);
   if(curIt&&ssOf(g,curIt.ex))L.forEach(x=>{if(ssOf(g,x.ex)===ssOf(g,curIt.ex)&&!exDone(g,x.ex,mods))open.add(x.ex.id)});
   const modNote=isToday&&a.level!=="go"?`<details class="mn"><summary>${esc(a.title)}<span>perché</span></summary><p>${esc(a.notes.join(" "))}</p></details>`:"";
@@ -2637,7 +2648,9 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   const stallTxt=!mods.has("deload")&&stalled(ex)?(phaseAt()==="def"?`<p class="prog down"><span>In calo</span><span>Massimale sotto del 5% nelle ultime 2 sedute. In definizione basta tenere i carichi: se continua togli una serie o fai lo scarico.</span></p>`:`<p class="prog down"><span>Fermo</span><span>Nessun miglioramento nelle ultime 3 sedute: prova una variante con ⇄ Cambia o togli una serie per due settimane.</span></p>`):"";
   const over=tOn&&tEnd<=Date.now();
   const rest=withRest&&tOn?`<div class="rest ${over?"over":""}" id="restIn" role="timer"><span class="rr"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rk" cx="32" cy="32" r="28"/><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg><b class="tv"></b></span><span class="tl" aria-live="assertive">${over?"Recupero finito":"Recupero"+(tPlus?" · +"+tPlus+"\u00a0s":"")}</span><button data-tp>+15 s</button><button data-ts>Chiudi</button></div>`:"";
-  return `<article class="ex cur ${ssP.length?"ss":""}" data-ex="${ex.id}">
+  // Scheda che si colora: un velo cresce in diagonale (alto sinistra → basso destra) a ogni serie; a esercizio finito passa l'oro
+  const fN=Math.min(n,rows.filter(r=>r.done).length),fr=n?fN/n:0,fPrev=fillMem[ex.id]??fr,isGold=goldHold&&goldHold.ex===ex.id;fillMem[ex.id]=fr;
+  return `<article class="ex cur ${ssP.length?"ss":""} ${isGold?"gold":""}" data-ex="${ex.id}" style="--f:${fr.toFixed(3)};--f0:${fPrev.toFixed(3)}"><i class="fl fp ${fPrev!==fr?"grow":""}" aria-hidden="true"></i>${isGold?'<i class="fl fg" aria-hidden="true"></i>':""}
     <div class="exhead"><h3>${esc(ex.n)}${(howOf(ex)||errOf(ex)||ex.note)?(IMGEX[ex.id]=ex,`<button class="qm" data-img="${ex.id}" aria-label="Come si fa: ${esc(ex.n)}">?</button>`):""}</h3><button class="swap" data-base="${base.id}" aria-label="Sostituisci ${esc(ex.n)}">⇄ Cambia</button></div>
     <div class="tgt"><b${cu?` data-cu="${lk}|${tg.kg}|${esc(" kg × "+r0)}|${ex.id}"`:""}>${big}</b>${tg.badge?`<small class="${tg.kind}">${esc(tg.badge)}</small>`:""}</div>
     ${dr.nextNote&&dr.nextNote.ex===ex.id?`<p class="prog down"><span>${esc(dr.nextNote.txt)}</span></p>`:`<p class="prog ${tg.kind}"><span>${esc(tg.msg)}</span></p>`}
@@ -2684,7 +2697,7 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;audioUnlock();
     const sessionDone=allEx.every(e=>((draftFor(g).ex[e.id]||[]).filter(x=>x.done).length)>=setsFor(e,mods));
     const want=num(tgFor(ex,mods).reps[j]??ex.lo),got=num(r.reps);
     const fail=ex.t!=="perf"&&want!=null&&got!=null&&got<want;
-    if(fail)celebrate("fail");else if(doneN>=n)goldEnd();else buzz(40)
+    if(fail)celebrate("fail");else if(doneN>=n)goldEnd(true);else buzz(40)
     // Serie molto sotto il minimo (3+ ripetizioni): la prossima parte già con il 10% in meno, sempre modificabile
     if(dd.nextNote&&dd.nextNote.ex===exId&&dd.nextNote.j!==j)delete dd.nextNote;
     const kNow=num(r.kg),nx=(dd.ex[exId]||[])[j+1];
@@ -2697,6 +2710,7 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;audioUnlock();
     if(restS&&!sessionDone)startTimer(restS+plus,ex.n,plus,null,{g,ex:exId});
     rec=!fail&&isRecord(g,ex,exId,j,r);wowNow=!fail&&doneN>=n;
   }
+  if(wowNow){goldCard(g,exId);tickFx(g,exId,j,rec,wowNow);return}
   renderTrain();
   const jump=r.done&&ssGo[g]&&ssGo[g]!==exId?ssGo[g]:null;
   keepFocus(!!jump||!document.querySelector(`#exs .tick[data-ex="${exId}"][data-j="${j}"]`),jump);
@@ -2710,9 +2724,13 @@ const myoShow=()=>{const m=document.querySelector("#exs .myo");if(m)setTimeout((
 function myoFinish(g,exId,j,mods){const r=cell(g,exId,j),dd=draftFor(g),ex=PLAN[g].ex.map(e=>effEx(g,e)).find(e=>e.id===exId)||exById(exId);
   r.myo=r.myo||[];r.myoEnd=true;dd.lastDone=exId;openEx[g]=null;save();stopTimer();
   const allEx=PLAN[g].ex.map(e=>effEx(g,e)).filter(e=>setsFor(e,mods)>0),sessionDone=allEx.every(e=>exDone(g,e,mods));
-  goldEnd();if(ex.rest&&!sessionDone)startTimer(ex.rest,ex.n,0,null,{g,ex:exId});renderTrain();keepFocus(true)}
+  goldEnd(true);if(ex.rest&&!sessionDone)startTimer(ex.rest,ex.n,0,null,{g,ex:exId});goldCard(g,exId)}
 // Primo piano: dopo ogni spunta l'esercizio in corso torna subito sotto l'intestazione, con la prossima serie visibile
 const ssGo={};
+const fillMem={};let goldHold=null;
+// Fine esercizio: la scheda resta in primo piano il tempo della passata dorata, poi passa al prossimo
+function goldCard(g,exId,after){goldHold={g,ex:exId};openEx[g]=exId;renderTrain();keepFocus(false,exId);
+  clearTimeout(goldCard.t);goldCard.t=setTimeout(()=>{goldHold=null;delete fillMem[exId];if(openEx[g]===exId)openEx[g]=null;after&&after();renderTrain();keepFocus(true)},RM()?450:1050)}
 // Superserie: quella del piano, oppure quella scelta solo per la seduta di oggi (draft.ss, "" = sciolta)
 const ssOf=(g,ex)=>{const o=(S.draft&&S.draft[g]&&S.draft[g].ss)||{};return ex.id in o?o[ex.id]:(ex.ss||"")};
 function ssSheet(g,ex,mods){
