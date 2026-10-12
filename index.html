@@ -15,7 +15,7 @@
 <title>Allenati Scemo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&family=Dela+Gothic+One&family=Syne:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Big+Shoulders+Display:wght@700;800&family=Manrope:wght@400;500;600;700;800&family=Dela+Gothic+One&family=Syne:wght@600;700;800&display=swap">
 <style>
 /* Layout: app a schermo intero da telefono, scuro per scelta (stile "Notte"). Header con giorno, contenuto scorrevole, timer sopra la barra di navigazione in basso. */
 :root{
@@ -1339,6 +1339,31 @@ html[data-skin="manga"][data-var="1"]:not(#z):not(#y){--pad:#ff8fd0}
 html[data-skin="manga"]:not([data-var="1"]):not([data-var="2"]):not(#z):not(#y){--pad:#7fe6ff;--match:#c9a8ff}
 html[data-skin="campo"]:not(#z):not(#y) .head>button.back{background:none;padding-inline:0;margin-inline:0}
 html[data-skin="manga"]:not(#z):not(#y) select{color:var(--fg)}
+/* ===== VETRO "LASTRA" (2026-10-12): vetro solo su ciò che galleggia, schede piene, una luce dall'alto ===== */
+html[data-skin="vetro"]:not(#z):not(#y):not(#x){--bg:#0c0d16;--line:rgba(255,255,255,.09);--cardbg:#15161f;--card:#15161f;--card-2:#1d1e29;--field:#0e0f17;--navbg:rgba(14,15,24,.72)}
+html[data-skin="vetro"]:not(#z):not(#y):not(#x) body{background:#0c0d16}
+html[data-skin="vetro"]:not(#z):not(#y):not(#x) body::before{inset:-10% -20% 40% -20%;filter:blur(30px);opacity:1;
+  background:radial-gradient(60% 55% at 50% 0%,rgba(225,232,255,.16),transparent 70%),radial-gradient(40% 40% at 50% 0%,rgba(var(--acc-rgb),.14),transparent 70%)}
+@media (prefers-reduced-motion:no-preference){html[data-skin="vetro"]:not(#z):not(#y):not(#x) body::before{animation:vxBreath 14s ease-in-out infinite alternate}}
+@keyframes vxBreath{from{opacity:.8;translate:-3% 0}to{opacity:1;translate:3% 0}}
+html[data-skin="vetro"]:not(#z):not(#y):not(#x) :is(.card,.ex,.status,details.h,.banner,.hero,.tile,.tabs button,.ctx button,.xrow,.dayr,.rest:not(.over)){background:#15161f;-webkit-backdrop-filter:none;backdrop-filter:none;border:1px solid rgba(255,255,255,.07);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 10px 24px -14px rgba(0,0,0,.9)}
+html[data-skin="vetro"]:not(#z):not(#y):not(#x) :is(.card,.ex,.status,details.h)::before{display:none}
+html[data-skin="vetro"]:not(#z):not(#y):not(#x) :is(.tile,.tabs button,.ctx button,.dayr,.xrow){background:#1b1c26}
+html[data-skin="vetro"]:not(#z):not(#y):not(#x) .ex.cur{border-color:rgba(var(--acc-rgb),.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 10px 24px -14px rgba(0,0,0,.9)}
+html[data-skin="vetro"]:not(#z):not(#y):not(#x) .field{background:#0e0f17;border-color:rgba(255,255,255,.08)}
+/* il vetro vero: barra in basso, intestazione, timer, schede dal basso */
+html[data-skin="vetro"]:not(#z):not(#y):not(#x) nav.bar{background:rgba(18,19,30,.62);-webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);border-top:1px solid rgba(255,255,255,.1)}
+html[data-skin="vetro"]:not(#z):not(#y):not(#x) .thead{background:rgba(12,13,22,.62);-webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%)}
+html[data-skin="vetro"]:not(#z):not(#y):not(#x) div.timer:not(.over){background:rgba(24,25,38,.66);-webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);border:1px solid rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 12px 30px rgba(0,0,0,.55)}
+html[data-skin="vetro"]:not(#z):not(#y):not(#x) .sheet{background:rgba(22,23,34,.78);-webkit-backdrop-filter:blur(26px) saturate(160%);backdrop-filter:blur(26px) saturate(160%);border-top:1px solid rgba(255,255,255,.14)}
+html[data-skin="vetro"]:not(#z):not(#y):not(#x) #aurw{background:radial-gradient(70% 40% at 50% 100%,rgba(var(--acc-rgb),.35),transparent 70%);opacity:calc(var(--p,0) * .7)}
+
+/* A: carattere e bottone pieno */
+html[data-skin="vetro"]:not(#z):not(#y):not(#x){--display:"Big Shoulders Display","Bebas Neue",sans-serif;--grad:linear-gradient(var(--acc),var(--acc))}
+html[data-skin="vetro"]:not(#z):not(#y):not(#x) :is(h1,h2,h3,.hero .big,.tgt b,.kpi b,.dayr .d,.timer .t,.rest .tv,.set .i){font-family:var(--display);font-weight:800;letter-spacing:-.005em}
+html[data-skin="vetro"]:not(#z):not(#y):not(#x) .btn.hot{background:var(--acc);box-shadow:none;border-radius:12px}
+html[data-skin="vetro"]:not(#z):not(#y):not(#x) .btn.hot::before,html[data-skin="vetro"]:not(#z):not(#y):not(#x) .btn.hot::after{display:none}
+html[data-skin="vetro"]:not(#z):not(#y):not(#x) body::before{background:radial-gradient(60% 55% at 50% 0%,rgba(235,240,255,.22),transparent 70%),radial-gradient(35% 35% at 50% 0%,rgba(var(--acc-rgb),.16),transparent 70%)}
 </style>
 <!--APP-HEAD-END-->
 </head>
