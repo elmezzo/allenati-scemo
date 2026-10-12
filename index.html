@@ -2493,13 +2493,15 @@ const setupKey=ex=>String(ex.n||"").trim().toLowerCase();
 const setupOf=ex=>((S.setup||{})[setupKey(ex)]||"").trim();
 // Attrezzo: quanto pesa davvero il numero sul pacco. Cavi: rapporto della carrucola (2:1 = senti metà). Macchine: più leggera o più pesante del solito.
 // Serve ai ranghi (confronto con le tabelle di forza); i progressi del singolo esercizio restano nei kg che carichi.
-const isCable=ex=>ex.eq==="cavl"||(!/lat machine|pulley/i.test(ex.n||"")&&/\bcav[oi]\b|pushdown|face pull|woodchop|pallof|corda/i.test(ex.n||""));
+const isCable=ex=>ex.eq==="cavl"||(!/lat machine|pulley|elastico|manubri/i.test(ex.n||"")&&/\bcav[oi]\b|pushdown|face pull|woodchop|pallof|corda/i.test(ex.n||""));
 const eqKind=ex=>isCable(ex)?"cavo":eqOf(ex)==="mac"?"mac":"";
 const CAB_F=[[1,"1:1","peso pieno"],[.5,"2:1","metà"],[1/3,"3:1","un terzo"],[.25,"4:1","un quarto"]];
 const MAC_F=[[.7,"−30%","molto più leggera"],[.85,"−15%","più leggera"],[1,"Normale","come le altre"],[1.15,"+15%","più pesante"],[1.3,"+30%","molto più pesante"]];
 // Attrezzi della sua palestra (detti da lui): modello e peso massimo del pacco. Il fattore resta Normale finché non c'è un dato migliore.
 const S700={m:"Technogym Selection 700 Pectoral / Reverse Fly",s:"Selection 700",max:50};
-const EQ_DEF={"butterfly alla macchina":S700,"reverse fly":S700,"reverse fly alla macchina":S700};
+// Macchine (taratura, pacco massimo, Selection 700): pronte ma spente finché Alessandro non le approva
+const EQ_MAC=false;
+const EQ_DEF=EQ_MAC?{"butterfly alla macchina":S700,"reverse fly":S700,"reverse fly alla macchina":S700}:{};
 /* Due attrezzi per i cavi nella sua palestra: la stazione cavi (quasi tutto, gradini da 5 kg) e il cavo singolo (gradini da 2,5 kg, molto più pesante: carrucola 1:1).
    Ogni esercizio ai cavi ricorda su quale lo fai; le sedute salvano la stazione usata. Se cambi attrezzo, i kg delle volte precedenti vengono convertiti con il rapporto stR
    (stessa fatica: 1 kg sul cavo singolo = stR kg sulla stazione; predefinito 2, la stazione si comporta come una carrucola 2:1). */
@@ -2511,12 +2513,12 @@ const stnOfSet=(s,id)=>{const e=exById(id);if(!isCable(e))return null;return (s.
 const stnConv=(from,to)=>from===to||!from||!to?1:from==="multi"?1/stR():stR();
 const stepOf=ex=>{const t=stationOf(ex);return t?STN[t].step:(ex.step||2.5)};
 const eqDef=ex=>EQ_DEF[setupKey(ex)]||null;
-const eqMax=ex=>{const u=(S.eqmax||{})[setupKey(ex)];if(u===0)return null;return u>0?u:(eqDef(ex)||{}).max||null};
-const eqFOf=(ex,stn)=>{if(isCable(ex))return stnConv(stn||stationOf(ex),stnDef(ex));const v=(S.eqf||{})[setupKey(ex)]||(eqDef(ex)||{}).f;return eqKind(ex)&&v>0?v:1};
+const eqMax=ex=>{if(!EQ_MAC)return null;const u=(S.eqmax||{})[setupKey(ex)];if(u===0)return null;return u>0?u:(eqDef(ex)||{}).max||null};
+const eqFOf=(ex,stn)=>{if(isCable(ex))return stnConv(stn||stationOf(ex),stnDef(ex));if(!EQ_MAC)return 1;const v=(S.eqf||{})[setupKey(ex)]||(eqDef(ex)||{}).f;return eqKind(ex)&&v>0?v:1};
 const eqLbl=ex=>{const f=eqFOf(ex),d=eqDef(ex),mx=eqMax(ex),t=[];if(d)t.push(d.s);if(isCable(ex))t.push(STN[stationOf(ex)].n);
   if(f!==1&&!isCable(ex)){const L=eqKind(ex)==="cavo"?CAB_F:MAC_F,o=L.find(x=>Math.abs(x[0]-f)<1e-6);if(o)t.push(eqKind(ex)==="cavo"?"Cavo "+o[1]:"Macchina "+o[1])}
   if(mx)t.push("pacco fino a "+fk(mx)+" kg");return t.join(", ")};
-function setupHTML(ex){const t=[setupOf(ex),eqLbl(ex)].filter(Boolean).join(" · ");return t?`<button class="setup has" data-setup="${ex.id}"><b>Regolazioni</b><span>${esc(t)}</span></button>`:`<button class="lnk setup0" data-setup="${ex.id}">+ Regolazioni e carrucola</button>`}
+function setupHTML(ex){const t=[setupOf(ex),eqLbl(ex)].filter(Boolean).join(" · ");return t?`<button class="setup has" data-setup="${ex.id}"><b>Regolazioni</b><span>${esc(t)}</span></button>`:`<button class="lnk setup0" data-setup="${ex.id}">+ Regolazioni</button>`}
 function setupSheet(ex){
   openSheet({html:()=>`<h2>Regolazioni</h2><p class="note" style="margin:0">${esc(ex.n)}: sedile, schienale, presa, perni. Le ritrovi ogni volta che apri l'esercizio, in tutti i piani.</p>
     <textarea id="setupTx" rows="3" maxlength="160" placeholder="Es. sedile 4, schienale 2, presa neutra">${esc(setupOf(ex))}</textarea>
@@ -2524,7 +2526,7 @@ function setupSheet(ex){
     <div class="seg eqseg" role="group" aria-label="Attrezzo" style="grid-template-columns:1fr 1fr">${Object.entries(STN).map(([k,o])=>`<button type="button" data-stn="${k}" aria-pressed="${stationOf(ex)===k}">${o.n}<small class="stn-s">gradini ${fk(o.step)} kg</small></button>`).join("")}</div>
     <b style="margin-top:6px">Quanto pesa di più il cavo singolo</b><label class="eqmx"><span>1 kg lì =</span><input id="stR" type="number" inputmode="decimal" min="1" max="5" step="0.1" value="${fk(stR())}"><span>kg sulla stazione</span></label>
     <small>A parità di fatica. Vale per tutti gli esercizi ai cavi: se i kg convertiti ti sembrano sbagliati, cambia questo numero.</small></div>`:""}
-    ${eqKind(ex)&&!isCable(ex)?`<div class="eqf"><b>${eqKind(ex)==="cavo"?"Carrucola del cavo":"Questa macchina"}</b><small>${eqKind(ex)==="cavo"?"Con la carrucola 2:1 sollevi metà del numero sul pacco. Lo trovi scritto sulla macchina o lo capisci se il cavo passa per una carrucola che si muove.":"Rispetto alle macchine simili, il numero sul pacco si sente più leggero o più pesante?"} Conta solo per i ranghi.</small>
+    ${EQ_MAC&&eqKind(ex)&&!isCable(ex)?`<div class="eqf"><b>${eqKind(ex)==="cavo"?"Carrucola del cavo":"Questa macchina"}</b><small>${eqKind(ex)==="cavo"?"Con la carrucola 2:1 sollevi metà del numero sul pacco. Lo trovi scritto sulla macchina o lo capisci se il cavo passa per una carrucola che si muove.":"Rispetto alle macchine simili, il numero sul pacco si sente più leggero o più pesante?"} Conta solo per i ranghi.</small>
     ${eqDef(ex)?`<small>Attrezzo: ${esc(eqDef(ex).m)}.</small>`:""}<div class="seg eqseg" role="group" aria-label="${eqKind(ex)==="cavo"?"Rapporto della carrucola":"Taratura della macchina"}" style="grid-template-columns:repeat(${(eqKind(ex)==="cavo"?CAB_F:MAC_F).length},1fr)">${(eqKind(ex)==="cavo"?CAB_F:MAC_F).map(([f,l,d])=>`<button type="button" data-eqf="${f}" aria-pressed="${Math.abs(eqFOf(ex)-f)<1e-6}" title="${d}">${l}</button>`).join("")}</div>
     <label class="eqmx"><span>Peso massimo del pacco</span><input id="eqMax" type="number" inputmode="decimal" min="0" step="0.5" placeholder="—" value="${eqMax(ex)||""}"><span>kg</span></label>
     <small>Quando arrivi al massimo, la progressione continua con le ripetizioni.</small></div>`:""}
