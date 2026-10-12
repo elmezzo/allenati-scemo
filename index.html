@@ -795,7 +795,7 @@ html[data-skin="campo"] .rbd .gs{opacity:.5}
 .myo .mi{width:64px}.myo .mi input{text-align:center}.myo .mt{width:44px}.myo .mdone{font-size:14px;color:var(--muted);font-weight:600}
 .ex.cur{position:relative;isolation:isolate}
 .ex.cur>.fl{position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none}
-.ex.cur>.fp{background:radial-gradient(120% 90% at 30% 20%,color-mix(in srgb,var(--go) 26%,transparent),color-mix(in srgb,var(--go) 14%,transparent));opacity:var(--f)}
+.ex.cur>.fp{background:radial-gradient(120% 90% at 30% 20%,color-mix(in srgb,var(--fc,var(--go)) 28%,transparent),color-mix(in srgb,var(--fc,var(--go)) 15%,transparent));opacity:var(--f);transition:background .9s}
 .ex.cur>.fp.grow{animation:flGrow .9s cubic-bezier(.4,0,.2,1)}
 @keyframes flGrow{from{opacity:var(--f0)}to{opacity:var(--f)}}
 .ex.cur>.fg{background:linear-gradient(135deg,rgba(255,226,140,.42),rgba(232,170,52,.3) 55%,rgba(196,128,24,.38));clip-path:polygon(0 0,200% 0,0 200%);animation:flGold .68s cubic-bezier(.23,1,.32,1) both}
@@ -2650,7 +2650,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   const rest=withRest&&tOn?`<div class="rest ${over?"over":""}" id="restIn" role="timer"><span class="rr"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rk" cx="32" cy="32" r="28"/><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg><b class="tv"></b></span><span class="tl" aria-live="assertive">${over?"Recupero finito":"Recupero"+(tPlus?" · +"+tPlus+"\u00a0s":"")}</span><button data-tp>+15 s</button><button data-ts>Chiudi</button></div>`:"";
   // Scheda che si colora: a ogni serie un velo su tutta la scheda si intensifica piano; a esercizio finito passa l'oro in diagonale
   const fN=Math.min(n,rows.filter(r=>r.done).length),fr=n?fN/n:0,fPrev=fillMem[ex.id]??fr,isGold=goldHold&&goldHold.ex===ex.id;fillMem[ex.id]=fr;
-  return `<article class="ex cur ${ssP.length?"ss":""} ${isGold?"gold":""}" data-ex="${ex.id}" style="--f:${fr.toFixed(3)};--f0:${fPrev.toFixed(3)}"><i class="fl fp ${fPrev!==fr?"grow":""}" aria-hidden="true"></i>${isGold?'<i class="fl fg" aria-hidden="true"></i>':""}
+  return `<article class="ex cur ${ssP.length?"ss":""} ${isGold?"gold":""}" data-ex="${ex.id}" style="--f:${fr.toFixed(3)};--f0:${fPrev.toFixed(3)};--fc:${fillCol(fr)}"><i class="fl fp ${fPrev!==fr?"grow":""}" aria-hidden="true"></i>${isGold?'<i class="fl fg" aria-hidden="true"></i>':""}
     <div class="exhead"><h3>${esc(ex.n)}${(howOf(ex)||errOf(ex)||ex.note)?(IMGEX[ex.id]=ex,`<button class="qm" data-img="${ex.id}" aria-label="Come si fa: ${esc(ex.n)}">?</button>`):""}</h3><button class="swap" data-base="${base.id}" aria-label="Sostituisci ${esc(ex.n)}">⇄ Cambia</button></div>
     <div class="tgt"><b${cu?` data-cu="${lk}|${tg.kg}|${esc(" kg × "+r0)}|${ex.id}"`:""}>${big}</b>${tg.badge?`<small class="${tg.kind}">${esc(tg.badge)}</small>`:""}</div>
     ${dr.nextNote&&dr.nextNote.ex===ex.id?`<p class="prog down"><span>${esc(dr.nextNote.txt)}</span></p>`:`<p class="prog ${tg.kind}"><span>${esc(tg.msg)}</span></p>`}
@@ -2728,6 +2728,10 @@ function myoFinish(g,exId,j,mods){const r=cell(g,exId,j),dd=draftFor(g),ex=PLAN[
 // Primo piano: dopo ogni spunta l'esercizio in corso torna subito sotto l'intestazione, con la prossima serie visibile
 const ssGo={};
 const fillMem={};let goldHold=null;
+// Colore della scheda serie dopo serie. metallo: bronzo → argento → oro (come i ranghi); caldo: muscolo freddo → caldo → oro; stile: colore dello stile; verde: come le spunte
+const FILLV={metallo:[[0,[184,115,61]],[.5,[201,204,214]],[1,[232,180,64]]],caldo:[[0,[61,127,217]],[.5,[224,144,42]],[1,[232,180,64]]]};
+function fillCol(f){const v=S.fillv||"verde",L=FILLV[v];if(!L)return v==="stile"?"var(--hot)":"var(--go)";
+  let i=0;while(i<L.length-2&&f>L[i+1][0])i++;const [a,ca]=L[i],[b,cb]=L[i+1],t=Math.max(0,Math.min(1,(f-a)/(b-a)));return "rgb("+ca.map((x,k)=>Math.round(x+(cb[k]-x)*t)).join(",")+")"}
 // Fine esercizio: la scheda resta in primo piano il tempo della passata dorata, poi passa al prossimo
 function goldCard(g,exId,after){goldHold={g,ex:exId};openEx[g]=exId;renderTrain();keepFocus(false,exId);
   clearTimeout(goldCard.t);goldCard.t=setTimeout(()=>{goldHold=null;delete fillMem[exId];if(openEx[g]===exId)openEx[g]=null;after&&after();renderTrain();keepFocus(true)},RM()?450:1050)}
