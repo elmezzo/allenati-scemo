@@ -785,7 +785,7 @@ html[data-skin="campo"] .rbd .gs{opacity:.5}
 .field.pmf span{margin-right:2px}
 .pm{flex:none;width:30px;height:38px;border:0;background:none;color:var(--muted);font-size:20px;font-weight:700;line-height:1;border-radius:8px;touch-action:manipulation}
 .pm:active{background:color-mix(in srgb,var(--hot) 22%,transparent);color:var(--fg)}
-.eqmx{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600}.eqmx input{width:84px;min-height:44px;text-align:center}.eqf{display:grid;gap:6px;margin:12px 0 4px}.eqf b{font-size:14px}.eqf small{color:var(--muted);font-size:12px;line-height:1.4}.eqseg button{padding:10px 2px;font-size:13px;min-height:44px}
+.stn-s{display:block;font-size:12px;font-weight:600;opacity:.75;margin-top:2px}.eqmx{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:14px;font-weight:600}.eqmx input{width:84px;min-height:44px;text-align:center}.eqf{display:grid;gap:6px;margin:12px 0 4px}.eqf b{font-size:14px}.eqf small{color:var(--muted);font-size:12px;line-height:1.4}.eqseg button{padding:10px 2px;font-size:13px;min-height:44px}
 .setup{display:flex;gap:8px;align-items:baseline;width:100%;text-align:left;border:1px dashed var(--line);background:none;border-radius:12px;padding:8px 11px;color:var(--muted);font-size:14px;font-weight:600}
 .setup.has{border-style:solid;background:var(--field);color:var(--fg)}
 .setup.has b{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--hot);flex:none}
@@ -1614,7 +1614,7 @@ const BUILTIN={
   {id:"g6",mu:"Gambe",n:"Nordic curl",s:3,lo:4,hi:6,rir:"1-2",rest:120,t:"nordic",ecc:true,note:"Con elastico all'inizio."},
   {id:"g8",mu:"Gambe",n:"Calf in piedi",s:3,lo:10,hi:15,rir:"1",rest:75,t:"iso",step:5,note:"Discesa in 3 s.",eq:"mac"},
   {id:"g9",mu:"Core",n:"Woodchop al cavo",s:3,lo:6,hi:6,rir:"—",rest:60,t:"prev",step:5,side:true,note:"Esplosivo in uscita, controllato al ritorno.",eq:"mac"},
-  {id:"a8",n:"Extrarotazione al cavo",s:2,lo:15,hi:15,rir:"2",rest:45,t:"prev",step:5,side:true,note:"Gomito a 90°, braccio lungo il fianco.",eq:"mac"},
+  {id:"a8",n:"Extrarotazione al cavo",s:2,lo:15,hi:15,rir:"2",rest:45,t:"prev",step:2.5,side:true,note:"Gomito a 90°, braccio lungo il fianco.",eq:"cavl"},
   {id:"b9",n:"Estensione del polso",s:2,lo:15,hi:15,rir:"1-2",rest:45,t:"prev",step:1,note:"Discesa lenta. Prevenzione gomito.",eq:"db"}]},
  B:{name:"Upper B",title:"Upper B",sub:"Spalle, dorso e braccia",ex:[
   {id:"b10",mu:"Deltoidi",n:"Landmine press",s:4,lo:8,hi:10,rir:"1-2",rest:120,t:"comp",step:2.5,oh:true,side:true,note:"Kg = dischi caricati sul bilanciere (non il bilanciere).",eq:"bar"},
@@ -1634,7 +1634,7 @@ const BUILTIN={
   {id:"c6",mu:"Tricipiti",n:"Pushdown al cavo",s:3,lo:12,hi:15,rir:"1-2",keep:true,rest:60,t:"iso",step:5,ss:"5",eq:"mac"},
   {id:"c7",mu:"Core",n:"Pallof press",s:2,lo:10,hi:10,rir:"2",rest:45,t:"prev",step:5,side:true,eq:"mac"},
   {id:"g7",mu:"Gambe",n:"Copenhagen plank",s:2,lo:20,hi:30,rir:"—",rest:60,t:"time",side:true,keep:true,note:"Spostato qui dal martedì: tenuta controllata, mai a sfinimento prima delle partite."},
-  {id:"a8",n:"Extrarotazione al cavo",s:2,lo:15,hi:15,rir:"2",rest:45,t:"prev",step:5,side:true,note:"Gomito a 90°, braccio lungo il fianco.",eq:"mac"},
+  {id:"a8",n:"Extrarotazione al cavo",s:2,lo:15,hi:15,rir:"2",rest:45,t:"prev",step:2.5,side:true,note:"Gomito a 90°, braccio lungo il fianco.",eq:"cavl"},
   {id:"b9",n:"Estensione del polso",s:2,lo:15,hi:15,rir:"1-2",rest:45,t:"prev",step:1,note:"Discesa lenta. Prevenzione gomito.",eq:"db"}]}
 };
 // Varianti simili per quando la macchina è occupata: [chiave, nome, campi che cambiano]
@@ -1674,7 +1674,7 @@ const ALTS={
  c6:[["french","French press al cavo",{step:5,eq:"mac"}],["kickback","Kickback al cavo",{side:true,step:5,eq:"mac"}],["kickman","Kickback con manubri",{step:1,note:"Kg = un manubrio.",eq:"db"}]],
  c7:[["elastico","Pallof press con elastico",{}],["deadbug","Dead bug con cavo",{step:5,eq:"mac"}]]
 };
-const EQS=[["mac","Macchina o cavo",5],["cavl","Cavo delle alzate",2.5],["bar","Bilanciere o Smith",2.5],["db","Manubri",2],["zav","Zavorra (dischi o kettlebell)",2],["altro","Altro",null]];
+const EQS=[["mac","Macchina o cavo",5],["cavl","Cavo singolo (alzate, extrarotazioni)",2.5],["bar","Bilanciere o Smith",2.5],["db","Manubri",2],["zav","Zavorra (dischi o kettlebell)",2],["altro","Altro",null]];
 const eqOf=e=>e.eq||(e.t==="bw"?"zav":e.step===5?"mac":e.step===2.5?"bar":e.step===2?"db":"altro");
 const TYPES=[["comp","Multiarticolare"],["iso","Isolamento"],["bw","Corpo libero + zavorra"],["prev","Prevenzione (reps fisse)"],["perf","Salti / pliometria"],["nordic","Eccentrico assistito"],["time","Tenuta in secondi"]];
 let PLAN={},GYM_ORDER=[],ALL_EX=[],EX={};
@@ -1805,7 +1805,10 @@ function famIds(id){const k=S.sessions.length+"|"+ALL_EX.length;
   if(famC.k!==k){const m=new Map(),add=i=>{const n=nmKey(exName(i));if(!m.has(n))m.set(n,new Set());m.get(n).add(i)};Object.keys(EX).forEach(add);S.sessions.forEach(x=>x.sets&&Object.keys(x.sets).forEach(add));famC={k,m}}
   const f=famC.m.get(nmKey(exName(id)));return f&&f.has(id)?[id,...[...f].filter(i=>i!==id)]:[id]}
 const okSets=a=>a&&a.some(x=>num(x.reps)!=null);
-function history(exId){const F=famIds(exId);return S.sessions.map(s=>{if(!s.sets)return null;if(okSets(s.sets[exId]))return s;const f=F.find(i=>okSets(s.sets[i]));return f?{...s,sets:{...s.sets,[exId]:s.sets[f]},from:f}:null}).filter(Boolean).sort((a,b)=>b.date.localeCompare(a.date))}
+function history(exId){const F=famIds(exId),ex=exById(exId),cur=stationOf(ex);return S.sessions.map(s=>{if(!s.sets)return null;let o=null;if(okSets(s.sets[exId]))o=s;else{const f=F.find(i=>okSets(s.sets[i]));o=f?{...s,sets:{...s.sets,[exId]:s.sets[f]},from:f}:null}
+  // Fatto sull'altro attrezzo dei cavi: kg convertiti all'attrezzo attuale (raw = quello che hai caricato davvero)
+  if(o&&cur){const was=stnOfSet(s,o.from||exId);if(was&&was!==cur){const c=stnConv(was,cur),st=STN[cur].step,raw=o.sets[exId];o={...o,raw,stnFrom:was,sets:{...o.sets,[exId]:raw.map(x=>{const k=num(x.kg);return k>0?{...x,kg:String(Math.max(st,roundStep(k*c,st)))}:x})}}}}
+  return o}).filter(Boolean).sort((a,b)=>b.date.localeCompare(a.date))}
 const roundStep=(x,st)=>Math.round(x/st)*st;
 function target(ex){
   const h=history(ex.id).filter(x=>!x.deload),last=h[0];
@@ -1818,7 +1821,7 @@ function target(ex){
   const fx=last.from&&EX[last.from];
   if(fx&&(fx.lo!==ex.lo||fx.hi!==ex.hi)&&!["time","perf","nordic","bw"].includes(ex.t)){
     const ls=last.sets[ex.id].filter(x=>num(x.reps)!=null&&num(x.kg)>0);
-    if(ls.length){const st=ex.step||2.5,lk=Math.max(...ls.map(x=>num(x.kg))),best=Math.max(...ls.map(x=>e1rm(num(x.kg),num(x.reps))));
+    if(ls.length){const st=stepOf(ex),lk=Math.max(...ls.map(x=>num(x.kg))),best=Math.max(...ls.map(x=>e1rm(num(x.kg),num(x.reps))));
       let k=Math.max(st,roundStep(best/(1+ex.lo/30),st));if(ex.lo>fx.lo)k=Math.min(k,lk);
       const dn=PLAN[last.day]?PLAN[last.day].name:"un altro giorno";
       return {kg:k,reps:Array(ex.s).fill(ex.lo),kind:"flat",badge:"",msg:`Ultima volta in ${dn} (${fk(lk)} kg, range ${fx.lo}-${fx.hi}): qui il range è ${rr}, carico ricalcolato.`}}}
@@ -1831,7 +1834,7 @@ function target(ex){
   const planned=Math.max(1,lm?setsFor(ex,new Set(lm)):ex.s);
   const heavy=kg!=null?sets.filter(x=>num(x.kg)===kg):sets,hReps=heavy.map(x=>num(x.reps));
   const full=heavy.length>=planned;
-  const st=ex.step||2.5;
+  const st=stepOf(ex);
   // Isolamento e prevenzione con un gradino grosso rispetto al carico (>15%, es. extrarotazione 5 → 10 kg): prima si va oltre il range con le ripetizioni
   const cap=kg>0?eqMax(ex):null,atCap=cap&&kg+st>cap+1e-6;
   // Pacco finito: niente più kg, si continua con le ripetizioni (fino a +10 oltre il range, poi discesa più lenta)
@@ -1860,6 +1863,9 @@ function target(ex){
     if(ex.t==="bw"&&!kg)return {kg:inc,reps:Array(ex.s).fill(ex.lo),top,kind:"up",badge:"Zavorra",msg:`Chiuse tutte a ${ex.hi}: aggiungi ${fk(inc)} kg di zavorra e riparti da ${ex.lo}.`};
     if(kg==null&&ex.t!=="bw"){const fx=/flexbar/i.test(ex.n);return {kg:null,reps:Array(ex.s).fill(ex.lo),top,kind:"up",badge:"Più duro",msg:`Chiuse tutte a ${top}: passa a ${fx?"una Flexbar":"un elastico"} più dur${fx?"a":"o"} e riparti da ${ex.lo}.`}}
     let nk=(kg||0)+inc;if(cap&&nk>cap)nk=cap;
+    // Gradino grosso (es. cavo singolo, 7,5 → 10 kg = +33%): al carico nuovo non si riparte dal minimo del range ma dalle ripetizioni che il massimale stimato permette
+    if(big&&nk>kg){const er=Math.max(...heavy.map(x=>e1rm(kg,num(x.reps)))),rr=Math.max(6,Math.min(ex.lo,Math.floor((er/nk-1)*30)));
+      if(rr<ex.lo)return {kg:nk,reps:Array(ex.s).fill(rr),top,kind:"up",badge:`+${fk(nk-kg)} kg`,msg:`Arrivato a ${top} ripetizioni: passa a ${fk(nk)} kg. Il salto è del ${Math.round((nk-kg)/kg*100)}%, quindi punta a ${rr} ripetizioni e risali una alla volta fino a ${ex.lo}.`}}
     return {kg:nk,reps:Array(ex.s).fill(ex.lo),top,kind:"up",badge:`+${fk(inc)} kg`,msg:easy?`Range chiuso ed era facile: doppio aumento, ${fk(nk)} kg, riparti da ${ex.lo} ripetizioni.`:big?`Arrivato a ${top} ripetizioni: passa a ${fk(nk)} kg e riparti da ${ex.lo}.`:`Tutte le serie al limite alto: ${fk(nk)} kg e riparti da ${ex.lo} ripetizioni.`};
   }
   const sm=a=>a.reduce((t,r)=>t+r,0);
@@ -1869,6 +1875,7 @@ function target(ex){
     if(ex.t!=="bw"&&(kg-nk)/kg>0.15)return {kg,reps:pad(reps.map(r=>Math.min(top,r+1)),ex.s,ex.lo),top,kind:"up",badge:"+1 rip",msg:`Stesso carico: scendere di un gradino sarebbe troppo. Una ripetizione in più per serie, finché arrivi a ${ex.lo}.`};
     return {kg:nk,reps:Array(ex.s).fill(ex.lo),top,kind:"down",badge:nk<kg?`-${fk(kg-nk)} kg`:"=",msg:`Due sedute sotto le ${ex.lo} ripetizioni: scendi a ${fk(nk)} kg e ricostruisci.`};
   }
+  if(!allIn&&kg>0&&(ex.t==="iso"||ex.t==="prev")&&st/kg>0.15&&!(missTwice&&prev&&sm(reps)<sm(prev)))return {kg,reps:pad(reps.map(r=>Math.min(ex.lo,r+1)),ex.s,ex.lo),top,kind:"up",badge:"+1 rip",msg:`Stesso carico: il gradino da ${fk(st)} kg è grosso, si risale una ripetizione per serie fino a ${ex.lo}.`};
   if(!allIn)return {kg,reps:Array(ex.s).fill(ex.lo),top,kind:"flat",badge:"=",msg:`${kg==null&&ex.t!=="bw"?"Stesso elastico":"Stesso carico"}, obiettivo ${ex.lo} ripetizioni su tutte le serie.`};
   if(!full&&hReps.length&&hReps.every(r=>r>=top))return {kg,reps:Array(ex.s).fill(top),top,kind:"flat",badge:"=",msg:`Fai tutte le serie previste a ${fk(kg)} kg: poi sale il carico.`};
   const add=eff==="easy"?2:1;
@@ -1914,7 +1921,7 @@ function pad(a,n,fill){const r=a.slice(0,n);while(r.length<n)r.push(fill??r[r.le
 const e1rm=(kg,r)=>kg*(1+r/30);
 function bestMetric(exId,excludeId){
   const ex=EX[exId];let best=0;
-  const F=famIds(exId);for(const s of S.sessions){if(s.id===excludeId)continue;for(const fid of F)for(const x of (s.sets[fid]||[])){const v=metricOf(ex,x);if(v>best)best=v}}
+  const F=famIds(exId);for(const s of S.sessions){if(s.id===excludeId)continue;for(const fid of F){const cv=isCable(ex)?stnConv(stnOfSet(s,fid),stationOf(ex)):1;for(const x of (s.sets[fid]||[])){const v=metricOf(ex,cv===1?x:{...x,kg:num(x.kg)*cv});if(v>best)best=v}}}
   return best;
 }
 function metricOf(ex,x){const r=num(x.reps),k=num(x.kg);if(r==null)return 0;if(k&&k>0&&ex.t!=="time"&&ex.t!=="perf"&&ex.t!=="nordic")return e1rm(k,r);return r}
@@ -2071,7 +2078,7 @@ const WARMUP={up:[["Rotazioni delle braccia avanti e indietro","30 s"],["Band pu
   legs:[["Cyclette o corsa leggera","3 min"],["Squat a corpo libero","10"],["Affondi camminati","6 per lato"],["Ponte glutei","10"],["Saltelli sulle caviglie","20 s"]]};
 function warmupHTML(g,P,dr,dn){if(dn>0||dr.wu)return"";const L=WARMUP[P.legs?"legs":"up"];
   return `<details class="card wu"><summary><span class="wut"><h3>Riscaldamento</h3><small>5 min · ${L.length} esercizi</small></span><span class="wub"><button class="btn" data-wu="1">Fatto</button><button class="btn ghost" data-wu="0">Salta</button></span></summary><ol>${L.map(([n,d])=>`<li><span>${esc(n)}</span><em>${esc(d)}</em></li>`).join("")}</ol></details>`}
-function rampHTML(ex,tg){const step=(EQS.find(q=>q[0]===eqOf(ex))||[])[2]||ex.step||2.5;const top=tg.kg;
+function rampHTML(ex,tg){const step=isCable(ex)?stepOf(ex):(EQS.find(q=>q[0]===eqOf(ex))||[])[2]||ex.step||2.5;const top=tg.kg;
   const plan=top>=40?[[.5,8],[.7,4],[.85,2]]:[[.5,8],[.75,3]];const seen=new Set(),out=[];
   for(const [p,r] of plan){const kg=Math.round(top*p/step)*step;if(kg<=0||kg>=top||seen.has(kg))continue;seen.add(kg);out.push(`<b>${fk(kg)} kg × ${r}</b>`)}
   return out.length?`<p class="ramp">Avvicinamento, non conta: ${out.join(" · ")}</p>`:""}
@@ -2452,7 +2459,7 @@ function renderTrain(){
   document.querySelectorAll("#exs .tick").forEach(b=>b.onclick=()=>toggleSet(g,b.dataset.ex,+b.dataset.j,mods));
   document.querySelectorAll("#exs .hold").forEach(b=>b.onclick=()=>holdStart(g,b.dataset.ex,+b.dataset.j,mods));
   document.querySelectorAll("#exs [data-pm]").forEach(b=>b.onclick=e=>{e.preventDefault();const inp=b.parentElement.querySelector("input"),f=b.dataset.pm,d=+b.dataset.d,ex=exById(b.dataset.ex);let v=num(inp.value)||0;
-    if(f==="kg"){v=Math.max(0,Math.round((v+d*(ex.step||2.5))*100)/100);inp.value=fk(v)}else{v=Math.max(0,Math.round(v)+d*(ex.t==="time"?5:1));inp.value=String(v)}
+    if(f==="kg"){v=Math.max(0,Math.round((v+d*stepOf(ex))*100)/100);inp.value=fk(v)}else{v=Math.max(0,Math.round(v)+d*(ex.t==="time"?5:1));inp.value=String(v)}
     cell(g,b.dataset.ex,+b.dataset.j)[f]=inp.value;save();buzz(8)});
   document.querySelectorAll("#exs [data-setup]").forEach(b=>b.onclick=()=>setupSheet(exById(b.dataset.setup)));
   document.querySelectorAll("#exs [data-ss]").forEach(b=>b.onclick=()=>{const ex=PLAN[g].ex.map(e=>effEx(g,e)).find(e=>e.id===b.dataset.ss);if(ex)ssSheet(g,ex,mods)});
@@ -2486,33 +2493,49 @@ const setupKey=ex=>String(ex.n||"").trim().toLowerCase();
 const setupOf=ex=>((S.setup||{})[setupKey(ex)]||"").trim();
 // Attrezzo: quanto pesa davvero il numero sul pacco. Cavi: rapporto della carrucola (2:1 = senti metà). Macchine: più leggera o più pesante del solito.
 // Serve ai ranghi (confronto con le tabelle di forza); i progressi del singolo esercizio restano nei kg che carichi.
-const isCable=ex=>ex.eq==="cavl"||/\bcav[oi]\b|pulley|pushdown|face pull|lat machine|woodchop|pallof|corda/i.test(ex.n||"");
+const isCable=ex=>ex.eq==="cavl"||(!/lat machine|pulley/i.test(ex.n||"")&&/\bcav[oi]\b|pushdown|face pull|woodchop|pallof|corda/i.test(ex.n||""));
 const eqKind=ex=>isCable(ex)?"cavo":eqOf(ex)==="mac"?"mac":"";
 const CAB_F=[[1,"1:1","peso pieno"],[.5,"2:1","metà"],[1/3,"3:1","un terzo"],[.25,"4:1","un quarto"]];
 const MAC_F=[[.7,"−30%","molto più leggera"],[.85,"−15%","più leggera"],[1,"Normale","come le altre"],[1.15,"+15%","più pesante"],[1.3,"+30%","molto più pesante"]];
 // Attrezzi della sua palestra (detti da lui): modello e peso massimo del pacco. Il fattore resta Normale finché non c'è un dato migliore.
 const S700={m:"Technogym Selection 700 Pectoral / Reverse Fly",s:"Selection 700",max:50};
 const EQ_DEF={"butterfly alla macchina":S700,"reverse fly":S700,"reverse fly alla macchina":S700};
+/* Due attrezzi per i cavi nella sua palestra: la stazione cavi (quasi tutto, gradini da 5 kg) e il cavo singolo (gradini da 2,5 kg, molto più pesante: carrucola 1:1).
+   Ogni esercizio ai cavi ricorda su quale lo fai; le sedute salvano la stazione usata. Se cambi attrezzo, i kg delle volte precedenti vengono convertiti con il rapporto stR
+   (stessa fatica: 1 kg sul cavo singolo = stR kg sulla stazione; predefinito 2, la stazione si comporta come una carrucola 2:1). */
+const STN={multi:{n:"Stazione cavi",step:5},single:{n:"Cavo singolo",step:2.5}};
+const stR=()=>S.stR>0?S.stR:2;
+const stnDef=ex=>ex.eq==="cavl"||/extrarotazione al cavo/i.test(ex.n||"")?"single":"multi";
+const stationOf=ex=>isCable(ex)?((S.station||{})[setupKey(ex)]||stnDef(ex)):null;
+const stnOfSet=(s,id)=>{const e=exById(id);if(!isCable(e))return null;return (s.stn||{})[id]||stnDef(e)};
+const stnConv=(from,to)=>from===to||!from||!to?1:from==="multi"?1/stR():stR();
+const stepOf=ex=>{const t=stationOf(ex);return t?STN[t].step:(ex.step||2.5)};
 const eqDef=ex=>EQ_DEF[setupKey(ex)]||null;
 const eqMax=ex=>{const u=(S.eqmax||{})[setupKey(ex)];if(u===0)return null;return u>0?u:(eqDef(ex)||{}).max||null};
-const eqFOf=ex=>{const v=(S.eqf||{})[setupKey(ex)];return eqKind(ex)&&v>0?v:1};
-const eqLbl=ex=>{const f=eqFOf(ex),d=eqDef(ex),mx=eqMax(ex),t=[];if(d)t.push(d.s);
-  if(f!==1){const L=eqKind(ex)==="cavo"?CAB_F:MAC_F,o=L.find(x=>Math.abs(x[0]-f)<1e-6);if(o)t.push(eqKind(ex)==="cavo"?"Cavo "+o[1]:"Macchina "+o[1])}
+const eqFOf=(ex,stn)=>{if(isCable(ex))return stnConv(stn||stationOf(ex),stnDef(ex));const v=(S.eqf||{})[setupKey(ex)]||(eqDef(ex)||{}).f;return eqKind(ex)&&v>0?v:1};
+const eqLbl=ex=>{const f=eqFOf(ex),d=eqDef(ex),mx=eqMax(ex),t=[];if(d)t.push(d.s);if(isCable(ex))t.push(STN[stationOf(ex)].n);
+  if(f!==1&&!isCable(ex)){const L=eqKind(ex)==="cavo"?CAB_F:MAC_F,o=L.find(x=>Math.abs(x[0]-f)<1e-6);if(o)t.push(eqKind(ex)==="cavo"?"Cavo "+o[1]:"Macchina "+o[1])}
   if(mx)t.push("pacco fino a "+fk(mx)+" kg");return t.join(", ")};
 function setupHTML(ex){const t=[setupOf(ex),eqLbl(ex)].filter(Boolean).join(" · ");return t?`<button class="setup has" data-setup="${ex.id}"><b>Regolazioni</b><span>${esc(t)}</span></button>`:`<button class="lnk setup0" data-setup="${ex.id}">+ Regolazioni e carrucola</button>`}
 function setupSheet(ex){
   openSheet({html:()=>`<h2>Regolazioni</h2><p class="note" style="margin:0">${esc(ex.n)}: sedile, schienale, presa, perni. Le ritrovi ogni volta che apri l'esercizio, in tutti i piani.</p>
     <textarea id="setupTx" rows="3" maxlength="160" placeholder="Es. sedile 4, schienale 2, presa neutra">${esc(setupOf(ex))}</textarea>
-    ${eqKind(ex)?`<div class="eqf"><b>${eqKind(ex)==="cavo"?"Carrucola del cavo":"Questa macchina"}</b><small>${eqKind(ex)==="cavo"?"Con la carrucola 2:1 sollevi metà del numero sul pacco. Lo trovi scritto sulla macchina o lo capisci se il cavo passa per una carrucola che si muove.":"Rispetto alle macchine simili, il numero sul pacco si sente più leggero o più pesante?"} Conta solo per i ranghi.</small>
+    ${isCable(ex)?`<div class="eqf"><b>Dove lo fai</b><small>I kg suggeriti si adattano all'attrezzo: le volte fatte sull'altro vengono convertite.</small>
+    <div class="seg eqseg" role="group" aria-label="Attrezzo" style="grid-template-columns:1fr 1fr">${Object.entries(STN).map(([k,o])=>`<button type="button" data-stn="${k}" aria-pressed="${stationOf(ex)===k}">${o.n}<small class="stn-s">gradini ${fk(o.step)} kg</small></button>`).join("")}</div>
+    <b style="margin-top:6px">Quanto pesa di più il cavo singolo</b><label class="eqmx"><span>1 kg lì =</span><input id="stR" type="number" inputmode="decimal" min="1" max="5" step="0.1" value="${fk(stR())}"><span>kg sulla stazione</span></label>
+    <small>A parità di fatica. Vale per tutti gli esercizi ai cavi: se i kg convertiti ti sembrano sbagliati, cambia questo numero.</small></div>`:""}
+    ${eqKind(ex)&&!isCable(ex)?`<div class="eqf"><b>${eqKind(ex)==="cavo"?"Carrucola del cavo":"Questa macchina"}</b><small>${eqKind(ex)==="cavo"?"Con la carrucola 2:1 sollevi metà del numero sul pacco. Lo trovi scritto sulla macchina o lo capisci se il cavo passa per una carrucola che si muove.":"Rispetto alle macchine simili, il numero sul pacco si sente più leggero o più pesante?"} Conta solo per i ranghi.</small>
     ${eqDef(ex)?`<small>Attrezzo: ${esc(eqDef(ex).m)}.</small>`:""}<div class="seg eqseg" role="group" aria-label="${eqKind(ex)==="cavo"?"Rapporto della carrucola":"Taratura della macchina"}" style="grid-template-columns:repeat(${(eqKind(ex)==="cavo"?CAB_F:MAC_F).length},1fr)">${(eqKind(ex)==="cavo"?CAB_F:MAC_F).map(([f,l,d])=>`<button type="button" data-eqf="${f}" aria-pressed="${Math.abs(eqFOf(ex)-f)<1e-6}" title="${d}">${l}</button>`).join("")}</div>
     <label class="eqmx"><span>Peso massimo del pacco</span><input id="eqMax" type="number" inputmode="decimal" min="0" step="0.5" placeholder="—" value="${eqMax(ex)||""}"><span>kg</span></label>
     <small>Quando arrivi al massimo, la progressione continua con le ripetizioni.</small></div>`:""}
-    <div class="row"><button class="btn hot" id="setupOk">Salva</button>${setupOf(ex)||eqLbl(ex)?`<button class="btn ghost" id="setupDel">Cancella</button>`:""}</div>`,
+    <div class="row"><button class="btn hot" id="setupOk">Salva</button>${setupOf(ex)||(eqLbl(ex)&&eqLbl(ex)!==(isCable(ex)?STN[stnDef(ex)].n:""))?`<button class="btn ghost" id="setupDel">Cancella</button>`:""}</div>`,
    bind:(w,draw,close)=>{const tx=w.querySelector("#setupTx");setTimeout(()=>tx.focus(),50);
+     let stn=stationOf(ex);w.querySelectorAll("[data-stn]").forEach(b=>b.onclick=()=>{stn=b.dataset.stn;w.querySelectorAll("[data-stn]").forEach(x=>x.setAttribute("aria-pressed",x===b))});
      let ef=eqFOf(ex);w.querySelectorAll("[data-eqf]").forEach(b=>b.onclick=()=>{ef=+b.dataset.eqf;w.querySelectorAll("[data-eqf]").forEach(x=>x.setAttribute("aria-pressed",x===b))});
-     const done=v=>{S.setup=S.setup||{};if(v)S.setup[setupKey(ex)]=v;else delete S.setup[setupKey(ex)];S.eqf=S.eqf||{};if(eqKind(ex)&&Math.abs(ef-1)>1e-6)S.eqf[setupKey(ex)]=ef;else delete S.eqf[setupKey(ex)];
+     const done=v=>{S.setup=S.setup||{};if(v)S.setup[setupKey(ex)]=v;else delete S.setup[setupKey(ex)];if(stn){S.station=S.station||{};if(stn===stnDef(ex))delete S.station[setupKey(ex)];else S.station[setupKey(ex)]=stn;const ri=w.querySelector("#stR"),rv=num(ri&&ri.value);if(rv>=1&&rv<=5)S.stR=rv}
+       S.eqf=S.eqf||{};if(!isCable(ex)&&eqKind(ex)&&Math.abs(ef-1)>1e-6)S.eqf[setupKey(ex)]=ef;else delete S.eqf[setupKey(ex)];
        const mi=w.querySelector("#eqMax");if(mi){const m=num(mi.value),dm=(eqDef(ex)||{}).max||null;S.eqmax=S.eqmax||{};if((m||null)===dm)delete S.eqmax[setupKey(ex)];else S.eqmax[setupKey(ex)]=m>0?m:0}save();close();if(view==="train"){renderTrain();keepFocus(false)}};
-     w.querySelector("#setupOk").onclick=()=>done(tx.value.trim());const d=w.querySelector("#setupDel");if(d)d.onclick=()=>{ef=1;const mi=w.querySelector("#eqMax");if(mi)mi.value=(eqDef(ex)||{}).max||"";done("")}}})}
+     w.querySelector("#setupOk").onclick=()=>done(tx.value.trim());const d=w.querySelector("#setupDel");if(d)d.onclick=()=>{ef=1;if(stn)stn=stnDef(ex);const mi=w.querySelector("#eqMax");if(mi)mi.value=(eqDef(ex)||{}).max||"";done("")}}})}
 let wl=null,wlBusy=false;
 async function wakeOn(){if(wl||wlBusy||S.awake===false||!("wakeLock" in navigator)||document.visibilityState!=="visible")return;wlBusy=true;try{wl=await navigator.wakeLock.request("screen");wl.addEventListener("release",()=>{wl=null})}catch(e){wl=null}wlBusy=false}
 function wakeOff(){if(wl){wl.release().catch(()=>{});wl=null}}
@@ -2537,7 +2560,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   const rows=dr.ex[ex.id]||[];
   const unit=ex.t==="time"?"s":"rip";
   const hasKg=!["perf","nordic","time"].includes(ex.t);
-  const lastTxt=last?`Ultima volta (${fmtShort(last.date)}${last.day&&last.day!==g&&PLAN[last.day]?", "+esc(PLAN[last.day].name):""}): <b>${last.sets[ex.id].filter(x=>num(x.reps)!=null).map(x=>(num(x.kg)?fk(num(x.kg))+"×":"")+x.reps).join(" · ")}</b>`:"Mai fatto finora.";
+  const lastTxt=last?`Ultima volta (${fmtShort(last.date)}${last.day&&last.day!==g&&PLAN[last.day]?", "+esc(PLAN[last.day].name):""}${last.stnFrom?", "+STN[last.stnFrom].n.toLowerCase():""}): <b>${(last.raw||last.sets[ex.id]).filter(x=>num(x.reps)!=null).map(x=>(num(x.kg)?fk(num(x.kg))+"×":"")+x.reps).join(" · ")}</b>`:"Mai fatto finora.";
   const rng=(ex.lo===ex.hi?ex.lo:ex.lo+"-"+ex.hi)+(ex.t==="time"?" s":"")+(ex.side?" per lato":"");
   const r0=tg.reps[0]??ex.lo,rMin=Math.min(...tg.reps.slice(0,setsFor(ex,mods)).map(Number).filter(v=>!isNaN(v)),r0),rMax=Math.max(...tg.reps.slice(0,setsFor(ex,mods)).map(Number).filter(v=>!isNaN(v)),r0),rT=rMin===rMax?String(r0):rMin+"-"+rMax;
   const lk=hasKg&&tg.kind==="up"&&tg.kg>0&&last?Math.max(0,...last.sets[ex.id].map(x=>num(x.kg)||0)):0,cu=lk>0&&lk<tg.kg&&ex.t!=="time"&&ex.t!=="perf";
@@ -2614,7 +2637,7 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;audioUnlock();
     // Serie molto sotto il minimo (3+ ripetizioni): la prossima parte già con il 10% in meno, sempre modificabile
     if(dd.nextNote&&dd.nextNote.ex===exId&&dd.nextNote.j!==j)delete dd.nextNote;
     const kNow=num(r.kg),nx=(dd.ex[exId]||[])[j+1];
-    if(fail&&kNow>0&&got<ex.lo-2&&j+1<n&&!(nx&&nx.done)&&!["perf","time","nordic"].includes(ex.t)){const st=ex.step||2.5;let nk=Math.max(st,roundStep(kNow*0.9,st));if(nk>=kNow&&kNow-st>0)nk=kNow-st;
+    if(fail&&kNow>0&&got<ex.lo-2&&j+1<n&&!(nx&&nx.done)&&!["perf","time","nordic"].includes(ex.t)){const st=stepOf(ex);let nk=Math.max(st,roundStep(kNow*0.9,st));if(nk>=kNow&&kNow-st>0)nk=kNow-st;
       if(nk<kNow){const old={};for(let k=j+1;k<n;k++){const c=cell(g,exId,k);if(!c.done){old[k]=c.kg;c.kg=fk(nk)}}
         dd.nextNote={ex:exId,j,old,txt:`${n-j-1>1?"Prossime serie":"Prossima serie"}: ${fk(nk)} kg, il ${Math.round((kNow-nk)/kNow*100)}% in meno. Puoi cambiarlo.`}}}
     save();
@@ -2653,12 +2676,12 @@ function finish(g,mods){
   const names={};
   const order=PLAN[g].ex.flatMap(e=>[e.id,...altsOf(e).map(a=>e.id+"~"+a.k)]);
   const ids=[...order.filter(id=>d.ex[id]),...Object.keys(d.ex).filter(id=>!order.includes(id))];
-  const eff={};for(const id of ids){const r=(d.ex[id]||[]).filter(x=>x.done).map(x=>({kg:x.kg??"",reps:x.reps??""}));if(r.length){sets[id]=r;names[id]=exName(id);n+=r.length;if(d.eff&&d.eff[id])eff[id]=d.eff[id]}}
+  const eff={};let stn=null;for(const id of ids){const r=(d.ex[id]||[]).filter(x=>x.done).map(x=>({kg:x.kg??"",reps:x.reps??""}));if(r.length){sets[id]=r;names[id]=exName(id);n+=r.length;if(d.eff&&d.eff[id])eff[id]=d.eff[id];const t=stationOf(exById(id));if(t)(stn=stn||{})[id]=t}}
   const m=document.getElementById("msg");
   if(!n){m.className="msg err";m.textContent="Spunta almeno una serie con ✓ prima di salvare.";return}
   const dur=d.start?Math.max(1,Math.round((Date.now()-d.start)/60000)):null;
   clearDemo();
-  S.sessions.push({id:"s"+Date.now(),day:g,planName:PLAN[g].name,date:new Date().toISOString(),sets,names,eff,mods:[...mods],deload:mods.has("deload"),dur});
+  S.sessions.push({id:"s"+Date.now(),day:g,planName:PLAN[g].name,date:new Date().toISOString(),sets,names,eff,mods:[...mods],deload:mods.has("deload"),dur,...(stn?{stn}:{})});
   delete S.draft[g];openEx[g]=null;if(g==="LIB"){delete S.free;rebuild();gymSel=null}save();stopTimer();renderTrain();summarySheet(S.sessions[S.sessions.length-1]);
   const mm=document.getElementById("msg");mm.className="msg ok";mm.textContent=`Seduta salvata: ${n} serie. I carichi della prossima volta sono già pronti.`;
   if(!storageOk){mm.className="msg err";mm.textContent="Non riesco a salvare su questo dispositivo: controlla che il browser non sia in navigazione privata."}
@@ -2882,9 +2905,9 @@ function exRank(ids,BW,excl,at){
     if(s.id===excl||s.deload||!s.sets||!s.sets[xid]||s.date.slice(0,10)<from||s.date.slice(0,10)>to)continue;
     const arr=s.sets[xid],ef=(s.eff||{})[xid];
     arr.forEach((x,j)=>{const r=num(x.reps);let kg=num(x.kg);if(r==null||r<1)return;
-      if(sd.k==="w")kg=BW+(kg||0);else if(!kg||kg<=0)return;else kg*=eqFOf(exById(xid));
+      if(sd.k==="w")kg=BW+(kg||0);else if(!kg||kg<=0)return;else kg*=eqFOf(exById(xid),stnOfSet(s,xid));
       const rir=j===arr.length-1&&ef?(ef==="easy"?3:ef==="hard"?0:mid):mid;
-      const c={v:kg*(1+(r+rir)/30),kg:num(x.kg)||0,f:sd.k==="w"?1:eqFOf(exById(xid)),r,rir};
+      const c={v:kg*(1+(r+rir)/30),kg:num(x.kg)||0,f:sd.k==="w"?1:eqFOf(exById(xid),stnOfSet(s,xid)),r,rir};
       const mx=sd.k==="w"?null:eqMax(exById(xid));
       if(r<=12){if(!best||c.v>best.v)best=c}else if(r<=20||(mx&&c.kg>=mx&&r<=30)){if(!loose||c.v>loose.v)loose=c}})}
   const b=best||loose;if(!b)return null;
@@ -2893,7 +2916,7 @@ function exRank(ids,BW,excl,at){
   const lo=r?TH[r-1]:0,hi=r<8?TH[r]:L[4]+(L[4]-L[3]);
   const pt=Math.max(0,Math.min(99,Math.floor((b.v-lo)/(hi-lo)*100)));
   let need=null;
-  if(r<8){const f=1+(b.r+b.rir)/30,tot=TH[r]/f,st=ex.step||2.5;
+  if(r<8){const f=1+(b.r+b.rir)/30,tot=TH[r]/f,st=stepOf(ex);if(sd.k!=="w"){const cf=eqFOf(ex);b.kg=Math.round(b.kg*(b.f||1)/cf*2)/2;b.f=cf}
     if(sd.k==="w"){const z=Math.ceil((tot-BW)/st-1e-9)*st;
       need=z>0?{txt:`+${fk(z)} kg × ${b.r}`,pct:(BW+z)/(BW+b.kg)-1}:{txt:`${Math.max(b.r+1,Math.ceil((TH[r]/BW-1)*30-b.rir))} rip a corpo libero`,pct:.01}}
     else{const k=Math.max(b.kg+st,Math.ceil(tot/(b.f||1)/st-1e-9)*st),mx=eqMax(ex);
@@ -3377,7 +3400,7 @@ function renderSettings(){
 
 /* ================= EDITOR PIANI ================= */
 function blankEx(){return {id:null,n:"",s:3,lo:8,hi:12,rir:"1-2",rest:90,t:"comp",step:5,eq:"mac",side:false,oh:false,ecc:false,ss:"",note:""}}
-const edSum=e=>`${e.s}×${e.lo===e.hi?e.lo:e.lo+"-"+e.hi}${e.t==="time"?" s":""} · ${e.rest||0} s · ${({mac:"Macchina",cavl:"Cavo alzate",bar:"Bilanciere",db:"Manubri",zav:"Zavorra"})[eqOf(e)]||"Altro"}`;
+const edSum=e=>`${e.s}×${e.lo===e.hi?e.lo:e.lo+"-"+e.hi}${e.t==="time"?" s":""} · ${e.rest||0} s · ${({mac:"Macchina",cavl:"Cavo singolo",bar:"Bilanciere",db:"Manubri",zav:"Zavorra"})[eqOf(e)]||"Altro"}`;
 function renderEditor(){
   const E=editPlan;
   const lib=Object.keys(BUILTIN).map(k=>`<optgroup label="${esc(BUILTIN[k].name)}">${BUILTIN[k].ex.map(e=>`<option value="${e.id}">${esc(e.n)}</option>${altsOf(e).filter(a=>!a.custom).map(a=>`<option value="${e.id}~${a.k}">  ↳ ${esc(a.n)}</option>`).join("")}`).join("")}</optgroup>`).join("");
