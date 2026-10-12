@@ -2496,11 +2496,11 @@ const setupOf=ex=>((S.setup||{})[setupKey(ex)]||"").trim();
 const isCable=ex=>ex.eq==="cavl"||(!/lat machine|pulley|elastico|manubri/i.test(ex.n||"")&&/\bcav[oi]\b|pushdown|face pull|woodchop|pallof|corda/i.test(ex.n||""));
 const eqKind=ex=>isCable(ex)?"cavo":eqOf(ex)==="mac"?"mac":"";
 const CAB_F=[[1,"1:1","peso pieno"],[.5,"2:1","metà"],[1/3,"3:1","un terzo"],[.25,"4:1","un quarto"]];
-const MAC_F=[[.7,"−30%","molto più leggera"],[.85,"−15%","più leggera"],[1,"Normale","come le altre"],[1.15,"+15%","più pesante"],[1.3,"+30%","molto più pesante"]];
+const MAC_F=[[.5,"×0,5","molto più leggera"],[.75,"×0,75","più leggera"],[1,"Normale","come le altre"],[1.5,"×1,5","più pesante"],[2,"×2","molto più pesante"]];
 // Attrezzi della sua palestra (detti da lui): modello e peso massimo del pacco. Il fattore resta Normale finché non c'è un dato migliore.
-const S700={m:"Technogym Selection 700 Pectoral / Reverse Fly",s:"Selection 700",max:50};
+const S700={m:"Technogym Selection 700 Pectoral / Reverse Fly",s:"Selection 700",max:50,f:2};
 // Macchine (taratura, pacco massimo, Selection 700): pronte ma spente finché Alessandro non le approva
-const EQ_MAC=false;
+const EQ_MAC=true;
 const EQ_DEF=EQ_MAC?{"butterfly alla macchina":S700,"reverse fly":S700,"reverse fly alla macchina":S700}:{};
 /* Due attrezzi per i cavi nella sua palestra: la stazione cavi (quasi tutto, gradini da 5 kg) e il cavo singolo (gradini da 2,5 kg, molto più pesante: carrucola 1:1).
    Ogni esercizio ai cavi ricorda su quale lo fai; le sedute salvano la stazione usata. Se cambi attrezzo, i kg delle volte precedenti vengono convertiti con il rapporto stR
@@ -2535,9 +2535,9 @@ function setupSheet(ex){
      let stn=stationOf(ex);w.querySelectorAll("[data-stn]").forEach(b=>b.onclick=()=>{stn=b.dataset.stn;w.querySelectorAll("[data-stn]").forEach(x=>x.setAttribute("aria-pressed",x===b))});
      let ef=eqFOf(ex);w.querySelectorAll("[data-eqf]").forEach(b=>b.onclick=()=>{ef=+b.dataset.eqf;w.querySelectorAll("[data-eqf]").forEach(x=>x.setAttribute("aria-pressed",x===b))});
      const done=v=>{S.setup=S.setup||{};if(v)S.setup[setupKey(ex)]=v;else delete S.setup[setupKey(ex)];if(stn){S.station=S.station||{};if(stn===stnDef(ex))delete S.station[setupKey(ex)];else S.station[setupKey(ex)]=stn;const ri=w.querySelector("#stR"),rv=num(ri&&ri.value);if(rv>=1&&rv<=5)S.stR=rv}
-       S.eqf=S.eqf||{};if(!isCable(ex)&&eqKind(ex)&&Math.abs(ef-1)>1e-6)S.eqf[setupKey(ex)]=ef;else delete S.eqf[setupKey(ex)];
+       S.eqf=S.eqf||{};if(!isCable(ex)&&eqKind(ex)&&Math.abs(ef-((eqDef(ex)||{}).f||1))>1e-6)S.eqf[setupKey(ex)]=ef;else delete S.eqf[setupKey(ex)];
        const mi=w.querySelector("#eqMax");if(mi){const m=num(mi.value),dm=(eqDef(ex)||{}).max||null;S.eqmax=S.eqmax||{};if((m||null)===dm)delete S.eqmax[setupKey(ex)];else S.eqmax[setupKey(ex)]=m>0?m:0}save();close();if(view==="train"){renderTrain();keepFocus(false)}};
-     w.querySelector("#setupOk").onclick=()=>done(tx.value.trim());const d=w.querySelector("#setupDel");if(d)d.onclick=()=>{ef=1;if(stn)stn=stnDef(ex);const mi=w.querySelector("#eqMax");if(mi)mi.value=(eqDef(ex)||{}).max||"";done("")}}})}
+     w.querySelector("#setupOk").onclick=()=>done(tx.value.trim());const d=w.querySelector("#setupDel");if(d)d.onclick=()=>{ef=(eqDef(ex)||{}).f||1;if(stn)stn=stnDef(ex);const mi=w.querySelector("#eqMax");if(mi)mi.value=(eqDef(ex)||{}).max||"";done("")}}})}
 let wl=null,wlBusy=false;
 async function wakeOn(){if(wl||wlBusy||S.awake===false||!("wakeLock" in navigator)||document.visibilityState!=="visible")return;wlBusy=true;try{wl=await navigator.wakeLock.request("screen");wl.addEventListener("release",()=>{wl=null})}catch(e){wl=null}wlBusy=false}
 function wakeOff(){if(wl){wl.release().catch(()=>{});wl=null}}
