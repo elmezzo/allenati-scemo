@@ -1500,6 +1500,20 @@ html[data-skin="lavagna"]:not(#z):not(#y) .set.now .field{border-color:transpare
 html[data-skin="lavagna"]:not(#z):not(#y) .pm{font-family:"Manrope",system-ui,sans-serif;font-weight:700;font-size:20px;color:var(--muted)}
 html[data-skin="lavagna"]:not(#z):not(#y) button.btn.hot,html[data-skin="lavagna"]:not(#z):not(#y) .btn.hot{border-radius:3px 6px 4px 5px}
 html[data-skin="lavagna"]:not(#z):not(#y) nav.bar{background:linear-gradient(#7a5a3c,#5b412a 1px,#4a3422 4px,#3a291b 9px,#241a12 11px,#171d1a 11px)}
+/* Lavagna, giro 4 */
+html[data-skin="lavagna"]:not(#z):not(#y) .dayr.t:not(#q)::after{border-color:var(--acc);border-width:2.2px}
+html[data-skin="lavagna"]:not(#z):not(#y) .dayr.t .d{color:var(--acc)}
+html[data-skin="lavagna"]:not(#z):not(#y) :is(.rk-m,.bal-r,.rk-flip,.rk-i,.qm,.swap,.gear,.tick:not([aria-pressed="true"]),.timer button,.rest button){position:relative;border-color:transparent!important;box-shadow:none;border-radius:5px}
+html[data-skin="lavagna"]:not(#z):not(#y) :is(.rk-m,.bal-r,.gear){background:rgba(34,43,38,.75)}
+html[data-skin="lavagna"]:not(#z):not(#y) :is(.rk-m,.bal-r,.rk-flip,.rk-i,.qm,.swap,.gear,.tick:not([aria-pressed="true"]),.timer button,.rest button)::before{content:"";position:absolute;inset:0;border:1.5px solid rgba(var(--chalk-rgb),.32);border-radius:6px 3px 7px 4px;pointer-events:none;filter:url(#chalk);background:none;display:block;animation:none;transform:none}
+html[data-skin="lavagna"]:not(#z):not(#y) :is(.timer,.rest) button::before{border-color:rgba(var(--acc-rgb),.75)}
+html[data-skin="lavagna"]:not(#z):not(#y) .rk-m.sel::before,html[data-skin="lavagna"]:not(#z):not(#y) .rk-m[aria-pressed="true"]::before{border-color:var(--acc)}
+html[data-skin="lavagna"] .rk-fig ellipse{fill:none;stroke:rgba(238,236,228,.6);stroke-width:1.1}
+html[data-skin="lavagna"]{--rk-n:rgba(238,236,228,.03);--rk-c:rgba(238,236,228,.05);--rk-0:rgba(238,236,228,.02)}
+/* bottone principale: gesso passato a mano, bordi irregolari */
+html[data-skin="lavagna"]:not(#z):not(#y) button.btn.hot,html[data-skin="lavagna"]:not(#z):not(#y) .btn.hot{position:relative;isolation:isolate;background:transparent}
+html[data-skin="lavagna"]:not(#z):not(#y) .btn.hot::before{content:"";display:block;position:absolute;inset:0;z-index:-1;border-radius:4px;filter:url(#chalkb);animation:none;
+  background:repeating-linear-gradient(-55deg,rgba(0,0,0,0) 0 4px,rgba(29,37,33,.16) 4px 5.5px),var(--acc)}
 </style>
 <!--APP-HEAD-END-->
 </head>
@@ -1517,7 +1531,7 @@ html[data-skin="lavagna"]:not(#z):not(#y) nav.bar{background:linear-gradient(#7a
 <div id="aurw" aria-hidden="true"></div>
 <svg id="court" viewBox="0 0 120 220" aria-hidden="true"><path class="ln" pathLength="1" d="M10 10 H110 V210 H10 Z"/><path class="ln net" pathLength="1" d="M4 110 H116"/><path class="ln" pathLength="1" d="M10 40.5 H110"/><path class="ln" pathLength="1" d="M10 179.5 H110"/><path class="ln" pathLength="1" d="M60 40.5 V179.5"/></svg>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <defs><linearGradient id="rgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff9a5a"/><stop offset=".7" style="stop-color:var(--acc,#ff4f9a)"/><stop offset="1" stop-color="#c34dff"/></linearGradient><filter id="chalk" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="2" seed="4" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="3.5" xChannelSelector="R" yChannelSelector="G" result="d"/><feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="1" seed="9" result="g"/><feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2.6 0 0 0 1.9" result="m"/><feComposite in="d" in2="m" operator="in"/></filter></defs>
+  <defs><linearGradient id="rgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff9a5a"/><stop offset=".7" style="stop-color:var(--acc,#ff4f9a)"/><stop offset="1" stop-color="#c34dff"/></linearGradient><filter id="chalk" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="2" seed="4" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="3.5" xChannelSelector="R" yChannelSelector="G" result="d"/><feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="1" seed="9" result="g"/><feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2.6 0 0 0 1.9" result="m"/><feComposite in="d" in2="m" operator="in"/></filter><filter id="chalkb" x="-3%" y="-8%" width="106%" height="116%"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="2" seed="11" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="4" xChannelSelector="R" yChannelSelector="G" result="d"/><feTurbulence type="fractalNoise" baseFrequency="1.3" numOctaves="1" seed="5" result="g"/><feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -1.4 0 0 0 1.75" result="m"/><feComposite in="d" in2="m" operator="in"/></filter></defs>
   <symbol id="i-rac" viewBox="0 0 24 24"><circle cx="9.5" cy="9.5" r="6.8"/><path d="m14.3 14.3 1.9 1.9"/><path d="m15.4 18.2 2.8-2.8 3.9 3.9-2.8 2.8z"/><circle cx="7.4" cy="8" r=".75"/><circle cx="11.6" cy="8" r=".75"/><circle cx="9.5" cy="11.4" r=".75"/></symbol>
   <symbol id="i-cup" viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 0 1-10 0V4zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4M12 13v4M8 21h8M10 17h4v4h-4z"/></symbol>
   <symbol id="i-gym" viewBox="0 0 24 24"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></symbol>
