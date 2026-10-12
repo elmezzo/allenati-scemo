@@ -786,6 +786,13 @@ html[data-skin="campo"] .rbd .gs{opacity:.5}
 .field.pmf span{margin-right:2px}
 .pm{flex:none;width:30px;height:38px;border:0;background:none;color:var(--muted);font-size:20px;font-weight:700;line-height:1;border-radius:8px;touch-action:manipulation}
 .pm:active{background:color-mix(in srgb,var(--hot) 22%,transparent);color:var(--fg)}
+.bks{display:grid;gap:6px;justify-items:center;margin-top:4px}.bks small{font-size:12px;color:var(--muted);text-align:center}
+.set.myom .i{color:var(--hot);font-weight:800}
+.myo{display:grid;gap:6px;margin:-2px 0 8px 28px;padding:8px 10px;border:1px dashed var(--line);border-radius:12px}
+.myo .ml{font-size:14px;font-weight:700}.myo .ml small{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-top:2px}
+.myo .mc{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.myo .mv{min-width:36px;height:36px;display:grid;place-items:center;border-radius:10px;background:var(--card-2);font-weight:800;font-variant-numeric:tabular-nums}
+.myo .mi{width:64px}.myo .mi input{text-align:center}.myo .mt{width:44px}.myo .mdone{font-size:14px;color:var(--muted);font-weight:600}
 .stn-s{display:block;font-size:12px;font-weight:600;opacity:.75;margin-top:2px}.eqmx{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:14px;font-weight:600}.eqmx input{width:84px;min-height:44px;text-align:center}.eqf{display:grid;gap:6px;margin:12px 0 4px}.eqf b{font-size:14px}.eqf small{color:var(--muted);font-size:12px;line-height:1.4}.eqseg button{padding:10px 2px;font-size:13px;min-height:44px}
 .setup{display:flex;gap:8px;align-items:baseline;width:100%;text-align:left;border:1px dashed var(--line);background:none;border-radius:12px;padding:8px 11px;color:var(--muted);font-size:14px;font-weight:600}
 .setup.has{border-style:solid;background:var(--field);color:var(--fg)}
@@ -1575,6 +1582,7 @@ html[data-skin="lavagna"] .ho-ring .rk{stroke-dasharray:3 4;opacity:.2}
   <symbol id="i-rac" viewBox="0 0 24 24"><circle cx="9.5" cy="9.5" r="6.8"/><path d="m14.3 14.3 1.9 1.9"/><path d="m15.4 18.2 2.8-2.8 3.9 3.9-2.8 2.8z"/><circle cx="7.4" cy="8" r=".75"/><circle cx="11.6" cy="8" r=".75"/><circle cx="9.5" cy="11.4" r=".75"/></symbol>
   <symbol id="i-cup" viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 0 1-10 0V4zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4M12 13v4M8 21h8M10 17h4v4h-4z"/></symbol>
   <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 19h14"/></symbol>
   <symbol id="i-gym" viewBox="0 0 24 24"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></symbol>
   <symbol id="i-bed" viewBox="0 0 24 24"><path d="M3 18V7M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="1.6"/></symbol>
   <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3 5 14h6l-1 7 8-11h-6z"/></symbol>
@@ -1811,6 +1819,13 @@ function history(exId){const F=famIds(exId),ex=exById(exId),cur=stationOf(ex);re
   if(o&&cur){const was=stnOfSet(s,o.from||exId);if(was&&was!==cur){const c=stnConv(was,cur),st=STN[cur].step,raw=o.sets[exId];o={...o,raw,stnFrom:was,sets:{...o.sets,[exId]:raw.map(x=>{const k=num(x.kg);return k>0?{...x,kg:String(Math.max(st,roundStep(k*c,st)))}:x})}}}}
   return o}).filter(Boolean).sort((a,b)=>b.date.localeCompare(a.date))}
 const roundStep=(x,st)=>Math.round(x/st)*st;
+/* MYO-REP (Fagerli; rest-pause: Prestes 2019): ultima serie a cedimento tecnico, poi mini-serie da 5 con 15 s di pausa.
+   Solo isolamento della parte alta a macchina o cavo, e solo quando il carico non può salire: pacco al massimo o gradino troppo grosso (>15%).
+   Mai in scarico, prima del padel, con energia bassa o in superserie. Le mini-serie non contano per massimale e ranghi. */
+const MYO={mini:5,max:5,rest:15,stop:3};
+const myoEx=ex=>ex.t==="iso"&&!/face pull/i.test(ex.n||"")&&!["Gambe","Core"].includes(ex.mu||(EX[String(ex.id).split("~")[0]]||{}).mu)&&(isCable(ex)||eqOf(ex)==="mac");
+const myoOn=(g,ex,mods,tg)=>!!(tg&&tg.myo)&&!["deload","prePadel","rir","light"].some(m=>mods.has(m))&&!ssOf(g,ex);
+const myoTxt=x=>Array.isArray(x.myo)&&x.myo.length?"+"+x.myo.join("+"):"";
 function target(ex){
   const h=history(ex.id).filter(x=>!x.deload),last=h[0];
   const rr=(ex.lo===ex.hi?ex.lo:ex.lo+"-"+ex.hi),lr=/\d/.test(ex.rir||"")?" lasciando "+ex.rir+" in canna":"";
@@ -1845,6 +1860,17 @@ function target(ex){
   const allIn=reps.every(r=>r>=ex.lo);
   const prev=h[1]?h[1].sets[ex.id].filter(x=>num(x.reps)!=null).map(x=>num(x.reps)):null;
   const missTwice=!allIn&&prev&&prev.some(r=>r<ex.lo);
+  if(myoEx(ex)&&kg>0&&(atCap||st/kg>0.15)){
+    const ls=heavy[heavy.length-1],mm=(ls&&Array.isArray(ls.myo)?ls.myo:[]).map(Number),mt=mm.reduce((a,b)=>a+b,0);
+    const atHi=full&&hReps.every(r=>r>=ex.hi);
+    if(atHi||mm.length){
+      if(atHi&&mm.length&&mt>=MYO.mini*4){
+        if(atCap)return {kg,reps:Array(ex.s).fill(ex.hi),top:ex.hi,kind:"flat",badge:"Max pacco",myo:true,msg:`Myo-rep completi a ${fk(kg)} kg, il massimo del pacco: stesso schema, discesa in 3 secondi.`};
+        let nk=kg+st;if(cap&&nk>cap)nk=cap;const er=Math.max(...heavy.map(x=>e1rm(kg,num(x.reps)))),rr=Math.max(6,Math.min(ex.lo,Math.floor((er/nk-1)*30)));
+        return {kg:nk,reps:Array(ex.s).fill(rr),top:ex.hi,kind:"up",badge:`+${fk(nk-kg)} kg`,msg:`Myo-rep completi: passa a ${fk(nk)} kg e punta a ${rr} ripetizioni${rr<ex.lo?`, poi risali una alla volta fino a ${ex.lo}`:""}. Serie normali.`}}
+      const nr=pad(reps.map(r=>Math.min(ex.hi,r+1)),ex.s,ex.lo);nr[ex.s-1]=ex.hi;
+      return {kg,reps:nr,top:ex.hi,kind:"up",badge:"Myo-rep",myo:true,msg:`${atCap?`${fk(kg)} kg è il massimo del pacco`:`Il prossimo gradino è un salto del ${Math.round(st/kg*100)}%`}: ultima serie in myo-rep, ${ex.hi} ripetizioni e poi mini-serie da ${MYO.mini} con ${MYO.rest} s di pausa. Con 4 mini-serie complete ${atCap?"hai chiuso lo schema":`sali a ${fk(Math.min(kg+st,cap||1e9))} kg`}.`}}
+  }
   if(ex.t==="time"){
     if(allTop)return {kg:null,reps:Array(ex.s).fill(ex.lo),kind:"up",badge:"Livello +",msg:`Hai tenuto ${ex.hi} s su tutte: ${/leva corta/i.test(ex.n)?"torna al Copenhagen con la caviglia sulla panca (⇄ Cambia)":/copenhagen/i.test(ex.n)?"passa alla versione più dura (gamba tesa, appoggio alla caviglia)":"passa a una versione più dura"} e riparti da ${ex.lo} s.`};
     const nr=reps.map(r=>Math.min(ex.hi,Math.max(ex.lo,r+5)));
@@ -2150,8 +2176,10 @@ function summarySheet(sess){
     ${recs.length?`<section class="sumr"><b>Record (massimale stimato)</b><ul>${recs.join("")}</ul></section>`:""}
     ${cmp||`<p class="note" style="margin:0">Prima volta con questa seduta: il confronto parte dalla prossima.</p>`}
     ${nextHTML(sess)}
-    <p class="note" style="margin:0">I carichi della prossima volta sono già pronti.</p>`,
-   bind:w=>{const r=w.querySelector(".sumr:not(.sumn)");if(r)setTimeout(()=>blade(r),450)}})}
+    <p class="note" style="margin:0">I carichi della prossima volta sono già pronti.</p>
+    <div class="bks"><button class="btn ghost" id="sumBk">${I("save")}Salva backup in File</button><small id="sumBkM">${S.lastBackup===iso(today())?"Backup di oggi già salvato.":"Scegli \"Salva in File\" e poi iCloud Drive."}</small></div>`,
+   bind:w=>{const r=w.querySelector(".sumr:not(.sumn)");if(r)setTimeout(()=>blade(r),450);
+     const b=w.querySelector("#sumBk"),m=w.querySelector("#sumBkM");b.onclick=async()=>{const x=await shareBackup();m.textContent=x==="ok"?"Backup salvato.":x==="no"?"Non salvato: puoi riprovare.":"Non riuscito: prova da Impostazioni.";}}})}
 
 /* ================= EFFETTI ================= */
 const RM=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -2344,6 +2372,12 @@ function estMin(g,mods){const t=PLAN[g].ex.reduce((a,e)=>{const x=effEx(g,e),n=s
 function dayIcons(p){const out=[];if(p.padel==="train")out.push(`<span class="c-pad" title="Padel">${I("rac")}</span>`);if(p.padel==="match")out.push(`<span class="c-match" title="Partita">${I("cup")}</span>`);if(p.gym in PLAN)out.push(`<span class="c-gym" title="${esc(PLAN[p.gym].name)}">${I("gym")}</span>`);if(!out.length)out.push(`<span class="c-rest" title="Riposo">${I("bed")}</span>`);return out.join("")}
 
 // Backup: i dati stanno solo sul telefono. Promemoria in Oggi se l'ultimo backup (o la prima seduta) ha più di 30 giorni
+// Backup in File/iCloud: su iPhone apre la condivisione ("Salva in File"); dove non si può, scarica il file
+async function shareBackup(){const name="allenati-scemo-"+iso(today())+".json";
+  try{const f=new File([JSON.stringify(S,null,1)],name,{type:"application/json"});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:"Backup Allenati Scemo"});S.lastBackup=iso(today());save();return "ok"}}
+  catch(e){if(e&&e.name==="AbortError")return "no"}
+  return dlBackup()?"ok":"err"}
 function dlBackup(){try{S.lastBackup=iso(today());save();const b=new Blob([JSON.stringify(S,null,1)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="allenati-scemo-"+iso(today())+".json";document.body.appendChild(a);a.click();a.remove();return true}catch(e){return false}}
 function backupDue(){const L=S.sessions||[];if(L.length<3)return null;const k=iso(today());if(S.bkSnooze&&S.bkSnooze>k)return null;
   const from=S.lastBackup||L.map(x=>x.date.slice(0,10)).sort()[0],days=Math.floor((today()-new Date(from+"T00:00:00"))/864e5);return days>=14?{days,never:!S.lastBackup,n:L.length}:null}
@@ -2397,7 +2431,7 @@ function renderToday(){
   const fg=document.getElementById("freeGo");if(fg)fg.onclick=()=>{if(PLAN.LIB&&S.draft.LIB){gymSel="LIB";go("train")}else freeSheet()};
   const cg=document.getElementById("chGym");if(cg)cg.onclick=()=>pickSheet("Palestra oggi",[{v:"none",l:"Niente palestra"},...GYM_ORDER.filter(x=>x!=="LIB").map(g=>({v:g,l:PLAN[g].name,sub:PLAN[g].sub}))],a.gym,v=>setO(d,"gym",v));
   const sd=document.getElementById("startDl");if(sd)sd.onclick=()=>{startDeload();renderToday();reviewSheet(S.cycles[S.cycles.length-1])};
-  const bkN=document.getElementById("bkNow");if(bkN)bkN.onclick=()=>{dlBackup();renderToday()};
+  const bkN=document.getElementById("bkNow");if(bkN)bkN.onclick=async()=>{await shareBackup();renderToday()};
   const bkL=document.getElementById("bkLater");if(bkL)bkL.onclick=()=>{S.bkSnooze=iso(addDays(today(),7));save();renderToday()};
   const zd=document.getElementById("snoozeDl");if(zd)zd.onclick=()=>{S.deloadSnooze=iso(addDays(today(),7));save();renderToday()};
   const ed=document.getElementById("endDl");if(ed)ed.onclick=()=>{endDeload();renderToday()};
@@ -2412,7 +2446,8 @@ let openEx={};
 function trainMods(g){const a=assess(today());const mods=new Set(a.gym===g?a.mods:[]);if(deloadOn())mods.add("deload");return mods}
 function trainList(g,mods){const L=PLAN[g].ex.map(e=>({ex:effEx(g,e),base:e}));if(!mods.has("prePadel"))return L;return [...L.filter(x=>x.ex.t!=="prev"),...L.filter(x=>x.ex.t==="prev")]}
 const doneCount=(g,id)=>(draftFor(g).ex[id]||[]).filter(x=>x.done).length;
-function exDone(g,ex,mods){const n=setsFor(ex,mods);return n===0||doneCount(g,ex.id)>=n}
+function exDone(g,ex,mods){const n=setsFor(ex,mods);if(n===0)return true;if(doneCount(g,ex.id)<n)return false;
+  const r=(draftFor(g).ex[ex.id]||[])[n-1];return !(r&&r.done&&Array.isArray(r.myo)&&!r.myoEnd)}
 const noEff=ex=>["perf","time","nordic"].includes(ex.t);
 function renderTrain(){
   const g=currentGym(),P=PLAN[g],a=assess(today());
@@ -2456,8 +2491,10 @@ function renderTrain(){
   ${!first&&dn?"":`<button class="btn hot" id="finish">Termina e salva</button>`}<button class="lnk clr" id="clear">Svuota la seduta</button>
   <p class="msg" id="msg" aria-live="polite"></p>`;
   document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{gymSel=b.dataset.k;S.gym=gymSel;save();renderTrain()});
-  document.querySelectorAll("#exs input").forEach(i=>i.oninput=()=>{const v=i.dataset.f==="kg"?i.value.replace(/[^\d.,]/g,""):i.value.replace(/\D/g,"").slice(0,3);if(v!==i.value)i.value=v;cell(g,i.dataset.ex,+i.dataset.j)[i.dataset.f]=v.trim();save()});
-  document.querySelectorAll("#exs .tick").forEach(b=>b.onclick=()=>toggleSet(g,b.dataset.ex,+b.dataset.j,mods));
+  document.querySelectorAll("#exs input[data-f]").forEach(i=>i.oninput=()=>{const v=i.dataset.f==="kg"?i.value.replace(/[^\d.,]/g,""):i.value.replace(/\D/g,"").slice(0,3);if(v!==i.value)i.value=v;cell(g,i.dataset.ex,+i.dataset.j)[i.dataset.f]=v.trim();save()});
+  document.querySelectorAll("#exs .tick:not(.mt)").forEach(b=>b.onclick=()=>toggleSet(g,b.dataset.ex,+b.dataset.j,mods));
+  document.querySelectorAll("#exs [data-myot]").forEach(b=>b.onclick=()=>myoTick(g,b.dataset.myot,+b.dataset.j,mods));
+  document.querySelectorAll("#exs [data-myoend]").forEach(b=>b.onclick=()=>myoFinish(g,b.dataset.myoend,+b.dataset.j,mods));
   document.querySelectorAll("#exs .hold").forEach(b=>b.onclick=()=>holdStart(g,b.dataset.ex,+b.dataset.j,mods));
   document.querySelectorAll("#exs [data-pm]").forEach(b=>b.onclick=e=>{e.preventDefault();const inp=b.parentElement.querySelector("input"),f=b.dataset.pm,d=+b.dataset.d,ex=exById(b.dataset.ex);let v=num(inp.value)||0;
     if(f==="kg"){v=Math.max(0,Math.round((v+d*stepOf(ex))*100)/100);inp.value=fk(v)}else{v=Math.max(0,Math.round(v)+d*(ex.t==="time"?5:1));inp.value=String(v)}
@@ -2563,25 +2600,31 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   const rows=dr.ex[ex.id]||[];
   const unit=ex.t==="time"?"s":"rip";
   const hasKg=!["perf","nordic","time"].includes(ex.t);
-  const lastTxt=last?`Ultima volta (${fmtShort(last.date)}${last.day&&last.day!==g&&PLAN[last.day]?", "+esc(PLAN[last.day].name):""}${last.stnFrom?", "+STN[last.stnFrom].n.toLowerCase():""}): <b>${(last.raw||last.sets[ex.id]).filter(x=>num(x.reps)!=null).map(x=>(num(x.kg)?fk(num(x.kg))+"×":"")+x.reps).join(" · ")}</b>`:"Mai fatto finora.";
+  const lastTxt=last?`Ultima volta (${fmtShort(last.date)}${last.day&&last.day!==g&&PLAN[last.day]?", "+esc(PLAN[last.day].name):""}${last.stnFrom?", "+STN[last.stnFrom].n.toLowerCase():""}): <b>${(last.raw||last.sets[ex.id]).filter(x=>num(x.reps)!=null).map(x=>(num(x.kg)?fk(num(x.kg))+"×":"")+x.reps+myoTxt(x)).join(" · ")}</b>`:"Mai fatto finora.";
   const rng=(ex.lo===ex.hi?ex.lo:ex.lo+"-"+ex.hi)+(ex.t==="time"?" s":"")+(ex.side?" per lato":"");
   const r0=tg.reps[0]??ex.lo,rMin=Math.min(...tg.reps.slice(0,setsFor(ex,mods)).map(Number).filter(v=>!isNaN(v)),r0),rMax=Math.max(...tg.reps.slice(0,setsFor(ex,mods)).map(Number).filter(v=>!isNaN(v)),r0),rT=rMin===rMax?String(r0):rMin+"-"+rMax;
   const lk=hasKg&&tg.kind==="up"&&tg.kg>0&&last?Math.max(0,...last.sets[ex.id].map(x=>num(x.kg)||0)):0,cu=lk>0&&lk<tg.kg&&ex.t!=="time"&&ex.t!=="perf";
   const big=ex.t==="perf"?`${n} × ${ex.lo}${ex.side?" per lato":""}`:ex.t==="time"?`${r0} s`:hasKg&&tg.kg>0?`${fk(tg.kg)} kg × ${rT}`:hasKg&&tg.kg==null?`${n} × ${ex.lo===ex.hi?ex.lo:ex.lo+"-"+ex.hi}`:`${rT} rip`;
-  let sets="",nowSet=false;
+  let sets="",nowSet=false;const myoA=hasKg&&myoOn(g,ex,mods,tg);
   for(let j=0;j<Math.max(n,rows.filter(r=>r.done).length);j++){
     const r=rows[j]||{};
     const now=!r.done&&!nowSet;if(now)nowSet=true;
     const kgV=r.kg!=null?r.kg:(tg.kg!=null?fk(tg.kg):"");
     const rpV=r.reps!=null?r.reps:String(tg.reps[j]??ex.lo);
     const pm=(f,d)=>r.done?"":`<button class="pm" data-pm="${f}" data-d="${d}" data-ex="${ex.id}" data-j="${j}" aria-label="${d>0?"Più":"Meno"} ${f==="kg"?"kg":unit}, serie ${j+1}">${d>0?"+":"−"}</button>`,fw=r.done?"label":"div";
-    sets+=`<div class="set ${r.done?"done":""} ${now?"now":""}"><span class="i">${j+1}</span>
+    const isM=myoA&&j===n-1;
+    sets+=`<div class="set ${r.done?"done":""} ${now?"now":""} ${isM?"myom":""}"><span class="i"${isM?' title="Serie myo-rep"':""}>${isM?"M":j+1}</span>
       ${hasKg?`<${fw} class="field ${r.done?"":"pmf"}">${pm("kg",-1)}<input inputmode="decimal" value="${esc(kgV)}" placeholder="kg" data-ex="${ex.id}" data-j="${j}" data-f="kg" aria-label="Kg serie ${j+1}"><span>kg</span>${pm("kg",1)}</${fw}>`:(ex.t==="time"&&!r.done?`<button class="hold" data-ex="${ex.id}" data-j="${j}" aria-label="Avvia il cronometro della tenuta, serie ${j+1}">${I("play")}Via</button>`:`<span class="bw">${ex.t==="nordic"?"elastico":ex.t==="time"?"tenuta":"salto"}</span>`)}
       <${fw} class="field ${r.done?"":"pmf"}">${pm("reps",-1)}<input inputmode="numeric" value="${esc(rpV)}" data-ex="${ex.id}" data-j="${j}" data-f="reps" aria-label="${unit} serie ${j+1}"><span>${unit}</span>${pm("reps",1)}</${fw}>
       <button class="tick" data-ex="${ex.id}" data-j="${j}" aria-pressed="${!!r.done}" aria-label="Serie ${j+1} fatta">✓</button></div>`;
+    if(isM&&r.done){const mm=r.myo||[],open=!r.myoEnd&&mm.length<MYO.max;
+      sets+=`<div class="myo"><span class="ml">Mini-serie<small>${MYO.mini} rip · ${MYO.rest} s di pausa · ti fermi quando ne fai meno di ${MYO.stop}</small></span>
+        <div class="mc">${mm.map((v,k)=>`<span class="mv" aria-label="Mini-serie ${k+1}: ${v} ripetizioni">${v}</span>`).join("")}
+        ${open?`<label class="field mi"><input inputmode="numeric" value="${MYO.mini}" data-myo="${ex.id}" aria-label="Ripetizioni mini-serie ${mm.length+1}"></label><button class="tick mt" data-myot="${ex.id}" data-j="${j}" aria-label="Mini-serie ${mm.length+1} fatta">✓</button><button class="lnk" data-myoend="${ex.id}" data-j="${j}">Basta</button>`:`<span class="mdone">${mm.reduce((a,b)=>a+b,0)} rip in ${mm.length} mini-serie</span>`}</div></div>`}
   }
   const chips=[];
   if(ex.id!==base.id)chips.push(`<span class="chip adapt">Variante di ${esc(base.n)}</span>`);
+  if(myoA)chips.push(`<span class="chip hot">Ultima serie in myo-rep</span>`);
   const ssK=ssOf(g,ex),ssP=ssK?PLAN[g].ex.map(e=>effEx(g,e)).filter(e=>e.id!==ex.id&&ssOf(g,e)===ssK):[];if(ssP.length)chips.push(`<span class="chip hot">Superserie con ${esc(ssP.map(e=>e.n).join(", "))}</span>`);
   // Serie · ripetizioni · in canna · recupero su una riga; le parti cambiate dall'adattamento in evidenza
   let rir=mods.has("deload")?"3-4":mods.has("prePadel")&&/^0/.test(ex.rir)?"1":ex.rir;
@@ -2621,10 +2664,15 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;audioUnlock();
     if(k!=null&&ref>0&&(k>ref*1.5||k<ref*.5)&&kgChk!==key){kgChk=key;document.querySelector(".kgchk")?.remove();row.insertAdjacentHTML("afterend",`<p class="kgchk" role="alert">${esc(fk(k))} kg? L'ultima volta ${esc(fk(ref))}. Tocca ✓ di nuovo per confermare.</p>`);buzz(20);return}}
   kgChk="";
   r.done=!r.done;const dd=draftFor(g);if(r.done&&!dd.start)dd.start=Date.now();
+  if(!r.done){delete r.myo;delete r.myoEnd}
   if(!r.done&&dd.nextNote&&dd.nextNote.ex===exId&&dd.nextNote.j===j){for(const [k,v] of Object.entries(dd.nextNote.old||{})){const c=cell(g,exId,+k);if(!c.done){if(v==null)delete c.kg;else c.kg=v}}delete dd.nextNote}
   save();
   if(r.done){
     const n=setsFor(ex,mods),doneN=(draftFor(g).ex[exId]||[]).filter(x=>x.done).length;
+    // Serie myo-rep: dopo l'attivazione si resta sull'esercizio per le mini-serie, con 15 s di pausa
+    if(j===n-1&&ex.t==="iso"&&myoOn(g,ex,mods,tgFor(ex,mods))){r.myo=[];openEx[g]=exId;save();
+      const want=num(tgFor(ex,mods).reps[j]??ex.hi),got=num(r.reps);if(want!=null&&got!=null&&got<want)celebrate("fail");else buzz(40);
+      startTimer(MYO.rest,ex.n+" · mini-serie",0,null,{g,ex:exId});renderTrain();keepFocus(false,exId);myoShow();tickFx(g,exId,j,false,false);return}
     if(doneN>=n){dd.lastDone=exId;openEx[g]=null;save()}
     const allEx=PLAN[g].ex.map(e=>effEx(g,e)).filter(e=>setsFor(e,mods)>0);
     // Superserie: dopo ogni serie passa da solo all'altro esercizio della coppia che ha ancora serie da fare
@@ -2654,6 +2702,15 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;audioUnlock();
   keepFocus(!!jump||!document.querySelector(`#exs .tick[data-ex="${exId}"][data-j="${j}"]`),jump);
   if(r.done)tickFx(g,exId,j,rec,wowNow);
 }
+function myoTick(g,exId,j,mods){const r=cell(g,exId,j),inp=document.querySelector(`#exs [data-myo="${exId}"]`),v=Math.max(0,Math.round(num(inp&&inp.value)||0));
+  r.myo=r.myo||[];r.myo.push(v);save();buzz(30);
+  if(v<MYO.stop||r.myo.length>=MYO.max)return myoFinish(g,exId,j,mods);
+  startTimer(MYO.rest,PLAN[g]?(exById(exId).n+" · mini-serie "+(r.myo.length+1)):"Mini-serie",0,null,{g,ex:exId});renderTrain();keepFocus(false,exId);myoShow()}
+const myoShow=()=>{const m=document.querySelector("#exs .myo");if(m)setTimeout(()=>m.scrollIntoView({block:"center",behavior:RM()?"auto":"smooth"}),60)};
+function myoFinish(g,exId,j,mods){const r=cell(g,exId,j),dd=draftFor(g),ex=PLAN[g].ex.map(e=>effEx(g,e)).find(e=>e.id===exId)||exById(exId);
+  r.myo=r.myo||[];r.myoEnd=true;dd.lastDone=exId;openEx[g]=null;save();stopTimer();
+  const allEx=PLAN[g].ex.map(e=>effEx(g,e)).filter(e=>setsFor(e,mods)>0),sessionDone=allEx.every(e=>exDone(g,e,mods));
+  goldEnd();if(ex.rest&&!sessionDone)startTimer(ex.rest,ex.n,0,null,{g,ex:exId});renderTrain();keepFocus(true)}
 // Primo piano: dopo ogni spunta l'esercizio in corso torna subito sotto l'intestazione, con la prossima serie visibile
 const ssGo={};
 // Superserie: quella del piano, oppure quella scelta solo per la seduta di oggi (draft.ss, "" = sciolta)
@@ -2679,7 +2736,7 @@ function finish(g,mods){
   const names={};
   const order=PLAN[g].ex.flatMap(e=>[e.id,...altsOf(e).map(a=>e.id+"~"+a.k)]);
   const ids=[...order.filter(id=>d.ex[id]),...Object.keys(d.ex).filter(id=>!order.includes(id))];
-  const eff={};let stn=null;for(const id of ids){const r=(d.ex[id]||[]).filter(x=>x.done).map(x=>({kg:x.kg??"",reps:x.reps??""}));if(r.length){sets[id]=r;names[id]=exName(id);n+=r.length;if(d.eff&&d.eff[id])eff[id]=d.eff[id];const t=stationOf(exById(id));if(t)(stn=stn||{})[id]=t}}
+  const eff={};let stn=null;for(const id of ids){const r=(d.ex[id]||[]).filter(x=>x.done).map(x=>({kg:x.kg??"",reps:x.reps??"",...(Array.isArray(x.myo)&&x.myo.length?{myo:x.myo.slice()}:{})}));if(r.length){sets[id]=r;names[id]=exName(id);n+=r.length;if(d.eff&&d.eff[id])eff[id]=d.eff[id];const t=stationOf(exById(id));if(t)(stn=stn||{})[id]=t}}
   const m=document.getElementById("msg");
   if(!n){m.className="msg err";m.textContent="Spunta almeno una serie con ✓ prima di salvare.";return}
   const dur=d.start?Math.max(1,Math.round((Date.now()-d.start)/60000)):null;
@@ -3396,7 +3453,7 @@ function renderSettings(){
   document.querySelectorAll("[data-dup]").forEach(b=>b.onclick=()=>{const P=PLAN[b.dataset.dup];editPlan=JSON.parse(JSON.stringify({key:null,name:P.name+" (copia)",sub:P.sub||"",legs:!!P.legs,ex:P.ex.map(e=>({...e,lib:e.lib||e.id}))}));go("edit")});
   document.querySelectorAll("[data-delp]").forEach(b=>b.onclick=()=>{if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Sicuro?";return}const k=b.dataset.delp;archivePlan(k,"eliminato");delete S.plans[k];for(const d in S.week)if(S.week[d].gym===k)S.week[d]={...S.week[d],gym:"none"};for(const d in S.overrides)if(S.overrides[d].gym===k)delete S.overrides[d].gym;delete S.draft[k];rebuild();save();renderSettings()});
   const bm=document.getElementById("bmsg");
-  document.getElementById("exp").onclick=()=>{if(dlBackup()){bm.className="msg ok";bm.textContent="Backup scaricato."}else{bm.className="msg err";bm.textContent="Download non riuscito su questo browser."}};
+  document.getElementById("exp").onclick=async()=>{const x=await shareBackup();if(x==="ok"){bm.className="msg ok";bm.textContent="Backup salvato."}else if(x==="no"){bm.className="msg";bm.textContent="Backup non salvato."}else{bm.className="msg err";bm.textContent="Salvataggio non riuscito su questo browser."}};
   // Prima di cancellare o importare: copia dei dati attuali e "Annulla" per 10 secondi
   const undoable=(txt)=>{const m=document.getElementById("bmsg");m.className="msg ok";m.innerHTML=`${esc(txt)} <button class="lnk" id="undoD">Annulla</button>`;
     const u=document.getElementById("undoD");const t=setTimeout(()=>{if(u.isConnected)u.remove()},10000);
