@@ -785,7 +785,7 @@ html[data-skin="campo"] .rbd .gs{opacity:.5}
 .field.pmf span{margin-right:2px}
 .pm{flex:none;width:30px;height:38px;border:0;background:none;color:var(--muted);font-size:20px;font-weight:700;line-height:1;border-radius:8px;touch-action:manipulation}
 .pm:active{background:color-mix(in srgb,var(--hot) 22%,transparent);color:var(--fg)}
-.eqf{display:grid;gap:6px;margin:12px 0 4px}.eqf b{font-size:14px}.eqf small{color:var(--muted);font-size:12px;line-height:1.4}.eqseg button{padding:10px 2px;font-size:13px;min-height:44px}
+.eqmx{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600}.eqmx input{width:84px;min-height:44px;text-align:center}.eqf{display:grid;gap:6px;margin:12px 0 4px}.eqf b{font-size:14px}.eqf small{color:var(--muted);font-size:12px;line-height:1.4}.eqseg button{padding:10px 2px;font-size:13px;min-height:44px}
 .setup{display:flex;gap:8px;align-items:baseline;width:100%;text-align:left;border:1px dashed var(--line);background:none;border-radius:12px;padding:8px 11px;color:var(--muted);font-size:14px;font-weight:600}
 .setup.has{border-style:solid;background:var(--field);color:var(--fg)}
 .setup.has b{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--hot);flex:none}
@@ -1833,8 +1833,10 @@ function target(ex){
   const full=heavy.length>=planned;
   const st=ex.step||2.5;
   // Isolamento e prevenzione con un gradino grosso rispetto al carico (>15%, es. extrarotazione 5 → 10 kg): prima si va oltre il range con le ripetizioni
-  const big=(ex.t==="iso"||ex.t==="prev")&&kg>0&&st/kg>0.15;
-  const top=big?Math.min(30,ex.hi+5):ex.hi;
+  const cap=kg>0?eqMax(ex):null,atCap=cap&&kg+st>cap+1e-6;
+  // Pacco finito: niente più kg, si continua con le ripetizioni (fino a +10 oltre il range, poi discesa più lenta)
+  const big=!atCap&&(ex.t==="iso"||ex.t==="prev")&&kg>0&&st/kg>0.15;
+  const top=atCap?Math.min(30,ex.hi+10):big?Math.min(30,ex.hi+5):ex.hi;
   const allTop=full&&hReps.every(r=>r>=top);
   const allIn=reps.every(r=>r>=ex.lo);
   const prev=h[1]?h[1].sets[ex.id].filter(x=>num(x.reps)!=null).map(x=>num(x.reps)):null;
@@ -1848,6 +1850,7 @@ function target(ex){
     if(allTop)return {kg:null,reps:Array(ex.s).fill(ex.lo),kind:"up",badge:"Meno aiuto",msg:`Chiuse tutte a ${ex.hi}: usa un elastico più leggero e riparti da ${ex.lo}.`};
     return {kg:null,reps:pad(reps.map(r=>Math.min(ex.hi,Math.max(ex.lo,r+1))),ex.s),kind:"up",badge:"+1 rip",msg:"Una ripetizione in più per serie, stesso elastico."};
   }
+  if(allTop&&atCap)return {kg,reps:Array(ex.s).fill(top),top,kind:"flat",badge:"Max pacco",msg:`${fk(kg)} kg è il massimo del pacco e sei a ${top} ripetizioni: stesso carico, discesa in 3 secondi e 1 secondo fermo in chiusura.`};
   if(allTop){
     if(eff==="hard"&&ex.t==="comp")return {kg,reps:Array(ex.s).fill(ex.hi),top,kind:"flat",badge:"=",msg:`Range chiuso ma al limite: stesso carico e stesse ripetizioni. Aumenti quando ti restano ${ex.rir} in canna.`};
     let inc=st;
@@ -1856,7 +1859,7 @@ function target(ex){
     if(easy)inc+=st;
     if(ex.t==="bw"&&!kg)return {kg:inc,reps:Array(ex.s).fill(ex.lo),top,kind:"up",badge:"Zavorra",msg:`Chiuse tutte a ${ex.hi}: aggiungi ${fk(inc)} kg di zavorra e riparti da ${ex.lo}.`};
     if(kg==null&&ex.t!=="bw"){const fx=/flexbar/i.test(ex.n);return {kg:null,reps:Array(ex.s).fill(ex.lo),top,kind:"up",badge:"Più duro",msg:`Chiuse tutte a ${top}: passa a ${fx?"una Flexbar":"un elastico"} più dur${fx?"a":"o"} e riparti da ${ex.lo}.`}}
-    const nk=(kg||0)+inc;
+    let nk=(kg||0)+inc;if(cap&&nk>cap)nk=cap;
     return {kg:nk,reps:Array(ex.s).fill(ex.lo),top,kind:"up",badge:`+${fk(inc)} kg`,msg:easy?`Range chiuso ed era facile: doppio aumento, ${fk(nk)} kg, riparti da ${ex.lo} ripetizioni.`:big?`Arrivato a ${top} ripetizioni: passa a ${fk(nk)} kg e riparti da ${ex.lo}.`:`Tutte le serie al limite alto: ${fk(nk)} kg e riparti da ${ex.lo} ripetizioni.`};
   }
   const sm=a=>a.reduce((t,r)=>t+r,0);
@@ -1871,6 +1874,7 @@ function target(ex){
   const add=eff==="easy"?2:1;
   const nr=pad(reps.map(r=>Math.min(top,r+add)),ex.s,ex.lo);
   const over=big&&reps.every(r=>r>=ex.hi);
+  if(atCap&&reps.every(r=>r>=ex.hi))return {kg,reps:nr,top,kind:"up",badge:`+${add} rip`,msg:`${fk(kg)} kg è il massimo del pacco: si sale con le ripetizioni, fino a ${top}.`};
   return {kg,reps:nr,top,kind:"up",badge:`+${add} rip`,msg:over?`Il prossimo peso è un salto del ${Math.round(st/kg*100)}%: prima porta tutte le serie a ${top} ripetizioni.`:add===2?`Era facile: ${kg==null&&ex.t!=="bw"?"stesso elastico":"stesso carico"}, due ripetizioni in più per serie.`:`${kg==null&&ex.t!=="bw"?"Stesso elastico":"Stesso carico"}, una ripetizione in più per serie.`};
 }
 function lastKg(ex){const l=history(ex.id).filter(x=>!x.deload)[0];if(!l)return null;const k=l.sets[ex.id].map(x=>num(x.kg)).filter(v=>v!=null);return k.length?Math.max(...k):null}
@@ -2486,19 +2490,29 @@ const isCable=ex=>ex.eq==="cavl"||/\bcav[oi]\b|pulley|pushdown|face pull|lat mac
 const eqKind=ex=>isCable(ex)?"cavo":eqOf(ex)==="mac"?"mac":"";
 const CAB_F=[[1,"1:1","peso pieno"],[.5,"2:1","metà"],[1/3,"3:1","un terzo"],[.25,"4:1","un quarto"]];
 const MAC_F=[[.7,"−30%","molto più leggera"],[.85,"−15%","più leggera"],[1,"Normale","come le altre"],[1.15,"+15%","più pesante"],[1.3,"+30%","molto più pesante"]];
+// Attrezzi della sua palestra (detti da lui): modello e peso massimo del pacco. Il fattore resta Normale finché non c'è un dato migliore.
+const S700={m:"Technogym Selection 700 Pectoral / Reverse Fly",s:"Selection 700",max:50};
+const EQ_DEF={"butterfly alla macchina":S700,"reverse fly":S700,"reverse fly alla macchina":S700};
+const eqDef=ex=>EQ_DEF[setupKey(ex)]||null;
+const eqMax=ex=>{const u=(S.eqmax||{})[setupKey(ex)];if(u===0)return null;return u>0?u:(eqDef(ex)||{}).max||null};
 const eqFOf=ex=>{const v=(S.eqf||{})[setupKey(ex)];return eqKind(ex)&&v>0?v:1};
-const eqLbl=ex=>{const f=eqFOf(ex);if(f===1)return "";const L=eqKind(ex)==="cavo"?CAB_F:MAC_F,o=L.find(x=>Math.abs(x[0]-f)<1e-6);return o?(eqKind(ex)==="cavo"?"Cavo "+o[1]:"Macchina "+o[1]):""};
+const eqLbl=ex=>{const f=eqFOf(ex),d=eqDef(ex),mx=eqMax(ex),t=[];if(d)t.push(d.s);
+  if(f!==1){const L=eqKind(ex)==="cavo"?CAB_F:MAC_F,o=L.find(x=>Math.abs(x[0]-f)<1e-6);if(o)t.push(eqKind(ex)==="cavo"?"Cavo "+o[1]:"Macchina "+o[1])}
+  if(mx)t.push("pacco fino a "+fk(mx)+" kg");return t.join(", ")};
 function setupHTML(ex){const t=[setupOf(ex),eqLbl(ex)].filter(Boolean).join(" · ");return t?`<button class="setup has" data-setup="${ex.id}"><b>Regolazioni</b><span>${esc(t)}</span></button>`:`<button class="lnk setup0" data-setup="${ex.id}">+ Regolazioni e carrucola</button>`}
 function setupSheet(ex){
   openSheet({html:()=>`<h2>Regolazioni</h2><p class="note" style="margin:0">${esc(ex.n)}: sedile, schienale, presa, perni. Le ritrovi ogni volta che apri l'esercizio, in tutti i piani.</p>
     <textarea id="setupTx" rows="3" maxlength="160" placeholder="Es. sedile 4, schienale 2, presa neutra">${esc(setupOf(ex))}</textarea>
     ${eqKind(ex)?`<div class="eqf"><b>${eqKind(ex)==="cavo"?"Carrucola del cavo":"Questa macchina"}</b><small>${eqKind(ex)==="cavo"?"Con la carrucola 2:1 sollevi metà del numero sul pacco. Lo trovi scritto sulla macchina o lo capisci se il cavo passa per una carrucola che si muove.":"Rispetto alle macchine simili, il numero sul pacco si sente più leggero o più pesante?"} Conta solo per i ranghi.</small>
-    <div class="seg eqseg" role="group" aria-label="${eqKind(ex)==="cavo"?"Rapporto della carrucola":"Taratura della macchina"}" style="grid-template-columns:repeat(${(eqKind(ex)==="cavo"?CAB_F:MAC_F).length},1fr)">${(eqKind(ex)==="cavo"?CAB_F:MAC_F).map(([f,l,d])=>`<button type="button" data-eqf="${f}" aria-pressed="${Math.abs(eqFOf(ex)-f)<1e-6}" title="${d}">${l}</button>`).join("")}</div></div>`:""}
+    ${eqDef(ex)?`<small>Attrezzo: ${esc(eqDef(ex).m)}.</small>`:""}<div class="seg eqseg" role="group" aria-label="${eqKind(ex)==="cavo"?"Rapporto della carrucola":"Taratura della macchina"}" style="grid-template-columns:repeat(${(eqKind(ex)==="cavo"?CAB_F:MAC_F).length},1fr)">${(eqKind(ex)==="cavo"?CAB_F:MAC_F).map(([f,l,d])=>`<button type="button" data-eqf="${f}" aria-pressed="${Math.abs(eqFOf(ex)-f)<1e-6}" title="${d}">${l}</button>`).join("")}</div>
+    <label class="eqmx"><span>Peso massimo del pacco</span><input id="eqMax" type="number" inputmode="decimal" min="0" step="0.5" placeholder="—" value="${eqMax(ex)||""}"><span>kg</span></label>
+    <small>Quando arrivi al massimo, la progressione continua con le ripetizioni.</small></div>`:""}
     <div class="row"><button class="btn hot" id="setupOk">Salva</button>${setupOf(ex)||eqLbl(ex)?`<button class="btn ghost" id="setupDel">Cancella</button>`:""}</div>`,
    bind:(w,draw,close)=>{const tx=w.querySelector("#setupTx");setTimeout(()=>tx.focus(),50);
      let ef=eqFOf(ex);w.querySelectorAll("[data-eqf]").forEach(b=>b.onclick=()=>{ef=+b.dataset.eqf;w.querySelectorAll("[data-eqf]").forEach(x=>x.setAttribute("aria-pressed",x===b))});
-     const done=v=>{S.setup=S.setup||{};if(v)S.setup[setupKey(ex)]=v;else delete S.setup[setupKey(ex)];S.eqf=S.eqf||{};if(eqKind(ex)&&Math.abs(ef-1)>1e-6)S.eqf[setupKey(ex)]=ef;else delete S.eqf[setupKey(ex)];save();close();if(view==="train"){renderTrain();keepFocus(false)}};
-     w.querySelector("#setupOk").onclick=()=>done(tx.value.trim());const d=w.querySelector("#setupDel");if(d)d.onclick=()=>{ef=1;done("")}}})}
+     const done=v=>{S.setup=S.setup||{};if(v)S.setup[setupKey(ex)]=v;else delete S.setup[setupKey(ex)];S.eqf=S.eqf||{};if(eqKind(ex)&&Math.abs(ef-1)>1e-6)S.eqf[setupKey(ex)]=ef;else delete S.eqf[setupKey(ex)];
+       const mi=w.querySelector("#eqMax");if(mi){const m=num(mi.value),dm=(eqDef(ex)||{}).max||null;S.eqmax=S.eqmax||{};if((m||null)===dm)delete S.eqmax[setupKey(ex)];else S.eqmax[setupKey(ex)]=m>0?m:0}save();close();if(view==="train"){renderTrain();keepFocus(false)}};
+     w.querySelector("#setupOk").onclick=()=>done(tx.value.trim());const d=w.querySelector("#setupDel");if(d)d.onclick=()=>{ef=1;const mi=w.querySelector("#eqMax");if(mi)mi.value=(eqDef(ex)||{}).max||"";done("")}}})}
 let wl=null,wlBusy=false;
 async function wakeOn(){if(wl||wlBusy||S.awake===false||!("wakeLock" in navigator)||document.visibilityState!=="visible")return;wlBusy=true;try{wl=await navigator.wakeLock.request("screen");wl.addEventListener("release",()=>{wl=null})}catch(e){wl=null}wlBusy=false}
 function wakeOff(){if(wl){wl.release().catch(()=>{});wl=null}}
@@ -2871,7 +2885,8 @@ function exRank(ids,BW,excl,at){
       if(sd.k==="w")kg=BW+(kg||0);else if(!kg||kg<=0)return;else kg*=eqFOf(exById(xid));
       const rir=j===arr.length-1&&ef?(ef==="easy"?3:ef==="hard"?0:mid):mid;
       const c={v:kg*(1+(r+rir)/30),kg:num(x.kg)||0,f:sd.k==="w"?1:eqFOf(exById(xid)),r,rir};
-      if(r<=12){if(!best||c.v>best.v)best=c}else if(r<=20){if(!loose||c.v>loose.v)loose=c}})}
+      const mx=sd.k==="w"?null:eqMax(exById(xid));
+      if(r<=12){if(!best||c.v>best.v)best=c}else if(r<=20||(mx&&c.kg>=mx&&r<=30)){if(!loose||c.v>loose.v)loose=c}})}
   const b=best||loose;if(!b)return null;
   const L=stdAt(sd,BW),TH=thrOf(L),R=b.v/BW;
   let r=0;while(r<8&&b.v>=TH[r])r++;
@@ -2881,7 +2896,9 @@ function exRank(ids,BW,excl,at){
   if(r<8){const f=1+(b.r+b.rir)/30,tot=TH[r]/f,st=ex.step||2.5;
     if(sd.k==="w"){const z=Math.ceil((tot-BW)/st-1e-9)*st;
       need=z>0?{txt:`+${fk(z)} kg × ${b.r}`,pct:(BW+z)/(BW+b.kg)-1}:{txt:`${Math.max(b.r+1,Math.ceil((TH[r]/BW-1)*30-b.rir))} rip a corpo libero`,pct:.01}}
-    else{const k=Math.max(b.kg+st,Math.ceil(tot/(b.f||1)/st-1e-9)*st);need={txt:`${fk(k)} kg × ${b.r}`,pct:k/b.kg-1}}}
+    else{const k=Math.max(b.kg+st,Math.ceil(tot/(b.f||1)/st-1e-9)*st),mx=eqMax(ex);
+      if(mx&&k>mx){const rr=Math.ceil((TH[r]/(mx*(b.f||1))-1)*30-b.rir-1e-9);need=rr<=20?{txt:`${fk(mx)} kg × ${Math.max(b.r+1,rr)} (pacco al massimo)`,pct:Math.max(.01,(Math.max(b.r+1,rr)-b.r)/30)}:{txt:"oltre il massimo del pacco",pct:9,cap:true}}
+      else need={txt:`${fk(k)} kg × ${b.r}`,pct:k/b.kg-1}}}
   return {id,n:exName(id),sd,R,r,pt,b,v:r+pt/100,need,approx:(sd.k==="m"&&eqFOf(ex)===1)||sd.proxy,loose:!best}
 }
 function rankAll(excl,at){
@@ -2987,7 +3004,7 @@ function rankCard(){
   const G=A.gen,nx=G.r<8?RANKS[G.r+1][0]:null;
   return `<section class="card rank">${head}
   <div class="rk-g"><div class="rk-fig">${rFigure(A)}</div>
-    <div class="rk-gen" style="--rc:${RANKS[G.r][2]}">${rBadge(G.r,"big")}<b>${RANKS[G.r][0]}</b><span>${G.pt}/100 pt</span><div class="rk-bar"><i style="width:${G.pt}%"></i></div><small>${nx?`${100-G.pt} pt a ${nx}`:"Rango massimo"}</small>${(()=>{const e=A.ex.filter(x=>x.need).sort((a,b)=>a.need.pct-b.need.pct)[0];return e?`<p class="rk-next">Il passo più vicino: <b>${esc(e.n)} <span class="nw">${e.need.txt}</span></b> porta quell'esercizio a ${RANKS[Math.min(8,e.r+1)][0]}.</p>`:""})()}</div></div>
+    <div class="rk-gen" style="--rc:${RANKS[G.r][2]}">${rBadge(G.r,"big")}<b>${RANKS[G.r][0]}</b><span>${G.pt}/100 pt</span><div class="rk-bar"><i style="width:${G.pt}%"></i></div><small>${nx?`${100-G.pt} pt a ${nx}`:"Rango massimo"}</small>${(()=>{const e=A.ex.filter(x=>x.need&&!x.need.cap).sort((a,b)=>a.need.pct-b.need.pct)[0];return e?`<p class="rk-next">Il passo più vicino: <b>${esc(e.n)} <span class="nw">${e.need.txt}</span></b> porta quell'esercizio a ${RANKS[Math.min(8,e.r+1)][0]}.</p>`:""})()}</div></div>
   <div class="rk-tr">${RANKS.map((r,i)=>`<span class="${i>G.r?"off":""}${i===G.r?" cur":""}">${rBadge(i)}<em>${r[0]}</em></span>`).join("")}</div>
   ${rankHist()}
   <div class="rk-mus">${RMU.map(([k,n])=>{const m=A.mus[k];return `<button class="rk-m${m.none?" none":""}" data-rm="${k}">${m.none?rNone():rBadge(m.r)}<b>${n}</b><small>${m.none?"Nessun dato":`${m.approx?"≈ ":""}${RANKS[m.r][0]} · ${m.pt}/100`}</small></button>`}).join("")}</div>
@@ -3008,7 +3025,7 @@ function rankSheet(k){
   const row=e=>{const tot=e.sd.k==="w";return `<div class="rk-x">${rBadge(e.r)}<div><b>${esc(e.n)}${e.approx?` <span class="rk-ap" title="Soglia indicativa">≈</span>`:""}</b><small>${RANKS[e.r][0]} ${e.pt} · massimale con le rip. in canna ${fk(Math.round(e.b.v))}&nbsp;kg${tot?" con il tuo peso":""}, ${fk(Math.round(e.b.v/A.BW*100)/100)}×&nbsp;il&nbsp;peso${e.loose?" · stima meno precisa (oltre 12 rip)":""}</small></div><em>${tot?(e.b.kg?"+"+fk(e.b.kg)+" kg × ":"")+e.b.r+(e.b.kg?"":" rip"):fk(e.b.kg)+" kg × "+e.b.r}</em></div>`};
   openSheet({html:()=>{
     if(m.none)return `<h2>${m.n}</h2><p class="note" style="margin:0">Nessun esercizio di questo muscolo con carichi registrati nelle ultime 6 settimane.</p>`;
-    const nx=m.r<8?RANKS[m.r+1][0]:null,near=m.L.filter(e=>e.need).sort((a,b)=>a.need.pct-b.need.pct).slice(0,2);
+    const nx=m.r<8?RANKS[m.r+1][0]:null,near=m.L.filter(e=>e.need&&!e.need.cap).sort((a,b)=>a.need.pct-b.need.pct).slice(0,2);
     return `<div class="rk-sh" style="--rc:${RANKS[m.r][2]}">${rBadge(m.r)}<div><h2>${m.n}</h2><span>${m.approx?"≈ ":""}${RANKS[m.r][0]} · ${m.pt} pt</span></div></div>
     ${nx?`<div class="rk-goal"><div class="l"><span>${RANKS[m.r][0]}</span><span>${nx}</span></div><div class="rk-bar"><i style="width:${m.pt}%"></i></div>
       <p>Mancano ${100-m.pt} pt per ${nx}.${near.length?` I più vicini a salire: ${near.map(e=>`<b>${esc(e.n)} ${e.need.txt}</b>`).join(" oppure ")}.`:""}</p></div>`:""}
