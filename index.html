@@ -2735,7 +2735,7 @@ const fillMem={};let goldHold=null;
 // Colore della scheda serie dopo serie, vivo e sempre più intenso, fino all'oro di fine esercizio
 // fuoco: giallo → arancio → rosso; neon: ciano → viola → magenta; padel: lime della pallina; tramonto: rosa → arancio → oro
 const FILLV={fuoco:[[0,[255,214,0]],[.5,[255,128,0]],[1,[255,40,60]]],neon:[[0,[0,229,255]],[.5,[140,80,255]],[1,[255,0,170]]],padel:[[0,[200,255,0]],[1,[120,255,60]]],tramonto:[[0,[255,64,150]],[.5,[255,120,40]],[1,[255,200,0]]]};
-function fillCol(f){const v=S.fillv||"fuoco",L=FILLV[v];if(!L)return v==="stile"?"var(--hot)":"var(--go)";
+function fillCol(f){const v=S.fillv||"tramonto",L=FILLV[v];if(!L)return v==="stile"?"var(--hot)":"var(--go)";
   let i=0;while(i<L.length-2&&f>L[i+1][0])i++;const [a,ca]=L[i],[b,cb]=L[i+1],t=Math.max(0,Math.min(1,(f-a)/(b-a)));return "rgb("+ca.map((x,k)=>Math.round(x+(cb[k]-x)*t)).join(",")+")"}
 // Fine esercizio: la scheda resta in primo piano il tempo della passata dorata, poi passa al prossimo
 function goldCard(g,exId,after){goldHold={g,ex:exId};openEx[g]=exId;renderTrain();keepFocus(false,exId);
