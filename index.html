@@ -1601,19 +1601,6 @@ html.vt-back::view-transition-new(root){animation:vtIn .2s var(--ease-out) .06s 
 }
 @keyframes rkBreath{50%{transform:scale(1.012,1.018)}}
 @keyframes rkLag{50%{opacity:.35}}
-/* Avatar piccolo accanto al timer di recupero (2026-10-13) */
-.rest .mini{flex:none;width:26px;height:50px;display:block;margin-right:-2px}
-.rest .mini svg{width:100%;height:100%;display:block;overflow:visible}
-.rest .mini .mm path{transform-box:fill-box;transform-origin:center;transform:scale(var(--s,1))}
-.ex.gold .rest .mini .mm{fill:#ffd36a}
-.ex.gold .rest .mini svg{filter:drop-shadow(0 0 6px rgba(255,211,106,.6))}
-@media (prefers-reduced-motion:no-preference){
-  .rest .mini .mb{transform-box:view-box;transform-origin:100px 150px;animation:miniB 3.2s ease-in-out infinite}
-  .rest.soon .mini .mb{animation-duration:1.3s}
-  .rest.over .mini .mb{animation:miniFlex .8s cubic-bezier(.23,1,.32,1) 1}
-}
-@keyframes miniB{50%{transform:scale(1.035,1.05)}}
-@keyframes miniFlex{30%{transform:scale(1.14)}}
 /* ===== ALTRE TRANSIZIONI (2026-10-13) ===== */
 /* 1. Allenamento: l'esercizio scelto tra i Prossimi sale e diventa la scheda in corso, le altre righe scorrono al loro posto */
 ::view-transition-group(*.vx){animation-duration:.36s;animation-timing-function:var(--ease-in-out);overflow:clip;border-radius:16px}
@@ -2749,7 +2736,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   if(tg.top&&tg.top>ex.hi&&!mods.has("deload")&&tg.reps.every(r=>r>=ex.lo))chips.push(`<span class="chip hot">Range esteso fino a ${tg.top}: il prossimo gradino è il ${Math.round((ex.step||2.5)/Math.max(1,tg.kg||lastKg(ex)||1)*100)}%</span>`);
   const stallTxt=!mods.has("deload")&&stalled(ex)?(phaseAt()==="def"?`<p class="prog down"><span>In calo</span><span>Massimale sotto del 5% nelle ultime 2 sedute. In definizione basta tenere i carichi: se continua togli una serie o fai lo scarico.</span></p>`:`<p class="prog down"><span>Fermo</span><span>Nessun miglioramento nelle ultime 3 sedute: prova una variante con ⇄ Cambia o togli una serie per due settimane.</span></p>`):"";
   const over=tOn&&tEnd<=Date.now();
-  const rest=withRest&&tOn?`<div class="rest ${over?"over":""}" id="restIn" role="timer"><span class="mini" aria-hidden="true">${miniFig()}</span><span class="rr"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rk" cx="32" cy="32" r="28"/><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg><b class="tv"></b></span><span class="tl" aria-live="assertive">${over?"Recupero finito":"Recupero"+(tPlus?" · +"+tPlus+"\u00a0s":"")}</span><button data-tp>+15 s</button><button data-ts>Chiudi</button></div>`:"";
+  const rest=withRest&&tOn?`<div class="rest ${over?"over":""}" id="restIn" role="timer"><span class="rr"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rk" cx="32" cy="32" r="28"/><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg><b class="tv"></b></span><span class="tl" aria-live="assertive">${over?"Recupero finito":"Recupero"+(tPlus?" · +"+tPlus+"\u00a0s":"")}</span><button data-tp>+15 s</button><button data-ts>Chiudi</button></div>`:"";
   // Scheda che si colora: a ogni serie un velo su tutta la scheda si intensifica piano; a esercizio finito passa l'oro in diagonale
   const fN=Math.min(n,rows.filter(r=>r.done).length),fr=n?fN/n:0,isGold=goldHold&&goldHold.ex===ex.id,fa=fillAnim(ex.id,fr),fPrev=fa.from;
   return `<article class="ex cur ${ssP.length?"ss":""} ${isGold?"gold":""}" data-ex="${ex.id}" style="--f:${fr.toFixed(3)};--f0:${fPrev.toFixed(3)};--fc:${fillCol(fr)};--fc0:${fillCol(fPrev)};--fd:-${fa.el}ms"><i class="fl fp ${fa.on?"grow":""}" aria-hidden="true"></i>${isGold?'<i class="fl fg" aria-hidden="true"></i>':""}
@@ -3243,15 +3230,6 @@ function rankBind(){
     if(!(k in (rView==="front"?R_FRONT:R_BACK)))rView=rView==="front"?"back":"front";if(rMode==="rank")sheetFrom(b,()=>{rankRedraw();rankSheet(k)});else rankRedraw()});
   const ib=document.getElementById("rkInfo");if(ib)ib.onclick=rankInfo;
 }
-// Avatar piccolo accanto al timer di recupero: la stessa sagoma del rango, solo busto, rifatta solo quando cambiano le sedute
-let miniC={n:-1,h:""};
-function miniFig(){const n=S.sessions.length+"|"+S.sessions.slice(-1).map(x=>x.id).join();if(miniC.n===n)return miniC.h;
-  let A={mus:{}};try{A=rankAll();if(!A.mus)A={mus:{}}}catch(e){}
-  let g="";for(const k in R_FRONT){const m=A.mus[k],r=m&&!m.none?m.r:null;
-    const fill=k==="_n"?"currentColor":r!=null?RANKS[r][1]:"currentColor",op=k==="_n"?".22":r!=null?"1":".32";
-    const sc=k==="_n"?"":`style="--s:${(r!=null?.86+.03*r:.86).toFixed(3)}"`,paths=R_FRONT[k].map(d=>`<path d="${d}"/>`).join("");
-    g+=`<g class="${k==="_n"?"":"mm"}" ${sc} fill="${fill}" fill-opacity="${op}">${paths}<g transform="matrix(-1 0 0 1 200 0)">${paths}</g></g>`}
-  miniC={n,h:`<svg viewBox="50 4 100 196"><g class="mb"><ellipse cx="100" cy="28" rx="15" ry="19" fill="currentColor" fill-opacity=".22"/>${g}</g></svg>`};return miniC.h}
 // Avatar: il muscolo dell'esercizio contrae per un attimo quando c'è un record
 function flexMus(ks){if(RM())return;
   ks.forEach(k=>document.querySelectorAll(`.rk-fig [data-rm="${k}"]`).forEach(g=>{const sc=parseFloat(g.style.getPropertyValue("--s"))||1;
