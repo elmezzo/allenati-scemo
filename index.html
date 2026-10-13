@@ -1584,8 +1584,8 @@ html.vt-sed nav.bar{view-transition-name:bar}
 ::view-transition-old(sed){animation:vtHold .4s linear both}
 ::view-transition-new(sed){animation:vtIn .22s var(--ease-out) .18s both}
 ::view-transition-old(sed-t),::view-transition-new(sed-t){height:100%;width:100%}
-::view-transition-old(root){animation:vtOut .16s var(--ease-out) both}
-::view-transition-new(root){animation:vtRise .3s var(--ease-out) .16s both}
+html.vt-sed::view-transition-old(root){animation:vtOut .16s var(--ease-out) both}
+html.vt-sed::view-transition-new(root){animation:vtRise .3s var(--ease-out) .16s both}
 ::view-transition-group(bar),::view-transition-old(bar),::view-transition-new(bar){animation:none}
 ::view-transition-old(bar){display:none}
 html[data-skin="manga"]::view-transition-group(sed){border-radius:0}
@@ -1593,6 +1593,24 @@ html.vt-back::view-transition-group(sed),html.vt-back::view-transition-group(sed
 html.vt-back::view-transition-old(sed){animation:vtOut .14s var(--ease-out) both}
 html.vt-back::view-transition-new(sed){animation:vtIn .2s var(--ease-out) .06s both}
 html.vt-back::view-transition-new(root){animation:vtIn .2s var(--ease-out) .06s both}
+/* ===== ALTRE TRANSIZIONI (2026-10-13) ===== */
+/* 1. Allenamento: l'esercizio scelto tra i Prossimi sale e diventa la scheda in corso, le altre righe scorrono al loro posto */
+::view-transition-group(*.vx){animation-duration:.36s;animation-timing-function:var(--ease-in-out);overflow:clip;border-radius:16px}
+::view-transition-old(*.vx),::view-transition-new(*.vx){height:100%;width:100%;object-fit:none;object-position:top left}
+::view-transition-old(*.vx){animation:vtHold .36s linear both}
+::view-transition-new(*.vx){animation:vtIn .2s var(--ease-out) .16s both}
+html[data-skin="manga"]::view-transition-group(*.vx){border-radius:0}
+html.vt-ex::view-transition-old(root){animation:vtOut .14s var(--ease-out) both}
+html.vt-ex::view-transition-new(root){animation:vtIn .2s var(--ease-out) .1s both}
+/* 2 e 4. Fogli che si aprono dall'elemento toccato (Termina e salva -> riepilogo, muscolo -> dettaglio, seduta fatta -> riepilogo) */
+::view-transition-group(vt-src){animation-duration:.4s;animation-timing-function:var(--ease-in-out);overflow:clip;border-radius:20px 20px 0 0}
+::view-transition-old(vt-src){animation:vtOut .14s var(--ease-out) both}
+::view-transition-new(vt-src){animation:vtIn .2s var(--ease-out) both}
+html[data-skin="manga"]::view-transition-group(vt-src){border-radius:0}
+html.vt-sh::view-transition-old(root){animation:none}
+html.vt-sh::view-transition-new(root){animation:vtIn .22s var(--ease-out) both}
+/* 3. Cambio stile: il nuovo stile si allarga a cerchio dal punto toccato (animazione in JS sul nuovo stato) */
+html.vt-skin::view-transition-old(root),html.vt-skin::view-transition-new(root){animation:none;mix-blend-mode:normal}
 @keyframes vtOut{to{opacity:0}}
 @keyframes vtHold{0%,45%{opacity:1}to{opacity:0}}
 @keyframes vtIn{from{opacity:0}}
@@ -2393,7 +2411,34 @@ function imgSheet(ex){const how=howOf(ex),k=(ex.n||"").toLowerCase().trim();cons
 const EN_LBL={low:"Stanco",ok:"Normale",high:"In forma"};
 let sheetN=0;
 // Entrata dal basso con curva tipo iOS, uscita più rapida; la maniglia si trascina giù per chiudere
-function sheetFx(wrap,close){if(!RM()){wrap.classList.add("enter");setTimeout(()=>wrap.classList.remove("enter"),340)}
+/* Transizioni con View Transitions (2026-10-13). Senza supporto o con "Riduci movimento" si cambia subito, come prima */
+let vtSheet=false;
+const vtOk=()=>!!document.startViewTransition&&!RM();
+function vtRun(cls,upd){const h=document.documentElement;h.classList.add(cls);const t=document.startViewTransition(upd);t.finished.finally(()=>h.classList.remove(cls));return t}
+// Foglio che si apre dall'elemento toccato: l'elemento (o il suo riquadro, se è un pezzo di SVG) diventa il foglio
+function sheetFrom(src,open){
+  if(!vtOk()||!src||!src.isConnected){open();return}
+  let gh=null,el=src;
+  if(!(src instanceof HTMLElement)){const r=src.getBoundingClientRect();gh=document.createElement("div");gh.style.cssText=`position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;pointer-events:none`;document.body.appendChild(gh);el=gh}
+  el.style.viewTransitionName="vt-src";let sh=null;
+  const t=vtRun("vt-sh",()=>{el.style.viewTransitionName="";if(gh)gh.remove();vtSheet=true;try{open()}finally{vtSheet=false}
+    sh=[...document.querySelectorAll(".sheet-wrap:not(.out) .sheet")].pop();if(sh)sh.style.viewTransitionName="vt-src"});
+  t.finished.finally(()=>{if(sh)sh.style.viewTransitionName=""})}
+// Allenamento: ogni esercizio (riga o scheda) ha lo stesso nome prima e dopo, così si sposta invece di sparire
+const vxN=new Map();const vxName=id=>{if(!vxN.has(id))vxN.set(id,"vx"+vxN.size);return vxN.get(id)};
+function nameEx(on,skip){document.querySelectorAll("#exs [data-open],#exs article.ex[data-ex]").forEach(e=>{const id=e.dataset.open||e.dataset.ex,n=on&&!(skip&&skip.has(id));e.style.viewTransitionName=n?vxName(id):"";e.style.viewTransitionClass=n?"vx":""})}
+function openExVT(g,id){
+  if(!vtOk()){openEx[g]=id;renderTrain();keepFocus(true);return}
+  // la scheda che si chiude sparisce in dissolvenza: se si spostasse anche lei si incrocerebbe con quella che si apre
+  const skip=new Set([...document.querySelectorAll("#exs article.ex[data-ex]")].map(e=>e.dataset.ex));skip.delete(id);
+  nameEx(true,skip);const t=vtRun("vt-ex",()=>{openEx[g]=id;renderTrain();keepFocus(false,id);nameEx(true,skip)});t.finished.finally(()=>nameEx(false))}
+// Cambio stile: cerchio che si allarga dal dito
+function skinVT(e,upd){
+  if(!vtOk()){upd();return}
+  const x=e&&e.clientX?e.clientX:innerWidth/2,y=e&&e.clientY?e.clientY:innerHeight/2,r=Math.hypot(Math.max(x,innerWidth-x),Math.max(y,innerHeight-y));
+  const t=vtRun("vt-skin",upd);
+  t.ready.then(()=>document.documentElement.animate({clipPath:[`circle(0px at ${x}px ${y}px)`,`circle(${r}px at ${x}px ${y}px)`]},{duration:560,easing:"cubic-bezier(.23,1,.32,1)",pseudoElement:"::view-transition-new(root)"})).catch(()=>{})}
+function sheetFx(wrap,close){if(!RM()&&!vtSheet){wrap.classList.add("enter");setTimeout(()=>wrap.classList.remove("enter"),340)}
   let y0=null,dy=0,pts=[];const sh=()=>wrap.querySelector(".sheet");
   wrap.addEventListener("pointerdown",e=>{if(!e.target.closest(".grab,.sheet h2")||sh().scrollTop>0)return;y0=e.clientY;dy=0;pts=[[e.clientY,performance.now()]];sh().style.transition="none";try{e.target.setPointerCapture(e.pointerId)}catch(_){}});
   wrap.addEventListener("pointermove",e=>{if(y0==null)return;const raw=e.clientY-y0;dy=raw<0?raw*.2:raw;const t=performance.now();pts.push([e.clientY,t]);while(pts.length>2&&t-pts[0][1]>80)pts.shift();sh().style.transform=`translateY(${dy}px)`});
@@ -2484,7 +2529,7 @@ function renderToday(){
   const ed=document.getElementById("endDl");if(ed)ed.onclick=()=>{endDeload();renderToday()};
   const bg=document.getElementById("bodyGo");if(bg)bg.onclick=()=>bodySheet(renderToday);
   const bn=document.getElementById("bodyNo");if(bn)bn.onclick=()=>{S.bodySnooze=iso(addDays(today(),2));save();renderToday()};
-  const ss2=document.getElementById("seeSum");if(ss2)ss2.onclick=()=>summarySheet(doneS);
+  const ss2=document.getElementById("seeSum");if(ss2)ss2.onclick=()=>sheetFrom(ss2.closest(".hero"),()=>summarySheet(doneS));
   const sg=document.getElementById("startGym");if(sg)sg.onclick=()=>{gymSel=a.gym;go("train")};
   const sa=document.getElementById("startAlt");if(sa)sa.onclick=()=>{setO(d,"gym",a.gymAlt);gymSel=a.gymAlt;go("train")};
 }
@@ -2554,7 +2599,7 @@ function renderTrain(){
   document.querySelectorAll("[data-wu]").forEach(b=>b.onclick=e=>{e.preventDefault();draftFor(g).wu=1;save();renderTrain()});
   document.querySelectorAll("#exs [data-pain]").forEach(b=>b.onclick=()=>{const y=b.getBoundingClientRect().top,id=b.dataset.pain;togglePain(id);renderTrain();const nb=document.querySelector(`#exs [data-pain="${id}"]`);if(nb)window.scrollBy(0,nb.getBoundingClientRect().top-y)});
   document.querySelectorAll("#exs [data-painswap]").forEach(b=>b.onclick=()=>openSwap(g,b.dataset.painswap));
-  document.querySelectorAll("#exs [data-open]").forEach(b=>b.onclick=()=>{openEx[g]=b.dataset.open;renderTrain();keepFocus(true)});
+  document.querySelectorAll("#exs [data-open]").forEach(b=>b.onclick=()=>openExVT(g,b.dataset.open));
   document.querySelectorAll("#exs [data-eff]").forEach(b=>b.onclick=()=>{const d=draftFor(g);d.eff=d.eff||{};d.eff[b.dataset.ex]=b.dataset.eff;
     const ex=PLAN[g].ex.map(e=>effEx(g,e)).find(e=>e.id===b.dataset.ex)||exById(b.dataset.ex);
     if(b.dataset.eff==="hard"&&ex.t==="comp"&&S.adrest!==false&&tOn&&tEnd>Date.now()&&!(d.restPlus||{})[ex.id]){d.restPlus=d.restPlus||{};d.restPlus[ex.id]=1;tEnd+=30000;tTot+=30;tPlus+=30;T("tlbl").textContent="Recupero · "+tLbl+" · +"+tPlus+"\u00a0s"}
@@ -2566,7 +2611,7 @@ function renderTrain(){
   const fb=document.getElementById("finish");fb.onclick=()=>{const miss=tot-dn;
     if(miss>0&&fb.dataset.arm!=="1"){fb.dataset.arm="1";fb.textContent=`Mancano ${miss} serie · tocca ancora`;clearTimeout(fb.t);fb.t=setTimeout(()=>{fb.dataset.arm="";fb.textContent="Termina e salva"},4000);return}
     finish(g,mods)};
-  const sv=document.getElementById("seeSv");if(sv)sv.onclick=()=>summarySheet(svd);
+  const sv=document.getElementById("seeSv");if(sv)sv.onclick=()=>sheetFrom(sv.closest(".card"),()=>summarySheet(svd));
   const c=document.getElementById("clear");c.onclick=()=>{if(c.dataset.arm!=="1"){c.dataset.arm="1";c.textContent="Tocca di nuovo per svuotare";setTimeout(()=>{c.dataset.arm="";c.textContent="Svuota la seduta"},3500);return}delete S.draft[g];openEx[g]=null;save();renderTrain()};
   trainFx(g,pct);
   if(tOn)tick();
@@ -2807,9 +2852,10 @@ function finish(g,mods){
   const dur=d.start?Math.max(1,Math.round((Date.now()-d.start)/60000)):null;
   clearDemo();
   S.sessions.push({id:"s"+Date.now(),day:g,planName:PLAN[g].name,date:new Date().toISOString(),sets,names,eff,mods:[...mods],deload:mods.has("deload"),dur,...(stn?{stn}:{})});
-  delete S.draft[g];openEx[g]=null;if(g==="LIB"){delete S.free;rebuild();gymSel=null}save();stopTimer();renderTrain();summarySheet(S.sessions[S.sessions.length-1]);
+  delete S.draft[g];openEx[g]=null;if(g==="LIB"){delete S.free;rebuild();gymSel=null}save();stopTimer();sheetFrom(document.getElementById("finish"),()=>{renderTrain();
   const mm=document.getElementById("msg");mm.className="msg ok";mm.textContent=`Seduta salvata: ${n} serie. I carichi della prossima volta sono già pronti.`;
   if(!storageOk){mm.className="msg err";mm.textContent="Non riesco a salvare su questo dispositivo: controlla che il browser non sia in navigazione privata."}
+  summarySheet(S.sessions[S.sessions.length-1])});
 }
 
 
@@ -3170,7 +3216,7 @@ function rankBind(){
   card.querySelectorAll("[data-rmode]").forEach(b=>b.onclick=()=>{rMode=b.dataset.rmode;rankRedraw()});
   card.querySelectorAll("[data-flip]").forEach(b=>b.onclick=()=>{rView=rView==="front"?"back":"front";rankRedraw()});
   card.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{const k=b.dataset.rm;rSel=k;
-    if(!(k in (rView==="front"?R_FRONT:R_BACK)))rView=rView==="front"?"back":"front";rankRedraw();if(rMode==="rank")rankSheet(k)});
+    if(!(k in (rView==="front"?R_FRONT:R_BACK)))rView=rView==="front"?"back":"front";if(rMode==="rank")sheetFrom(b,()=>{rankRedraw();rankSheet(k)});else rankRedraw()});
   const ib=document.getElementById("rkInfo");if(ib)ib.onclick=rankInfo;
 }
 function rankRedraw(){const c=document.querySelector(".card.rank");if(!c)return;const t=document.createElement("div");t.innerHTML=rankCard();c.replaceWith(t.firstElementChild);rankBind()}
@@ -3505,11 +3551,11 @@ function renderSettings(){
   document.querySelectorAll("#segOrd button").forEach(b=>b.onclick=()=>{S.order=b.dataset.v;save();renderSettings()});
   document.getElementById("dlBtn").onclick=()=>{const on=deloadOn();on?endDeload():startDeload();renderSettings();if(!on)reviewSheet(S.cycles[S.cycles.length-1])};
   const rvb=document.getElementById("rvBtn");if(rvb)rvb.onclick=()=>reviewSheet(S.cycles[S.cycles.length-1]);
-  document.querySelectorAll("#skins button").forEach(b=>b.onclick=()=>{S.skin=b.dataset.s;save();applySkin();renderSettings()});
+  document.querySelectorAll("#skins button").forEach(b=>b.onclick=e=>{if(S.skin===b.dataset.s)return;skinVT(e,()=>{S.skin=b.dataset.s;save();applySkin();renderSettings()})});
   document.querySelectorAll("[data-ph]").forEach(b=>b.onclick=()=>{setPhase(b.dataset.ph);renderSettings()});
   document.querySelectorAll("[data-tgf]").forEach(b=>b.onclick=()=>{const k=b.dataset.tgf;S[k]=!S[k];save();if(k==="loud"){audioUnlock();beep()}renderSettings()});
   document.querySelectorAll("[data-tg]").forEach(b=>b.onclick=()=>{const k=b.dataset.tg;S[k]=S[k]===false;save();if(k==="sound"&&S.sound){audioUnlock();beep()}renderSettings()});
-  document.querySelectorAll(".vars [data-var]").forEach(b=>b.onclick=()=>{S.vars=S.vars||{};S.vars[S.skin||"vetro"]=+b.dataset.var;save();applySkin();renderSettings()});
+  document.querySelectorAll(".vars [data-var]").forEach(b=>b.onclick=e=>{S.vars=S.vars||{};if((S.vars[S.skin||"vetro"]||0)===+b.dataset.var)return;skinVT(e,()=>{S.vars[S.skin||"vetro"]=+b.dataset.var;save();applySkin();renderSettings()})});
   document.getElementById("newPlan").onclick=()=>{editPlan={key:null,name:"",sub:"",legs:false,ex:[blankEx()]};go("edit")};
   document.querySelectorAll("[data-ed]").forEach(b=>b.onclick=()=>{const k=b.dataset.ed,P=PLAN[k];editPlan=JSON.parse(JSON.stringify({key:k,name:P.name,sub:P.sub||"",legs:!!P.legs,ex:P.ex}));go("edit")});
   document.querySelectorAll("[data-vw]").forEach(b=>b.onclick=()=>{const l=document.getElementById("ax-"+b.dataset.vw);l.hidden=!l.hidden;b.textContent=l.hidden?"Vedi":"Chiudi"});
