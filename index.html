@@ -1571,6 +1571,32 @@ body.ho-on{overflow:hidden}
 @keyframes hoPulse{50%{transform:scale(1.06)}}
 html[data-skin="lavagna"] .ho-ring .ra{filter:url(#chalk)}
 html[data-skin="lavagna"] .ho-ring .rk{stroke-dasharray:3 4;opacity:.2}
+/* ===== TRANSIZIONE OGGI -> ALLENAMENTO (2026-10-13): la scheda di Oggi diventa l'intestazione dell'Allenamento (View Transitions; senza supporto o con riduzione movimento resta la dissolvenza) ===== */
+:root{--ease-in-out:cubic-bezier(.77,0,.175,1)}
+html.vt-sed .hero{view-transition-name:sed}
+html.vt-sed .hero .big{view-transition-name:sed-t;width:fit-content}
+html.vt-sed .thead{view-transition-name:sed}
+html.vt-sed .thead h1{view-transition-name:sed-t}
+html.vt-sed nav.bar{view-transition-name:bar}
+::view-transition-group(sed){animation-duration:.4s;animation-timing-function:var(--ease-in-out);overflow:clip;border-radius:16px}
+::view-transition-group(sed-t){animation-duration:.4s;animation-timing-function:var(--ease-in-out)}
+::view-transition-old(sed),::view-transition-new(sed){height:100%;width:100%;object-fit:none;object-position:top left}
+::view-transition-old(sed){animation:vtHold .4s linear both}
+::view-transition-new(sed){animation:vtIn .22s var(--ease-out) .18s both}
+::view-transition-old(sed-t),::view-transition-new(sed-t){height:100%;width:100%}
+::view-transition-old(root){animation:vtOut .16s var(--ease-out) both}
+::view-transition-new(root){animation:vtRise .3s var(--ease-out) .16s both}
+::view-transition-group(bar),::view-transition-old(bar),::view-transition-new(bar){animation:none}
+::view-transition-old(bar){display:none}
+html[data-skin="manga"]::view-transition-group(sed){border-radius:0}
+html.vt-back::view-transition-group(sed),html.vt-back::view-transition-group(sed-t){animation-duration:.34s}
+html.vt-back::view-transition-old(sed){animation:vtOut .14s var(--ease-out) both}
+html.vt-back::view-transition-new(sed){animation:vtIn .2s var(--ease-out) .06s both}
+html.vt-back::view-transition-new(root){animation:vtIn .2s var(--ease-out) .06s both}
+@keyframes vtOut{to{opacity:0}}
+@keyframes vtHold{0%,45%{opacity:1}to{opacity:0}}
+@keyframes vtIn{from{opacity:0}}
+@keyframes vtRise{from{opacity:0;transform:translateY(12px)}}
 </style>
 <!--APP-HEAD-END-->
 </head>
@@ -1987,7 +2013,12 @@ function render(){
   if(tOn)tick();
   wakeSync();
 }
-function go(v){const from=view;view=v;if(v!=="edit"){S.view=v;save()}render();window.scrollTo(0,0);if(from!==v)slideIn((VORD[v]??0)>=(VORD[from]??0)?"in-r":"in-l")}
+function go(v){const from=view,upd=()=>{view=v;if(v!=="edit"){S.view=v;save()}render();window.scrollTo(0,0)};
+  // Oggi <-> Allenamento: la scheda della seduta si trasforma nell'intestazione (e ritorno)
+  const pair=(from==="oggi"&&v==="train")||(from==="train"&&v==="oggi");
+  if(pair&&document.startViewTransition&&!RM()){const h=document.documentElement;h.classList.add("vt-sed");h.classList.toggle("vt-back",v==="oggi");
+    const t=document.startViewTransition(upd);t.finished.finally(()=>h.classList.remove("vt-sed","vt-back"));return}
+  upd();if(from!==v)slideIn((VORD[v]??0)>=(VORD[from]??0)?"in-r":"in-l")}
 document.querySelectorAll("nav.bar button").forEach(b=>b.onclick=()=>go(b.dataset.v));
 
 /* ================= CONTENUTI: errori comuni, riscaldamento, avvicinamento, fastidio, peso e misure ================= */
