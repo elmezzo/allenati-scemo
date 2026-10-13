@@ -22,7 +22,7 @@
   --bg:#10151d; --card:#171e28; --card-2:#1d2633; --field:#0c1118; --line:#2a3443;
   --fg:#eef1f5; --muted:#9aa5b3; --dim:#76828f;
   --hot:#ff9f43; --hot-ink:#1b1003;
-  --go:#7fd6a0; --adapt:#ffd166; --stop:#ff7b72;
+  --go:#7fd6a0; --adapt:#ffd166; --stop:#ff3d6e;
   --display:"Bebas Neue","Oswald","Arial Narrow",sans-serif;
   --ui:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
   --navh:64px;
@@ -31,9 +31,10 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
 html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--ui);font-size:17px;line-height:1.45;overscroll-behavior-y:none}
+@supports (font:-apple-system-body){html{font:-apple-system-body}}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--ui);font-size:max(17px,1rem);line-height:1.45;overscroll-behavior-y:none}
 button,input,select{font:inherit;color:inherit}
-button{cursor:pointer}
+button{cursor:pointer;touch-action:manipulation}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--hot);outline-offset:2px}
 .app{max-width:560px;margin:0 auto;padding-inline:16px;padding-block:calc(env(safe-area-inset-top,0px) + 14px) calc(var(--navh) + env(safe-area-inset-bottom,0px) + 96px);display:flex;flex-direction:column;gap:14px}
 .kicker{font:700 12px/1 var(--ui);letter-spacing:.16em;text-transform:uppercase;color:var(--hot)}
@@ -156,7 +157,7 @@ nav.bar button[aria-current="page"]{color:var(--hot)}
 @media (prefers-reduced-motion:no-preference){
   .cele{animation:fade 1.5s ease forwards}
   .cele .txt{animation:pop 1.5s cubic-bezier(.2,1.4,.4,1) forwards}
-  .tick,.tabs button,.seg button{transition:background .15s,color .15s}
+  .tick,.tabs button,.seg button{transition:background .15s,color .15s,scale .16s cubic-bezier(.23,1,.32,1)}
 }
 @media (prefers-reduced-motion:reduce){.cele{animation:fade 1.4s steps(1) forwards}}
 
@@ -220,7 +221,8 @@ html[data-skin="campo"] .tile,html[data-skin="campo"] .tabs button{background:va
 /* riflesso che passa sul pulsante principale */
 html[data-skin]:not([data-skin="notte"]) .btn.hot{position:relative;overflow:hidden}
 html[data-skin]:not([data-skin="notte"]) .btn.hot::after{content:"";position:absolute;top:-20%;bottom:-20%;width:40%;left:-60%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg)}
-@media (prefers-reduced-motion:no-preference){html[data-skin]:not([data-skin="notte"]) .btn.hot::after{animation:shine 3.6s ease-in-out infinite}}
+/* Riflesso: un solo passaggio quando il bottone compare, non in loop */
+@media (prefers-reduced-motion:no-preference){html[data-skin]:not([data-skin="notte"]) .btn.hot::after{animation:shine 2.2s ease-in-out .3s 1 both}}
 @keyframes shine{0%,62%{transform:translateX(0) skewX(-20deg)}100%{transform:translateX(475%) skewX(-20deg)}}
 .skins{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
 .skins button{border:1px solid var(--line);border-radius:10px;padding:8px 2px 7px;background:var(--card-2);font-size:12px;font-weight:700;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:5px}
@@ -379,6 +381,17 @@ html[data-skin="campo"]{--pad:#7fe6ff;--match:#ffd36b}
 html[data-skin="vetro"] :is(.ctx button,.xrow,.dayr){-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);background:rgba(255,255,255,.065);border-color:rgba(255,255,255,.13)}
 /* allenamento */
 .thead{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;margin:-14px -16px 0;padding:12px 16px;display:flex;flex-direction:column;gap:8px;background:color-mix(in srgb,var(--bg) 80%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+/* Fascia dietro orologio e Dynamic Island: il contenuto non scorre sotto l'ora */
+.sbar{position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);z-index:25;pointer-events:none;background:color-mix(in srgb,var(--bg) 96%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+html[data-skin="vetro"] .sbar{background:rgba(12,13,22,.95)}
+html[data-skin="lavagna"] .sbar{background:#1d2521;-webkit-backdrop-filter:none;backdrop-filter:none}
+html[data-skin="manga"] .sbar{background:rgba(15,14,18,.92)}
+.swq{border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;background:color-mix(in srgb,var(--fg) 5%,transparent)}
+.swq p{margin:0;font-size:15px}
+/* Scheda che si colora a ogni serie: il testo grigio si schiarisce per restare leggibile sul velo */
+:root:not(#z) .ex.cur{--muted:color-mix(in srgb,var(--fg) 72%,var(--card-2));--dim:color-mix(in srgb,var(--fg) 62%,var(--card-2))}
+.set.low .i{color:var(--adapt);position:relative}
+.set.low .i::after{content:"";position:absolute;right:-6px;top:2px;width:6px;height:6px;border-radius:50%;background:var(--adapt)}
 .thead .r{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 .thead h1{font-size:36px}
 .thead .r span{font-size:14px;color:var(--muted);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -689,7 +702,7 @@ body{overflow-anchor:none}
 .rk-m{display:flex;flex-direction:column;align-items:center;text-align:center;gap:3px;padding:9px 4px 8px;border-radius:14px;background:var(--field);border:1px solid var(--line);color:var(--fg)}
 .rk-m svg{width:34px;height:34px}
 .rk-m b{font-size:12px;line-height:1.15}
-.rk-m small{font-size:12px;color:var(--muted);font-weight:600;overflow-wrap:anywhere}
+.rk-m small{font-size:12px;color:var(--muted);font-weight:600;overflow-wrap:anywhere;display:flex;flex-direction:column;line-height:1.3}
 .rk-m.none{opacity:.6}
 .rbd.none{color:var(--muted)}
 .rk-sh{display:flex;gap:14px;align-items:center}
@@ -730,7 +743,7 @@ body{overflow-anchor:none}
 .rk-pr .more{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 12px;margin-top:6px;font-size:12px;font-weight:700;color:var(--muted)}
 .rk-pr .more span{display:flex;align-items:center;gap:4px}
 .rk-pr .more svg{width:22px;height:22px}
-.rk-pr::after{content:"";position:absolute;inset:-40% auto -40% -60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.3),transparent);transform:skewX(-18deg);animation:rkBlade 2.8s ease-in-out .6s infinite}
+.rk-pr::after{content:"";position:absolute;inset:-40% auto -40% -60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.3),transparent);transform:skewX(-18deg);animation:rkBlade 2.8s ease-in-out .6s 1 both}
 @keyframes rkLand{0%{transform:scale(.85);opacity:0}100%{transform:none;opacity:1}}
 @keyframes rkBlade{0%{transform:translateX(0) skewX(-18deg)}55%,100%{transform:translateX(475%) skewX(-18deg)}}
 @media (prefers-reduced-motion:reduce){.rk-pr .rbd.n,.rk-pr::after{animation:none}}
@@ -802,6 +815,8 @@ html[data-skin="campo"] .rbd .gs{opacity:.5}
 @media (prefers-reduced-motion:reduce){.ex.cur.gold>.fp{animation:none}}
 @keyframes flOut{from{opacity:calc(.25 + var(--f)*.75)}to{opacity:0}}
 .ex.cur>.fp.grow{animation:flGrow var(--fdur,1.8s) cubic-bezier(.45,0,.25,1) both;animation-delay:var(--fd,0ms)}
+/* Scheda dorata: il velo sfuma mentre arriva l'oro (deve vincere su .grow, che ha la stessa specificità) */
+.ex.cur.gold>.fp.grow{animation:flOut .6s cubic-bezier(.23,1,.32,1) forwards}
 @keyframes flGrow{from{--fx:var(--f0);--cx:var(--fc0)}to{--fx:var(--f);--cx:var(--fc)}}
 .ex.cur>.fg{background:linear-gradient(135deg,rgba(255,226,140,.42),rgba(232,170,52,.3) 55%,rgba(196,128,24,.38));clip-path:polygon(0 0,200% 0,0 200%);animation:flGold .68s cubic-bezier(.23,1,.32,1) both}
 .ex.cur>.fg::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,transparent 35%,rgba(255,250,225,.55) 50%,transparent 65%);background-size:300% 300%;animation:flShine .9s .25s cubic-bezier(.23,1,.32,1) both}
@@ -851,7 +866,7 @@ html[data-skin="campo"] .rbd .gs{opacity:.5}
 html[data-skin="campo"]{--match:#d9c2ff}
 /* Testo tenue: almeno 4,5:1 sulle schede */
 html[data-skin="vetro"]{--dim:#a29ecb;--navbg:rgba(14,12,36,.94)}
-html[data-skin="carbonio"]{--dim:#8e98a3;--navbg:rgba(10,12,15,.96)}
+html[data-skin="carbonio"]{--dim:#7f8994;--navbg:rgba(10,12,15,.96)}
 html[data-skin="campo"]{--dim:#8aa3cc;--navbg:rgba(4,14,36,.95)}
 html[data-skin="campo"][data-var="1"]{--dim:#d09f8a;--navbg:rgba(32,11,5,.95)}
 html[data-skin="campo"][data-var="2"]{--dim:#8ec09d;--navbg:rgba(4,24,11,.95)}
@@ -937,7 +952,7 @@ html:not(#z) .sheet .fxgo{position:sticky;bottom:8px;margin-top:12px;z-index:3;b
 /* ===== VETRO RIFINITO (2026-10-07): meno "da IA". Via gradienti a tre colori, aloni rosa, bordo che gira, riflesso infinito sul bottone e luce che insegue il dito. Resta: viola-blu, vetro, grana, accento caldo, aurora che si scalda con la seduta. Una sola luce, dall'alto a sinistra, uguale per sfondo, schede e bordi. ===== */
 html[data-skin="vetro"]:not(#z){--acc:#ff7d66;--acc-rgb:255,125,102;--hot:#ff7d66;--hot-ink:#1f0a06;
   --grad:linear-gradient(180deg,#ff9078,#ff7259);--glow:rgba(0,0,0,0);--title:linear-gradient(#f4f2ff,#f4f2ff);--match:#c9a8ff;
-  --bg:#0c0b1c;--fg:#f3f1fb;--muted:#b0adc8;--dim:#a29ecb;
+  --bg:#0c0b1c;--fg:#f3f1fb;--muted:#b0adc8;--dim:#8f8bb8;
   --bgimg:radial-gradient(640px 420px at 6% -8%,rgba(255,150,120,.20),transparent 64%),radial-gradient(620px 560px at 108% 30%,rgba(98,104,230,.30),transparent 64%),#0c0b1c}
 html[data-skin="vetro"][data-var="1"]:not(#z){--acc:#5cc8ff;--acc-rgb:92,200,255;--hot:#5cc8ff;--hot-ink:#04131d;--grad:linear-gradient(180deg,#7dd4ff,#4dbcf5);
   --bg:#080c1c;--bgimg:radial-gradient(640px 420px at 6% -8%,rgba(120,200,255,.20),transparent 64%),radial-gradient(620px 560px at 108% 30%,rgba(80,96,220,.30),transparent 64%),#080c1c}
@@ -1015,8 +1030,8 @@ html[data-skin="eclisse"]:not(#z) .hero::after{content:"";position:absolute;top:
 html[data-skin="eclisse"]:not(#z) .hero>*{position:relative;z-index:1}
 html[data-skin="eclisse"]:not(#z) .thead .r>span{display:inline-flex;align-items:center;gap:10px}
 html[data-skin="eclisse"]:not(#z) .thead .r>span::after{content:"";width:26px;height:26px;border-radius:50%;flex:none;
-  background:radial-gradient(circle at calc(50% + var(--p,0) * 120%) 50%,#040406 0 44%,transparent 46%),radial-gradient(circle,var(--corona) 0 44%,rgba(var(--acc-rgb),.6) 50%,transparent 68%);
-  transition:background-position .3s var(--ease-out)}
+  --pm:var(--p,0);background:radial-gradient(circle at calc(50% + var(--pm) * 120%) 50%,#040406 0 44%,transparent 46%),radial-gradient(circle,var(--corona) 0 44%,rgba(var(--acc-rgb),.6) 50%,transparent 68%);
+  transition:--pm .5s var(--ease-out)}
 /* Fine recupero: anello bianco con alone rosa */
 html[data-skin="eclisse"]:not(#z) .ra{stroke:var(--corona);filter:drop-shadow(0 0 4px rgba(var(--acc-rgb),.7))}
 /* Record: la lama di luce diventa bianca */
@@ -1134,7 +1149,7 @@ details.more > div > .lnk,details.more > div > .painb{align-self:flex-start}
 :root:not(#z) .rest button{min-height:44px;white-space:nowrap}
 @media (max-width:360px){
   :root:not(#z) .set{grid-template-columns:14px minmax(0,1fr) minmax(0,1fr) 44px;column-gap:6px}
-  :root:not(#z) .set.now .pm{width:24px}
+  :root:not(#z) .set.now .pm{width:28px}
   :root:not(#z) .set .field input{min-width:2.4ch}
   :root:not(#z) .rest button{padding:8px 7px}
   :root:not(#z) .rest{gap:8px}
@@ -1155,7 +1170,11 @@ html[data-skin="carbonio"]:not(#z):not(#y) .exhead .swap{border:1px solid #4d556
 .sheet .grab::after{content:"";position:absolute;inset:-14px -80px}
 @keyframes shBg{from{background:rgba(0,0,0,0)}}
 @keyframes shUp{from{transform:translateY(100%)}}
-@media (max-width:400px){:root:not(#z) .set .pm{width:28px}:root:not(#z) .set .field input{min-width:3ch}}
+@media (max-width:400px){:root:not(#z) .set .pm{width:34px}:root:not(#z) .set .field input{min-width:3ch}}
+/* Riga della serie: numeri grandi da leggere a un braccio, −/+ più larghi, spazio tra i campi e prima della spunta */
+:root:not(#z) .set{column-gap:10px}
+:root:not(#z) .set .field input{font-size:20px;font-variant-numeric:tabular-nums}
+:root:not(#z) .set .pm::after{inset:0 -1px}
 .spec span{white-space:nowrap}
 details.wu .wut{min-width:0}
 html[data-skin="manga"]:not(#z):not(#y) details.wu .wut h3{font-size:clamp(15px,4.8vw,20px)}
@@ -1168,6 +1187,7 @@ html[data-skin="campo"]:not(#z) #court{opacity:.14}
 .edd summary{cursor:pointer;font-size:14px;font-weight:700;color:var(--info);min-height:44px;display:flex;align-items:center}
 .edd[open] summary{margin-bottom:6px}
 .edd>.g3,.edd>.checks{margin-top:8px}
+.sheet-wrap.rmfade{animation:tabIn .15s ease-out}
 @media (prefers-reduced-motion:reduce){
   .tick.pop::before,.tick.pop::after,.ex.cur.sw-n,.ex.cur.sw-p,.rk-pr .rbd.n{animation:none!important}
   .sheet{transition:none}
@@ -1193,10 +1213,10 @@ html[data-skin="carbonio"]:not([data-var="1"]):not([data-var="2"]){--acc:#ffb000
 html[data-skin="campo"]{--acc:#e4ff3a;--acc-rgb:228,255,58}
 html[data-skin="manga"]:not([data-var="1"]):not([data-var="2"]){--acc:#ff2340;--acc-rgb:255,35,64}
 
-@property --p{syntax:'<number>';inherits:true;initial-value:0}
-html{transition:--p .5s var(--ease-out)}
-/* Tutti: recupero nel colore dello stile, numeri grandi, un solo colore per gli avvisi */
-:root:not(#z):not(#y){--info:color-mix(in srgb,var(--acc,var(--hot)) 55%,var(--fg))}
+/* --p (avanzamento della seduta) cambia sulla radice senza transizione: animarla lì ricalcolava tutta la pagina a ogni spunta.
+   L'aurora sfuma da sola (transition sull'opacità), la luna di Eclisse anima una sua copia (--pm) solo sul suo elemento */
+@property --pm{syntax:'<number>';inherits:false;initial-value:0}
+/* Tutti: recupero nel colore dello stile, numeri grandi. Gli avvisi restano azzurri (--info), distinti dai tasti */
 :root:not(#z):not(#y) .rest:not(.over){background:color-mix(in srgb,var(--acc,var(--hot)) 12%,transparent);color:var(--fg)}
 :root:not(#z):not(#y) .rest:not(.over) button{color:var(--acc,var(--hot));border-color:color-mix(in srgb,var(--acc,var(--hot)) 60%,transparent)}
 :root:not(#z):not(#y) .rest .rr{width:76px;height:76px}
@@ -1260,7 +1280,6 @@ html[data-skin="eclisse"]:not(#z):not(#y) .timer:not(.over){box-shadow:0 0 0 1px
 html[data-skin="carbonio"]:not(#z):not(#y) :is(.timer .tr,.rest .rr) .seg7 svg{height:.95em}
 html[data-skin="carbonio"]:not(#z):not(#y) .seg7 .off{fill:rgba(var(--acc-rgb),.04)}
 html[data-skin="carbonio"]:not(#z):not(#y) .tgt .seg7+.lu{vertical-align:.1em}
-html[data-skin="carbonio"][data-var="1"]:not(#z):not(#y){--info:#ffc27a}
 html[data-skin="campo"]:not(#z):not(#y) :is(details.mn>summary,p.grp,p.note,.head p){text-shadow:0 0 3px var(--bg),0 0 8px var(--bg),0 0 14px var(--bg)}
 html[data-skin="campo"]:not(#z):not(#y) div.timer:not(.over){background:color-mix(in srgb,var(--card) 90%,var(--acc));color:var(--fg);border:1.5px solid var(--acc)}
 html[data-skin="campo"]:not(#z):not(#y) div.timer:not(.over) .ra{stroke:var(--acc);filter:none}
@@ -1310,10 +1329,8 @@ html[data-skin="eclisse"]:not(#z):not(#y) .timer:not(.over) button{color:var(--c
 html[data-skin="carbonio"]:not(#z):not(#y) .headrow::after{position:absolute;left:0;bottom:0}
 html[data-skin="carbonio"]:not(#z):not(#y) .tgt b{align-items:flex-end}
 html[data-skin="carbonio"]:not(#z):not(#y) .tgt .lu{padding-bottom:.06em}
-html[data-skin="carbonio"][data-var="1"]:not(#z):not(#y){--info:#ff9d94}
 html[data-skin="campo"]:not(#z):not(#y) #court{height:100dvh}
 html[data-skin="campo"]:not(#z):not(#y) :is(details.mn>summary,p.note,p.grp){background:color-mix(in srgb,var(--bg) 85%,transparent);border-radius:6px;padding:4px 8px;margin-inline:-8px;text-shadow:none}
-html[data-skin="campo"][data-var="2"]:not(#z):not(#y){--go:var(--acc)}
 html[data-skin="vetro"]:not(#z):not(#y) .wu .wub .btn:not(.ghost){background:color-mix(in srgb,var(--acc) 30%,transparent);color:#fff;border-color:var(--acc)}
 html[data-skin="vetro"][data-var="2"]:not(#z):not(#y){--go:#b5f27a}
 html[data-skin="manga"]:not(#z):not(#y) .rest:not(.over){box-shadow:4px 4px 0 var(--acc);border-color:var(--fg)}
@@ -1347,7 +1364,6 @@ html[data-skin="manga"][data-var="1"]:not(#z):not(#y) .tgt b{text-shadow:1.5px 1
 /* Giro 7 */
 html[data-skin="eclisse"]:not(#z):not(#y) .wu .wub .btn:not(.ghost){background:color-mix(in srgb,var(--fg) 14%,transparent);color:var(--fg);border-color:rgba(var(--cor-rgb),.35)}
 html[data-skin="campo"]:not(#z):not(#y) #court{-webkit-mask-image:linear-gradient(transparent 0 92px,#000 136px);mask-image:linear-gradient(transparent 0 92px,#000 136px)}
-html[data-skin="campo"]:not(#z):not(#y){--go:var(--acc)}
 html[data-skin="campo"]:not(#z):not(#y) :is(details.mn>summary,p.note,p.grp,.back){background:color-mix(in srgb,var(--bg) 80%,transparent)}
 html[data-skin="campo"]:not(#z):not(#y) :is(.card,.ex,.status,details.h,.banner,.sheet) :is(p.note,p.grp){background:none}
 html[data-skin="carbonio"]:not(#z):not(#y) .wu li em{color:#c3cad2}
@@ -1377,8 +1393,8 @@ html[data-skin="vetro"]:not(#z):not(#y):not(#x) :is(.tile,.tabs button,.ctx butt
 html[data-skin="vetro"]:not(#z):not(#y):not(#x) .ex.cur{border-color:rgba(var(--acc-rgb),.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 10px 24px -14px rgba(0,0,0,.9)}
 html[data-skin="vetro"]:not(#z):not(#y):not(#x) .field{background:#0e0f17;border-color:rgba(255,255,255,.08)}
 /* il vetro vero: barra in basso, intestazione, timer, schede dal basso */
-html[data-skin="vetro"]:not(#z):not(#y):not(#x) nav.bar{background:rgba(18,19,30,.62);-webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);border-top:1px solid rgba(255,255,255,.1)}
-html[data-skin="vetro"]:not(#z):not(#y):not(#x) .thead{background:rgba(12,13,22,.62);-webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%)}
+html[data-skin="vetro"]:not(#z):not(#y):not(#x) nav.bar{background:rgba(18,19,30,.86);-webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);border-top:1px solid rgba(255,255,255,.1)}
+html[data-skin="vetro"]:not(#z):not(#y):not(#x) .thead{background:rgba(12,13,22,.93);-webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%)}
 html[data-skin="vetro"]:not(#z):not(#y):not(#x) div.timer:not(.over){background:rgba(24,25,38,.66);-webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);border:1px solid rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 12px 30px rgba(0,0,0,.55)}
 html[data-skin="vetro"]:not(#z):not(#y):not(#x) .sheet{background:rgba(22,23,34,.78);-webkit-backdrop-filter:blur(26px) saturate(160%);backdrop-filter:blur(26px) saturate(160%);border-top:1px solid rgba(255,255,255,.14)}
 html[data-skin="vetro"]:not(#z):not(#y):not(#x) #aurw{background:radial-gradient(70% 40% at 50% 100%,rgba(var(--acc-rgb),.35),transparent 70%);opacity:calc(var(--p,0) * .7)}
@@ -1578,18 +1594,19 @@ html.vt-sed .hero .big{view-transition-name:sed-t;width:fit-content}
 html.vt-sed .thead{view-transition-name:sed}
 html.vt-sed .thead h1{view-transition-name:sed-t}
 html.vt-sed nav.bar{view-transition-name:bar}
-::view-transition-group(sed){animation-duration:.4s;animation-timing-function:var(--ease-in-out);overflow:clip;border-radius:16px}
-::view-transition-group(sed-t){animation-duration:.4s;animation-timing-function:var(--ease-in-out)}
+::view-transition-group(sed){animation-duration:.34s;animation-timing-function:var(--ease-in-out);overflow:clip;border-radius:16px;background:color-mix(in srgb,var(--card) 50%,var(--bg))}
+::view-transition-group(sed-t){animation-duration:.34s;animation-timing-function:var(--ease-in-out)}
 ::view-transition-old(sed),::view-transition-new(sed){height:100%;width:100%;object-fit:none;object-position:top left}
-::view-transition-old(sed){animation:vtHold .4s linear both}
-::view-transition-new(sed){animation:vtIn .22s var(--ease-out) .18s both}
+::view-transition-old(sed){animation:vtOut .12s var(--ease-out) both}
+::view-transition-new(sed){animation:vtIn .2s var(--ease-out) .08s both}
 ::view-transition-old(sed-t),::view-transition-new(sed-t){height:100%;width:100%}
-html.vt-sed::view-transition-old(root){animation:vtOut .16s var(--ease-out) both}
-html.vt-sed::view-transition-new(root){animation:vtRise .3s var(--ease-out) .16s both}
+html.vt-sed::view-transition-old(root){animation:vtOut .14s var(--ease-out) both}
+html.vt-sed::view-transition-new(root){animation:vtRise .26s var(--ease-out) .1s both}
 ::view-transition-group(bar),::view-transition-old(bar),::view-transition-new(bar){animation:none}
 ::view-transition-old(bar){display:none}
 html[data-skin="manga"]::view-transition-group(sed){border-radius:0}
-html.vt-back::view-transition-group(sed),html.vt-back::view-transition-group(sed-t){animation-duration:.34s}
+html.vt-back::view-transition-group(sed),html.vt-back::view-transition-group(sed-t){animation-duration:.3s}
+html.vt-back::view-transition-old(root){animation:none}
 html.vt-back::view-transition-old(sed){animation:vtOut .14s var(--ease-out) both}
 html.vt-back::view-transition-new(sed){animation:vtIn .2s var(--ease-out) .06s both}
 html.vt-back::view-transition-new(root){animation:vtIn .2s var(--ease-out) .06s both}
@@ -1608,8 +1625,9 @@ html.vt-back::view-transition-new(root){animation:vtIn .2s var(--ease-out) .06s 
 ::view-transition-old(*.vx){animation:vtHold .36s linear both}
 ::view-transition-new(*.vx){animation:vtIn .2s var(--ease-out) .16s both}
 html[data-skin="manga"]::view-transition-group(*.vx){border-radius:0}
-html.vt-ex::view-transition-old(root){animation:vtOut .14s var(--ease-out) both}
-html.vt-ex::view-transition-new(root){animation:vtIn .2s var(--ease-out) .1s both}
+html.vt-ex nav.bar{view-transition-name:bar}
+html.vt-ex::view-transition-old(root){animation:none}
+html.vt-ex::view-transition-new(root){animation:vtIn .2s var(--ease-out) both}
 /* 2 e 4. Fogli che si aprono dall'elemento toccato (Termina e salva -> riepilogo, muscolo -> dettaglio, seduta fatta -> riepilogo) */
 ::view-transition-group(vt-src){animation-duration:.4s;animation-timing-function:var(--ease-in-out);overflow:clip;border-radius:20px 20px 0 0}
 ::view-transition-old(vt-src){animation:vtOut .14s var(--ease-out) both}
@@ -1628,6 +1646,7 @@ html.vt-skin::view-transition-old(root),html.vt-skin::view-transition-new(root){
 </head>
 <body>
 <!--APP-BODY-START-->
+<div class="sbar" aria-hidden="true"></div>
 <main class="app" id="app"></main>
 
 <div class="timer" id="timer" hidden role="timer" tabindex="0" aria-label="Recupero: tocca per tornare all'esercizio">
@@ -1710,7 +1729,7 @@ const BUILTIN={
   {id:"c5",mu:"Bicipiti",n:"Curl al cavo dietro la schiena",s:3,lo:12,hi:15,rir:"1-2",keep:true,side:true,rest:0,t:"iso",step:5,ss:"5",eq:"mac"},
   {id:"c6",mu:"Tricipiti",n:"Pushdown al cavo",s:3,lo:12,hi:15,rir:"1-2",keep:true,rest:60,t:"iso",step:5,ss:"5",eq:"mac"},
   {id:"c7",mu:"Core",n:"Pallof press",s:2,lo:10,hi:10,rir:"2",rest:45,t:"prev",step:5,side:true,eq:"mac"},
-  {id:"g7",mu:"Gambe",n:"Copenhagen plank",s:2,lo:20,hi:30,rir:"—",rest:60,t:"time",side:true,keep:true,note:"Spostato qui dal martedì: tenuta controllata, mai a sfinimento prima delle partite."},
+  {id:"g7",mu:"Gambe",n:"Copenhagen plank",s:2,lo:20,hi:30,rir:"—",rest:60,t:"time",side:true,keep:true,note:"Tenuta controllata, mai a sfinimento prima delle partite."},
   {id:"a8",n:"Extrarotazione al cavo",s:2,lo:15,hi:15,rir:"2",rest:45,t:"prev",step:2.5,side:true,note:"Gomito a 90°, braccio lungo il fianco.",eq:"cavl"},
   {id:"b9",n:"Estensione del polso",s:2,lo:15,hi:15,rir:"1-2",rest:45,t:"prev",step:1,note:"Discesa lenta. Prevenzione gomito.",eq:"db"}]}
 };
@@ -1766,10 +1785,12 @@ function rebuild(){
   if(S.free&&(S.free.d===iso(today())||(S.draft&&S.draft.LIB))){const ex=S.free.ex.filter(id=>EX[id]).map(id=>({...EX[id],ss:""}));
     if(ex.length){PLAN.LIB={name:"Libera",title:"Seduta libera",sub:"Fuori dal piano",custom:true,ex};GYM_ORDER.push("LIB")}}
 }
-function freeSheet(){const sel=[],mus=[...new Set(ALL_EX.map(e=>muLbl(e.mu||"Altro")))];
-  const L=ALL_EX.filter(e=>!e.custom);
+function freeSheet(){const sel=[];
+  // Un esercizio per nome (lo storico è in comune per nome); prima quelli della scheda, poi le varianti, così il muscolo è quello giusto
+  const seen=new Set(),L=[...ALL_EX.filter(e=>!e.custom&&!String(e.id).includes("~")),...ALL_EX.filter(e=>!e.custom&&String(e.id).includes("~"))].filter(e=>{const k=nmKey(e.n);if(seen.has(k))return false;seen.add(k);return true});
+  const mus=[...new Set(L.map(e=>muLbl(e.mu||"Altro")))];
   openSheet({html:()=>`<h2>Seduta libera</h2><p class="note" style="margin:0">Scegli gli esercizi nell'ordine in cui li fai. Vale solo per oggi; carichi e progressi sono quelli di sempre.</p>
-    ${mus.map(m=>{const xs=L.filter(e=>muLbl(e.mu||"Altro")===m);return xs.length?`<p class="grp">${esc(m)}</p><div class="opts">${xs.map(e=>`<button class="opt" data-fx="${e.id}" aria-pressed="${sel.includes(e.id)}"><b>${sel.includes(e.id)?(sel.indexOf(e.id)+1)+". ":""}${esc(e.n)}</b><span>${e.s} serie · ${e.lo===e.hi?e.lo:e.lo+"-"+e.hi} rip</span></button>`).join("")}</div>`:""}).join("")}
+    ${mus.map(m=>{const xs=L.filter(e=>muLbl(e.mu||"Altro")===m);return xs.length?`<p class="grp">${esc(m)}</p><div class="opts">${xs.map(e=>`<button class="opt" data-fx="${e.id}" aria-pressed="${sel.includes(e.id)}"><b>${sel.includes(e.id)?(sel.indexOf(e.id)+1)+". ":""}${esc(e.n)}</b><span>${e.s} serie · ${e.lo===e.hi?e.lo:e.lo+"-"+e.hi} ${e.t==="time"?"s":"rip"}${e.side?" per lato":""}</span></button>`).join("")}</div>`:""}).join("")}
     <button class="btn hot fxgo" id="fxGo" ${sel.length?"":"disabled"}>${sel.length?`Inizia con ${sel.length} esercizi`:"Scegli almeno un esercizio"}</button>`,
    bind:(w,draw,close)=>{w.querySelectorAll("[data-fx]").forEach(b=>b.onclick=()=>{const id=b.dataset.fx,i=sel.indexOf(id);if(i<0)sel.push(id);else sel.splice(i,1);const y=w.querySelector(".sheet").scrollTop;draw();w.querySelector(".sheet").scrollTop=y});
      w.querySelector("#fxGo").onclick=()=>{if(!sel.length)return;S.free={d:iso(today()),ex:sel.slice()};delete S.draft.LIB;rebuild();gymSel="LIB";save();close();go("train")}}})}
@@ -1786,7 +1807,9 @@ const PADEL_LBL={none:"Niente",train:"Allenamento",match:"Partita"};
 const KEY="allenati-scemo.v1";
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.sessions)return s}catch(e){}return {sessions:[],draft:{},week:DEFAULT_WEEK,overrides:{},energy:{},view:"oggi",gym:null}}
 let S=load();
-S.week=S.week||DEFAULT_WEEK;S.overrides=S.overrides||{};S.energy=S.energy||{};S.draft=S.draft||{};S.plans=S.plans||{};S.swaps=S.swaps||{};S.customAlts=S.customAlts||{};S.archive=S.archive||[];S.body=S.body||[];S.pain=S.pain||{};for(const P of Object.values(S.plans))for(const e of P.ex||[])if(/^Alzate laterali al cavo/i.test(e.n||"")&&(e.eq||"mac")==="mac"){e.eq="cavl";e.step=2.5}for(const P of Object.values(S.plans))for(const e of P.ex||[])if(e.n==="Curl panca Scott"&&e.eq==="db"){e.n="Curl Scott con manubri";e.note=e.note||"Kg = un manubrio."}
+// Completa i campi mancanti: all'avvio, dopo "Cancella tutti i dati" e dopo un backup importato (anche vecchio)
+function normS(){S.sessions=Array.isArray(S.sessions)?S.sessions:[];S.week=S.week||JSON.parse(JSON.stringify(DEFAULT_WEEK));S.overrides=S.overrides||{};S.energy=S.energy||{};S.draft=S.draft||{};S.plans=S.plans||{};S.swaps=S.swaps||{};S.customAlts=S.customAlts||{};S.archive=S.archive||[];S.body=S.body||[];S.pain=S.pain||{}}
+normS();for(const P of Object.values(S.plans))for(const e of P.ex||[])if(/^Alzate laterali al cavo/i.test(e.n||"")&&(e.eq||"mac")==="mac"){e.eq="cavl";e.step=2.5}for(const P of Object.values(S.plans))for(const e of P.ex||[])if(e.n==="Curl panca Scott"&&e.eq==="db"){e.n="Curl Scott con manubri";e.note=e.note||"Kg = un manubrio."}
 if(S.deload){const t=new Date();t.setMinutes(t.getMinutes()-t.getTimezoneOffset());if(t.toISOString().slice(0,10)>S.deload.to){S.lastDeload=S.deload.to;delete S.deload}}
 rebuild();
 // Chiede al browser di non cancellare i dati dell'app quando il telefono ha poco spazio
@@ -1823,11 +1846,11 @@ function assess(d){
   if(PLAN[p.gym]?.legs){
     if(p.padel!=="none"){
       const alt=nextLegSlot(d);
-      say("stop",`Gambe e ${p.padel==="match"?"partita":"padel"} nello stesso giorno: le gambe ${alt?`spostale a ${WD_LONG[alt.getDay()]}`:"spostale a un giorno senza padel"}.`);
+      say("stop",`Gambe e ${p.padel==="match"?"partita":"padel"} nello stesso giorno: le gambe ${alt?`spostale a ${WD_LONG[alt.getDay()]} ${alt.getDate()}`:"spostale a un giorno senza padel"}.`);
       if(PLAN.C){r.notes.push("Se vuoi comunque allenarti oggi, fai l'Upper C.");r.gymAlt="C"}
     }else if(t1.padel==="match"){
       const alt=nextLegSlot(addDays(d,1));
-      say("stop",`Partita domani: niente gambe oggi. ${alt?`Spostale a ${WD_LONG[alt.getDay()]}.`:""}`);
+      say("stop",`Partita domani: niente gambe oggi. ${alt?`Spostale a ${WD_LONG[alt.getDay()]} ${alt.getDate()}.`:""}`);
       if(PLAN.C){r.notes.push("Oggi puoi fare l'Upper C o riposare.");r.gymAlt="C"}
     }else if(t2.padel==="match"){
       say("adapt","Partita dopodomani: gambe sì, ma senza Nordic e con una serie in meno sugli esercizi eccentrici pesanti (es. stacco rumeno).");r.mods.add("noEcc");
@@ -1844,7 +1867,7 @@ function assess(d){
       else{say(oh?"adapt":"go",`Padel prima, palestra dopo${oh?". Una serie in meno sulle spinte sopra la testa":""}.`);if(oh)r.mods.add("oh")}
     }else say("go","Niente padel oggi: seduta completa.");
     if(t1.padel==="match"&&t2.padel==="match"&&p.padel==="none"){say("adapt","Partite domani e dopodomani: oggi solo braccia, Copenhagen, cuffia e polso. Petto, dorso e spalle li salti, così arrivi alle partite con le spalle fresche.");r.mods.add("prevOnly");r.notes=r.notes.filter(n=>!/seduta completa/.test(n))}
-    else if(t1.padel==="match"){say("adapt","Partita domani: tieni 1 ripetizione in più in canna su tutto.");r.mods.add("rir")}
+    else if(t1.padel==="match"){say("adapt","Partita domani: niente serie a cedimento, almeno 1 ripetizione in canna su tutto.");r.mods.add("rir")}
   }else{
     if(p.padel==="match")r.notes.push("Giorno di partita. Carboidrati 2-3 h prima, acqua con sali durante, proteine + carboidrati entro 2 h dopo.");
     else if(p.padel==="train")r.notes.push("Solo padel oggi. Se ti avanza tempo: 10 minuti di extrarotazioni e polso.");
@@ -1892,7 +1915,10 @@ const roundStep=(x,st)=>Math.round(x/st)*st;
    Mai in scarico, prima del padel, con energia bassa o in superserie. Le mini-serie non contano per massimale e ranghi. */
 const MYO={mini:5,max:5,rest:15,stop:3};
 const myoEx=ex=>ex.t==="iso"&&!/face pull/i.test(ex.n||"")&&!["Gambe","Core"].includes(ex.mu||(EX[String(ex.id).split("~")[0]]||{}).mu)&&(isCable(ex)||eqOf(ex)==="mac");
-const myoOn=(g,ex,mods,tg)=>!!(tg&&tg.myo)&&!["deload","prePadel","rir","light"].some(m=>mods.has(m))&&!ssOf(g,ex);
+const myoOn=(g,ex,mods,tg)=>!!(tg&&tg.myo)&&!["deload","prePadel","rir","light","prevOnly"].some(m=>mods.has(m))&&!ssOf(g,ex);
+// Giorni senza myo-rep (padel dopo, partita domani, scarico, energia bassa, superserie): il messaggio dice serie normali
+function myoOffMsg(g,ex,mods,tg){const why=mods.has("deload")?"scarico":mods.has("prePadel")?"padel dopo la palestra":mods.has("rir")?"partita domani":mods.has("light")?"seduta alleggerita":ssOf(g,ex)?"superserie":"oggi";
+  return `Oggi niente myo-rep (${why}): serie normali a ${fk(tg.kg)} kg, ${ex.hi} ripetizioni dove ci arrivi.`}
 const myoTxt=x=>Array.isArray(x.myo)&&x.myo.length?"+"+x.myo.join("+"):"";
 function target(ex){
   const h=history(ex.id).filter(x=>!x.deload),last=h[0];
@@ -1906,10 +1932,11 @@ function target(ex){
   if(fx&&(fx.lo!==ex.lo||fx.hi!==ex.hi)&&!["time","perf","nordic","bw"].includes(ex.t)){
     const ls=last.sets[ex.id].filter(x=>num(x.reps)!=null&&num(x.kg)>0);
     if(ls.length){const st=stepOf(ex),lk=Math.max(...ls.map(x=>num(x.kg))),best=Math.max(...ls.map(x=>e1rm(num(x.kg),num(x.reps))));
-      let k=Math.max(st,roundStep(best/(1+ex.lo/30),st));if(ex.lo>fx.lo)k=Math.min(k,lk);
+      let k=Math.max(st,Math.floor(best/(1+ex.lo/30)/st+1e-9)*st);if(ex.lo>fx.lo)k=Math.min(k,lk);
       const dn=PLAN[last.day]?PLAN[last.day].name:"un altro giorno";
       return {kg:k,reps:Array(ex.s).fill(ex.lo),kind:"flat",badge:"",msg:`Ultima volta in ${dn} (${fk(lk)} kg, range ${fx.lo}-${fx.hi}): qui il range è ${rr}, carico ricalcolato.`}}}
-  const sets=last.sets[ex.id].filter(x=>num(x.reps)!=null);
+  // Serie salvate senza kg (prima seduta, carico scritto solo sulla prima): valgono quelli della serie prima
+  let pk0=null;const sets=last.sets[ex.id].filter(x=>num(x.reps)!=null).map(x=>{if(num(x.kg)!=null){pk0=x.kg;return x}return pk0!=null&&ex.t!=="bw"?{...x,kg:pk0}:x});
   const reps=sets.map(x=>num(x.reps));
   const kgs=sets.map(x=>num(x.kg)).filter(v=>v!=null);
   const kg=kgs.length?Math.max(...kgs):null;
@@ -1922,8 +1949,10 @@ function target(ex){
   // Isolamento e prevenzione con un gradino grosso rispetto al carico (>15%, es. extrarotazione 5 → 10 kg): prima si va oltre il range con le ripetizioni
   const cap=kg>0?eqMax(ex):null,atCap=cap&&kg+st>cap+1e-6;
   // Pacco finito: niente più kg, si continua con le ripetizioni (fino a +10 oltre il range, poi discesa più lenta)
-  const big=!atCap&&(ex.t==="iso"||ex.t==="prev")&&kg>0&&st/kg>0.15;
-  const top=atCap?Math.min(30,ex.hi+10):big?Math.min(30,ex.hi+5):ex.hi;
+  // Esercizi con myo-rep (isolamento a macchina o cavo): al gradino grosso si passa ai myo-rep, non al range esteso
+  const mx=myoEx(ex)&&kg>0;
+  const big=!atCap&&!mx&&(ex.t==="iso"||ex.t==="prev")&&kg>0&&st/kg>0.15;
+  const top=mx?ex.hi:atCap?Math.min(30,ex.hi+10):big?Math.min(30,ex.hi+5):ex.hi;
   const allTop=full&&hReps.every(r=>r>=top);
   const allIn=reps.every(r=>r>=ex.lo);
   const prev=h[1]?h[1].sets[ex.id].filter(x=>num(x.reps)!=null).map(x=>num(x.reps)):null;
@@ -1950,12 +1979,13 @@ function target(ex){
   }
   if(allTop&&atCap)return {kg,reps:Array(ex.s).fill(top),top,kind:"flat",badge:"Max pacco",msg:`${fk(kg)} kg è il massimo del pacco e sei a ${top} ripetizioni: stesso carico, discesa in 3 secondi e 1 secondo fermo in chiusura.`};
   if(allTop){
-    if(eff==="hard"&&ex.t==="comp")return {kg,reps:Array(ex.s).fill(ex.hi),top,kind:"flat",badge:"=",msg:`Range chiuso ma al limite: stesso carico e stesse ripetizioni. Aumenti quando ti restano ${ex.rir} in canna.`};
+    if(eff==="hard"&&(ex.t==="comp"||ex.t==="bw"))return {kg,reps:Array(ex.s).fill(ex.hi),top,kind:"flat",badge:"=",msg:`Range chiuso ma al limite: ${ex.t==="bw"&&!kg?"niente zavorra per ora,":"stesso carico e"} stesse ripetizioni. Aumenti quando ti restano ${ex.rir} in canna.`};
     let inc=st;
     if(ex.t==="comp"&&kg)inc=Math.max(st,roundStep(kg*(ex.lower?0.05:0.025),st));
     const easy=eff==="easy"&&(ex.t==="comp"||ex.t==="bw")&&(!kg||(inc+st)/kg<=0.1);
     if(easy)inc+=st;
     if(ex.t==="bw"&&!kg)return {kg:inc,reps:Array(ex.s).fill(ex.lo),top,kind:"up",badge:"Zavorra",msg:`Chiuse tutte a ${ex.hi}: aggiungi ${fk(inc)} kg di zavorra e riparti da ${ex.lo}.`};
+    if(kg==null&&ex.t!=="bw"&&eqOf(ex)!=="altro")return {kg:null,reps:Array(ex.s).fill(ex.lo),top,kind:"flat",badge:"",msg:`Chiuse tutte a ${top}, ma senza kg segnati: scrivi il carico che usi e da lì sale da solo.`};
     if(kg==null&&ex.t!=="bw"){const fx=/flexbar/i.test(ex.n);return {kg:null,reps:Array(ex.s).fill(ex.lo),top,kind:"up",badge:"Più duro",msg:`Chiuse tutte a ${top}: passa a ${fx?"una Flexbar":"un elastico"} più dur${fx?"a":"o"} e riparti da ${ex.lo}.`}}
     let nk=(kg||0)+inc;if(cap&&nk>cap)nk=cap;
     // Gradino grosso (es. cavo singolo, 7,5 → 10 kg = +33%): al carico nuovo non si riparte dal minimo del range ma dalle ripetizioni che il massimale stimato permette
@@ -1971,13 +2001,13 @@ function target(ex){
     return {kg:nk,reps:Array(ex.s).fill(ex.lo),top,kind:"down",badge:nk<kg?`-${fk(kg-nk)} kg`:"=",msg:`Due sedute sotto le ${ex.lo} ripetizioni: scendi a ${fk(nk)} kg e ricostruisci.`};
   }
   if(!allIn&&kg>0&&(ex.t==="iso"||ex.t==="prev")&&st/kg>0.15&&!(missTwice&&prev&&sm(reps)<sm(prev)))return {kg,reps:pad(reps.map(r=>Math.min(ex.lo,r+1)),ex.s,ex.lo),top,kind:"up",badge:"+1 rip",msg:`Stesso carico: il gradino da ${fk(st)} kg è grosso, si risale una ripetizione per serie fino a ${ex.lo}.`};
-  if(!allIn)return {kg,reps:Array(ex.s).fill(ex.lo),top,kind:"flat",badge:"=",msg:`${kg==null&&ex.t!=="bw"?"Stesso elastico":"Stesso carico"}, obiettivo ${ex.lo} ripetizioni su tutte le serie.`};
+  if(!allIn)return {kg,reps:Array(ex.s).fill(ex.lo),top,kind:"flat",badge:"=",msg:`${kg==null&&ex.t!=="bw"&&eqOf(ex)==="altro"?"Stesso elastico":"Stesso carico"}, obiettivo ${ex.lo} ripetizioni su tutte le serie.`};
   if(!full&&hReps.length&&hReps.every(r=>r>=top))return {kg,reps:Array(ex.s).fill(top),top,kind:"flat",badge:"=",msg:`Fai tutte le serie previste a ${fk(kg)} kg: poi sale il carico.`};
   const add=eff==="easy"?2:1;
   const nr=pad(reps.map(r=>Math.min(top,r+add)),ex.s,ex.lo);
   const over=big&&reps.every(r=>r>=ex.hi);
   if(atCap&&reps.every(r=>r>=ex.hi))return {kg,reps:nr,top,kind:"up",badge:`+${add} rip`,msg:`${fk(kg)} kg è il massimo del pacco: si sale con le ripetizioni, fino a ${top}.`};
-  return {kg,reps:nr,top,kind:"up",badge:`+${add} rip`,msg:over?`Il prossimo peso è un salto del ${Math.round(st/kg*100)}%: prima porta tutte le serie a ${top} ripetizioni.`:add===2?`Era facile: ${kg==null&&ex.t!=="bw"?"stesso elastico":"stesso carico"}, due ripetizioni in più per serie.`:`${kg==null&&ex.t!=="bw"?"Stesso elastico":"Stesso carico"}, una ripetizione in più per serie.`};
+  return {kg,reps:nr,top,kind:"up",badge:`+${add} rip`,msg:over?`Il prossimo peso è un salto del ${Math.round(st/kg*100)}%: prima porta tutte le serie a ${top} ripetizioni.`:add===2?`Era facile: ${kg==null&&ex.t!=="bw"&&eqOf(ex)==="altro"?"stesso elastico":"stesso carico"}, due ripetizioni in più per serie.`:`${kg==null&&ex.t!=="bw"&&eqOf(ex)==="altro"?"Stesso elastico":"Stesso carico"}, una ripetizione in più per serie.`};
 }
 function lastKg(ex){const l=history(ex.id).filter(x=>!x.deload)[0];if(!l)return null;const k=l.sets[ex.id].map(x=>num(x.kg)).filter(v=>v!=null);return k.length?Math.max(...k):null}
 function tgFor(ex,mods){const t=target(ex);if(!mods.has("deload")||["perf","time","nordic"].includes(ex.t))return t;const k=lastKg(ex);return {...t,kg:k,reps:Array(ex.s).fill(ex.lo),kind:"flat",badge:"Scarico",msg:`Stesso carico dell'ultima volta, ${ex.lo} ripetizioni, 3-4 in canna.`}}
@@ -1996,8 +2026,9 @@ function stalled(ex){if(["perf","time","nordic"].includes(ex.t))return false;con
   if(ph==="def"){const m=s=>Math.max(0,...s.sets[ex.id].map(x=>metricOf(ex,x)));return stallBy(ph,h.slice(0,4).map(m))}
   // Massa e mantenimento: fermo solo se in 3 sedute non sono saliti né i kg massimi né il massimale stimato della serie migliore
   // (salire di carico perdendo qualche ripetizione non è uno stallo; il numero di serie non conta)
-  const kg=s=>Math.max(0,...s.sets[ex.id].map(x=>num(x.kg)||0)),bm=s=>Math.max(0,...s.sets[ex.id].map(x=>metricOf(ex,x)));
-  return !(kg(h[0])>kg(h[3]))&&!(bm(h[0])>bm(h[3])+1e-9)}
+  // Doppia progressione: allo stesso carico contano anche le ripetizioni totali (8/7/7/7 → 8/8/8/8 è un progresso)
+  const kg=s=>Math.max(0,...s.sets[ex.id].map(x=>num(x.kg)||0)),bm=s=>Math.max(0,...s.sets[ex.id].map(x=>metricOf(ex,x))),rt=(s,k)=>s.sets[ex.id].filter(x=>(num(x.kg)||0)>=k).reduce((a,x)=>a+(num(x.reps)||0),0);
+  return !(kg(h[0])>kg(h[3]))&&!(bm(h[0])>bm(h[3])+1e-9)&&!(kg(h[0])===kg(h[3])&&rt(h[0],kg(h[0]))>rt(h[3],kg(h[3])))}
 const deloadOn=(d=today())=>!!S.deload&&iso(d)>=S.deload.from&&iso(d)<=S.deload.to;
 function deloadAdvice(){
   if(S.deload||!S.sessions.length)return null;if(S.deloadSnooze&&iso(today())<S.deloadSnooze)return null;
@@ -2043,7 +2074,7 @@ function go(v){const from=view,upd=()=>{view=v;if(v!=="edit"){S.view=v;save()}re
   // Oggi <-> Allenamento: la scheda della seduta si trasforma nell'intestazione (e ritorno)
   const pair=(from==="oggi"&&v==="train")||(from==="train"&&v==="oggi");
   if(pair&&document.startViewTransition&&!RM()){const h=document.documentElement;h.classList.add("vt-sed");h.classList.toggle("vt-back",v==="oggi");
-    const t=document.startViewTransition(upd);t.finished.finally(()=>h.classList.remove("vt-sed","vt-back"));return}
+    const t=vtTrack(document.startViewTransition(upd));t.finished.finally(()=>h.classList.remove("vt-sed","vt-back"));return}
   upd();if(from!==v)slideIn((VORD[v]??0)>=(VORD[from]??0)?"in-r":"in-l")}
 document.querySelectorAll("nav.bar button").forEach(b=>b.onclick=()=>go(b.dataset.v));
 
@@ -2076,7 +2107,7 @@ const ERRS={
  "face pull":["Tirare verso il petto: la corda arriva all'altezza degli occhi.","Gomiti bassi: tienili alti, all'altezza delle spalle."],
  "curl scott con manubri":["Gomiti che si sollevano dal cuscino: tieni le braccia appoggiate fino in fondo.","Stendere di scatto in basso: rallenta negli ultimi centimetri."],
  "pushdown al cavo":["Gomiti che si staccano dai fianchi: tienili fermi, si muove solo l'avambraccio.","Busto che si piega sopra il cavo per spingere: resta dritto e usa meno peso."],
- "pushdown con corda":["Gomiti che si staccano dai fianchi: tienili fermi, si muove solo l'avambraccio.","Non aprire la corda in basso: allarga le mani a fine spinta."],
+ "pushdown con corda":["Gomiti che si staccano dai fianchi: tienili fermi, si muove solo l'avambraccio.","Braccia che si fermano prima della fine: stendile del tutto e in fondo apri la corda ai lati delle cosce."],
  "butterfly alla macchina":["Gomiti oltre la linea del corpo: fermati prima che la spalla tiri.","Spalle che si staccano dallo schienale: tienile appoggiate per tutta la serie."],
  "pullover al cavo":["Piegare i gomiti come in un pushdown: restano quasi tesi.","Schiena che si inarca: addome contratto."],
  "reverse fly":["Strattonare: movimento lento e controllato.","Spalle che salgono: scapole basse, lavora la parte dietro della spalla."],
@@ -2114,7 +2145,7 @@ const ERRS={
  "squat jump":["Atterraggio rigido a gambe tese: atterra morbido piegando anche e ginocchia.", "Ripetizioni di rimbalzo: fermati in equilibrio prima del salto successivo."],
  "salto in lungo da fermo":["Ginocchia che cadono verso l'interno all'atterraggio: tienile in linea con i piedi.", "Atterraggio sbilanciato in avanti: atterra a ginocchia piegate e resta fermo prima di rialzarti."],
  "squat al smith":["Piedi sotto il bilanciere: mettili poco avanti, così le ginocchia restano in linea.", "Ginocchia che cadono verso l'interno: spingile in linea con le punte dei piedi."],
- "goblet squat":["Busto che cade in avanti: manubrio stretto al petto, petto alto.", "Talloni che si staccano: spingi da tutto il piede, peso sui talloni."],
+ "goblet squat":["Busto che cade in avanti: manubrio stretto al petto, petto alto.", "Talloni che si staccano: tieni tutto il piede a terra e spingi dal centro del piede verso i talloni."],
  "stacco rumeno con manubri":["Schiena che si incurva: scendi solo finché resta dritta.", "Piegare le ginocchia come uno squat: restano appena piegate, va indietro il bacino."],
  "pull-through al cavo":["Tirare con le braccia: restano tese, il lavoro lo fa il bacino.", "Schiena inarcata in cima: chiudi stringendo i glutei, senza piegarti indietro."],
  "affondi camminati":["Passo troppo corto: allunga il passo, il ginocchio davanti resta sopra il piede.", "Ginocchio davanti che cade verso l'interno: tienilo in linea con il piede."],
@@ -2165,7 +2196,11 @@ const MUSC={
  "calf in piedi":"Polpacci","copenhagen plank":"Adduttori (interno coscia) e core","extrarotazione al cavo":"Cuffia dei rotatori (infraspinato e piccolo rotondo)",
  "estensione del polso":"Estensori del polso (avambraccio)","estensione del polso con elastico":"Estensori del polso (avambraccio)","flexbar (tyler twist)":"Estensori del polso e tendini del gomito",
  "skater jump, arrivo bloccato":"Glutei e quadricipiti, in modo esplosivo","box jump":"Quadricipiti, glutei e polpacci, in modo esplosivo",
- "woodchop al cavo":"Obliqui e core","landmine press":"Spalla anteriore e petto alto","pallof press":"Addome e obliqui (anti-rotazione)","face pull":"Spalla posteriore e muscoli tra le scapole"};
+ "woodchop al cavo":"Obliqui e core","landmine press":"Spalla anteriore e petto alto",
+ "alzate laterali al cavo":"Deltoide laterale (spalla di lato)","alzate laterali manubri":"Deltoide laterale (spalla di lato)","alzate laterali alla macchina":"Deltoide laterale (spalla di lato)",
+ "reverse fly":"Deltoide posteriore e muscoli tra le scapole","reverse fly alla macchina":"Deltoide posteriore e muscoli tra le scapole","reverse fly ai cavi":"Deltoide posteriore e muscoli tra le scapole","reverse fly con manubri":"Deltoide posteriore e muscoli tra le scapole","reverse fly con manubri a busto flesso":"Deltoide posteriore e muscoli tra le scapole",
+ "pullover al cavo":"Gran dorsale (braccia tese)","pullover alla macchina":"Gran dorsale (braccia tese)","pullover con manubrio":"Gran dorsale e petto (braccia tese)",
+ "croci ai cavi dal basso":"Petto, soprattutto la parte alta","croci ai cavi":"Petto","croci su panca inclinata con manubri":"Petto, soprattutto la parte alta","croci con manubri su panca piana":"Petto","pallof press":"Addome e obliqui (anti-rotazione)","face pull":"Spalla posteriore e muscoli tra le scapole"};
 const PWHY={
  "extrarotazione al cavo":"Nel padel protegge la spalla nei colpi sopra la testa.","estensione del polso":"Nel padel protegge il gomito del braccio della racchetta.",
  "estensione del polso con elastico":"Nel padel protegge il gomito del braccio della racchetta.","flexbar (tyler twist)":"Nel padel protegge il gomito del braccio della racchetta.",
@@ -2244,7 +2279,7 @@ function summarySheet(sess){
       ${sess.dur&&prev.dur?`<div><span>Durata</span><em>${prev.dur} → ${sess.dur} min</em></div>`:""}
       ${com?`<div><span>Esercizi migliorati</span><em class="${up?"up":""}">${up} su ${com}</em></div>`:""}</section>`}
   openSheet({html:()=>`<h2>${esc(sess.planName||"Seduta")} salvata</h2>
-    <div class="tiles"><div class="tile"><b>${sess.dur??"—"}</b><span>minuti</span></div><div class="tile"><b>${st.n}</b><span>serie</span></div><div class="tile"><b>${Math.round(st.vol).toLocaleString("it-IT")}</b><span>kg sollevati</span></div></div>
+    <div class="tiles"><div class="tile"><b>${sess.dur??"—"}</b><span>${sess.dur===1?"minuto":"minuti"}</span></div><div class="tile"><b>${st.n}</b><span>serie</span></div><div class="tile"><b>${Math.round(st.vol).toLocaleString("it-IT")}</b><span>kg sollevati</span></div></div>
     ${rankPromoHTML(ups)}
     ${recs.length?`<section class="sumr"><b>Record (massimale stimato)</b><ul>${recs.join("")}</ul></section>`:""}
     ${cmp||`<p class="note" style="margin:0">Prima volta con questa seduta: il confronto parte dalla prossima.</p>`}
@@ -2293,7 +2328,8 @@ function goldEnd(card){buzz([50,40,50,40,120]);if(RM()||card)return;const slot=d
   slot.innerHTML=`<div class="gold-end" aria-hidden="true"><i></i></div>`;clearTimeout(celebrate.t);celebrate.t=setTimeout(()=>{slot.innerHTML=""},1500)}
 // Passaggi tra le sezioni
 const VORD={oggi:0,train:1,prog:2,set:3,imp:4,edit:5};
-function slideIn(c){if(RM())return;app.classList.remove("in-r","in-l");void app.offsetWidth;app.classList.add(c)}
+// Solo opacità (150 ms): resta anche con Riduci movimento, che toglie i movimenti ma non le dissolvenze
+function slideIn(c){app.classList.remove("in-r","in-l");void app.offsetWidth;app.classList.add(c)}
 app.addEventListener("animationend",e=>{if(e.target===app)app.classList.remove("in-r","in-l")});
 
 const I=n=>`<svg class="ic" aria-hidden="true"><use href="#i-${n}"/></svg>`;
@@ -2317,7 +2353,7 @@ const HOW={
  "copenhagen plank":["Di fianco su un avambraccio, gamba sopra appoggiata sulla panca (caviglia o ginocchio), gamba sotto libera.", "Solleva il bacino finché il corpo è dritto dalla testa ai piedi e tieni la posizione per i secondi indicati."],
  "calf in piedi":["Spalle sotto i cuscinetti, avampiedi sul bordo del gradino, gambe tese.", "Scendi coi talloni sotto il gradino e fermati 1 s, poi sali in punta più in alto possibile."],
  "woodchop al cavo":["Di fianco alla colonna, cavo alto, maniglia con due mani sopra la spalla vicina, piedi larghi.", "Tira in diagonale verso il fianco opposto ruotando anche e busto, braccia quasi tese; torna controllato."],
- "extrarotazione al cavo":["Di fianco al cavo regolato all'altezza del gomito, gomito a 90° attaccato al fianco, mano davanti alla pancia.", "Ruota l'avambraccio verso l'esterno tenendo il gomito fermo al fianco; torna lento."],
+ "extrarotazione al cavo":["Di fianco al cavo regolato all'altezza del gomito, con il braccio che lavora dal lato LONTANO dalla colonna; gomito a 90° attaccato al fianco, mano davanti alla pancia.", "Ruota l'avambraccio verso l'esterno tenendo il gomito fermo al fianco; torna lento."],
  "estensione del polso":["Seduto, avambraccio appoggiato sulla coscia, palmo verso il basso, mano oltre il ginocchio con un manubrio leggero.", "Alza il dorso della mano piegando solo il polso; scendi in 3 s."],
  "landmine press":["In ginocchio su una gamba o in piedi, estremità del bilanciere in una mano davanti alla spalla, l'altra estremità fissata a terra.", "Spingi in alto e in avanti fino al braccio teso; torna alla spalla controllando."],
  "lento manubri seduto":["Seduto con lo schienale quasi verticale, manubri all'altezza delle spalle, gomiti un po' in avanti.", "Spingi in alto fino a braccia quasi tese; scendi finché i manubri arrivano all'altezza delle orecchie."],
@@ -2422,7 +2458,10 @@ let sheetN=0;
 /* Transizioni con View Transitions (2026-10-13). Senza supporto o con "Riduci movimento" si cambia subito, come prima */
 let vtSheet=false;
 const vtOk=()=>!!document.startViewTransition&&!RM();
-function vtRun(cls,upd){const h=document.documentElement;h.classList.add(cls);const t=document.startViewTransition(upd);t.finished.finally(()=>h.classList.remove(cls));return t}
+// Un tocco durante una transizione la chiude subito, così il tocco dopo non va perso
+let curVT=null;document.addEventListener("pointerdown",()=>{if(curVT)try{curVT.skipTransition()}catch(e){}},true);
+function vtTrack(t){curVT=t;t.finished.finally(()=>{if(curVT===t)curVT=null});return t}
+function vtRun(cls,upd){const h=document.documentElement;h.classList.add(cls);const t=vtTrack(document.startViewTransition(upd));t.finished.finally(()=>h.classList.remove(cls));return t}
 // Foglio che si apre dall'elemento toccato: l'elemento (o il suo riquadro, se è un pezzo di SVG) diventa il foglio
 function sheetFrom(src,open){
   if(!vtOk()||!src||!src.isConnected){open();return}
@@ -2446,13 +2485,13 @@ function skinVT(e,upd){
   const x=e&&e.clientX?e.clientX:innerWidth/2,y=e&&e.clientY?e.clientY:innerHeight/2,r=Math.hypot(Math.max(x,innerWidth-x),Math.max(y,innerHeight-y));
   const t=vtRun("vt-skin",upd);
   t.ready.then(()=>document.documentElement.animate({clipPath:[`circle(0px at ${x}px ${y}px)`,`circle(${r}px at ${x}px ${y}px)`]},{duration:560,easing:"cubic-bezier(.23,1,.32,1)",pseudoElement:"::view-transition-new(root)"})).catch(()=>{})}
-function sheetFx(wrap,close){if(!RM()&&!vtSheet){wrap.classList.add("enter");setTimeout(()=>wrap.classList.remove("enter"),340)}
+function sheetFx(wrap,close){if(!RM()&&!vtSheet){wrap.classList.add("enter");setTimeout(()=>wrap.classList.remove("enter"),340)}else if(RM()){wrap.classList.add("rmfade")}
   let y0=null,dy=0,pts=[];const sh=()=>wrap.querySelector(".sheet");
   wrap.addEventListener("pointerdown",e=>{if(!e.target.closest(".grab,.sheet h2")||sh().scrollTop>0)return;y0=e.clientY;dy=0;pts=[[e.clientY,performance.now()]];sh().style.transition="none";try{e.target.setPointerCapture(e.pointerId)}catch(_){}});
   wrap.addEventListener("pointermove",e=>{if(y0==null)return;const raw=e.clientY-y0;dy=raw<0?raw*.2:raw;const t=performance.now();pts.push([e.clientY,t]);while(pts.length>2&&t-pts[0][1]>80)pts.shift();sh().style.transform=`translateY(${dy}px)`});
   const end=()=>{if(y0==null)return;y0=null;const s=sh();s.style.transition="";const a=pts[0],b=pts[pts.length-1],v=b&&a&&b[1]>a[1]?(b[0]-a[0])/(b[1]-a[1]):0;if(dy>90||(v>.5&&dy>10)){close()}else{s.style.transform=""}};
   wrap.addEventListener("pointerup",end);wrap.addEventListener("pointercancel",end)}
-function sheetOut(wrap){if(RM()||!wrap.isConnected){wrap.remove();return}const s=wrap.querySelector(".sheet");if(s){s.style.transition="";s.style.transform=""}wrap.classList.add("out");setTimeout(()=>wrap.remove(),200)}
+function sheetOut(wrap){if(!wrap.isConnected)return;if(RM()){wrap.style.transition="opacity .15s";wrap.style.opacity="0";wrap.style.pointerEvents="none";setTimeout(()=>wrap.remove(),160);return}const s=wrap.querySelector(".sheet");if(s){s.style.transition="";s.style.transform=""}wrap.classList.add("out");setTimeout(()=>wrap.remove(),200)}
 // Esc chiude anche i fogli costruiti a mano (Sostituisci)
 document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;const w=[...document.querySelectorAll(".sheet-wrap:not(.out)")].pop();if(w&&!w.dataset.esc)sheetOut(w)});
 function openSheet(build){
@@ -2545,7 +2584,8 @@ function renderToday(){
 let openEx={};
 function trainMods(g){const a=assess(today());const mods=new Set(a.gym===g?a.mods:[]);if(deloadOn())mods.add("deload");return mods}
 function trainList(g,mods){const L=PLAN[g].ex.map(e=>({ex:effEx(g,e),base:e}));if(!mods.has("prePadel"))return L;return [...L.filter(x=>x.ex.t!=="prev"),...L.filter(x=>x.ex.t==="prev")]}
-const doneCount=(g,id)=>(draftFor(g).ex[id]||[]).filter(x=>x.done).length;
+// pre: serie già fatte con l'esercizio di prima, tenute dopo un "Cambia" a metà
+const doneCount=(g,id)=>(draftFor(g).ex[id]||[]).filter(x=>x.done).length+((draftFor(g).pre||{})[id]||0);
 function exDone(g,ex,mods){const n=setsFor(ex,mods);if(n===0)return true;if(doneCount(g,ex.id)<n)return false;
   const r=(draftFor(g).ex[ex.id]||[])[n-1];return !(r&&r.done&&Array.isArray(r.myo)&&!r.myoEnd)}
 const noEff=ex=>["perf","time","nordic"].includes(ex.t);
@@ -2574,7 +2614,7 @@ function renderTrain(){
       return;
     }
     const tg=tgFor(ex,mods),rng=(ex.lo===ex.hi?ex.lo:ex.lo+"-"+ex.hi)+(ex.t==="time"?" s":"");
-    nextH.push(`<button class="xrow" data-open="${ex.id}"><span class="ck o">${i+1}</span><span class="nmw"><span class="nm">${esc(ex.n)}</span>${qmark(ex)}</span><em>${n}×${rng}${tg.kg>0&&!noEff(ex)?" · "+fk(tg.kg)+" kg":""}</em></button>`);
+    nextH.push(`<button class="xrow" data-open="${ex.id}"><span class="ck o">${L.filter((x,k)=>k<=i&&setsFor(x.ex,mods)>0).length}</span><span class="nmw"><span class="nm">${esc(ex.n)}</span>${qmark(ex)}</span><em>${n}×${rng}${tg.kg>0&&!noEff(ex)?" · "+fk(tg.kg)+" kg":""}</em></button>`);
   });
   if(curH.length&&askH.length){curH[0]=curH[0].replace("<!--ASK-->",askH.join(""));askH.length=0}
   html=askH.join("")+curH.join("")+(nextH.some(h=>h.startsWith("<button")||h.startsWith("<div"))?`<p class="grp">Prossimi</p>`+nextH.join(""):"")+(doneH.length?`<p class="grp">Fatti</p>`+doneH.join(""):"");
@@ -2591,7 +2631,7 @@ function renderTrain(){
   ${!first&&dn?"":`<button class="btn hot" id="finish">Termina e salva</button>`}<button class="lnk clr" id="clear">Svuota la seduta</button>
   <p class="msg" id="msg" aria-live="polite"></p>`;
   document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{gymSel=b.dataset.k;S.gym=gymSel;save();renderTrain()});
-  document.querySelectorAll("#exs input[data-f]").forEach(i=>i.oninput=()=>{const v=i.dataset.f==="kg"?i.value.replace(/[^\d.,]/g,""):i.value.replace(/\D/g,"").slice(0,3);if(v!==i.value)i.value=v;cell(g,i.dataset.ex,+i.dataset.j)[i.dataset.f]=v.trim();save()});
+  document.querySelectorAll("#exs input[data-f]").forEach(i=>i.oninput=()=>{const v=i.dataset.f==="kg"?i.value.replace(/[^\d.,]/g,"").replace(/([.,].*?)[.,]/g,"$1").slice(0,6):i.value.replace(/\D/g,"").slice(0,3);if(v!==i.value)i.value=v;cell(g,i.dataset.ex,+i.dataset.j)[i.dataset.f]=v.trim();save()});
   document.querySelectorAll("#exs .tick:not(.mt)").forEach(b=>b.onclick=()=>toggleSet(g,b.dataset.ex,+b.dataset.j,mods));
   document.querySelectorAll("#exs [data-myot]").forEach(b=>b.onclick=()=>myoTick(g,b.dataset.myot,+b.dataset.j,mods));
   document.querySelectorAll("#exs [data-myoend]").forEach(b=>b.onclick=()=>myoFinish(g,b.dataset.myoend,+b.dataset.j,mods));
@@ -2687,16 +2727,23 @@ function audioUnlock(){if(S.sound===false)return;try{if(navigator.audioSession)n
 function beep(){if(S.sound===false||!actx)return;try{const t=actx.currentTime+.02;[[0,880],[.2,880],[.4,1320]].forEach(([d,f])=>{const o=actx.createOscillator(),gn=actx.createGain();o.type="sine";o.frequency.value=f;gn.gain.setValueAtTime(.0001,t+d);gn.gain.exponentialRampToValueAtTime(.4,t+d+.02);gn.gain.exponentialRampToValueAtTime(.0001,t+d+(d>.3?.32:.16));o.connect(gn);gn.connect(actx.destination);o.start(t+d);o.stop(t+d+.35)})}catch(e){}}
 function swipeBind(g,L,curId,mods){
   const ids=L.filter(x=>setsFor(x.ex,mods)>0).map(x=>x.ex.id),i=ids.indexOf(curId);if(i<0)return;
-  const go=dir=>{const k=i+dir;if(k<0||k>=ids.length)return;openEx[g]=ids[k];renderTrain();const c=document.querySelector("#exs .ex.cur");if(c&&!RM()){c.classList.add(dir>0?"sw-n":"sw-p")}keepFocus(false);try{navigator.vibrate&&navigator.vibrate(10)}catch(e){}};
+  const go=dir=>{const k=i+dir;if(k<0||k>=ids.length)return;openEx[g]=ids[k];renderTrain();const c=document.querySelector("#exs .ex.cur");if(c&&!RM()){c.classList.add(dir>0?"sw-n":"sw-p")}keepFocus(false);buzz(10)};
   const c=document.querySelector("#exs .ex.cur");if(!c)return;
   c.insertAdjacentHTML("afterbegin",`<div class="pgr"><button data-sw="-1" aria-label="Esercizio precedente" ${i===0?"disabled":""}>‹</button><span>${i+1} di ${ids.length}</span><button data-sw="1" aria-label="Esercizio successivo" ${i===ids.length-1?"disabled":""}>›</button></div>`);
   c.querySelectorAll("[data-sw]").forEach(b=>b.onclick=()=>go(+b.dataset.sw));
-  let x0=null,y0=0,t0=0;
-  c.addEventListener("touchstart",e=>{if(e.target.closest("input,textarea,select,.pm,.tick")){x0=null;return}const t=e.touches[0];x0=t.clientX;y0=t.clientY;t0=Date.now()},{passive:true});
-  c.addEventListener("touchend",e=>{if(x0==null)return;const t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0;x0=null;if(Math.abs(dx)<60||Math.abs(dx)<Math.abs(dy)*1.6||Date.now()-t0>800)return;go(dx<0?1:-1)},{passive:true});
+  // La scheda segue il dito; cambia se la trascini oltre 60 px o con un colpetto veloce, altrimenti torna al suo posto
+  let x0=null,y0=0,t0=0,hz=null,dx=0;
+  const back=()=>{c.style.transition="transform .2s cubic-bezier(.23,1,.32,1)";c.style.transform="";setTimeout(()=>{c.style.transition=""},220)};
+  c.addEventListener("touchstart",e=>{if(e.target.closest("input,textarea,select,.pm,.tick,button,summary")){x0=null;return}const t=e.touches[0];x0=t.clientX;y0=t.clientY;t0=performance.now();hz=null;dx=0},{passive:true});
+  c.addEventListener("touchmove",e=>{if(x0==null)return;const t=e.touches[0];dx=t.clientX-x0;const dy=t.clientY-y0;
+    if(hz==null&&(Math.abs(dx)>10||Math.abs(dy)>10))hz=Math.abs(dx)>Math.abs(dy)*1.2;
+    if(hz&&!RM()){const edge=(dx>0&&i===0)||(dx<0&&i===ids.length-1);c.style.transition="";c.style.transform=`translateX(${(dx*(edge?.15:.5)).toFixed(1)}px)`}},{passive:true});
+  c.addEventListener("touchend",()=>{if(x0==null)return;x0=null;if(!hz){return}const v=Math.abs(dx)/Math.max(1,performance.now()-t0),k=i+(dx<0?1:-1);
+    if((Math.abs(dx)>60||v>.3&&Math.abs(dx)>20)&&k>=0&&k<ids.length){c.style.transform="";go(dx<0?1:-1)}else back()},{passive:true});
+  c.addEventListener("touchcancel",()=>{if(x0!=null){x0=null;back()}},{passive:true});
 }
 function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
-  const n=setsFor(ex,mods),tg=tgFor(ex,mods),last=history(ex.id)[0];
+  const pre=(dr.pre||{})[ex.id]||0,n=Math.max(0,setsFor(ex,mods)-pre),tg=tgFor(ex,mods),last=history(ex.id)[0];
   const rows=dr.ex[ex.id]||[];
   const unit=ex.t==="time"?"s":"rip";
   const hasKg=!["perf","nordic","time"].includes(ex.t);
@@ -2709,11 +2756,15 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   for(let j=0;j<Math.max(n,rows.filter(r=>r.done).length);j++){
     const r=rows[j]||{};
     const now=!r.done&&!nowSet;if(now)nowSet=true;
-    const kgV=r.kg!=null?r.kg:(tg.kg!=null?fk(tg.kg):"");
+    // Serie senza kg propri: prende quelli dell'ultima serie fatta (alla prima seduta il carico lo scrivi una volta sola)
+    const pk=rows.slice(0,j).reverse().find(x=>x.done&&num(x.kg)!=null);
+    const kgV=r.kg!=null&&r.kg!==""?r.kg:pk?pk.kg:(tg.kg!=null?fk(tg.kg):"");
     const rpV=r.reps!=null?r.reps:String(tg.reps[j]??ex.lo);
     const pm=(f,d)=>r.done?"":`<button class="pm" data-pm="${f}" data-d="${d}" data-ex="${ex.id}" data-j="${j}" aria-label="${d>0?"Più":"Meno"} ${f==="kg"?"kg":unit}, serie ${j+1}">${d>0?"+":"−"}</button>`,fw=r.done?"label":"div";
     const isM=myoA&&j===n-1;
-    sets+=`<div class="set ${r.done?"done":""} ${now?"now":""} ${isM?"myom":""}"><span class="i"${isM?' title="Serie myo-rep"':""}>${isM?"M":j+1}</span>
+    // Serie fatta sotto le ripetizioni previste: numero e puntino gialli (la spunta resta quella normale)
+    const low=r.done&&ex.t!=="perf"&&num(r.reps)!=null&&num(r.reps)<(+(tg.reps[j]??ex.lo)||ex.lo);
+    sets+=`<div class="set ${r.done?"done":""} ${now?"now":""} ${isM?"myom":""} ${low?"low":""}"><span class="i"${isM?' title="Serie myo-rep"':""}>${isM?"M":j+1}</span>
       ${hasKg?`<${fw} class="field ${r.done?"":"pmf"}">${pm("kg",-1)}<input inputmode="decimal" value="${esc(kgV)}" placeholder="kg" data-ex="${ex.id}" data-j="${j}" data-f="kg" aria-label="Kg serie ${j+1}"><span>kg</span>${pm("kg",1)}</${fw}>`:(ex.t==="time"&&!r.done?`<button class="hold" data-ex="${ex.id}" data-j="${j}" aria-label="Avvia il cronometro della tenuta, serie ${j+1}">${I("play")}Via</button>`:`<span class="bw">${ex.t==="nordic"?"elastico":ex.t==="time"?"tenuta":"salto"}</span>`)}
       <${fw} class="field ${r.done?"":"pmf"}">${pm("reps",-1)}<input inputmode="numeric" value="${esc(rpV)}" data-ex="${ex.id}" data-j="${j}" data-f="reps" aria-label="${unit} serie ${j+1}"><span>${unit}</span>${pm("reps",1)}</${fw}>
       <button class="tick" data-ex="${ex.id}" data-j="${j}" aria-pressed="${!!r.done}" aria-label="Serie ${j+1} fatta">✓</button></div>`;
@@ -2728,13 +2779,14 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   const ssK=ssOf(g,ex),ssP=ssK?PLAN[g].ex.map(e=>effEx(g,e)).filter(e=>e.id!==ex.id&&ssOf(g,e)===ssK):[];if(ssP.length)chips.push(`<span class="chip hot">Superserie con ${esc(ssP.map(e=>e.n).join(", "))}</span>`);
   // Serie · ripetizioni · in canna · recupero su una riga; le parti cambiate dall'adattamento in evidenza
   let rir=mods.has("deload")?"3-4":mods.has("prePadel")&&/^0/.test(ex.rir)?"1":ex.rir;
-  if(mods.has("rir")&&!mods.has("deload"))rir=String(rir).replace(/\d+/g,d=>+d+1);
+  // Partita domani: +1 in canna solo dove la scheda arriva a 0 (Upper C del venerdì è già a 1-2 per la partita)
+  if(mods.has("rir")&&!mods.has("deload")&&/^0/.test(String(rir)))rir=String(rir).replace(/\d+/g,d=>+d+1);
   const spec=[`<span${n<ex.s?' class="ad"':""}>${n} serie${n<ex.s?` (invece di ${ex.s})`:""}</span>`,`<span>${rng}</span>`];
   if(rir&&/\d/.test(rir))spec.push(`<span${rir!==ex.rir?' class="ad"':""}>${esc(rir)}&nbsp;in&nbsp;canna</span>`);
   spec.push(`<span>${ex.rest?(ex.rest>=120?fk(ex.rest/60)+"&nbsp;min":ex.rest+"&nbsp;s"):"Subito il prossimo"}</span>`);
   if(mods.has("prePadel")&&ex.strap)chips.push(`<span class="chip adapt">Fasce da polso: risparmi la presa per il padel</span>`);
-  if(tg.top&&tg.top>ex.hi&&!mods.has("deload")&&tg.reps.every(r=>r>=ex.lo))chips.push(`<span class="chip hot">Range esteso fino a ${tg.top}: il prossimo gradino è il ${Math.round((ex.step||2.5)/Math.max(1,tg.kg||lastKg(ex)||1)*100)}%</span>`);
-  const stallTxt=!mods.has("deload")&&stalled(ex)?(phaseAt()==="def"?`<p class="prog down"><span>In calo</span><span>Massimale sotto del 5% nelle ultime 2 sedute. In definizione basta tenere i carichi: se continua togli una serie o fai lo scarico.</span></p>`:`<p class="prog down"><span>Fermo</span><span>Nessun miglioramento nelle ultime 3 sedute: prova una variante con ⇄ Cambia o togli una serie per due settimane.</span></p>`):"";
+  if(tg.top&&tg.top>ex.hi&&!mods.has("deload")&&tg.reps.every(r=>r>=ex.lo))chips.push(`<span class="chip hot">Range esteso fino a ${tg.top}: il prossimo gradino è il ${Math.round(stepOf(ex)/Math.max(1,tg.kg||lastKg(ex)||1)*100)}%</span>`);
+  const stallTxt=!mods.has("deload")&&!(tg.kind==="up"&&tg.kg>0&&tg.kg>(lastKg(ex)||0))&&stalled(ex)?(phaseAt()==="def"?`<p class="prog down"><span>In calo</span><span>Massimale sotto del 5% nelle ultime 2 sedute. In definizione basta tenere i carichi: se continua togli una serie o fai lo scarico.</span></p>`:`<p class="prog down"><span>Fermo</span><span>Nessun miglioramento nelle ultime 3 sedute: prova una variante con ⇄ Cambia o togli una serie per due settimane.</span></p>`):"";
   const over=tOn&&tEnd<=Date.now();
   const rest=withRest&&tOn?`<div class="rest ${over?"over":""}" id="restIn" role="timer"><span class="rr"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rk" cx="32" cy="32" r="28"/><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg><b class="tv"></b></span><span class="tl" aria-live="assertive">${over?"Recupero finito":"Recupero"+(tPlus?" · +"+tPlus+"\u00a0s":"")}</span><button data-tp>+15 s</button><button data-ts>Chiudi</button></div>`:"";
   // Scheda che si colora: a ogni serie un velo su tutta la scheda si intensifica piano; a esercizio finito passa l'oro in diagonale
@@ -2742,7 +2794,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   return `<article class="ex cur ${ssP.length?"ss":""} ${isGold?"gold":""}" data-ex="${ex.id}" style="--f:${fr.toFixed(3)};--f0:${fPrev.toFixed(3)};--fc:${fillCol(fr)};--fc0:${fillCol(fPrev)};--fd:-${fa.el}ms"><i class="fl fp ${fa.on?"grow":""}" aria-hidden="true"></i>${isGold?'<i class="fl fg" aria-hidden="true"></i>':""}
     <div class="exhead"><h3>${esc(ex.n)}${(howOf(ex)||errOf(ex)||ex.note)?(IMGEX[ex.id]=ex,`<button class="qm" data-img="${ex.id}" aria-label="Come si fa: ${esc(ex.n)}">?</button>`):""}</h3><button class="swap" data-base="${base.id}" aria-label="Sostituisci ${esc(ex.n)}">⇄ Cambia</button></div>
     <div class="tgt"><b${cu?` data-cu="${lk}|${tg.kg}|${esc(" kg × "+r0)}|${ex.id}"`:""}>${big}</b>${tg.badge?`<small class="${tg.kind}">${esc(tg.badge)}</small>`:""}</div>
-    ${dr.nextNote&&dr.nextNote.ex===ex.id?`<p class="prog down"><span>${esc(dr.nextNote.txt)}</span></p>`:`<p class="prog ${tg.kind}"><span>${esc(tg.msg)}</span></p>`}
+    ${dr.nextNote&&dr.nextNote.ex===ex.id?`<p class="prog down"><span>${esc(dr.nextNote.txt)}</span></p>`:`<p class="prog ${tg.kind}"><span>${esc(tg.myo&&!myoA?myoOffMsg(g,ex,mods,tg):tg.msg)}</span></p>`}
     <p class="spec">${spec.join("<i> · </i>")}</p>
     ${chips.length?`<div class="chips">${chips.join("")}</div>`:""}
     ${hasKg&&(setupOf(ex)||eqLbl(ex))?setupHTML(ex):""}
@@ -2756,21 +2808,29 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
     ${painHTML(ex,base)}
     <button class="lnk ssl" data-ss="${ex.id}">${ssP.length?"Cambia o togli la superserie":"+ Superserie solo per oggi"}</button></div></details></article>`;
 }
-let kgChk="";
-function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;audioUnlock();
+let kgChk="",lastTk={t:0,k:""};
+function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;
+  // Doppio tocco: dopo la spunta la pagina scorre e la spunta dopo può finire sotto il dito. Una spunta diversa entro mezzo secondo si ignora
+  const tk=exId+"|"+j,tn=performance.now();if(tn-lastTk.t<500&&lastTk.k!==tk)return;lastTk={t:tn,k:tk};
+  audioUnlock();
   const ex=PLAN[g].ex.map(e=>effEx(g,e)).find(e=>e.id===exId)||exById(exId),r=cell(g,exId,j);
   const row=document.querySelector(`.tick[data-ex="${exId}"][data-j="${j}"]`).closest(".set");
   const ins=row.querySelectorAll("input");ins.forEach(i=>{r[i.dataset.f]=i.value.trim()});
   // Carico molto diverso dal solito (errore di battitura?): chiede un secondo tocco prima di segnare la serie
   if(!r.done){const k=num(r.kg),ref=Math.max(0,...(history(exId)[0]?.sets[exId]||[]).map(x=>num(x.kg)||0))||num(tgFor(ex,mods).kg)||0,key=exId+"|"+j+"|"+r.kg;
-    if(k!=null&&ref>0&&(k>ref*1.5||k<ref*.5)&&kgChk!==key){kgChk=key;document.querySelector(".kgchk")?.remove();row.insertAdjacentHTML("afterend",`<p class="kgchk" role="alert">${esc(fk(k))} kg? L'ultima volta ${esc(fk(ref))}. Tocca ✓ di nuovo per confermare.</p>`);buzz(20);return}}
+    const warn=m=>{document.querySelector(".kgchk")?.remove();row.insertAdjacentHTML("afterend",`<p class="kgchk" role="alert">${m}</p>`);buzz(20)};
+    // Kg scritti male (es. "1,2,5"): la serie non si segna finché non è un numero
+    if(String(r.kg||"").trim()&&k==null){kgChk="";warn("Kg non validi: scrivi un numero, per esempio 52,5.");return}
+    const rp=num(r.reps),key2=key+"|"+r.reps;
+    if(k!=null&&((ref>0&&(k>ref*1.5||k<ref*.5))||(!ref&&k>250))&&kgChk!==key){kgChk=key;warn(`${esc(fk(k))} kg? ${ref>0?`L'ultima volta ${esc(fk(ref))}.`:"È tanto per un primo carico."} Tocca ✓ di nuovo per confermare.`);return}
+    if(rp!=null&&rp>Math.max(60,(ex.hi||0)*3)&&kgChk!==key2){kgChk=key2;warn(`${rp} ${ex.t==="time"?"secondi":"ripetizioni"}? Tocca ✓ di nuovo per confermare.`);return}}
   kgChk="";
   r.done=!r.done;const dd=draftFor(g);if(r.done&&!dd.start)dd.start=Date.now();
   if(!r.done){delete r.myo;delete r.myoEnd}
   if(!r.done&&dd.nextNote&&dd.nextNote.ex===exId&&dd.nextNote.j===j){for(const [k,v] of Object.entries(dd.nextNote.old||{})){const c=cell(g,exId,+k);if(!c.done){if(v==null)delete c.kg;else c.kg=v}}delete dd.nextNote}
   save();
   if(r.done){
-    const n=setsFor(ex,mods),doneN=(draftFor(g).ex[exId]||[]).filter(x=>x.done).length;
+    const n=setsFor(ex,mods),doneN=doneCount(g,exId);
     // Serie myo-rep: dopo l'attivazione si resta sull'esercizio per le mini-serie, con 15 s di pausa
     if(j===n-1&&ex.t==="iso"&&myoOn(g,ex,mods,tgFor(ex,mods))){r.myo=[];openEx[g]=exId;save();
       const want=num(tgFor(ex,mods).reps[j]??ex.hi),got=num(r.reps);if(want!=null&&got!=null&&got<want)celebrate("fail");else buzz(40);
@@ -2780,10 +2840,10 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;audioUnlock();
     // Superserie: dopo ogni serie passa da solo all'altro esercizio della coppia che ha ancora serie da fare
     // il recupero parte solo a giro finito; tra un esercizio e l'altro della coppia si passa subito
     ssGo[g]=null;let restS=ex.rest||0;const sk=ssOf(g,ex);
-    if(sk){const dn=e=>((draftFor(g).ex[e.id]||[]).filter(x=>x.done).length),grp=allEx.filter(e=>ssOf(g,e)===sk),i=grp.findIndex(e=>e.id===exId);
+    if(sk){const dn=e=>doneCount(g,e.id),grp=allEx.filter(e=>ssOf(g,e)===sk),i=grp.findIndex(e=>e.id===exId);
       const nx=[...grp.slice(i+1),...grp.slice(0,i+1)].find(e=>dn(e)<setsFor(e,mods));ssGo[g]=nx?nx.id:null;
       if(grp.length>1&&nx&&nx.id!==exId)restS=grp.indexOf(nx)>i?0:Math.max(...grp.map(e=>e.rest||0))}
-    const sessionDone=allEx.every(e=>((draftFor(g).ex[e.id]||[]).filter(x=>x.done).length)>=setsFor(e,mods));
+    const sessionDone=allEx.every(e=>doneCount(g,e.id)>=setsFor(e,mods));
     const want=num(tgFor(ex,mods).reps[j]??ex.lo),got=num(r.reps);
     const fail=ex.t!=="perf"&&want!=null&&got!=null&&got<want;
     if(fail)celebrate("fail");else if(doneN>=n)goldEnd(true);else buzz(40)
@@ -2830,11 +2890,11 @@ function fillCol(f){const v=S.fillv||"tramonto",L=FILLV[v];if(!L)return v==="sti
   let i=0;while(i<L.length-2&&f>L[i+1][0])i++;const [a,ca]=L[i],[b,cb]=L[i+1],t=Math.max(0,Math.min(1,(f-a)/(b-a)));return "rgb("+ca.map((x,k)=>Math.round(x+(cb[k]-x)*t)).join(",")+")"}
 // Fine esercizio: la scheda resta in primo piano il tempo della passata dorata, poi passa al prossimo
 function goldCard(g,exId,after){goldHold={g,ex:exId};openEx[g]=exId;renderTrain();keepFocus(false,exId);
-  clearTimeout(goldCard.t);goldCard.t=setTimeout(()=>{goldHold=null;delete fillMem[exId];if(openEx[g]===exId)openEx[g]=null;after&&after();renderTrain();keepFocus(true)},RM()?450:1050)}
+  clearTimeout(goldCard.t);goldCard.t=setTimeout(()=>{goldHold=null;delete fillMem[exId];if(openEx[g]===exId)openEx[g]=ssGo[g]&&ssGo[g]!==exId?ssGo[g]:null;after&&after();renderTrain();{const c=document.querySelector("#exs .ex.cur");if(c&&!RM())c.classList.add("sw-n")}keepFocus(true)},RM()?450:1050)}
 // Superserie: quella del piano, oppure quella scelta solo per la seduta di oggi (draft.ss, "" = sciolta)
 const ssOf=(g,ex)=>{const o=(S.draft&&S.draft[g]&&S.draft[g].ss)||{};return ex.id in o?o[ex.id]:(ex.ss||"")};
 function ssSheet(g,ex,mods){
-  const dr=draftFor(g),cur=ssOf(g,ex),dn=e=>((dr.ex[e.id]||[]).filter(x=>x.done).length);
+  const dr=draftFor(g),cur=ssOf(g,ex),dn=e=>doneCount(g,e.id);
   const L=PLAN[g].ex.map(e=>effEx(g,e)).filter(e=>e.id!==ex.id&&setsFor(e,mods)>0&&dn(e)<setsFor(e,mods));
   const opts=L.map(e=>({v:e.id,l:e.n,sub:ssOf(g,e)&&ssOf(g,e)===cur?"In superserie adesso":muLbl(e.mu||"")}));
   if(cur)opts.push({v:"",l:"Togli la superserie",sub:"Solo per oggi"});
@@ -2847,7 +2907,11 @@ function keepFocus(changed,exId){
   const f=document.querySelector("#exs").firstElementChild,tgt=f&&f.classList.contains("ask")&&!exId?f:c;
   const th=document.querySelector(".thead"),off=(th?(parseFloat(getComputedStyle(th).top)||0)+th.offsetHeight:0)+16;
   let dy=tgt.getBoundingClientRect().top-off;
-  // la parte alta della scheda resta sempre sotto l'intestazione: niente scorrimento extra per mostrare la serie in basso
+  // Recupero sotto la barra in basso: si scorre ancora quanto basta per vederlo, senza far uscire in alto la serie da fare
+  const rs=tgt===c&&c.querySelector("#restIn"),nb=document.querySelector("nav.bar");
+  if(rs&&nb){const over=rs.getBoundingClientRect().bottom-dy-(nb.getBoundingClientRect().top-8);
+    const nw=c.querySelector(".set.now")||rs,room=nw.getBoundingClientRect().top-dy-off;
+    if(over>0)dy+=Math.max(0,Math.min(over,room))}
   if(Math.abs(dy)>2)window.scrollBy({top:dy,behavior:changed&&!RM()?"smooth":"auto"})}
 function finish(g,mods){
   const d=draftFor(g),sets={};let n=0;
@@ -2886,7 +2950,17 @@ function openSwap(g,baseId){
   wrap.onclick=e=>{if(e.target===wrap)close()};
   wrap.querySelector("#swClose").onclick=close;
   wrap.querySelectorAll("#swScope button").forEach(b=>b.onclick=()=>{swapScope=b.dataset.v;wrap.querySelectorAll("#swScope button").forEach(x=>x.setAttribute("aria-pressed",x===b))});
-  const pick=k=>{const key=g+"|"+baseId;if(!k)delete S.swaps[key];else S.swaps[key]=swapScope==="always"?{k,always:true}:{k,date:iso(today())};save();close();renderTrain()};
+  const doPick=(k,keep)=>{const key=g+"|"+baseId,old=effEx(g,base).id,d=draftFor(g),od=(d.ex[old]||[]).filter(x=>x.done).length+((d.pre||{})[old]||0);
+    if(!k)delete S.swaps[key];else S.swaps[key]=swapScope==="always"?{k,always:true}:{k,date:iso(today())};
+    const nw=effEx(g,base).id;d.pre=d.pre||{};delete d.pre[old];
+    if(nw!==old&&od&&keep)d.pre[nw]=od;
+    openEx[g]=nw;save();close();renderTrain();requestAnimationFrame(()=>keepFocus(false,nw))};
+  // Serie già fatte con l'esercizio di prima: si chiede se contano (si fanno solo le restanti) o se si ricomincia
+  const pick=k=>{const old=effEx(g,base).id,d=draftFor(g),od=(d.ex[old]||[]).filter(x=>x.done).length+((d.pre||{})[old]||0);
+    const nwId=k&&EX[base.id+"~"+k]?base.id+"~"+k:base.id;if(!od||nwId===old){doPick(k,false);return}
+    const q=wrap.querySelector(".swq")||wrap.querySelector(".opts").insertAdjacentElement("beforebegin",document.createElement("div"));q.className="swq";
+    q.innerHTML=`<p><b>Hai già fatto ${od} serie di ${esc(effEx(g,base).n)}.</b> Le conti e fai solo le restanti con l'esercizio nuovo?</p><div class="seg" style="grid-template-columns:1fr 1fr"><button class="btn hot" data-keep="1">Tienile</button><button class="btn ghost" data-keep="0">Le rifaccio tutte</button></div>`;
+    q.querySelectorAll("[data-keep]").forEach(b=>b.onclick=()=>doPick(k,b.dataset.keep==="1"));q.scrollIntoView({block:"nearest"})};
   wrap.querySelectorAll(".opt").forEach(b=>b.onclick=()=>pick(b.dataset.k));
   wrap.querySelector("#swAdd").onclick=()=>{const n=wrap.querySelector("#swNew").value.trim();if(!n)return;const lib=base.lib||base.id;const k="u"+Date.now().toString(36);(S.customAlts[lib]=S.customAlts[lib]||[]).push({k,n});rebuild();pick(k)};
 }
@@ -2961,7 +3035,8 @@ function startTimer(sec,label,plus,end,ctx){tPlus=plus||0;tLbl=label;tCtx=ctx||n
 function tick(){if(!tOn)return;const left=Math.round((tEnd-Date.now())/1000),a=Math.abs(left),txt=(left<0?"+":"")+Math.floor(a/60)+":"+String(a%60).padStart(2,"0");
   setNum(T("tval"),txt);const inl=document.getElementById("restIn");if(inl)setNum(inl.querySelector(".tv"),txt);
   const fr=Math.max(0,Math.min(1,(tEnd-Date.now())/1000/tTot));document.querySelectorAll("#timer .ra,#restIn .ra").forEach(c=>c.style.strokeDashoffset=(100*(1-fr)).toFixed(1));
-  T("timer").hidden=!!inl;
+  // Timer in basso nascosto solo se il recupero dentro la scheda si vede davvero (non sotto la barra o sotto l'intestazione)
+  T("timer").hidden=!!inl&&restSeen(inl);
   // 10 secondi alla fine: vibrazione breve e anello che pulsa
   const soon=left<=10&&left>0;T("timer").classList.toggle("soon",soon);if(inl)inl.classList.toggle("soon",soon);
   if(soon&&!tWarn){tWarn=true;try{navigator.vibrate&&navigator.vibrate([90,70,90])}catch(e){}}
@@ -2969,6 +3044,8 @@ function tick(){if(!tOn)return;const left=Math.round((tEnd-Date.now())/1000),a=M
   if(left<=0&&!T("timer").classList.contains("over")){T("timer").classList.add("over");T("tlbl").textContent="Recupero finito";try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}beep()}
   if(left<=0&&inl&&!inl.classList.contains("over")){inl.classList.add("over");inl.querySelector(".tl").textContent="Recupero finito"}
   if(left>0&&inl&&inl.classList.contains("over")){inl.classList.remove("over");inl.querySelector(".tl").textContent="Recupero"}}
+function restSeen(el){const r=el.getBoundingClientRect(),nb=document.querySelector("nav.bar"),th=document.querySelector(".thead");
+  const lo=nb?nb.getBoundingClientRect().top:innerHeight,hi=th?th.getBoundingClientRect().bottom:0;return r.height>0&&r.top>=hi-8&&r.bottom<=lo+8}
 function stopTimer(){clearInterval(tInt);tOn=false;if(S.timer){delete S.timer;save()}T("timer").hidden=true;const inl=document.getElementById("restIn");if(inl)inl.remove()}
 function addRest(){tEnd+=15000;tTot=Math.max(tTot,(tEnd-Date.now())/1000);if(S.timer){S.timer.end=tEnd;S.timer.tot=tTot;save()}T("timer").classList.remove("over");tick()}
 T("tplus").onclick=addRest;T("tstop").onclick=stopTimer;
@@ -3199,7 +3276,7 @@ function rankHist(){
   const t0=+pts[0].at,t1=+pts[pts.length-1].at,xt=t=>L+(W-L-6)*((t-t0)/((t1-t0)||1));
   bands+=phaseBands(new Date(t0),new Date(t1)).map(b=>`<rect x="${xt(b.a).toFixed(1)}" y="6" width="${(xt(b.b)-xt(b.a)).toFixed(1)}" height="${H-12}" fill="none" stroke="${PH[b.ph].col}" stroke-dasharray="3 3"/><text x="${(xt(b.a)+3).toFixed(1)}" y="15" style="fill:${PH[b.ph].col};font-weight:700">${PH[b.ph].n}</text>`).join("");
   return `<div class="rk-hist"><div class="l"><b>Andamento</b><span>${dv>0?"+":""}${dv} pt in 4 settimane</span></div>
-  <svg viewBox="0 0 ${W} ${H+16}" aria-label="Rango generale nelle ultime ${pts.length} settimane">${bands}<path d="${d}" fill="none" stroke="var(--hot)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>${pts.map((p,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="${i===pts.length-1?4:2.5}" fill="${i===pts.length-1?"var(--hot)":"var(--fg)"}"/>`).join("")}
+  <svg viewBox="0 0 ${W} ${H+20}" aria-label="Rango generale nelle ultime ${pts.length} settimane">${bands}<path d="${d}" fill="none" stroke="var(--hot)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>${pts.map((p,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="${i===pts.length-1?4:2.5}" fill="${i===pts.length-1?"var(--hot)":"var(--fg)"}"/>`).join("")}
   <text x="${L}" y="${H+14}">${fmtShort(first.at)}</text><text x="${W-6}" y="${H+14}" text-anchor="end">oggi</text></svg></div>`}
 let rMode="rank";
 function rankCard(){
@@ -3218,7 +3295,7 @@ function rankCard(){
     <div class="rk-gen" style="--rc:${RANKS[G.r][2]}">${rBadge(G.r,"big")}<b>${RANKS[G.r][0]}</b><span>${G.pt}/100 pt</span><div class="rk-bar"><i style="width:${G.pt}%"></i></div><small>${nx?`${100-G.pt} pt a ${nx}`:"Rango massimo"}</small>${(()=>{const e=A.ex.filter(x=>x.need&&!x.need.cap).sort((a,b)=>a.need.pct-b.need.pct)[0];return e?`<p class="rk-next">Il passo più vicino: <b>${esc(e.n)} <span class="nw">${e.need.txt}</span></b> porta quell'esercizio a ${RANKS[Math.min(8,e.r+1)][0]}.</p>`:""})()}</div></div>
   <div class="rk-tr">${RANKS.map((r,i)=>`<span class="${i>G.r?"off":""}${i===G.r?" cur":""}">${rBadge(i)}<em>${r[0]}</em></span>`).join("")}</div>
   ${rankHist()}
-  <div class="rk-mus">${RMU.map(([k,n])=>{const m=A.mus[k];return `<button class="rk-m${m.none?" none":""}" data-rm="${k}">${m.none?rNone():rBadge(m.r)}<b>${n}</b><small>${m.none?"Nessun dato":`${m.approx?"≈ ":""}${RANKS[m.r][0]} · ${m.pt}/100`}</small></button>`}).join("")}</div>
+  <div class="rk-mus">${RMU.map(([k,n])=>{const m=A.mus[k];return `<button class="rk-m${m.none?" none":""}" data-rm="${k}">${m.none?rNone():rBadge(m.r)}<b>${n}</b><small>${m.none?"Nessun dato":`<span>${m.approx?"≈ ":""}${RANKS[m.r][0]}</span><span>${m.pt}/100</span>`}</small></button>`}).join("")}</div>
   <p class="rk-note">100 pt = un rango.${RMU.some(([k])=>A.mus[k].approx)?" ≈ = soglia indicativa (macchine e cavi).":""} Tocca un muscolo per i dettagli.</p>
 </section>`}
 function rankBind(){
@@ -3418,7 +3495,7 @@ function fixSheet(sess){if(!sess)return;const cp=JSON.parse(JSON.stringify(sess.
   openSheet({html:()=>`<h2>Correggi serie</h2><p class="note" style="margin:0">${esc(fmtDay(sess.date))}. Cambia i numeri sbagliati e salva.</p>
     <div class="fix">${Object.keys(cp).map(id=>`<div class="fixe"><b>${esc((sess.names&&sess.names[id])||exName(id))}</b>${cp[id].map((x,j)=>`<div class="fixr"><span>${j+1}</span><label>kg<input inputmode="decimal" data-id="${id}" data-j="${j}" data-f="kg" value="${esc(x.kg)}"></label><label>rip<input inputmode="numeric" data-id="${id}" data-j="${j}" data-f="reps" value="${esc(x.reps)}"></label></div>`).join("")}</div>`).join("")}</div>
     <button class="btn hot" id="fixOk">Salva le correzioni</button>`,
-   bind:(w,draw,close)=>{w.querySelectorAll(".fix input").forEach(i=>i.oninput=()=>{const v=i.dataset.f==="kg"?i.value.replace(/[^\d.,]/g,""):i.value.replace(/\D/g,"").slice(0,3);if(v!==i.value)i.value=v;cp[i.dataset.id][+i.dataset.j][i.dataset.f]=v});
+   bind:(w,draw,close)=>{w.querySelectorAll(".fix input").forEach(i=>i.oninput=()=>{const v=i.dataset.f==="kg"?i.value.replace(/[^\d.,]/g,"").replace(/([.,].*?)[.,]/g,"$1").slice(0,6):i.value.replace(/\D/g,"").slice(0,3);if(v!==i.value)i.value=v;cp[i.dataset.id][+i.dataset.j][i.dataset.f]=v});
      w.querySelector("#fixOk").onclick=()=>{sess.sets=cp;save();close();renderProg()}}})}
 function histItem(s){
   const pname=PLAN[s.day]?.name||s.planName||"Seduta";let n=0,vol=0;
@@ -3548,16 +3625,17 @@ function renderSettings(){
   <section class="card"><h3>Regole che l'app applica</h3>
    <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px">
     <li>Ripetizioni prima, carico poi: +1 ripetizione per serie finché chiudi tutto al limite alto del range, poi aumenta il carico e riparti dal basso. L'aumento segue l'attrezzo: +5 kg macchine e cavi (pacco pesi), +2,5 kg bilanciere e Smith, +1-2 kg manubri e zavorra con kettlebell. Sui multiarticolari pesanti, se il 2,5% (parte alta) o il 5% (gambe) del carico è più del gradino, sale di quello, arrotondato al gradino.</li>
-    <li>Dopo l'ultima serie puoi dire com'era. Facile: due ripetizioni in più invece di una, oppure aumento doppio se resta entro il 10% del carico. Al limite su un multiarticolare a fine range: il carico resta fermo finché non chiudi con le ripetizioni in canna previste.</li>
-    <li>Isolamento e prevenzione con un gradino grosso rispetto al carico (oltre il 15%, es. extrarotazione da 5 a 10 kg): prima porti le ripetizioni fino a 5 oltre il range, poi sali di peso.</li>
+    <li>Dopo l'ultima serie puoi dire com'era. Facile: due ripetizioni in più invece di una, oppure aumento doppio se resta entro il 10% del carico. Al limite su un multiarticolare (trazioni comprese) a fine range: il carico resta fermo finché non chiudi con le ripetizioni in canna previste.</li>
+    <li>Isolamento della parte alta a macchina o al cavo con un gradino grosso (oltre il 15%) o a pacco finito: ultima serie in myo-rep, mini-serie da 5 con 15 s di pausa; con 4 mini-serie complete sali di peso. Mai nei giorni con padel dopo, partita domani, scarico, energia bassa o in superserie: lì serie normali.</li>
+    <li>Manubri e prevenzione con un gradino grosso rispetto al carico (es. extrarotazione da 5 a 10 kg): prima porti le ripetizioni fino a 5 oltre il range, poi sali di peso.</li>
     <li>Due sedute di fila sotto il minimo del range e ripetizioni medie per serie non salite: -10% e riparti dal basso. Se il -10% vuol dire scendere più del 15% (gradino grosso), carico fermo e una ripetizione in più per serie. Con la zavorra si scende comunque.</li>
-    <li>Esercizio fermo (né kg né massimale stimato saliti in 3 sedute): prova una variante o togli una serie per due settimane.</li>
+    <li>Esercizio fermo (in 3 sedute non sono saliti né i kg, né il massimale stimato, né le ripetizioni totali allo stesso carico): prova una variante o togli una serie per due settimane.</li>
     <li>Salti: ripetizioni fisse, si progredisce in altezza o distanza. Nordic: meno aiuto dall'elastico. Copenhagen: +5 s fino a 30, poi versione più dura.</li>
     <li>Gambe mai nello stesso giorno del padel e mai il giorno prima di una partita. Partita dopo 2 giorni: niente Nordic e una serie in meno sugli eccentrici.</li>
-    <li>Partita domani: 1 ripetizione in più in canna. Palestra prima del padel: almeno 1 in canna anche sull'isolamento. Serie molto sotto il range (3+ ripetizioni): le serie dopo scendono del 10%.</li>
+    <li>Partita domani: almeno 1 ripetizione in canna su tutto (dove la scheda dice 0 diventa 1). Palestra prima del padel: almeno 1 in canna anche sull'isolamento. Serie molto sotto il range (3+ ripetizioni): le serie dopo scendono del 10%.</li>
     <li>Venerdì prima di due partite (sabato e domenica): solo braccia, Copenhagen, cuffia e polso.</li>
     <li>Padel e palestra nello stesso giorno: una serie in meno sulle spinte sopra la testa. Giorno di partita o energia bassa: una serie in meno su tutto.</li>
-    <li>Scarico quando serve, non a calendario: l'app lo propone dopo 6 settimane senza scarico o con 3+ esercizi fermi. Serie dimezzate, stessi carichi, 3-4 in canna. Le sedute di scarico non contano per la progressione.</li>
+    <li>Scarico quando serve, non a calendario: l'app lo propone dopo 6 settimane senza scarico (la scheda dice ogni 5-6: puoi avviarlo prima a mano) o con 3+ esercizi fermi. Serie dimezzate, stessi carichi, 3-4 in canna. Le sedute di scarico non contano per la progressione.</li>
    </ul></section>
   <section class="card"><h3>Backup</h3><p class="note" style="margin:0">I dati stanno solo su questo telefono. Salva un backup ogni tanto.</p>
    <div class="row"><button class="btn" id="exp">Esporta backup</button><label class="btn" style="flex-direction:column;gap:2px;text-align:center">Importa backup<small style="font-size:12px;font-weight:500;opacity:.75">sostituisce i dati attuali</small><input type="file" id="imp" accept="application/json" hidden></label></div>
@@ -3583,10 +3661,10 @@ function renderSettings(){
   // Prima di cancellare o importare: copia dei dati attuali e "Annulla" per 10 secondi
   const undoable=(txt)=>{const m=document.getElementById("bmsg");m.className="msg ok";m.innerHTML=`${esc(txt)} <button class="lnk" id="undoD">Annulla</button>`;
     const u=document.getElementById("undoD");const t=setTimeout(()=>{if(u.isConnected)u.remove()},10000);
-    u.onclick=()=>{clearTimeout(t);try{S=JSON.parse(localStorage.getItem(KEY+".bak"));rebuild();save();applySkin();renderSettings();document.getElementById("bmsg").textContent="Dati ripristinati."}catch(e){}}};
+    u.onclick=()=>{clearTimeout(t);try{S=JSON.parse(localStorage.getItem(KEY+".bak"));normS();rebuild();save();applySkin();renderSettings();document.getElementById("bmsg").textContent="Dati ripristinati."}catch(e){}}};
   const snap=()=>{try{localStorage.setItem(KEY+".bak",JSON.stringify(S))}catch(e){}};
-  document.getElementById("imp").onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{const j=JSON.parse(t);if(!j.sessions)throw 0;snap();S=j;S.plans=S.plans||{};S.swaps=S.swaps||{};S.customAlts=S.customAlts||{};S.archive=S.archive||[];S.body=S.body||[];S.pain=S.pain||{};rebuild();save();applySkin();renderSettings();undoable(`Backup importato: ${j.sessions.length} sedute.`)}).catch(()=>{bm.className="msg err";bm.textContent="File non valido: scegli un backup esportato da Allenati Scemo."})};
-  const w=document.getElementById("wipe");w.onclick=()=>{if(w.dataset.arm!=="1"){w.dataset.arm="1";w.textContent="Tocca di nuovo: cancella tutto";clearTimeout(w.t);w.t=setTimeout(()=>{if(w.isConnected){w.dataset.arm="";w.textContent="Cancella tutti i dati"}},4000);return}snap();S={sessions:[],draft:{},week:DEFAULT_WEEK,overrides:{},energy:{},view:"set",plans:{},swaps:{},customAlts:{},archive:[],skin:S.skin};rebuild();save();renderSettings();undoable("Dati cancellati.")};
+  document.getElementById("imp").onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{const j=JSON.parse(t);if(!j.sessions)throw 0;snap();S=j;normS();rebuild();save();applySkin();renderSettings();undoable(`Backup importato: ${j.sessions.length} sedute.`)}).catch(()=>{bm.className="msg err";bm.textContent="File non valido: scegli un backup esportato da Allenati Scemo."})};
+  const w=document.getElementById("wipe");w.onclick=()=>{if(w.dataset.arm!=="1"){w.dataset.arm="1";w.textContent="Tocca di nuovo: cancella tutto";clearTimeout(w.t);w.t=setTimeout(()=>{if(w.isConnected){w.dataset.arm="";w.textContent="Cancella tutti i dati"}},4000);return}snap();S={sessions:[],view:"set",skin:S.skin,vars:S.vars};normS();rebuild();save();renderSettings();undoable("Dati cancellati.")};
 }
 
 
@@ -3632,7 +3710,9 @@ function renderEditor(){
   document.querySelectorAll(".edx").forEach(row=>{const i=+row.dataset.i,e=E.ex[i];
     row.querySelectorAll("[data-f]").forEach(inp=>{const f=inp.dataset.f;const h=()=>{
       if(inp.type==="checkbox")e[f]=inp.checked;
-      else if(["s","lo","hi","rest"].includes(f))e[f]=parseInt(inp.value,10)||0;
+      // Limiti: serie 1-10, ripetizioni 1-100, recupero 0-600 s (accetta anche "2 min" e "1:30")
+      else if(f==="rest"){const v=String(inp.value).trim().toLowerCase(),m=v.match(/^(\d+)\s*[:.,]\s*(\d{1,2})$/),mn=v.match(/^(\d+(?:[.,]\d+)?)\s*m/);e[f]=Math.max(0,Math.min(600,m?+m[1]*60+ +m[2]:mn?Math.round(num(mn[1])*60):parseInt(v,10)||0))}
+      else if(["s","lo","hi"].includes(f))e[f]=Math.max(1,Math.min(f==="s"?10:e.t==="time"?600:100,parseInt(inp.value,10)||1));
       else if(f==="step")e[f]=num(inp.value)||2.5;
       else e[f]=inp.value;
       if(f==="eq"){const q=EQS.find(x=>x[0]===inp.value);if(q&&q[2])e.step=q[2]}
@@ -3690,6 +3770,8 @@ applySkin();render();
 // Recupero in corso quando iOS ha chiuso l'app: riparte da dove era (se è finito da meno di 10 minuti)
 if(S.timer&&S.timer.end>Date.now()-6e5){const x=S.timer;startTimer(x.tot,x.lbl,x.plus,x.end,x.ctx);if(view==="train")renderTrain()}else if(S.timer){delete S.timer;save()}
 // Luce che segue il telefono tolta su richiesta (2026-10-06)
+// Su iPhone gli stati premuti (:active) si vedono solo se la pagina ascolta i tocchi
+document.addEventListener("touchstart",()=>{},{passive:true});
 if("serviceWorker" in navigator&&location.protocol==="https:"){navigator.serviceWorker.register("sw.js").catch(()=>{})}
 </script>
 <!--APP-BODY-END-->
