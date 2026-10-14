@@ -1824,7 +1824,7 @@ function freeSheet(){const sel=[];
      w.querySelector("#fxGo").onclick=()=>{if(!sel.length)return;S.free={d:iso(today()),ex:sel.slice()};delete S.draft.LIB;rebuild();gymSel="LIB";save();close();go("train")}}})}
 function exName(id){if(EX[id])return EX[id].n;for(const s of S.sessions){if(s.names&&s.names[id])return s.names[id]}return id}
 function exById(id){return EX[id]||{id,n:exName(id),t:"comp",s:3,lo:8,hi:12}}
-function effEx(g,ex){const sw=(S.swaps||{})[g+"|"+ex.id];if(sw&&(sw.always||sw.date===iso(today()))){const v=EX[ex.id+"~"+sw.k];if(v)return v}return ex}
+function effEx(g,ex){const sw=(S.swaps||{})[g+"|"+ex.id];if(sw&&(sw.always||sw.date===iso(today())||(S.draft&&S.draft[g]&&S.draft[g].date===sw.date))){const v=EX[ex.id+"~"+sw.k];if(v)return v}return ex}
 
 const WD=["Dom","Lun","Mar","Mer","Gio","Ven","Sab"];
 const WD_LONG=["domenica","lunedì","martedì","mercoledì","giovedì","venerdì","sabato"];
@@ -1832,24 +1832,41 @@ const DEFAULT_WEEK={1:{padel:"train",gym:"A"},2:{padel:"none",gym:"G"},3:{padel:
 const PADEL_LBL={none:"Niente",train:"Allenamento",match:"Partita"};
 
 /* ================= STORAGE ================= */
+const iso=d=>{const x=new Date(d);x.setMinutes(x.getMinutes()-x.getTimezoneOffset());return x.toISOString().slice(0,10)};
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const today=()=>new Date();
 const KEY="allenati-scemo.v1";
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.sessions)return s}catch(e){}return {sessions:[],draft:{},week:DEFAULT_WEEK,overrides:{},energy:{},view:"oggi",gym:null}}
 let S=load();
 // Completa i campi mancanti: all'avvio, dopo "Cancella tutti i dati" e dopo un backup importato (anche vecchio)
-function normS(){S.sessions=(Array.isArray(S.sessions)?S.sessions:[]).filter(x=>x&&typeof x==="object"&&typeof x.date==="string");S.sessions.forEach(x=>{if(!x.sets||typeof x.sets!=="object")x.sets={};for(const k in x.sets)if(!Array.isArray(x.sets[k]))delete x.sets[k]});S.sessions=S.sessions.filter(x=>Object.keys(x.sets).length);S.week=S.week||JSON.parse(JSON.stringify(DEFAULT_WEEK));S.overrides=S.overrides||{};S.energy=S.energy||{};S.draft=S.draft||{};S.plans=S.plans&&typeof S.plans==="object"?S.plans:{};for(const k in S.plans)if(!S.plans[k]||!Array.isArray(S.plans[k].ex))delete S.plans[k];S.swaps=S.swaps||{};S.customAlts=S.customAlts||{};S.archive=S.archive||[];S.body=S.body||[];S.pain=S.pain||{}}
-normS();for(const P of Object.values(S.plans))for(const e of P.ex||[])if(/^Alzate laterali al cavo/i.test(e.n||"")&&(e.eq||"mac")==="mac"){e.eq="cavl";e.step=2.5}for(const P of Object.values(S.plans))for(const e of P.ex||[])if(e.n==="Curl panca Scott"&&e.eq==="db"){e.n="Curl Scott con manubri";e.note=e.note||"Kg = un manubrio."}
+function normS(){const obj=v=>v&&typeof v==="object"&&!Array.isArray(v),arr=v=>Array.isArray(v)?v:[];
+  S.sessions=arr(S.sessions).filter(x=>obj(x)&&typeof x.date==="string"&&!isNaN(new Date(x.date)));S.sessions.forEach(x=>{if(!obj(x.sets))x.sets={};for(const k in x.sets)if(!Array.isArray(x.sets[k]))delete x.sets[k];else x.sets[k]=x.sets[k].filter(obj);if(!obj(x.names))x.names={};if(!Array.isArray(x.mods))x.mods=[]});S.sessions=S.sessions.filter(x=>Object.keys(x.sets).length);
+  // Ogni campo col suo tipo: un backup modificato a mano o rotto non deve bloccare le schermate
+  const wk=obj(S.week)?S.week:{};S.week={};for(let i=0;i<7;i++){const w=obj(wk[i])?wk[i]:DEFAULT_WEEK[i];S.week[i]={padel:typeof w.padel==="string"?w.padel:"none",gym:typeof w.gym==="string"?w.gym:"none"}}
+  S.overrides=obj(S.overrides)?S.overrides:{};for(const k in S.overrides)if(!obj(S.overrides[k]))delete S.overrides[k];S.energy=obj(S.energy)?S.energy:{};
+  for(const key of ["draft","oldDraft"]){S[key]=obj(S[key])?S[key]:{};for(const g in S[key]){const d=S[key][g];if(!obj(d)||!obj(d.ex)){delete S[key][g];continue}for(const id in d.ex)if(!Array.isArray(d.ex[id]))delete d.ex[id];else d.ex[id]=d.ex[id].map(x=>obj(x)?x:{});if(typeof d.date!=="string")d.date=iso(today())}}
+  S.plans=obj(S.plans)?S.plans:{};for(const k in S.plans)if(!obj(S.plans[k])||!Array.isArray(S.plans[k].ex))delete S.plans[k];else S.plans[k].ex=S.plans[k].ex.filter(e=>obj(e)&&e.id&&typeof e.n==="string");
+  S.swaps=obj(S.swaps)?S.swaps:{};for(const k in S.swaps)if(!obj(S.swaps[k]))delete S.swaps[k];S.customAlts=obj(S.customAlts)?S.customAlts:{};for(const k in S.customAlts)S.customAlts[k]=arr(S.customAlts[k]).filter(a=>obj(a)&&a.k&&typeof a.n==="string");if(S.skin!=null&&!["vetro","eclisse","carbonio","campo","manga","lavagna"].includes(S.skin))S.skin="vetro";S.pain=obj(S.pain)?S.pain:{};
+  for(const key of ["archive","body","phases","cycles"])S[key]=arr(S[key]).filter(obj);if(S.free&&!(obj(S.free)&&Array.isArray(S.free.ex)))delete S.free;if(S.deload&&!(obj(S.deload)&&S.deload.from&&S.deload.to))delete S.deload;if(S.timer&&!obj(S.timer))delete S.timer;for(const key of ["setup","station","eqmax","eqf","vars"])if(S[key]!=null&&!obj(S[key]))delete S[key]}
+let bootMsg="";
+function boot(){normS();for(const P of Object.values(S.plans))for(const e of P.ex||[])if(/^Alzate laterali al cavo/i.test(e.n||"")&&(e.eq||"mac")==="mac"){e.eq="cavl";e.step=2.5}for(const P of Object.values(S.plans))for(const e of P.ex||[])if(e.n==="Curl panca Scott"&&e.eq==="db"){e.n="Curl Scott con manubri";e.note=e.note||"Kg = un manubrio."}
 if(S.deload){const t=new Date();t.setMinutes(t.getMinutes()-t.getTimezoneOffset());if(t.toISOString().slice(0,10)>S.deload.to){S.lastDeload=S.deload.to;delete S.deload}}
-rebuild();
+rebuild()}
+// Se i dati salvati mandano in errore l'avvio: prima si chiudono le sedute non salvate, poi si prova la copia di sicurezza, infine si tengono solo le sedute
+try{boot()}catch(e){const cur=JSON.parse(JSON.stringify(S));try{delete S.free;S.draft={};S.oldDraft={};boot();bootMsg="Una seduta non salvata mandava in errore l'app: l'ho chiusa. Le sedute salvate ci sono tutte."}catch(e2){try{S=JSON.parse(localStorage.getItem(KEY+".bak"));if(!S||!Array.isArray(S.sessions))throw 0;boot();bootMsg="I dati salvati davano errore: ho rimesso la copia di sicurezza. Controlla le ultime sedute."}catch(e3){S={sessions:Array.isArray(cur.sessions)?cur.sessions:[],skin:cur.skin};boot();bootMsg="I dati salvati davano errore: ho tenuto solo le sedute."}}try{localStorage.setItem(KEY+".err",JSON.stringify(cur))}catch(e4){}save()}
 // Chiede al browser di non cancellare i dati dell'app quando il telefono ha poco spazio
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 function archivePlan(key,why){if(!PLAN[key])return;S.archive.unshift({id:"v"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),key,at:new Date().toISOString(),why,plan:JSON.parse(JSON.stringify(PLAN[key]))});S.archive=S.archive.slice(0,60)}
+// Prima di cancellare, importare o scartare: copia dei dati attuali e "Annulla" per 10 secondi nel messaggio della schermata
+const snap=()=>{try{localStorage.setItem(KEY+".bak",JSON.stringify(S))}catch(e){}};
+function undoable(txt){const m=document.getElementById("bmsg")||document.getElementById("omsg")||document.getElementById("msg");if(!m)return;m.className="msg ok";m.innerHTML=`${esc(txt)} <button class="lnk" id="undoD">Annulla</button>`;
+  const u=document.getElementById("undoD");const t=setTimeout(()=>{if(u.isConnected)u.remove()},10000);
+  u.onclick=()=>{clearTimeout(t);try{S=JSON.parse(localStorage.getItem(KEY+".bak"));normS();rebuild();save();applySkin();render();const mm=document.getElementById("bmsg")||document.getElementById("omsg")||document.getElementById("msg");if(mm){mm.className="msg ok";mm.textContent="Dati ripristinati."}}catch(e){}}}
 let storageOk=true;
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){storageOk=false}}
 
 /* ================= DATES ================= */
-const iso=d=>{const x=new Date(d);x.setMinutes(x.getMinutes()-x.getTimezoneOffset());return x.toISOString().slice(0,10)};
-const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
-const today=()=>new Date();
+// iso, addDays e today sono in cima a STORAGE: servono già all'avvio (seduta libera aperta)
 function dayPlan(d){const k=iso(d),base=S.week[new Date(d).getDay()]||{padel:"none",gym:"none"},o=S.overrides[k]||{};return {padel:o.padel||base.padel,gym:o.gym||base.gym}}
 const fmtShort=s=>new Date(s).toLocaleDateString("it-IT",{day:"numeric",month:"short"});
 const fmtWd=s=>{const d=new Date(s);return d.toLocaleDateString("it-IT",{weekday:"short"}).replace(".","")+" "+d.getDate()+"/"+(d.getMonth()+1)};
@@ -2099,15 +2116,21 @@ function metricOf(ex,x){const r=num(x.reps),k=num(x.kg);if(r==null)return 0;if(k
 /* ================= STATE: current workout ================= */
 let view=S.view==="edit"?"set":(S.view||"oggi");let editPlan=null;
 let gymSel=null;
-function currentGym(){const a=assess(today());if(gymSel&&PLAN[gymSel])return gymSel;if(a.gym in PLAN)return a.gym;return PLAN[S.gym]?S.gym:"A"}
-function draftFor(g){S.draft[g]=S.draft[g]||{date:iso(today()),ex:{}};if(S.draft[g].date!==iso(today())&&!Object.values(S.draft[g].ex).some(a=>a.some(x=>x.done)))S.draft[g]={date:iso(today()),ex:{}};return S.draft[g]}
+function currentGym(){const a=assess(today());if(gymSel&&PLAN[gymSel])return gymSel;moveOld();for(const g in S.draft||{})if(PLAN[g]&&draftOld(g))return g;if(a.gym in PLAN)return a.gym;return PLAN[S.gym]?S.gym:"A"}
+function draftFor(g){moveOld();S.draft[g]=S.draft[g]||{date:iso(today()),ex:{}};if(S.draft[g].date!==iso(today())&&!Object.values(S.draft[g].ex).some(a=>a.some(x=>x.done)))S.draft[g]={date:iso(today()),ex:{}};return S.draft[g]}
 // Seduta di un altro giorno non salvata: dopo 12 ore senza serie è "vecchia" (si salva con la sua data o si scarta); prima è ancora in corso (es. dopo mezzanotte)
-const draftOld=g=>{const d=S.draft&&S.draft[g];if(!d||d.date===iso(today())||!Object.values(d.ex||{}).some(a=>a.some(x=>x.done)))return null;return {d,stale:Date.now()-(d.last||d.start||0)>12*36e5}};
-function oldDraftBox(g){const o=draftOld(g);if(!o||!PLAN[g])return "";const dt=new Date(o.d.start||o.d.date+"T12:00:00"),n=Object.values(o.d.ex).reduce((a,r)=>a+r.filter(x=>x.done).length,0)+Object.values(o.d.pre||{}).reduce((a,b)=>a+b,0);
-  return o.stale?`<section class="card oldd"><p><b>${esc(PLAN[g].name)} di ${esc(WD_LONG[dt.getDay()])} ${dt.getDate()} non salvata</b> · ${n} serie</p><div class="seg" style="grid-template-columns:1fr 1fr"><button class="btn hot" data-oldsave="${g}">Salvala con la sua data</button><button class="btn ghost" data-olddrop="${g}">Scartala</button></div></section>`
-  :`<section class="card oldd"><p><b>${esc(PLAN[g].name)} in corso</b> · ${n} serie da ${esc(WD_LONG[dt.getDay()])}</p><div class="seg" style="grid-template-columns:1fr"><button class="btn hot" data-oldgo="${g}">Continua</button></div></section>`}
-function oldDraftBind(){document.querySelectorAll("[data-oldsave]").forEach(b=>b.onclick=()=>{const g=b.dataset.oldsave;gymSel=g;view="train";S.view="train";render();finish(g,new Set((S.draft[g]&&S.draft[g].mods)||[]))});
-  document.querySelectorAll("[data-olddrop]").forEach(b=>b.onclick=()=>{if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Tocca di nuovo per scartarla";return}snap();delete S.draft[b.dataset.olddrop];stopTimer();save();render();undoable("Seduta scartata.")});
+// Seduta di un altro giorno non salvata. Ferma da più di 12 ore è "vecchia": passa in S.oldDraft (si salva con la sua data o si scarta) e la seduta di oggi parte pulita.
+// Prima delle 12 ore è ancora in corso (es. dopo mezzanotte) e resta la seduta aperta.
+const hasDone=d=>Object.values(d.ex||{}).some(a=>a.some(x=>x.done));
+function moveOld(){for(const g in S.draft||{}){const d=S.draft[g];if(d&&d.date!==iso(today())&&hasDone(d)&&Date.now()-(d.last||d.start||Date.parse(d.date+"T12:00:00"))>12*36e5){S.oldDraft=S.oldDraft||{};S.oldDraft[g+"@"+d.date]={...d,g};delete S.draft[g]}}}
+const draftOld=g=>{const d=S.draft&&S.draft[g];if(!d||d.date===iso(today())||!hasDone(d))return null;return {d,stale:false}};
+function oldBox(key,d,stale){const g=d.g||key,nm=PLAN[g]?PLAN[g].name:g==="LIB"?"Seduta libera":"Seduta",dt=new Date(d.start||d.date+"T12:00:00"),n=Object.values(d.ex).reduce((a,r)=>a+r.filter(x=>x.done).length,0)+Object.values(d.pre||{}).reduce((a,b)=>a+b,0);
+  return stale?`<section class="card oldd"><p><b>${esc(nm)} di ${esc(WD_LONG[dt.getDay()])} ${dt.getDate()} non salvata</b> · ${n} serie</p><div class="seg" style="grid-template-columns:1fr 1fr"><button class="btn hot" data-oldsave="${esc(key)}">Salvala con la sua data</button><button class="btn ghost" data-olddrop="${esc(key)}">Scartala</button></div></section>`
+  :PLAN[g]?`<section class="card oldd"><p><b>${esc(nm)} in corso</b> · ${n} serie ${d.date===iso(today())?"di oggi":"da "+esc(WD_LONG[dt.getDay()])}</p><div class="seg" style="grid-template-columns:1fr"><button class="btn hot" data-oldgo="${g}">Continua</button></div></section>`:""}
+// Oggi: anche una seduta di oggi lasciata a metà per un'altra (Cambia seduta di oggi) resta raggiungibile con "Continua"
+function oldBoxes(only,cur){moveOld();let h="";for(const k in S.oldDraft||{})if(!only||S.oldDraft[k].g===only)h+=oldBox(k,S.oldDraft[k],true);if(!only)for(const g in S.draft||{}){const o=draftOld(g),d=S.draft[g];if(o)h+=oldBox(g,o.d,false);else if(d&&g!==cur&&g!=="LIB"&&d.date===iso(today())&&hasDone(d))h+=oldBox(g,d,false)}return h}
+function oldDraftBind(){document.querySelectorAll("[data-oldsave]").forEach(b=>b.onclick=()=>{const k=b.dataset.oldsave,od=(S.oldDraft||{})[k];if(!od)return;if(PLAN[od.g])gymSel=od.g;view="train";S.view="train";render();finish(od.g,new Set(od.mods||[]),k)});
+  document.querySelectorAll("[data-olddrop]").forEach(b=>b.onclick=()=>{if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Tocca di nuovo per scartarla";return}snap();delete S.oldDraft[b.dataset.olddrop];save();render();undoable("Seduta scartata.")});
   document.querySelectorAll("[data-oldgo]").forEach(b=>b.onclick=()=>{gymSel=b.dataset.oldgo;go("train")})}
 function cell(g,exId,j){const d=draftFor(g);const a=d.ex[exId]=d.ex[exId]||[];while(a.length<=j)a.push({});return a[j]}
 
@@ -2591,7 +2614,7 @@ function renderToday(){
   const bk=backupDue();if(bk)dl+=`<div class="banner bk">${I("info")}<div><b>Salva un backup</b><span>${bk.never?`${bk.n} sedute salvate solo su questo telefono, mai copiate.`:`Ultimo backup ${bk.days} giorni fa.`} Se cancelli l'app o cambi telefono le perdi.</span></div><button id="bkNow">Salva</button><button id="bkLater" class="sec">Non ora</button></div>`;
   app.innerHTML=`
   <header class="head"><span class="today-d">${esc(cap(WD_LONG[d.getDay()]))} ${d.getDate()} ${d.toLocaleDateString("it-IT",{month:"long"})}${phaseStart()?` · ${PH[phaseAt()].n} settimana ${Math.floor((d-new Date(phaseStart()+"T00:00:00"))/(7*864e5))+1}`:""}</span></header>
-  ${Object.keys(S.draft||{}).map(oldDraftBox).join("")}
+  ${oldBoxes(null,a.gym)}<p class="msg" id="omsg" aria-live="polite">${bootMsg?esc(bootMsg):""}</p>
   ${doneS?`<section class="card hero done" aria-live="polite">
     <span class="lbl">Oggi in palestra</span>
     <div class="big">${esc(doneS.planName||big)}</div>
@@ -2679,7 +2702,7 @@ function renderTrain(){
   app.innerHTML=`
   <div class="thead"><div class="r"><h1>${esc(P.title)}</h1><span>${dn} / ${tot} serie${dr.start&&mins>0?` · ${mins} min`:""}</span></div><div class="pbar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Serie fatte"><i style="--pw:${pct}"></i></div></div>
   <div class="tabs" role="group" aria-label="Scheda">${GYM_ORDER.map(k=>{const wd=Object.entries(S.week).find(([,v])=>v.gym===k);return `<button data-k="${k}" aria-pressed="${k===g}"><small>${wd?WD[wd[0]]:"Extra"}</small>${esc(PLAN[k].name)}</button>`}).join("")}</div>
-  ${od&&od.stale?oldDraftBox(g):""}
+  ${oldBoxes(g)}
   ${modNote}
   ${warmupHTML(g,P,dr,dn)}
   ${savedH}
@@ -2707,7 +2730,7 @@ function renderTrain(){
   document.querySelectorAll("#exs [data-open]").forEach(b=>b.onclick=()=>openExVT(g,b.dataset.open));
   document.querySelectorAll("#exs [data-eff]").forEach(b=>b.onclick=()=>{const d=draftFor(g);d.eff=d.eff||{};d.eff[b.dataset.ex]=b.dataset.eff;
     const ex=PLAN[g].ex.map(e=>effEx(g,e)).find(e=>e.id===b.dataset.ex)||exById(b.dataset.ex);
-    if(b.dataset.eff==="hard"&&ex.t==="comp"&&S.adrest!==false&&tOn&&tEnd>Date.now()&&!(d.restPlus||{})[ex.id]){d.restPlus=d.restPlus||{};d.restPlus[ex.id]=1;tEnd+=30000;tTot+=30;tPlus+=30;T("tlbl").textContent="Recupero · "+tLbl+" · +"+tPlus+"\u00a0s"}
+    if(b.dataset.eff==="hard"&&ex.t==="comp"&&S.adrest!==false&&tOn&&tEnd>Date.now()&&!(d.restPlus||{})[ex.id]){d.restPlus=d.restPlus||{};d.restPlus[ex.id]=1;tEnd+=30000;tTot+=30;tPlus+=30;if(S.timer){S.timer.end=tEnd;S.timer.tot=tTot;S.timer.plus=tPlus}save();T("tlbl").textContent="Recupero · "+tLbl+" · +"+tPlus+"\u00a0s"}
     save();renderTrain()});
   document.querySelectorAll("#exs [data-effskip]").forEach(b=>b.onclick=()=>{const d=draftFor(g);d.effSkip=d.effSkip||{};d.effSkip[b.dataset.effskip]=1;save();renderTrain()});
   const rp=document.querySelector("#restIn [data-tp]");if(rp)rp.onclick=()=>{if(!justTicked())addRest()};
@@ -2720,7 +2743,7 @@ function renderTrain(){
   oldDraftBind();
   // Il riflesso del bottone passa una volta sola: dopo ogni spunta la scheda si ridisegna e non deve ripartire
   if(hadFin){const fb=document.getElementById("finish");if(fb)fb.classList.add("noshine")}
-  const c=document.getElementById("clear");c.onclick=()=>{if(c.dataset.arm!=="1"){c.dataset.arm="1";c.textContent="Tocca di nuovo per svuotare";setTimeout(()=>{c.dataset.arm="";c.textContent="Svuota la seduta"},3500);return}delete S.draft[g];openEx[g]=null;save();renderTrain()};
+  const c=document.getElementById("clear");c.onclick=()=>{if(c.dataset.arm!=="1"){c.dataset.arm="1";c.textContent="Tocca di nuovo per svuotare";setTimeout(()=>{c.dataset.arm="";c.textContent="Svuota la seduta"},3500);return}delete S.draft[g];openEx[g]=null;stopTimer();save();renderTrain()};
   trainFx(g,pct);
   if(tOn)tick();
   wakeSync();
@@ -2809,6 +2832,8 @@ function swipeBind(g,L,curId,mods){
     else back()},{passive:true});
   c.addEventListener("touchcancel",()=>{if(x0!=null){x0=null;back()}},{passive:true});
 }
+// "l'8%", "l'11%", "il 10%"
+const pct=p=>(/^(8|11|1|8\d|8\d\d)$/.test(String(p))?"l'":"il ")+p+"%";
 function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   const pre=(dr.pre||{})[ex.id]||0,n=Math.max(0,setsFor(ex,mods)-pre),tg=tgFor(ex,mods,g),last=history(ex.id)[0];
   const rows=dr.ex[ex.id]||[];
@@ -2819,6 +2844,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   const r0=tg.reps[0]??ex.lo,rMin=Math.min(...tg.reps.slice(0,setsFor(ex,mods)).map(Number).filter(v=>!isNaN(v)),r0),rMax=Math.max(...tg.reps.slice(0,setsFor(ex,mods)).map(Number).filter(v=>!isNaN(v)),r0),rT=rMin===rMax?String(r0):rMin+"-"+rMax;
   const lk=hasKg&&tg.kind==="up"&&tg.kg>0&&last?Math.max(0,...last.sets[ex.id].map(x=>num(x.kg)||0)):0,cu=lk>0&&lk<tg.kg&&ex.t!=="time"&&ex.t!=="perf";
   const big=ex.t==="perf"?`${n} × ${ex.lo}${ex.side?" per lato":""}`:ex.t==="time"?`${r0} s`:hasKg&&tg.kg>0?`${fk(tg.kg)} kg × ${rT}`:hasKg&&tg.kg==null?`${n} × ${ex.lo===ex.hi?ex.lo:ex.lo+"-"+ex.hi}`:`${rT} rip`;
+  const nn=dr.nextNote&&dr.nextNote.ex===ex.id&&rows.filter(r=>r.done).length<n?dr.nextNote:null;
   let sets="",nowSet=false;const myoA=hasKg&&myoOn(g,ex,mods,tg);
   for(let j=0;j<Math.max(n,rows.filter(r=>r.done).length);j++){
     const r=rows[j]||{};
@@ -2848,13 +2874,14 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   let rir=mods.has("deload")?"3-4":mods.has("prePadel")&&/^0/.test(ex.rir)?"1":ex.rir;
   // Partita domani: +1 in canna solo dove la scheda arriva a 0 (Upper C del venerdì è già a 1-2 per la partita)
   if(mods.has("rir")&&!mods.has("deload")&&/^0/.test(String(rir)))rir=String(rir).replace(/\d+/g,d=>+d+1);
-  const spec=[`<span${n<ex.s?' class="ad"':""}>${n} serie${n<ex.s?` (invece di ${ex.s})`:""}</span>`,`<span>${rng}</span>`];
+  // Serie già fatte su un'altra postazione prima di "⇄ Cambia" (Tienile): non sono un adattamento
+  const nT=n+pre,spec=[`<span${nT<ex.s?' class="ad"':""}>${n} serie${pre?` + ${pre} già fatt${pre>1?"e":"a"}`:""}${nT<ex.s?` (invece di ${ex.s})`:""}</span>`,`<span>${rng}</span>`];
   if(rir&&/\d/.test(rir))spec.push(`<span${rir!==ex.rir?' class="ad"':""}>${esc(rir)}&nbsp;in&nbsp;canna</span>`);
   // Myo-rep: l'ultima serie va a cedimento tecnico, le altre restano con le ripetizioni in canna
   if(myoA)spec.push(`<span class="ad">ultima&nbsp;a&nbsp;cedimento</span>`);
   spec.push(`<span>${ex.rest?(ex.rest>=120?fk(ex.rest/60)+"&nbsp;min":ex.rest+"&nbsp;s"):"Subito il prossimo"}</span>`);
   if(mods.has("prePadel")&&ex.strap)chips.push(`<span class="chip adapt">Fasce da polso: risparmi la presa per il padel</span>`);
-  if(tg.top&&tg.top>ex.hi&&!mods.has("deload")&&tg.reps.every(r=>r>=ex.lo))chips.push(`<span class="chip hot">Range esteso fino a ${tg.top}: il prossimo gradino è il ${Math.round(stepOf(ex)/Math.max(1,tg.kg||lastKg(ex)||1)*100)}%</span>`);
+  if(tg.top&&tg.top>ex.hi&&!mods.has("deload")&&tg.reps.every(r=>r>=ex.lo))chips.push(`<span class="chip hot">Range esteso fino a ${tg.top}: il prossimo gradino è ${pct(Math.round(stepOf(ex)/Math.max(1,tg.kg||lastKg(ex)||1)*100))}</span>`);
   const stallTxt=!mods.has("deload")&&!tg.hold&&!(tg.kind==="up"&&tg.kg>0&&tg.kg>(lastKg(ex)||0))&&stalled(ex)?(phaseAt()==="def"?`<p class="prog down"><span>In calo</span><span>Massimale sotto del 5% nelle ultime 2 sedute. In definizione basta tenere i carichi: se continua togli una serie o fai lo scarico.</span></p>`:`<p class="prog down"><span>Fermo</span><span>Nessun miglioramento nelle ultime 3 sedute: prova una variante con ⇄ Cambia o togli una serie per due settimane.</span></p>`):"";
   const over=tOn&&tEnd<=Date.now();
   const rest=withRest&&tOn?`<div class="rest ${over?"over":""}" id="restIn" role="timer"><span class="rr"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rk" cx="32" cy="32" r="28"/><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg><b class="tv"></b></span><span class="tl" aria-live="assertive">${over?"Recupero finito":"Recupero"+(tPlus?"\u00a0·\u00a0+"+tPlus+"\u00a0s":"")}</span><button data-tp>+15 s</button><button data-ts>Chiudi</button></div>`:"";
@@ -2862,8 +2889,8 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   const fN=Math.min(n,rows.filter(r=>r.done).length),fr=n?fN/n:0,isGold=goldHold&&goldHold.ex===ex.id,fa=fillAnim(ex.id,fr),fPrev=fa.from;
   return `<article class="ex cur ${ssP.length?"ss":""} ${isGold?"gold":""}" data-ex="${ex.id}" style="--f:${fr.toFixed(3)};--f0:${fPrev.toFixed(3)};--fc:${fillCol(fr)};--fc0:${fillCol(fPrev)};--fd:-${fa.el}ms"><i class="fl fp ${fa.on?"grow":""}" aria-hidden="true"></i>${isGold?'<i class="fl fg" aria-hidden="true"></i>':""}
     <div class="exhead"><h3>${esc(ex.n)}${(howOf(ex)||errOf(ex)||ex.note)?(IMGEX[ex.id]=ex,`<button class="qm" data-img="${ex.id}" aria-label="Come si fa: ${esc(ex.n)}">?</button>`):""}</h3><button class="swap" data-base="${base.id}" aria-label="Sostituisci ${esc(ex.n)}">⇄ Cambia</button></div>
-    <div class="tgt"><b${cu?` data-cu="${lk}|${tg.kg}|${esc(" kg × "+r0)}|${ex.id}"`:""}>${big}</b>${tg.badge?`<small class="${tg.kind}">${esc(tg.badge)}</small>`:""}</div>
-    ${dr.nextNote&&dr.nextNote.ex===ex.id?`<p class="prog down"><span>${esc(dr.nextNote.txt)}</span></p>`:`<p class="prog ${tg.kind}"><span>${esc(tg.msg)}</span></p>`}
+    <div class="tgt"><b${cu&&!nn?` data-cu="${lk}|${tg.kg}|${esc(" kg × "+r0)}|${ex.id}"`:""}>${nn&&nn.kg!=null&&hasKg?`${fk(nn.kg)} kg × ${rT}`:big}</b>${tg.badge?`<small class="${tg.kind}">${esc(tg.badge)}</small>`:""}</div>
+    ${nn?`<p class="prog down"><span>${esc(nn.txt)}</span></p>`:`<p class="prog ${tg.kind}"><span>${esc(tg.msg)}</span></p>`}
     <p class="spec">${spec.join("<i> · </i>")}</p>
     ${chips.length?`<div class="chips">${chips.join("")}</div>`:""}
     ${hasKg&&(setupOf(ex)||eqLbl(ex))?setupHTML(ex):""}
@@ -2926,7 +2953,7 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;
     const kNow=num(r.kg),nx=(dd.ex[exId]||[])[j+1];
     if(fail&&kNow>0&&got<ex.lo-2&&j+1<n&&!(nx&&nx.done)&&!["perf","time","nordic"].includes(ex.t)){const st=stepOf(ex);let nk=Math.max(st,roundStep(kNow*0.9,st));if(nk>=kNow&&kNow-st>0)nk=kNow-st;
       if(nk<kNow){const old={};for(let k=j+1;k<n;k++){const c=cell(g,exId,k);if(!c.done){old[k]=c.kg;c.kg=fk(nk)}}
-        dd.nextNote={ex:exId,j,old,txt:`${n-j-1>1?"Prossime serie":"Prossima serie"}: ${fk(nk)} kg, il ${Math.round((kNow-nk)/kNow*100)}% in meno. Puoi cambiarlo.`}}}
+        dd.nextNote={ex:exId,j,old,txt:`${n-j-1>1?"Prossime serie":"Prossima serie"}: ${fk(nk)} kg, ${pct(Math.round((kNow-nk)/kNow*100))} in meno. Puoi cambiarlo.`,kg:nk}}}
     save();
     // Recupero adattivo: serie sotto le ripetizioni su un multiarticolare = 30 s in più
     const plus=fail&&ex.t==="comp"&&S.adrest!==false?30:0;
@@ -2988,20 +3015,20 @@ function keepFocus(changed,exId){
   const nb=document.querySelector("nav.bar"),nw=tgt===c&&c.querySelector(".set.now");
   if(nb&&nw&&tOn){const tm=T("timer"),fh=(tm&&!tm.hidden&&tm.offsetHeight)||88,lim=nb.getBoundingClientRect().top-fh-16,over=nw.getBoundingClientRect().bottom-dy-lim;if(over>0)dy+=over}
   if(Math.abs(dy)>2)window.scrollBy({top:dy,behavior:changed&&!RM()?"smooth":"auto"})}
-function finish(g,mods){
-  const d=draftFor(g),sets={};let n=0;
+function finish(g,mods,oldKey){
+  const d=oldKey?S.oldDraft[oldKey]:draftFor(g),sets={};let n=0;
   const names={};
-  const order=PLAN[g].ex.flatMap(e=>[e.id,...altsOf(e).map(a=>e.id+"~"+a.k)]);
+  const order=(PLAN[g]?PLAN[g].ex:[]).flatMap(e=>[e.id,...altsOf(e).map(a=>e.id+"~"+a.k)]);
   const ids=[...order.filter(id=>d.ex[id]),...Object.keys(d.ex).filter(id=>!order.includes(id))];
   const eff={};let stn=null;for(const id of ids){const r=(d.ex[id]||[]).filter(x=>x.done).map(x=>({kg:x.kg??"",reps:x.reps??"",...(Array.isArray(x.myo)&&x.myo.length?{myo:x.myo.slice()}:{})}));if(r.length){sets[id]=r;names[id]=exName(id);n+=r.length;if(d.eff&&d.eff[id])eff[id]=d.eff[id];const t=stationOf(exById(id));if(t)(stn=stn||{})[id]=t}}
   const m=document.getElementById("msg");
   if(!n){m.className="msg err";m.textContent="Spunta almeno una serie con ✓ prima di salvare.";return}
   // Seduta di un altro giorno: data dell'inizio e durata fino all'ultima serie
-  const old=draftOld(g),end=old&&old.stale?(d.last||d.start||Date.now()):Date.now(),when=old&&d.start?new Date(d.start):old?new Date(d.date+"T12:00:00"):new Date();
+  const old=oldKey?{d,stale:true}:draftOld(g),end=old&&old.stale?(d.last||d.start||Date.now()):Date.now(),when=old&&d.start?new Date(d.start):old?new Date(d.date+"T12:00:00"):new Date();
   const dur=d.start?Math.max(1,Math.round((end-d.start)/60000)):null;
   clearDemo();
-  S.sessions.push({id:"s"+Date.now(),day:g,planName:PLAN[g].name,date:when.toISOString(),sets,names,eff,mods:[...mods],deload:mods.has("deload"),dur,...(stn?{stn}:{})});
-  delete S.draft[g];openEx[g]=null;if(g==="LIB"){delete S.free;rebuild();gymSel=null}save();stopTimer();sheetFrom(document.getElementById("finish"),()=>{renderTrain();
+  S.sessions.push({id:"s"+Date.now(),day:g,planName:PLAN[g]?PLAN[g].name:"Seduta libera",date:when.toISOString(),sets,names,eff,mods:[...mods],deload:mods.has("deload"),dur,...(stn?{stn}:{})});
+  if(oldKey)delete S.oldDraft[oldKey];else{delete S.draft[g];openEx[g]=null;if(g==="LIB"){delete S.free;rebuild();gymSel=null}stopTimer()}save();sheetFrom(document.getElementById("finish"),()=>{renderTrain();
   const mm=document.getElementById("msg");mm.className="msg ok";mm.textContent=`Seduta salvata: ${n} serie. I carichi della prossima volta sono già pronti.`;
   if(!storageOk){mm.className="msg err";mm.textContent="Non riesco a salvare su questo dispositivo: controlla che il browser non sia in navigazione privata."}
   summarySheet(S.sessions[S.sessions.length-1])});
@@ -3751,14 +3778,10 @@ function renderSettings(){
   const bm=document.getElementById("bmsg");
   document.getElementById("exp").onclick=async()=>{const x=await shareBackup();if(x==="ok"){bm.className="msg ok";bm.textContent="Backup salvato."}else if(x==="no"){bm.className="msg";bm.textContent="Backup non salvato."}else{bm.className="msg err";bm.textContent="Salvataggio non riuscito su questo browser."}};
   // Prima di cancellare o importare: copia dei dati attuali e "Annulla" per 10 secondi
-  const undoable=(txt)=>{const m=document.getElementById("bmsg");m.className="msg ok";m.innerHTML=`${esc(txt)} <button class="lnk" id="undoD">Annulla</button>`;
-    const u=document.getElementById("undoD");const t=setTimeout(()=>{if(u.isConnected)u.remove()},10000);
-    u.onclick=()=>{clearTimeout(t);try{S=JSON.parse(localStorage.getItem(KEY+".bak"));normS();rebuild();save();applySkin();renderSettings();document.getElementById("bmsg").textContent="Dati ripristinati."}catch(e){}}};
-  const snap=()=>{try{localStorage.setItem(KEY+".bak",JSON.stringify(S))}catch(e){}};
   document.getElementById("imp").onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{const j=JSON.parse(t);if(!j||!Array.isArray(j.sessions))throw 0;const prev=S;snap();
     // Prima si prova il backup; se qualcosa non va si rimettono i dati di prima e non si salva niente
-    try{S=j;normS();rebuild();assess(today())}catch(e){S=prev;rebuild();throw e}
-    stopTimer();save();applySkin();renderSettings();undoable(`Backup importato: ${S.sessions.length} sedute.`)}).catch(()=>{bm.className="msg err";bm.textContent="File non valido: scegli un backup esportato da Allenati Scemo."})};
+    try{S=j;normS();rebuild();assess(today());for(const v of ["oggi","train","prog","set","imp"]){view=v;render()}}catch(e){S=prev;normS();rebuild();view="imp";render();throw e}
+    stopTimer();save();applySkin();view="imp";render();undoable(`Backup importato: ${S.sessions.length} sedute.`)}).catch(()=>{const bm=document.getElementById("bmsg");if(!bm)return;bm.className="msg err";bm.textContent="File non valido: scegli un backup esportato da Allenati Scemo."})};
   const w=document.getElementById("wipe");w.onclick=()=>{if(w.dataset.arm!=="1"){w.dataset.arm="1";w.textContent="Tocca di nuovo: cancella tutto";clearTimeout(w.t);w.t=setTimeout(()=>{if(w.isConnected){w.dataset.arm="";w.textContent="Cancella tutti i dati"}},4000);return}snap();stopTimer();S={sessions:[],view:"set",skin:S.skin,vars:S.vars};normS();rebuild();save();renderSettings();undoable("Dati cancellati.")};
 }
 
@@ -3805,12 +3828,13 @@ function renderEditor(){
   document.querySelectorAll(".edx").forEach(row=>{const i=+row.dataset.i,e=E.ex[i];
     row.querySelectorAll("[data-f]").forEach(inp=>{const f=inp.dataset.f;const h=ev=>{const fin=ev&&ev.type==="change",em=document.getElementById("emsg"),say=t=>{if(fin&&em){em.className="msg";em.textContent=t}};
       if(inp.type==="checkbox")e[f]=inp.checked;
-      // Limiti: serie 1-10, ripetizioni 1-100, recupero 0-10 min. Recupero: "90" = secondi, "1:30" = minuti e secondi, "1,5" o "2 min" = minuti, un numero fino a 10 = minuti
-      else if(f==="rest"){const v=String(inp.value).trim().toLowerCase(),m=v.match(/^(\d+)\s*:\s*(\d{1,2})$/),dm=v.match(/^(\d+[.,]\d+)$/),mn=v.match(/^(\d+(?:[.,]\d+)?)\s*m(?:in(?:ut[oi])?)?\s*(\d{1,2})?\s*(?:s|sec)?$/),n0=parseInt(v,10);
+      // Limiti: serie 1-10, ripetizioni 1-100, recupero 0-10 min. Recupero: "90" = secondi, "1:30" o "1.30" = minuti e secondi, "1,5", "2 min" o "2'" = minuti, un numero fino a 10 = minuti
+      else if(f==="rest"){const v=String(inp.value).trim().toLowerCase(),m=v.match(/^(\d+)\s*:\s*(\d{1,2})$/)||v.match(/^(\d+)\s*[.,]\s*(\d{2})$/),dm=v.match(/^(\d+[.,]\d)$/),mn=v.match(/^(\d+(?:[.,]\d+)?)\s*(?:m(?:in(?:ut[oi])?)?|['’])\s*(\d{1,2})?\s*(?:s|sec|["”])?$/),n0=parseInt(v,10);
         const raw=m?+m[1]*60+ +m[2]:dm?Math.round(num(dm[1])*60):mn?Math.round(num(mn[1])*60)+(+mn[2]||0):n0>0&&n0<=10&&/^\d+$/.test(v)?n0*60:n0||0,sec=Math.max(0,Math.min(600,raw));e[f]=sec;
         if(fin){inp.value=sec>=60?Math.floor(sec/60)+":"+String(sec%60).padStart(2,"0"):String(sec);say(raw>600?"Recupero: massimo 10 minuti.":sec?`Recupero: ${sec>=60?fk(sec/60)+" min":sec+" s"}.`:"Recupero 0: si passa subito al prossimo.")}}
       else if(["s","lo","hi"].includes(f)){const mx=f==="s"?10:e.t==="time"?600:100,v=parseInt(inp.value,10),c=Math.max(1,Math.min(mx,v||1));e[f]=c;
-        if(fin&&String(c)!==String(inp.value).trim()){inp.value=c;say(`${f==="s"?"Serie":f==="lo"?"Ripetizioni minime":"Ripetizioni massime"}: ${v>mx?`massimo ${mx}`:"almeno 1"}, ho messo ${c}.`)}}
+        if(fin&&String(c)!==String(inp.value).trim()){inp.value=c;say(`${f==="s"?"Serie":f==="lo"?"Ripetizioni minime":"Ripetizioni massime"}: ${v>mx?`massimo ${mx}`:"almeno 1"}, ho messo ${c}.`)}
+        else if(fin&&f!=="s"&&e.lo>e.hi)say(`Le ripetizioni minime (${e.lo}) sono più alte delle massime (${e.hi}).`);else if(fin&&em)em.textContent=""}
       else if(f==="step")e[f]=num(inp.value)||2.5;
       else e[f]=inp.value;
       if(f==="eq"){const q=EQS.find(x=>x[0]===inp.value);if(q&&q[2])e.step=q[2]}
