@@ -1643,8 +1643,8 @@ html.vt-ex::view-transition-old(root){animation:none}
 html.vt-ex::view-transition-new(root){animation:vtIn .2s var(--ease-out) .12s both}
 /* 2 e 4. Fogli che si aprono dall'elemento toccato (Termina e salva -> riepilogo, muscolo -> dettaglio, seduta fatta -> riepilogo) */
 ::view-transition-group(vt-src){animation-duration:.32s;animation-timing-function:cubic-bezier(.32,.72,0,1);overflow:clip;border-radius:20px 20px 0 0}
-::view-transition-old(vt-src){animation:vtOut .14s var(--ease-out) both}
-::view-transition-new(vt-src){animation:vtIn .2s var(--ease-out) both}
+::view-transition-old(vt-src){animation:vtOut .06s var(--ease-out) both}
+::view-transition-new(vt-src){animation:vtIn .06s var(--ease-out) both}
 html[data-skin="manga"]::view-transition-group(vt-src){border-radius:0}
 /* Sotto il foglio la pagina cambia di colpo: si muove solo il foglio, niente strati sovrapposti */
 html.vt-sh::view-transition-old(root){animation:none;display:none}
@@ -3040,7 +3040,7 @@ document.addEventListener("click",e=>{if(view!=="train"||performance.now()-lastT
 function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;
   // Doppio tocco: dopo la spunta la pagina scorre e un'altra spunta (o un tasto del recupero) può finire sotto il dito
   // Stessa spunta entro 0,4 s: doppio tocco, non toglie la serie appena segnata. Spunta diversa entro 0,5 s: si ignora solo se la pagina è scivolata sotto il dito
-  const tk=exId+"|"+j,tn=performance.now(),dt=tn-lastTk.t;if(lastTk.k===tk&&dt<400)return;if(lastTk.k!==tk&&dt<500&&Math.abs(scrollY-lastTk.y)>4){const rw=document.querySelector(`.tick[data-ex="${exId}"][data-j="${j}"]`);if(rw&&!RM())rw.animate([{transform:"translateX(0)"},{transform:"translateX(-4px)"},{transform:"translateX(4px)"},{transform:"translateX(0)"}],{duration:220});return}lastTk={t:tn,k:tk,y:scrollY};
+  const tk=exId+"|"+j,tn=performance.now(),dt=tn-lastTk.t;if(lastTk.k===tk&&dt<400)return;if(lastTk.k!==tk&&dt<1100&&Math.abs(scrollY-lastTk.y)>4){const rw=document.querySelector(`.tick[data-ex="${exId}"][data-j="${j}"]`);if(rw&&!RM())rw.animate([{transform:"translateX(0)"},{transform:"translateX(-4px)"},{transform:"translateX(4px)"},{transform:"translateX(0)"}],{duration:220});return}lastTk={t:tn,k:tk,y:scrollY};
   audioUnlock();
   const ex=PLAN[g].ex.map(e=>effEx(g,e)).find(e=>e.id===exId)||exById(exId),r=cell(g,exId,j);
   const row=document.querySelector(`.tick[data-ex="${exId}"][data-j="${j}"]`).closest(".set");
