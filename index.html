@@ -3348,11 +3348,18 @@ function volRange(from,to){
     L.forEach((k,i)=>{if(k in out)out[k]+=n*(i?.5:1)})}}
   return out}
 const volCol=v=>v<10?"var(--adapt)":v<=20?"var(--go)":"var(--hot)";
+/* Andamento: ogni esercizio entra nella media con il suo primo valore anche nei punti prima della prima volta che l'hai fatto.
+   Così aggiungere un esercizio o un muscolo nuovo (es. il primo giorno di gambe) non sposta la linea: si muove solo se cambiano i tuoi massimali. */
+function rankSeries(rows){const keys=[...new Set(rows.flatMap(r=>r.A.ex.map(e=>nmKey(e.n))))],sd={};
+  const val=rows.map(r=>{const m={};r.A.ex.forEach(e=>{m[nmKey(e.n)]=e.v;sd[nmKey(e.n)]=e.sd});return m});
+  for(const k of keys){const f=val.find(m=>m[k]!=null)[k];for(const m of val){if(m[k]!=null)break;m[k]=f}}
+  return rows.map((r,i)=>{const mv=RMU.map(([mk])=>{const L=keys.filter(k=>sd[k].m.includes(mk)&&val[i][k]!=null);return L.length?L.reduce((a,k)=>a+val[i][k],0)/L.length:null}).filter(v=>v!=null);return {at:r.at,v:mv.reduce((a,b)=>a+b,0)/mv.length}})}
 function rankHist(){
-  let pts=[],perS=false;for(let w=11;w>=0;w--){const at=addDays(today(),-7*w),A=rankAll(null,at);if(A.gen)pts.push({at,v:A.gen.v})}
+  let pts=[],perS=false,rows=[];for(let w=11;w>=0;w--){const at=addDays(today(),-7*w),A=rankAll(null,at);if(A.gen)rows.push({at,A})}pts=rows.length>1?rankSeries(rows):rows;
   // Prime settimane: meno di due punti settimanali, allora un punto per ogni giorno con una seduta (così la linea compare subito)
-  if(pts.length<2){perS=true;pts=[];const ds=[...new Set(S.sessions.filter(s=>!s.deload&&new Date(s.date)>=addDays(today(),-84)).map(s=>iso(s.date)))].sort();
-    for(const d of ds){const at=addDays(new Date(d+"T00:00:00"),1),A=rankAll(null,at>today()?addDays(today(),1):at);if(A.gen)pts.push({at:new Date(d+"T12:00:00"),v:A.gen.v})}}
+  if(pts.length<2){perS=true;pts=[];rows=[];const ds=[...new Set(S.sessions.filter(s=>!s.deload&&new Date(s.date)>=addDays(today(),-84)).map(s=>iso(s.date)))].sort();
+    for(const d of ds){const at=new Date(d+"T12:00:00"),A=rankAll(null,at);if(A.gen)rows.push({at,A})}
+    pts=rows.length>1?rankSeries(rows):rows}
   if(pts.length<2)return pts.length?`<div class="rk-hist"><div class="l"><b>Andamento</b><span>dalla prossima seduta</span></div><p class="note" style="margin:0">La linea del rango compare quando hai almeno due giorni di allenamento.</p></div>`:"";
   const lo=Math.max(0,Math.floor(Math.min(...pts.map(p=>p.v)))),hi=Math.min(9,Math.ceil(Math.max(...pts.map(p=>p.v)))+ (Math.max(...pts.map(p=>p.v))%1===0?1:0)),W=300,H=96,L=68;
   const x=i=>L+(W-L-6)*(pts.length===1?0:i/(pts.length-1)),y=v=>6+(H-12)*(1-(v-lo)/Math.max(1,hi-lo));
@@ -3360,7 +3367,7 @@ function rankHist(){
   const d=pts.map((p,i)=>`${i?"L":"M"}${x(i).toFixed(1)} ${y(p.v).toFixed(1)}`).join(" "),last=pts[pts.length-1],first=pts[0],dv=Math.round((last.v-pts[Math.max(0,pts.length-5)].v)*100);
   const t0=+pts[0].at,t1=+pts[pts.length-1].at,xt=t=>L+(W-L-6)*((t-t0)/((t1-t0)||1));
   bands+=phaseBands(new Date(t0),new Date(t1)).map(b=>`<rect x="${xt(b.a).toFixed(1)}" y="6" width="${(xt(b.b)-xt(b.a)).toFixed(1)}" height="${H-12}" fill="none" stroke="${PH[b.ph].col}" stroke-dasharray="3 3"/><text x="${(xt(b.a)+3).toFixed(1)}" y="15" style="fill:${PH[b.ph].col};font-weight:700">${PH[b.ph].n}</text>`).join("");
-  return `<div class="rk-hist"><div class="l"><b>Andamento</b><span>${perS?`${dv>0?"+":""}${Math.round((last.v-first.v)*100)} pt in ${pts.length} sedute`:`${dv>0?"+":""}${dv} pt in 4 settimane`}</span></div>
+  return `<div class="rk-hist"><div class="l"><b>Andamento</b><span>${perS?`${dv>0?"+":""}${Math.round((last.v-first.v)*100)} pt in ${pts.length} sedute`:(wk=>`${dv>0?"+":""}${dv} pt in ${wk===1?"1 settimana":wk+" settimane"}`)(Math.max(1,Math.round((last.at-pts[Math.max(0,pts.length-5)].at)/(7*864e5))))}</span></div>
   <svg viewBox="0 0 ${W} ${H+20}" aria-label="Rango generale nelle ultime ${pts.length} settimane">${bands}<path d="${d}" fill="none" stroke="var(--hot)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>${pts.map((p,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="${i===pts.length-1?4:2.5}" fill="${i===pts.length-1?"var(--hot)":"var(--fg)"}"/>`).join("")}
   <text x="${L}" y="${H+14}">${fmtShort(first.at)}</text><text x="${W-6}" y="${H+14}" text-anchor="end">${perS&&iso(last.at)!==iso(today())?fmtShort(last.at):"oggi"}</text></svg></div>`}
 let rMode="rank";
