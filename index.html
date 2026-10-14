@@ -2045,7 +2045,7 @@ function target(ex,noMyo){
     if(!mm.length&&hReps.some(r=>r>ex.hi))noM=true;
     else if(atHi||mm.length){
       if(atHi&&mm.filter(v=>v>=MYO.mini).length>=4){
-        if(atCap)return {kg,reps:Array(ex.s).fill(ex.hi),top:ex.hi,kind:"flat",badge:"Max pacco",myo:true,msg:`Myo-rep completi a ${fk(kg)} kg, il massimo del pacco: stesso schema, discesa in 3 secondi.`};
+        if(atCap)return {kg,reps:Array(ex.s).fill(ex.hi),top:ex.hi,kind:"flat",badge:"Max pacco",myo:true,hold:true,msg:`Myo-rep completi a ${fk(kg)} kg, il massimo del pacco: stesso schema, discesa in 3 secondi.`};
         let nk=kg+st;if(cap&&nk>cap)nk=cap;const raw=repsAt(nk);
         if(raw>=floorR){const rr=Math.min(ex.lo,raw);
           return {kg:nk,reps:Array(ex.s).fill(rr),top:ex.hi,kind:"up",badge:`+${fk(nk-kg)} kg`,msg:`Myo-rep completi: passa a ${fk(nk)} kg e punta a ${rr} ripetizioni${rr<ex.lo?`, poi risali una alla volta fino a ${ex.lo}`:""}. Serie normali.`}}
@@ -2070,7 +2070,7 @@ function target(ex,noMyo){
     if(allTop)return {kg:null,reps:Array(ex.s).fill(ex.lo),kind:"up",badge:"Meno aiuto",msg:`Chiuse tutte a ${ex.hi}: usa un elastico più leggero e riparti da ${ex.lo}.`};
     return {kg:null,reps:pad(reps.map(r=>Math.min(ex.hi,Math.max(ex.lo,r+1))),ex.s),kind:"up",badge:"+1 rip",msg:"Una ripetizione in più per serie, stesso elastico."};
   }
-  if(allTop&&atCap)return {kg,reps:Array(ex.s).fill(top),top,kind:"flat",badge:"Max pacco",msg:`${fk(kg)} kg è il massimo del pacco e sei a ${top} ripetizioni: stesso carico, discesa in 3 secondi e 1 secondo fermo in chiusura.`};
+  if(allTop&&atCap)return {kg,reps:Array(ex.s).fill(top),top,kind:"flat",badge:"Max pacco",hold:true,msg:`${fk(kg)} kg è il massimo del pacco e sei a ${top} ripetizioni: stesso carico, discesa in 3 secondi e 1 secondo fermo in chiusura.${altsOf(EX[String(ex.id).split("~")[0]]||ex).length?" Se vuoi più carico, ⇄ Cambia con una variante.":""}`};
   if(allTop){
     if(eff==="hard"&&(ex.t==="comp"||ex.t==="bw"))return {kg,reps:Array(ex.s).fill(ex.hi),top,kind:"flat",badge:"=",msg:`Range chiuso ma al limite: ${ex.t==="bw"&&!kg?"niente zavorra per ora,":"stesso carico e"} stesse ripetizioni. Aumenti quando ti restano ${ex.rir} in canna.`};
     let inc=st;
@@ -2795,7 +2795,7 @@ const setupKey=ex=>String(ex.n||"").trim().toLowerCase();
 const setupOf=ex=>((S.setup||{})[setupKey(ex)]||"").trim();
 // Attrezzo: quanto pesa davvero il numero sul pacco. Cavi: rapporto della carrucola (2:1 = senti metà). Macchine: più leggera o più pesante del solito.
 // Serve ai ranghi (confronto con le tabelle di forza); i progressi del singolo esercizio restano nei kg che carichi.
-const isCable=ex=>ex.eq==="cavl"||(!/lat machine|pulley|elastico|manubri/i.test(ex.n||"")&&/\bcav[oi]\b|pushdown|face pull|woodchop|pallof|corda/i.test(ex.n||""));
+const isCable=ex=>ex.eq==="cavl"||/^pulley basso/i.test(ex.n||"")||(!/lat machine|pulley|elastico|manubri/i.test(ex.n||"")&&/\bcav[oi]\b|pushdown|face pull|woodchop|pallof|corda/i.test(ex.n||""));
 const eqKind=ex=>isCable(ex)?"cavo":eqOf(ex)==="mac"?"mac":"";
 const CAB_F=[[1,"1:1","peso pieno"],[.5,"2:1","metà"],[1/3,"3:1","un terzo"],[.25,"4:1","un quarto"]];
 const MAC_F=[[.5,"×0,5","molto più leggera"],[.75,"×0,75","più leggera"],[1,"Normale","come le altre"],[1.5,"×1,5","più pesante"],[2,"×2","molto più pesante"]];
@@ -2803,21 +2803,22 @@ const MAC_F=[[.5,"×0,5","molto più leggera"],[.75,"×0,75","più leggera"],[1,
 const S700={m:"Technogym Selection 700 Pectoral / Reverse Fly",s:"Selection 700",max:50,f:2};
 // Macchine (taratura, pacco massimo, Selection 700): pronte ma spente finché Alessandro non le approva
 const EQ_MAC=true;
-const EQ_DEF=EQ_MAC?{"butterfly alla macchina":S700,"reverse fly":S700,"reverse fly alla macchina":S700}:{};
+// Pulley basso: lo fa sul cavo singolo, pacco fino a 50 kg (detto da lui il 14 ottobre)
+const EQ_DEF=EQ_MAC?{"butterfly alla macchina":S700,"reverse fly":S700,"reverse fly alla macchina":S700,"pulley basso":{max:50,stn:"single"}}:{};
 /* Due attrezzi per i cavi nella sua palestra: la stazione cavi (quasi tutto, gradini da 5 kg) e il cavo singolo (gradini da 2,5 kg, molto più pesante: carrucola 1:1).
    Ogni esercizio ai cavi ricorda su quale lo fai; le sedute salvano la stazione usata. Se cambi attrezzo, i kg delle volte precedenti vengono convertiti con il rapporto stR
    (stessa fatica: 1 kg sul cavo singolo = stR kg sulla stazione; predefinito 2, la stazione si comporta come una carrucola 2:1). */
 const STN={multi:{n:"Stazione cavi",step:5},single:{n:"Cavo singolo",step:2.5}};
 const stR=()=>S.stR>0?S.stR:2;
-const stnDef=ex=>ex.eq==="cavl"||/extrarotazione al cavo/i.test(ex.n||"")?"single":"multi";
+const stnDef=ex=>ex.eq==="cavl"||/extrarotazione al cavo|^pulley basso/i.test(ex.n||"")?"single":"multi";
 const stationOf=ex=>isCable(ex)?((S.station||{})[setupKey(ex)]||stnDef(ex)):null;
 const stnOfSet=(s,id)=>{const e=exById(id);if(!isCable(e))return null;return (s.stn||{})[id]||stnDef(e)};
 const stnConv=(from,to)=>from===to||!from||!to?1:from==="multi"?1/stR():stR();
 const stepOf=ex=>{const t=stationOf(ex);return t?STN[t].step:(ex.step||2.5)};
 const eqDef=ex=>EQ_DEF[setupKey(ex)]||null;
-const eqMax=ex=>{if(!EQ_MAC)return null;const u=(S.eqmax||{})[setupKey(ex)];if(u===0)return null;return u>0?u:(eqDef(ex)||{}).max||null};
+const eqMax=ex=>{if(!EQ_MAC)return null;const u=(S.eqmax||{})[setupKey(ex)];if(u===0)return null;const d=eqDef(ex);if(d&&d.stn&&stationOf(ex)!==d.stn)return null;return u>0?u:(d||{}).max||null};
 const eqFOf=(ex,stn)=>{if(isCable(ex))return stnConv(stn||stationOf(ex),stnDef(ex));if(!EQ_MAC)return 1;const v=(S.eqf||{})[setupKey(ex)]||(eqDef(ex)||{}).f;return eqKind(ex)&&v>0?v:1};
-const eqLbl=ex=>{const f=eqFOf(ex),d=eqDef(ex),mx=eqMax(ex),t=[];if(d)t.push(d.s);if(isCable(ex))t.push(STN[stationOf(ex)].n);
+const eqLbl=ex=>{const f=eqFOf(ex),d=eqDef(ex),mx=eqMax(ex),t=[];if(d&&d.s)t.push(d.s);if(isCable(ex))t.push(STN[stationOf(ex)].n);
   if(f!==1&&!isCable(ex)){const L=eqKind(ex)==="cavo"?CAB_F:MAC_F,o=L.find(x=>Math.abs(x[0]-f)<1e-6);if(o)t.push(eqKind(ex)==="cavo"?"Cavo "+o[1]:"Macchina "+o[1])}
   if(mx)t.push("pacco fino a "+fk(mx)+" kg");return t.join(", ")};
 function setupHTML(ex){const t=[setupOf(ex),eqLbl(ex)].filter(Boolean).join(" · ");return t?`<button class="setup has" data-setup="${ex.id}"><b>Regolazioni</b><span>${esc(t)}</span></button>`:`<button class="lnk setup0" data-setup="${ex.id}">+ Regolazioni</button>`}
@@ -2922,7 +2923,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   if(myoA)spec.push(`<span class="ad">ultima&nbsp;a&nbsp;cedimento</span>`);
   spec.push(`<span>${ex.rest?(ex.rest>=120?fk(ex.rest/60)+"&nbsp;min":ex.rest+"&nbsp;s"):"Subito il prossimo"}</span>`);
   if(mods.has("prePadel")&&ex.strap)chips.push(`<span class="chip adapt">Fasce da polso: risparmi la presa per il padel</span>`);
-  if(tg.top&&tg.top>ex.hi&&!mods.has("deload")&&tg.reps.every(r=>r>=ex.lo))chips.push(`<span class="chip hot">Range esteso fino a ${tg.top}: il prossimo gradino è ${pct(Math.round(stepOf(ex)/Math.max(1,tg.kg||lastKg(ex)||1)*100))}</span>`);
+  if(tg.top&&tg.top>ex.hi&&!mods.has("deload")&&tg.reps.every(r=>r>=ex.lo)){const mx=eqMax(ex);chips.push(`<span class="chip hot">Range esteso fino a ${tg.top}: ${mx&&(tg.kg||0)>=mx?`${fk(mx)} kg è il massimo del pacco`:`il prossimo gradino è ${pct(Math.round(stepOf(ex)/Math.max(1,tg.kg||lastKg(ex)||1)*100))}`}</span>`)}
   const stallTxt=!mods.has("deload")&&!tg.hold&&!(tg.kind==="up"&&tg.kg>0&&tg.kg>(lastKg(ex)||0))&&stalled(ex)?(phaseAt()==="def"?`<p class="prog down"><span>In calo</span><span>Massimale sotto del 5% nelle ultime 2 sedute. In definizione basta tenere i carichi: se continua togli una serie o fai lo scarico.</span></p>`:`<p class="prog down"><span>Fermo</span><span>Nessun miglioramento nelle ultime 3 sedute: prova una variante con ⇄ Cambia o togli una serie per due settimane.</span></p>`):"";
   const over=tOn&&tEnd<=Date.now();
   const rest=withRest&&tOn?`<div class="rest ${over?"over":""}" id="restIn" role="timer"><span class="rr"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rk" cx="32" cy="32" r="28"/><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg><b class="tv"></b></span><span class="tl" aria-live="assertive">${over?"Recupero finito":"Recupero"+(tPlus?"\u00a0·\u00a0+"+tPlus+"\u00a0s":"")}</span><button data-tp>+15 s</button><button data-ts>Chiudi</button></div>`:"";
