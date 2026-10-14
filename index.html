@@ -41,7 +41,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.02em;margin:0;text-wrap:balance}
 h1{font-size:48px;line-height:.9}
 h2{font-size:30px;line-height:1}
-h3{font-size:25px;line-height:1}
+h3{font-size:22px;line-height:1.05}
 .muted{color:var(--muted)}
 .head{display:flex;flex-direction:column;gap:6px}
 .card{background:var(--card);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
@@ -1726,8 +1726,8 @@ html[data-skin="vetro"]:not(#z):not(#y) .timer button{color:var(--hot-ink);borde
 :root:not(#z):not(#y) details.h summary span{white-space:normal}
 :root:not(#z):not(#y) details.h summary b{min-width:0;overflow-wrap:anywhere}
 /* Selettori a 2-3 opzioni: colonne che si stringono, testo che va a capo */
-:root:not(#z) .seg{grid-template-columns:repeat(auto-fit,minmax(min(100%,5.4rem),1fr))}
-:root:not(#z) .seg button{min-width:0;overflow-wrap:break-word}
+:root:not(#z) .seg{display:flex;flex-wrap:wrap}
+:root:not(#z) .seg button{flex:1 1 auto;min-width:min(100%,4.4rem);overflow-wrap:normal;word-break:normal;hyphens:none}
 /* Barra in basso: le etichette non crescono oltre 13 px (come le barre di iOS) */
 :root:not(#z):not(#y) nav.bar button{font-size:clamp(11px,.7059rem,13px);letter-spacing:.02em}
 /* Eclisse: opzione scelta con il bordo luminoso della scheda in corso */
@@ -1740,6 +1740,24 @@ html[data-skin="eclisse"]:not(#z):not(#y) .seg button:not([aria-pressed="true"])
 /* Tocchi da almeno 44 px senza cambiare il disegno: area di tocco più grande del bottone */
 .rk-seg button::after,.rk-flip::after{content:"";position:absolute;inset:-10px}
 .rk-seg button,.rk-flip{position:relative}
+/* Seduta libera: il tasto cresce col testo grande e resta fisso in basso anche in Lavagna */
+html:not(#z):not(#y):not(#x) .sheet .btn.fxgo{position:sticky;bottom:8px;flex-shrink:0;height:auto;min-height:50px;padding-block:12px;line-height:1.2;text-align:center}
+html:not(#z):not(#y):not(#x) .sheet .fxgo:disabled::before,html:not(#z):not(#y):not(#x) .sheet .fxgo:disabled::after{display:none}
+/* Riscaldamento: le dosi vanno sotto il nome quando non ci stanno (320 px, testo grande) */
+:root:not(#z):not(#y) .wu li{flex-wrap:wrap;row-gap:2px}
+:root:not(#z):not(#y) .wu li span{min-width:0;flex:1 1 10rem}
+:root:not(#z):not(#y) .wu li em{margin-left:auto;max-width:100%;white-space:normal;text-align:right}
+/* Oro: i testi piccoli hanno un fondo scuro sotto, sul giallo chiaro di Carbonio e Campo non bastava il colore */
+:root:not(#z):not(#y):not(#x) .ex.cur.gold .pgr>span{background:rgba(0,0,0,.34);color:var(--fg);padding:2px 8px;border-radius:999px}
+:root:not(#z):not(#y):not(#x) .ex.cur.gold .qm{background:rgba(0,0,0,.42);color:#fff;border-color:rgba(255,255,255,.5)}
+:root:not(#z):not(#y):not(#x) .ex.cur.gold .lu{color:var(--fg);text-shadow:0 1px 2px rgba(0,0,0,.55)}
+/* Progressi: il ? accanto al titolo va a capo invece di uscire dalla scheda */
+:root:not(#z):not(#y) .rk-h{flex-wrap:wrap;row-gap:6px}
+:root:not(#z):not(#y) .rk-h h3{min-width:0;overflow-wrap:break-word}
+/* Striscia settimana: nomi su due righe quando non ci stanno, testo che cresce poco */
+:root:not(#z):not(#y):not(#x) .wd2 small{font-size:clamp(12px,.7059rem,13px);letter-spacing:-.03em;padding:0;white-space:normal;overflow-wrap:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;text-overflow:clip;text-align:center;line-height:1.1;max-width:100%}
+:root:not(#z):not(#y):not(#x) .wd2 b{font-size:clamp(12px,.7059rem,15px)}
+@media (max-width:360px){:root:not(#z):not(#y):not(#x) .wd2 small{font-size:12px;letter-spacing:-.04em}:root:not(#z):not(#y):not(#x) .wk{padding-inline:2px!important;gap:1px!important}}
 </style>
 <!--APP-HEAD-END-->
 </head>
@@ -2711,7 +2729,7 @@ function renderToday(){
   const runG=hasGym&&!doneS&&S.draft&&S.draft[a.gym]&&!draftOld(a.gym)?a.gym:null;let runN=0,runT=0;
   if(runG){const L=trainList(runG,trainMods(runG));for(const {ex} of L){const n=setsFor(ex,trainMods(runG));runT+=n;runN+=Math.min(n,doneCount(runG,ex.id))}}
   const doneSt=doneS?sessStats(doneS):null,doneAt=doneS?new Date(doneS.date).toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"}):"";
-  const week=[...Array(7)].map((_,i)=>{const x=addDays(d,i),p=dayPlan(x);return `<button class="wd2 ${i===0?"t":""}" data-wd="${i}" aria-label="${esc(cap(WD_LONG[x.getDay()]))}: cambia il padel"><b>${WD[x.getDay()]}</b><span class="ics">${i===0&&doneS?dayIcons(p).replace(I("gym"),`<b class="dk" aria-label="Fatta">✓</b>`):dayIcons(p)}</span><small>${p.gym in PLAN?esc(PLAN[p.gym].name):p.padel==="match"?"Partita":p.padel==="train"?"Padel":"Riposo"}</small></button>`}).join("");
+  const week=[...Array(7)].map((_,i)=>{const x=addDays(d,i),p=dayPlan(x);return `<button class="wd2 ${i===0?"t":""}" data-wd="${i}" aria-label="${esc(cap(WD_LONG[x.getDay()]))}: cambia il padel"><b>${WD[x.getDay()]}</b><span class="ics">${i===0&&doneS?dayIcons(p).replace(I("gym"),`<b class="dk" aria-label="Fatta">✓</b>`):dayIcons(p)}</span><small>${p.gym in PLAN?esc(PLAN[p.gym].name).replace(/ (\S{1,2})$/,"<br>$1"):p.padel==="match"?"Partita":p.padel==="train"?"Padel":"Riposo"}</small></button>`}).join("");
   let dl="";
   if(deloadOn())dl=`<div class="banner">${I("bolt")}<div><b>Scarico in corso</b><span>Fino a ${fmtShort(S.deload.to)}: metà serie, stessi carichi, 3-4 in canna.</span></div><button id="endDl">Termina</button></div>`;
   else{const w=deloadAdvice();if(w)dl=`<div class="banner">${I("bolt")}<div><b>Scarico consigliato</b><span>${esc(cap(w.join(" e ")))}.</span></div><button id="startDl">Avvia scarico</button><button id="snoozeDl" class="sec">Non ora</button></div>`}
