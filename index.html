@@ -2076,6 +2076,7 @@ function target(ex,noMyo){
   // Isolamento e prevenzione con un gradino grosso rispetto al carico (>15%, es. extrarotazione 5 → 10 kg): prima si va oltre il range con le ripetizioni
   const cap=kg>0?eqMax(ex):null,atCap=cap&&kg+st>cap+1e-6;
   // Ultima volta più del pacco (storico di prima o pacco cambiato): si riparte dal pacco con le ripetizioni che il massimale permette
+  if(cap&&kg>cap+1e-6&&powEx(ex))return {kg:cap,reps:Array(ex.s).fill(ex.lo),top:ex.lo,kind:"down",badge:`${fk(cap)} kg`,hold:true,msg:`Il pacco arriva a ${fk(cap)} kg (l'ultima volta ${fk(kg)}): ${fk(cap)} kg, sempre ${ex.lo}${ex.side?" per lato":""}, ogni ripetizione esplosiva.`};
   if(cap&&kg>cap+1e-6){const b=Math.max(...heavy.map(x=>e1rm(kg,num(x.reps)+rirMid(ex.rir)))),tp=Math.min(30,ex.hi+(ex.t==="comp"?5:10)),rr=Math.max(ex.lo,Math.min(tp,Math.floor((b/cap-1)*30-rirMid(ex.rir))));
     return {kg:cap,reps:Array(ex.s).fill(rr),top:tp,kind:"down",badge:`${fk(cap)} kg`,hold:true,msg:`Il pacco arriva a ${fk(cap)} kg (l'ultima volta ${fk(kg)}): ${rr>=tp?`${fk(cap)} × ${rr}, discesa in 3 secondi e 1 secondo fermo in chiusura.${altsOf(EX[String(ex.id).split("~")[0]]||ex).length?" Se vuoi più carico, ⇄ Cambia con una variante.":""}`:`riparti da ${fk(cap)} × ${rr}${rr>ex.hi?`, poi sali con le ripetizioni fino a ${tp}`:""}.`}`}}
   // Pacco finito: niente più kg, si continua con le ripetizioni (fino a +10 oltre il range, poi discesa più lenta)
@@ -2750,7 +2751,7 @@ function renderToday(){
   document.getElementById("cEn").onclick=()=>pickSheet("Come ti senti",[{v:"low",l:"Stanco",sub:"Stessi carichi, una serie in meno per esercizio"},{v:"ok",l:"Normale"},{v:"high",l:"In forma"}],a.energy,v=>{S.energy[k]=v;save();renderToday()});
   const fg=document.getElementById("freeGo");if(fg)fg.onclick=()=>{if(PLAN.LIB&&S.draft.LIB){gymSel="LIB";go("train")}else freeSheet()};
   const fd=document.getElementById("fullDay");if(fd)fd.onclick=()=>{if(a.full)delete S.fullDay;else S.fullDay=k;save();renderToday()};
-  const cg=document.getElementById("chGym");if(cg)cg.onclick=()=>pickSheet("Palestra oggi",[{v:"none",l:"Niente palestra"},...GYM_ORDER.filter(x=>x!=="LIB").map(g=>({v:g,l:PLAN[g].name,sub:PLAN[g].sub}))],a.gym,v=>setO(d,"gym",v));
+  const cg=document.getElementById("chGym");if(cg)cg.onclick=()=>pickSheet("Palestra oggi",[{v:"none",l:"Niente palestra"},...GYM_ORDER.filter(x=>x!=="LIB").map(g=>({v:g,l:PLAN[g].name,sub:PLAN[g].sub})),{v:"@free",l:PLAN.LIB&&S.draft.LIB?"Continua la seduta libera":"Seduta libera",sub:"Esercizi scelti al volo, fuori dal piano"}],a.gym,v=>{if(v==="@free"){if(PLAN.LIB&&S.draft.LIB){gymSel="LIB";go("train")}else setTimeout(freeSheet,240);return}setO(d,"gym",v)});
   const sd=document.getElementById("startDl");if(sd)sd.onclick=()=>{startDeload();renderToday();reviewSheet(S.cycles[S.cycles.length-1])};
   const bkN=document.getElementById("bkNow");if(bkN)bkN.onclick=async()=>{await shareBackup();renderToday()};
   const bkL=document.getElementById("bkLater");if(bkL)bkL.onclick=()=>{S.bkSnooze=iso(addDays(today(),7));save();renderToday()};
@@ -2769,6 +2770,7 @@ let openEx={};
 function modsCtx(g){const dr=(S.draft||{})[g],busy=!!dr&&hasDone(dr),d=busy&&dr.date&&dr.date!==iso(today())?new Date(dr.date+"T12:00:00"):today(),a=assess(d),own=a.gym===g;
   const m=new Set(own?a.mods:busy&&Array.isArray(dr.mods)?dr.mods:[]);m.delete("deload");if(deloadOn())m.add("deload");return {a,mods:m,own}}
 function trainMods(g){return modsCtx(g).mods}
+const MODTXT={prePadel:"almeno 1 ripetizione in canna anche sull'isolamento (padel dopo)",oh:"una serie in meno sulle spinte sopra la testa",prevOnly:"solo braccia, Copenhagen, cuffia e polso",rir:"almeno 1 ripetizione in canna su tutto",light:"una serie in meno su tutto",noEcc:"niente Nordic",noEccLight:"una serie in meno sugli eccentrici"};
 function trainList(g,mods){const L=PLAN[g].ex.map(e=>({ex:effEx(g,e),base:e}));if(!mods.has("prePadel"))return L;return [...L.filter(x=>x.ex.t!=="prev"),...L.filter(x=>x.ex.t==="prev")]}
 // pre: serie già fatte con l'esercizio di prima, tenute dopo un "Cambia" a metà
 const doneCount=(g,id)=>(draftFor(g).ex[id]||[]).filter(x=>x.done).length+((draftFor(g).pre||{})[id]||0);
@@ -2787,7 +2789,8 @@ function renderTrain(){
   const curId=(goldHold&&goldHold.g===g?goldHold.ex:null)||openEx[g]||first?.ex.id;const curIt=L.find(x=>x.ex.id===curId);
   const open=new Set(curId?[curId]:[]);
   if(curIt&&ssOf(g,curIt.ex))L.forEach(x=>{if(ssOf(g,x.ex)===ssOf(g,curIt.ex)&&!exDone(g,x.ex,mods))open.add(x.ex.id)});
-  const modNote=isToday&&a.level!=="go"?`<details class="mn"><summary>${esc(a.title)}<span>perché</span></summary><p>${esc(a.notes.join(" "))}</p></details>`:"";
+  const mList=[...mods].filter(m=>MODTXT[m]).map(m=>MODTXT[m]);
+  const modNote=isToday&&a.level!=="go"?`<details class="mn"><summary>${esc(a.title)}<span>perché</span></summary><p>${esc(a.notes.join(" "))}</p></details>`:!isToday&&mList.length?`<details class="mn"><summary>Seduta adattata<span>perché</span></summary><p>${esc(cap("tiene gli adattamenti del giorno in cui l'hai iniziata: "+mList.join(", ")+"."))}</p></details>`:"";
   let html="",shownPost=false,restShown=false;const askH=[],curH=[],nextH=[],doneH=[];
   L.forEach(({ex,base},i)=>{
     const n=setsFor(ex,mods),dc=doneCount(g,ex.id);
@@ -3962,7 +3965,7 @@ function renderEditor(){
       else if(f==="rest"){const v=String(inp.value).trim().toLowerCase(),m=v.match(/^(\d+)\s*:\s*(\d{1,2})$/)||v.match(/^(\d+)\s*[.,]\s*(\d{2})$/),dm=v.match(/^(\d+[.,]\d)$/),mn=v.match(/^(\d+(?:[.,]\d+)?)\s*(?:m(?:in(?:ut[oi])?)?|['’])\s*(\d{1,2})?\s*(?:s|sec|["”])?$/),sc=v.match(/^(\d+)\s*(?:s|sec|secondi|["”])$/),bare=/^\d+$/.test(v),n0=parseInt(v,10);
         const mmss=x=>x>=60?Math.floor(x/60)+":"+String(x%60).padStart(2,"0"):x+" s";
         // Testo che non è un tempo: resta il valore di prima e si spiega cosa scrivere
-        if(!(m||dm||mn||sc||bare)){if(fin){inp.value=e[f]>=60?mmss(e[f]):String(e[f]||0);say(`"${v}" non è un tempo: scrivi ad esempio 90, 1:30 o 2 min. Resta ${mmss(e[f]||0)}.`)}}
+        if(!(m||dm||mn||sc||bare)){if(fin){inp.value=e[f]>=60?mmss(e[f]):String(e[f]||0);say(`${v?`"${v}" non è un tempo: scrivi`:"Scrivi un tempo,"} ad esempio 90, 1:30 o 2 min. Resta ${mmss(e[f]||0)}.`)}}
         else{const raw=m?+m[1]*60+ +m[2]:dm?Math.round(num(dm[1])*60):mn?Math.round(num(mn[1])*60)+(+mn[2]||0):sc?+sc[1]:n0>0&&n0<=10&&bare?n0*60:n0||0,sec=Math.max(0,Math.min(600,raw));e[f]=sec;
         if(fin){inp.value=sec>=60?mmss(sec):String(sec);say(raw>600?"Recupero: massimo 10 minuti, ho messo 10:00.":sec?`Recupero: ${sec>=60?mmss(sec)+" min":sec+" s"}.${bare&&n0>10&&n0<20?" Se intendevi minuti, scrivi ad esempio 2 min (massimo 10).":""}`:"Recupero 0: si passa subito al prossimo.")}}}
       else if(["s","lo","hi"].includes(f)){const mx=f==="s"?10:e.t==="time"?600:100,v=parseInt(inp.value,10),c=Math.max(1,Math.min(mx,v||1));e[f]=c;
