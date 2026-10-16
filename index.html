@@ -2421,10 +2421,19 @@ const WARMUP={up:[["Rotazioni delle braccia avanti e indietro","30 s"],["Band pu
   legs:[["Cyclette o corsa leggera","3 min"],["Squat a corpo libero","10"],["Affondi camminati","6 per lato"],["Ponte glutei","10"],["Saltelli sulle caviglie","20 s"]]};
 function warmupHTML(g,P,dr,dn){if(dn>0||dr.wu)return"";const L=WARMUP[P.legs?"legs":"up"];
   return `<details class="card wu"><summary><span class="wut"><h3>Riscaldamento</h3><small>5 min · ${L.length} esercizi</small></span><span class="wub"><button class="btn" data-wu="1">Fatto</button><button class="btn ghost" data-wu="0">Salta</button></span></summary><ol>${L.map(([n,d])=>`<li><span>${esc(n)}</span><em>${esc(d)}</em></li>`).join("")}</ol></details>`}
-function rampHTML(ex,tg){const step=isCable(ex)?stepOf(ex):(EQS.find(q=>q[0]===eqOf(ex))||[])[2]||ex.step||2.5;const top=tg.kg;
-  const plan=top>=40?[[.5,8],[.7,4],[.85,2]]:[[.5,8],[.75,3]];const seen=new Set(),out=[];
+// Avvicinamento: sul primo multiarticolare della seduta e sul primo esercizio di petto e di schiena (anche varianti, piani propri e seduta libera)
+const rampMu=e=>{const sd=STD[(e.n||"").trim().toLowerCase()],m=sd?sd.m[0]:VOLMU[e.mu||muOf(e.id)];return m==="petto"||m==="dorso"?m:null};
+function rampOn(g,ex,mods){if(mods.has("deload"))return false;const L=PLAN[g].ex.map(e=>effEx(g,e)).filter(e=>setsFor(e,mods)>0);
+  const m=["comp","iso","bw"].includes(ex.t)?rampMu(ex):null;
+  // Petto e schiena: solo il primo dei due muscoli, così non si scalda due volte lo stesso muscolo
+  if(!m&&L.find(e=>e.t==="comp")?.id===ex.id)return true;return !!m&&L.find(e=>["comp","iso","bw"].includes(e.t)&&rampMu(e)===m)?.id===ex.id}
+function rampHTML(ex,tg){const step=isCable(ex)?stepOf(ex):(EQS.find(q=>q[0]===eqOf(ex))||[])[2]||ex.step||2.5,top=tg.kg||0,out=[],seen=new Set();
+  // Trazioni e dip: kg = zavorra, quindi si parte dal corpo libero
+  if(ex.t==="bw"){out.push(`<b>corpo libero × ${top>0?5:3}</b>`);seen.add(0)}
+  else if(top<=0)return"";
+  const plan=ex.t==="bw"?(top>=6?[[.5,3]]:[]):ex.t==="iso"?(top>=40?[[.5,10],[.75,5]]:[[.5,10]]):top>=40?[[.5,8],[.7,4],[.85,2]]:[[.5,8],[.75,3]];
   for(const [p,r] of plan){const kg=Math.round(top*p/step)*step;if(kg<=0||kg>=top||seen.has(kg))continue;seen.add(kg);out.push(`<b>${fk(kg)} kg × ${r}</b>`)}
-  return out.length?`<p class="ramp">Avvicinamento, non conta: ${out.join(" · ")}</p>`:""}
+  return out.length?`<p class="ramp">Avvicinamento, non conta: ${out.join("\u00a0· ")}</p>`:""}
 const painList=id=>(S.pain[id]||[]).filter(d=>d>=iso(addDays(today(),-30)));
 function painWarn(ex,base){const L=painList(ex.id);return L.length>=2?`<div class="painw"><span>Fastidio segnato ${L.length} volte nell'ultimo mese. Cambia esercizio per qualche settimana; se continua, fallo vedere a un fisioterapista.</span><button data-painswap="${base.id}">Vedi varianti</button></div>`:""}
 const moreOpen=new Set();
@@ -3035,7 +3044,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
     ${chips.length&&!fN?`<div class="chips">${chips.join("")}</div>`:""}
     ${hasKg&&(setupOf(ex)||eqLbl(ex))?setupHTML(ex):""}
     ${stallTxt}
-    ${hasKg&&tg.kg>=20&&!mods.has("deload")&&!rows.some(r=>r.done)&&PLAN[g].ex.map(e=>effEx(g,e)).find(e=>e.t==="comp"&&setsFor(e,mods)>0)?.id===ex.id?rampHTML(ex,tg):""}
+    ${hasKg&&tg.kg!=null&&!rows.some(r=>r.done)&&!((dr.pre||{})[ex.id]>0)&&rampOn(g,ex,mods)?rampHTML(ex,tg):""}
     <div class="sets"><div class="set sethd" aria-hidden="true"><span></span><span>${hasKg?"kg":""}</span><span>${unit}</span><span></span></div>${sets}</div>
     ${rest}<!--ASK-->
     ${painWarn(ex,base)}
