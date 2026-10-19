@@ -2144,8 +2144,15 @@ const myoEx=ex=>ex.t==="iso"&&!/face pull/i.test(ex.n||"")&&!["Gambe","Core"].in
 const myoOn=(g,ex,mods,tg)=>!!(tg&&tg.myo)&&!["deload","prePadel","rir","light","prevOnly"].some(m=>mods.has(m))&&!(g&&ssOf(g,ex));
 const myoTxt=x=>Array.isArray(x.myo)&&x.myo.length?"+"+x.myo.join("+"):"";
 const powEx=ex=>!!ex&&(ex.pow||/^woodchop/i.test(ex.n||""))&&ex.t!=="perf";
+// Prevenzione del core a ripetizioni fisse (Pallof)
+const fixRep=ex=>ex.t==="prev"&&ex.lo===ex.hi&&(ex.mu||(EX[String(ex.id).split("~")[0]]||{}).mu)==="Core";
+// Seduta alleggerita (Stanco, partita) fatta peggio della seduta normale prima: la progressione riparte dalla seduta normale, non da quella fatta da stanco
+const lgtS=x=>(x.mods||[]).includes("light");
+function baseHist(ex){const h=history(ex.id).filter(x=>!x.deload);if(!h.length||!lgtS(h[0]))return h;const i=h.findIndex(x=>!lgtS(x));if(i<0)return h;
+  const kO=x=>Math.max(-1,...x.sets[ex.id].map(y=>num(y.kg)).filter(v=>v!=null)),aR=x=>{const r=x.sets[ex.id].map(y=>num(y.reps)).filter(v=>v!=null);return r.length?r.reduce((a,v)=>a+v,0)/r.length:0},a=h[0],b=h[i];
+  return kO(b)>kO(a)+1e-9||Math.abs(kO(b)-kO(a))<1e-9&&aR(b)>=aR(a)?h.slice(i):h}
 function target(ex,noMyo){
-  let h=history(ex.id).filter(x=>!x.deload),last=h[0];
+  let h=baseHist(ex),last=h[0];
   const rr=(ex.lo===ex.hi?ex.lo:ex.lo+"-"+ex.hi),lr=/\d/.test(ex.rir||"")?" lasciando "+ex.rir+" in canna":"";
   const base={kg:null,reps:Array(ex.s).fill(ex.lo),badge:"",kind:"flat",msg:ex.t==="time"?`Prima volta: tieni ${ex.lo} s${ex.side?" per lato":""}, senza arrivare allo sfinimento.`:ex.t==="nordic"?`Prima volta: scegli l'elastico con cui fai ${rr} ripetizioni frenando fino in fondo.`:ex.t==="bw"?`Prima volta: a corpo libero, ${rr} ripetizioni${lr}. Se ne fai di più, aggiungi zavorra.`:`Prima volta: scegli un carico con cui arrivi a ${rr} ripetizioni${lr}.`};
   // Esplosivi a ripetizioni fisse (woodchop): conta la velocità, mai ripetizioni in più o discesa lenta
@@ -2167,7 +2174,7 @@ function target(ex,noMyo){
       // Mai oltre il pacco della macchina (es. butterfly 55 su un pacco da 50): pacco e ripetizioni che il massimale permette
       const cp=eqMax(ex),dn=PLAN[last.day]?PLAN[last.day].name:"un altro giorno";let rp=ex.lo,ct="";
       if(cp&&k>cp+1e-6){k=cp;rp=Math.max(ex.lo,Math.min(ex.hi+(ex.t==="comp"?5:10),Math.floor((best/cp-1)*30-rirMid(ex.rir))));ct=` Il pacco arriva a ${fk(cp)} kg: ${fk(cp)} × ${rp}.`}
-      return {kg:k,reps:Array(ex.s).fill(rp),top:rp>ex.hi?rp:undefined,kind:"flat",badge:"",msg:`Ultima volta in ${dn} (${fk(lk)} kg, range ${fx.lo}-${fx.hi}): qui il range è ${rr}, carico ricalcolato.${ct}`}}}}
+      return {kg:k,reps:Array(ex.s).fill(rp),top:rp>ex.hi?rp:undefined,kind:"flat",badge:"",xr:true,msg:`Ultima volta in ${dn} (${fk(lk)} kg, range ${fx.lo}-${fx.hi}): qui il range è ${rr}, carico ricalcolato.${ct}`}}}}
   // Serie salvate senza kg (prima seduta, carico scritto solo sulla prima): valgono quelli della serie prima
   let pk0=null;const sets=last.sets[ex.id].filter(x=>num(x.reps)!=null).map(x=>{if(num(x.kg)!=null){pk0=x.kg;return x}return pk0!=null&&ex.t!=="bw"?{...x,kg:pk0}:x});
   const reps=sets.map(x=>num(x.reps));
@@ -2190,6 +2197,8 @@ function target(ex,noMyo){
   // Esercizi con myo-rep (isolamento a macchina o cavo): al gradino grosso si passa ai myo-rep, non al range esteso
   // Ripetizioni che il massimale stimato permette al carico nuovo; sotto questa soglia il salto è troppo grosso e si resta al carico attuale
   const repsAt=nk=>Math.floor((Math.max(...heavy.map(x=>e1rm(kg,num(x.reps)+rirMid(ex.rir))))/nk-1)*30-rirMid(ex.rir)),floorR=ex.t==="iso"?Math.max(8,ex.lo-4):Math.max(6,ex.lo-6);
+  // Ripetizioni (su tutte le serie) da cui il carico nuovo diventa raggiungibile; null = mai, nemmeno al mantenimento
+  const rAt=(r,nk)=>Math.floor((e1rm(kg,r+rirMid(ex.rir))/nk-1)*30-rirMid(ex.rir));
   if(powEx(ex)){const fix=Array(ex.s).fill(ex.lo),lp=ex.side?" per lato":"",allOk=full&&hReps.every(r=>r>=ex.lo);
     if(kg==null)return {kg:null,reps:fix,top:ex.lo,kind:"flat",badge:"=",hold:true,msg:allOk&&eff!=="hard"?`Tutte veloci: ${eqOf(ex)==="altro"?"elastico più duro":"aumenta il carico"}, sempre ${ex.lo}${lp}.`:`Stesse ${ex.lo} ripetizioni${lp}: ogni ripetizione esplosiva.`};
     let nk=kg+st;if(cap&&nk>cap)nk=cap;
@@ -2206,16 +2215,16 @@ function target(ex,noMyo){
     else if(atHi||mm.length){
       if(atHi&&mm.filter(v=>v>=MYO.mini).length>=4){
         if(atCap)return {kg,reps:Array(ex.s).fill(ex.hi),top:ex.hi,kind:"flat",badge:"Max pacco",myo:true,hold:true,msg:`Myo-rep completi a ${fk(kg)} kg, il massimo del pacco: stesso schema, discesa in 3 secondi.`};
-        // Con 4 mini-serie complete si sale sempre (come dicono le Regole): il massimale conta anche le mini-serie (a metà, sono a riposo breve)
-        let nk=kg+st;if(cap&&nk>cap)nk=cap;const mx1=kg*(1+(ex.hi+mm.reduce((a,v)=>a+v,0)/2)/30),rr=Math.min(ex.lo,Math.max(6,Math.floor((mx1/nk-1)*30)));
+        // Con 4 mini-serie complete si sale sempre (come dicono le Regole): il massimale conta anche le mini-serie (a un quarto: a riposo breve rendono meno)
+        let nk=kg+st;if(cap&&nk>cap)nk=cap;const mx1=kg*(1+(ex.hi+mm.reduce((a,v)=>a+v,0)/4)/30),rr=Math.min(ex.lo,Math.max(6,Math.floor((mx1/nk-1)*30)));
         return {kg:nk,reps:Array(ex.s).fill(rr),top:ex.hi,kind:"up",badge:`+${fk(nk-kg)} kg`,msg:`Myo-rep completi: passa a ${fk(nk)} kg e punta a ${rr} ripetizioni${rr<ex.lo?`, poi risali una alla volta fino a ${ex.lo}`:""}. Serie normali.`}}
-      else{const nr=pad(reps.map(r=>Math.min(ex.hi,r+1)),ex.s,ex.lo);nr[ex.s-1]=ex.hi;
-      return {kg,reps:nr,top:ex.hi,kind:"up",badge:"Myo-rep",myo:true,msg:`${atCap?`${fk(kg)} kg è il massimo del pacco`:`Il prossimo gradino è un salto del ${Math.round(st/kg*100)}%`}: ultima serie in myo-rep, ${ex.hi} ripetizioni e poi mini-serie da ${MYO.mini} con ${MYO.rest} s di pausa. Con 4 mini-serie complete ${atCap?"hai chiuso lo schema":`sali a ${fk(Math.min(kg+st,cap||1e9))} kg`}.`}}
+      else{const nr=pad(reps.map(r=>Math.min(ex.hi,r+1)),ex.s,ex.lo);nr[ex.s-1]=ex.hi;const swM=!atCap&&st/kg>0.25?smallAlt(ex):null;
+      return {kg,reps:nr,top:ex.hi,kind:"up",badge:"Myo-rep",myo:true,alt:swM,msg:`${atCap?`${fk(kg)} kg è il massimo del pacco`:`Il prossimo gradino è un salto del ${Math.round(st/kg*100)}%`}: ultima serie in myo-rep, ${ex.hi} ripetizioni e poi mini-serie da ${MYO.mini} con ${MYO.rest} s di pausa. Con 4 mini-serie complete ${atCap?"hai chiuso lo schema":`sali a ${fk(Math.min(kg+st,cap||1e9))} kg`}.${swM?` Per salire a passi più piccoli: ⇄ Cambia con «${swM.n}».`:""}`}}
     }
   }
   const mx=myoEx(ex)&&kg>0&&!noM&&(atCap||st/kg>0.15);
   // Prevenzione del core a ripetizioni fisse (Pallof): niente ripetizioni in più, si sale di carico solo quando era Facile
-  const fixR=ex.t==="prev"&&ex.lo===ex.hi&&(ex.mu||(EX[String(ex.id).split("~")[0]]||{}).mu)==="Core";
+  const fixR=fixRep(ex);
   if(fixR){const fix=Array(ex.s).fill(ex.lo),lp=ex.side?" per lato":"",allOk=full&&hReps.every(r=>r>=ex.lo);
     if(kg==null)return {kg:null,reps:fix,top:ex.lo,kind:allOk&&eff==="easy"?"up":"flat",badge:allOk&&eff==="easy"?"Più duro":"=",hold:true,msg:allOk&&eff==="easy"?`Era facile: elastico più duro, sempre ${ex.lo}${lp}.`:`Ripetizioni fisse: stesso elastico, ${ex.lo}${lp}, ferme senza ruotare.`};
     let nk=kg+st;if(cap&&nk>cap)nk=cap;
@@ -2224,7 +2233,7 @@ function target(ex,noMyo){
     if(hReps.some(r=>r<=ex.lo-2)&&kb!=null)return {kg:kb,reps:fix,top:ex.lo,kind:"down",badge:`-${fk(kg-kb)} kg`,hold:true,msg:`${fk(kg)} kg non regge per ${ex.lo}${lp}: torna a ${fk(kb)} kg, ripetizioni ferme senza ruotare.`};
     // Si sale solo se il gradino non supera il 25% (Pallof 15 → 20 è +33%: resta, o ⇄ Cambia con l'elastico)
     if(allOk&&eff==="easy"&&nk>kg&&(nk-kg)/kg<=0.25+1e-9)return {kg:nk,reps:fix,top:ex.lo,kind:"up",badge:`+${fk(nk-kg)} kg`,msg:`Era facile: ${fk(nk)} kg, sempre ${ex.lo}${lp}. Se ruoti il busto, torna a ${fk(kg)} kg.`};
-    return {kg,reps:fix,top:ex.lo,kind:"flat",badge:"=",hold:true,msg:`Ripetizioni fisse: ${fk(kg)} kg, ${ex.lo}${lp}, ferme senza ruotare.${allOk&&eff==="easy"&&nk>kg?` Il prossimo gradino (${fk(nk)} kg) è un salto del ${Math.round((nk-kg)/kg*100)}%: per renderlo più duro allontanati di un passo dal cavo, o ⇄ Cambia con l'elastico.`:" Quando l'ultima serie è Facile, sali di carico."}`}}
+    return {kg,reps:fix,top:ex.lo,kind:"flat",badge:"=",hold:true,msg:`Ripetizioni fisse: ${fk(kg)} kg, ${ex.lo}${lp}, ferme senza ruotare.${nk>kg&&(nk-kg)/kg>0.25+1e-9?` Il prossimo gradino (${fk(nk)} kg) è un salto del ${Math.round((nk-kg)/kg*100)}%: ${allOk&&eff==="easy"?"":"quando l'ultima serie è Facile, "}per renderlo più duro allontanati di un passo dal cavo, o ⇄ Cambia con l'elastico.`:nk>kg?" Quando l'ultima serie è Facile, sali di carico.":""}`}}
   // Gradino grosso: isolamento e prevenzione oltre il 15% (oltre il 10% se il range è fisso, es. reverse fly 2×15: 35 → 40 kg), multiarticolari a range fisso oltre il 10%
   const bigC=!atCap&&!mx&&ex.t==="comp"&&ex.lo===ex.hi&&kg>0&&st/kg>0.1;
   const big=!atCap&&!mx&&((ex.t==="iso"||ex.t==="prev")&&kg>0&&st/kg>(ex.lo===ex.hi?0.1:0.15)||bigC);
@@ -2244,8 +2253,10 @@ function target(ex,noMyo){
     // Copenhagen: si parte già con la caviglia (versione piena). A 30 s si allunga la tenuta di 10 s, poi discesa più lenta; la leva corta (ginocchio) torna alla caviglia
     if(allTop){const cop=/copenhagen/i.test(ex.n),lc=/leva corta/i.test(ex.n);
       if(lc)return {kg:null,reps:Array(ex.s).fill(ex.lo),kind:"up",badge:"Livello +",msg:`Hai tenuto ${ex.hi} s su tutte: torna al Copenhagen con la caviglia sulla panca (⇄ Cambia) e riparti da ${ex.lo} s.`};
-      if(cop)return {kg:null,reps:Array(ex.s).fill(Math.min(ex.hi+10,Math.max(...reps)+5)),top:ex.hi+10,kind:Math.max(...reps)>=ex.hi+10?"flat":"up",badge:Math.max(...reps)>=ex.hi+10?"=":"+5 s",hold:Math.max(...reps)>=ex.hi+10,msg:Math.max(...reps)>=ex.hi+10?`${ex.hi+10} s su tutte: tienili, e rendila più dura alzando e abbassando piano la gamba sotto. Mai a sfinimento prima delle partite.`:`Hai tenuto ${ex.hi} s su tutte: aggiungi 5 s, fino a ${ex.hi+10}.`};
+      if(cop){const mx2=ex.hi+10,dn2=full&&Math.min(...reps)>=mx2;return {kg:null,reps:dn2?Array(ex.s).fill(mx2):pad(reps.map(r=>Math.min(mx2,r+5)),ex.s),top:mx2,kind:dn2?"flat":"up",badge:dn2?"=":"+5 s",hold:dn2,msg:dn2?`${mx2} s su tutte: tienili, e rendila più dura alzando e abbassando piano la gamba sotto. Mai a sfinimento prima delle partite.`:`Hai tenuto almeno ${ex.hi} s su tutte: aggiungi 5 s, fino a ${mx2}.`}}
       return {kg:null,reps:Array(ex.s).fill(ex.lo),kind:"up",badge:"Livello +",msg:`Hai tenuto ${ex.hi} s su tutte: passa a una versione più dura e riparti da ${ex.lo} s.`}}
+    // Copenhagen già oltre i ${ex.hi} s su qualche serie (es. 35/28): si portano su le altre, mai sotto quanto già tenuto
+    const m0=Math.max(...reps);if(/copenhagen/i.test(ex.n)&&m0>ex.hi){const nr=pad(reps.map(r=>Math.min(m0,Math.max(ex.lo,r+5))),ex.s,m0);return {kg:null,reps:nr,top:ex.hi+10,kind:"up",badge:"+5 s",msg:`Aggiungi 5 secondi dove sei sotto i ${m0} s, fino a ${m0} su tutte.`}}
     const nr=reps.map(r=>Math.min(ex.hi,Math.max(ex.lo,r+5)));
     return {kg:null,reps:pad(nr,ex.s),kind:"up",badge:"+5 s",msg:"Aggiungi 5 secondi per serie."};
   }
@@ -2273,9 +2284,9 @@ function target(ex,noMyo){
         est=lo0>12?"":(()=>{const r1=Math.max(1,raw);return ` e arriveresti a circa ${r1} ripetizion${r1===1?"e":"i"}`})();
         // Arrivato al massimo delle ripetizioni: il salto non si avvicina più, si mantiene (o si cambia variante)
         if(hr<=lo0)return {kg,reps:Array(ex.s).fill(hr),top:hr,kind:"flat",badge:"=",hold:true,alt:sw,msg:`${fk(kg)} kg × ${hr} è il tuo carico di mantenimento: il prossimo gradino (${fk(nk)} kg) è un salto del ${pc}%${est}. ${ex.t==="prev"?"Per la prevenzione va bene così, discesa in 3 secondi.":"Stesso carico, discesa in 3 secondi."}${swT||(altsOf(EX[String(ex.id).split("~")[0]]||ex).length?" Per salire, ⇄ Cambia con una variante.":"")}`};
-        return {kg,reps:Array(ex.s).fill(hr),top:hr,kind:"flat",badge:"+1 rip",hold:true,alt:sw,msg:`Il prossimo gradino (${fk(nk)} kg) è un salto del ${pc}%${est?est.replace(" e ",": "):""}. Resta a ${fk(kg)} kg, una ripetizione in più (${hr}), discesa in 3 secondi.${swT}`}}
-      if(rr<ex.lo)return {kg:nk,reps:Array(ex.s).fill(rr),top,kind:"up",badge:`+${fk(nk-kg)} kg`,msg:`Arrivato a ${top} ripetizioni: passa a ${fk(nk)} kg. Il salto è del ${Math.round((nk-kg)/kg*100)}%, quindi punta a ${rr} ripetizioni e risali una alla volta fino a ${ex.lo}.`}}
-    return {kg:nk,reps:Array(ex.s).fill(ex.lo),top,kind:"up",badge:`+${fk(nk-kg)} kg`,msg:easy?`Range chiuso ed era facile: doppio aumento, ${fk(nk)} kg, riparti da ${ex.lo} ripetizioni.`:big?`Arrivato a ${top} ripetizioni: passa a ${fk(nk)} kg e riparti da ${ex.lo}.`:`Tutte le serie al limite alto: ${fk(nk)} kg e riparti da ${ex.lo} ripetizioni.${eNo?" Era facile, ma un doppio aumento supererebbe il 10%.":""}`};
+        return {kg,reps:Array(ex.s).fill(hr),top:hr,kind:"flat",badge:"+1 rip",hold:true,alt:sw,msg:`Il prossimo gradino (${fk(nk)} kg) è un salto del ${pc}%${est?est.replace(" e ",": "):""}. Resta a ${fk(kg)} kg, una ripetizione in più (${hr}), discesa in 3 secondi${rAt(hr,nk)>=floorR?`: a ${hr} su tutte si sale`:""}.${swT}`}}
+      if(rr<ex.lo)return {kg:nk,reps:Array(ex.s).fill(rr),top,kind:"up",badge:`+${fk(nk-kg)} kg`,msg:`Arrivato a ${Math.min(...hReps)} ripetizioni: passa a ${fk(nk)} kg. Il salto è del ${Math.round((nk-kg)/kg*100)}%, quindi punta a ${rr} ripetizioni e risali una alla volta fino a ${ex.lo}.`}}
+    return {kg:nk,reps:Array(ex.s).fill(ex.lo),top,kind:"up",badge:`+${fk(nk-kg)} kg`,msg:easy?`Range chiuso ed era facile: doppio aumento, ${fk(nk)} kg, riparti da ${ex.lo} ripetizioni.`:big?`Arrivato a ${Math.min(...hReps)} ripetizioni: passa a ${fk(nk)} kg e riparti da ${ex.lo}.`:`Tutte le serie al limite alto: ${fk(nk)} kg e riparti da ${ex.lo} ripetizioni.${eNo?" Era facile, ma un doppio aumento supererebbe il 10%.":""}`};
   }
   const sm=a=>a.reduce((t,r)=>t+r,0);
   if(missTwice&&kg&&!(prev&&prev.length&&sm(reps)/reps.length>sm(prev)/prev.length)){
@@ -2295,13 +2306,15 @@ function target(ex,noMyo){
   const add=eff==="easy"?2:1;
   const nr=pad(reps.map(r=>Math.min(top,r+add)),ex.s,Math.min(top,reps[reps.length-1]));
   const over=big&&reps.every(r=>r>=ex.hi);
+  // Il salto resta irraggiungibile anche arrivato in cima alle ripetizioni: niente promessa, solo la variante (o ripetizioni in più fino al mantenimento)
+  const nkO=Math.min(kg+st,cap||1e9);let jA=top;if(over&&kg>0){jA=null;for(let r=top;r<=top+5;r++)if(rAt(r,nkO)>=floorR){jA=r;break}}const reach=jA!=null;
   if(atCap&&reps.every(r=>r>=ex.hi))return {kg,reps:nr,top,kind:"up",badge:`+${add} rip`,msg:`${fk(kg)} kg è il massimo del pacco: si sale con le ripetizioni, fino a ${top}.`};
-  return {kg,reps:nr,top,kind:"up",badge:`+${add} rip`,alt:sw,msg:over?`Il prossimo peso è un salto del ${Math.round(st/kg*100)}%: prima porta tutte le serie a ${top} ripetizioni.${swT}`:add===2?`Era facile: ${kg==null&&ex.t!=="bw"&&eqOf(ex)==="altro"?"stesso elastico":"stesso carico"}, due ripetizioni in più per serie.${swT}`:`${kg==null&&ex.t!=="bw"&&eqOf(ex)==="altro"?"Stesso elastico":"Stesso carico"}, una ripetizione in più per serie.${swT}`};
+  return {kg,reps:nr,top,kind:"up",badge:`+${add} rip`,alt:sw,msg:over?(reach?`Il prossimo peso è un salto del ${Math.round(st/kg*100)}%: prima porta tutte le serie a ${jA} ripetizioni.${swT}`:`Il prossimo peso è un salto del ${Math.round(st/kg*100)}%, troppo grosso anche a ${top} ripetizioni.${swT} ${swT?"Se resti, una":"Una"} ripetizione in più per serie fino a ${top+5}, poi si mantiene.`):add===2?`Era facile: ${kg==null&&ex.t!=="bw"&&eqOf(ex)==="altro"?"stesso elastico":"stesso carico"}, due ripetizioni in più per serie.${swT}`:`${kg==null&&ex.t!=="bw"&&eqOf(ex)==="altro"?"Stesso elastico":"Stesso carico"}, una ripetizione in più per serie.${swT}`};
 }
-// Variante con il gradino piccolo rispetto al carico (≤ 20%): prima quelle già fatte (es. butterfly per le croci), poi macchina o bilanciere al posto di cavo singolo e manubri
+// Variante con il gradino piccolo rispetto al carico (≤ 20%): prima quelle già fatte, poi macchina o bilanciere (non a cavo) al posto di cavi e manubri (es. butterfly per le croci)
 function smallAlt(ex){const b=EX[String(ex.id).split("~")[0]]||ex,cur=ex.k||String(ex.id).split("~")[1]||"";let best=null;
   for(const a of altsOf(b)){if(a.k===cur||a.custom)continue;const v=exById(b.id+"~"+a.k);if(!v||!["iso","prev","comp"].includes(v.t))continue;const k=lastKg(v),st=stepOf(v);
-    const r=k>0?st/k:["mac","bar"].includes(eqOf(v))&&["cavl","db"].includes(eqOf(ex))?0.199:null;if(r!=null&&r<=0.2&&(!best||r<best.r))best={k:a.k,n:a.n,r}}
+    const r=k>0?st/k:["mac","bar"].includes(eqOf(v))&&!isCable(v)&&(["cavl","db"].includes(eqOf(ex))||isCable(ex))?0.199:null;if(r!=null&&r<=0.2&&(!best||r<best.r))best={k:a.k,n:a.n,r}}
   if(!best&&cur&&b.id!==ex.id){const k=lastKg(b);if(k>0&&stepOf(b)/k<=0.2)best={k:"",n:b.n,r:stepOf(b)/k}}
   return best}
 function lastKg(ex,same){const l=history(ex.id).filter(x=>!x.deload&&(!same||!x.from||sameRng(EX[x.from],ex)))[0];if(!l)return null;const k=l.sets[ex.id].map(x=>num(x.kg)).filter(v=>v!=null);return k.length?Math.max(...k):null}
@@ -2309,9 +2322,13 @@ function tgFor(ex,mods,g){let t=target(ex);
   // Giorno senza myo-rep (padel dopo, partita domani, superserie...): stesso esercizio con il range esteso
   if(t.myo&&!mods.has("deload")&&!myoOn(g,ex,mods,t))t=target(ex,true);
   // Energia bassa e giorno di partita: stessi carichi e stesse ripetizioni dell'ultima volta, niente aumenti (un calo chiesto dall'app resta)
-  if(mods.has("light")&&!mods.has("deload")&&t.kind==="up"&&ex.t!=="perf"){const l=history(ex.id).filter(x=>!x.deload)[0];
-    if(l){const a=l.sets[ex.id].filter(x=>num(x.reps)!=null),k=a.map(x=>num(x.kg)).filter(v=>v!=null),r=a.map(x=>num(x.reps)),kg=t.kg==null?null:k.length?Math.min(t.kg,Math.max(...k)):t.kg;
-      return {...t,myo:false,kg,reps:pad(r.length?r:t.reps,ex.s),kind:"flat",badge:"=",msg:`Seduta alleggerita: ${kg>0?`${fk(kg)} kg, `:""}${ex.t==="time"?"stessi secondi":"stesse ripetizioni"} dell'ultima volta. Si sale la prossima volta.`}}}
+  // Vale per ogni proposta che chiede più kg o più ripetizioni (anche "+1 rip" sugli isolamenti), non per un calo né per il ricalcolo tra giorni con range diversi
+  if(mods.has("light")&&!mods.has("deload")&&t.kind!=="down"&&!t.xr&&ex.t!=="perf"){const l=baseHist(ex)[0];
+    if(l){const a=l.sets[ex.id].filter(x=>num(x.reps)!=null),k=a.map(x=>num(x.kg)).filter(v=>v!=null),r=a.map(x=>num(x.reps)),rp=pad(r.length?r:t.reps,ex.s),lk=k.length?Math.max(...k):null,
+      up=t.kind==="up"||t.kg!=null&&(lk==null?t.kg>0:t.kg>lk+1e-9)||(t.reps||[]).some((v,i)=>v>rp[i]);
+      // Kg vuoti l'ultima volta (trazioni a corpo libero): niente zavorra proprio nel giorno leggero
+      const kg=t.kg==null?null:lk!=null?Math.min(t.kg,lk):ex.t==="bw"?0:null;
+      if(up)return {...t,myo:false,kg,reps:rp,kind:"flat",badge:"=",msg:`Seduta alleggerita: ${kg>0?`${fk(kg)} kg, `:""}${ex.t==="time"?"stessi secondi":"stesse ripetizioni"} dell'ultima volta. Si sale la prossima volta.`}}}
   if(!mods.has("deload")||ex.t==="perf")return t;
   // Scarico: Nordic e tenute restano come l'ultima volta (niente +1); per i carichi vale l'ultima seduta nello stesso range, mai un carico più alto
   if(ex.t==="time"||ex.t==="nordic"){const l=history(ex.id)[0],r=l?l.sets[ex.id].map(x=>num(x.reps)).filter(v=>v!=null):[],r0=r.length?Math.min(...r):ex.lo;return {...t,top:ex.hi,reps:Array(ex.s).fill(r0),kind:"flat",badge:"Scarico",msg:ex.t==="time"?`Scarico: ${r0} s come l'ultima volta, metà serie.`:`Scarico: stesso elastico e ${r0} ripetizioni come l'ultima volta, metà serie.`}}
@@ -2333,11 +2350,13 @@ const noStall=ex=>["perf","time","nordic","prev"].includes(ex.t);
 const dayOf=x=>iso(new Date(x.date));
 function stalled(ex){if(noStall(ex))return false;// Le prime 2 sedute di un esercizio sono di calibrazione (carico cercato, "-5 kg ricostruisci" chiesto dall'app): non contano per lo stallo
   // Le sedute con energia bassa o di partita (una serie in meno, stessi carichi per scelta) non dicono niente sullo stallo
-  const all=history(ex.id).filter(x=>!x.deload),cal=new Set(all.slice(-2));const h=all.filter(x=>!cal.has(x)&&(!x.from||sameRng(EX[x.from],ex))&&!(x.mods||[]).includes("light"));if(h.length<4)return false;const ph=phaseAt();
+  const all=history(ex.id).filter(x=>!x.deload),cal=new Set(all.slice(-2)),hr=all.filter(x=>!cal.has(x)&&(!x.from||sameRng(EX[x.from],ex)));
+  // Dopo un calo di carico (chiesto dall'app o scelto, anche in una seduta Stanco) si confronta solo con le sedute da lì in poi: la ricostruzione non è stallo
+  const kgS=s=>Math.max(0,...s.sets[ex.id].map(x=>num(x.kg)||0)),ci=hr.findIndex((s,i)=>i+1<hr.length&&kgS(s)<kgS(hr[i+1])-1e-9);
+  const h=(ci<0?hr:hr.slice(0,ci+1)).filter(x=>!(x.mods||[]).includes("light"));if(h.length<4)return false;const ph=phaseAt();
   if(ph==="def"){const m=s=>Math.max(0,...s.sets[ex.id].map(x=>metricOf(ex,x)));return stallBy(ph,h.slice(0,4).map(m))}
   // Massa e mantenimento: fermo se nelle ultime 3 sedute non hai battuto il meglio delle sedute prima (fino a 6) né nei kg massimi,
   // né nel massimale stimato, né nelle ripetizioni totali al carico più alto. Lo scarico non lo azzera: conta il meglio di prima.
-  // Un calo chiesto dall'app nelle ultime 3 sedute (scendi e ricostruisci) è ricostruzione, non stallo.
   const kg=s=>Math.max(0,...s.sets[ex.id].map(x=>num(x.kg)||0)),bm=s=>Math.max(0,...s.sets[ex.id].map(x=>metricOf(ex,x))),rt=(s,k)=>s.sets[ex.id].filter(x=>(num(x.kg)||0)>=k).reduce((a,x)=>a+(num(x.reps)||0)+(Array.isArray(x.myo)?x.myo.reduce((b,v)=>b+(+v||0),0):0),0);
   const W=h.slice(0,3),P=h.slice(3,9);if(W.some((s,i)=>kg(s)<kg(h[i+1])-1e-9))return false;
   const pk=Math.max(...P.map(kg)),pb=Math.max(...P.map(bm)),pr=Math.max(0,...P.filter(s=>kg(s)===pk).map(s=>rt(s,pk)));
@@ -2351,7 +2370,7 @@ function deloadAdvice(){
   if(S.deload||!S.sessions.length)return null;if(S.deloadSnooze&&iso(today())<S.deloadSnooze)return null;
   const why=[],cut=iso(addDays(today(),-21));
   const ids=[...new Set(S.sessions.filter(x=>dayOf(x)>=cut).flatMap(x=>Object.keys(x.sets||{})))];
-  const st=new Set(ids.filter(id=>{const ex=exById(id);if(!stalled(ex))return false;try{return !target(ex).hold}catch(e){return true}}).map(id=>nmKey(exName(id)))).size;  const since=cycleStart();const wk=Math.floor((today()-new Date(since+"T00:00:00"))/(7*864e5));
+  const st=new Set(ids.filter(id=>{const ex=exById(id);if(!stalled(ex))return false;try{const t=target(ex);return !t.hold&&t.kind!=="down"}catch(e){return true}}).map(id=>nmKey(exName(id)))).size;  const since=cycleStart();const wk=Math.floor((today()-new Date(since+"T00:00:00"))/(7*864e5));
   // Per gli stalli lo scarico si propone solo dopo almeno 4 settimane di lavoro (dall'inizio o dall'ultimo scarico)
   if(st>=3&&wk>=4)why.push(`${st} esercizi fermi da 3 sedute`);
   if(wk>=6)why.push(`${wk} settimane di allenamento senza scarico`);
@@ -2700,15 +2719,15 @@ function trainFx(g,pct){
   ledify();
   app.querySelectorAll(".tgt b[data-cu]").forEach(b=>{const [a,z,rest,id]=b.dataset.cu.split("|");const k=g+id+iso(today());if(counted.has(k))return;counted.add(k);rollUp(b,+a,+z,rest)});
 }
-function isRecord(g,ex,exId,j,r){if(noEff(ex)||!history(exId).length)return false;const v=metricOf(ex,r);if(!(v>0))return false;
+function isRecord(g,ex,exId,j,r){if(noEff(ex)||powEx(ex)||fixRep(ex)||!history(exId).length)return false;const v=metricOf(ex,r);if(!(v>0))return false;
   // Storico già convertito all'attrezzo dei cavi di oggi (bestMetric)
   let best=bestMetric(exId),mk=maxKgEver(exId);
   (draftFor(g).ex[exId]||[]).forEach((x,i)=>{if(i!==j&&x.done){best=Math.max(best,metricOf(ex,x));mk=Math.max(mk,num(x.kg)||0)}});
   if(!(best>0&&v>=best*PR_MIN-1e-9))return false;
-  // Seguire la progressione (+1 ripetizione a seduta) supera sempre il massimale di un 2-3%: il timbro va solo a un carico mai usato o a più di quanto proposto
+  // Seguire la progressione (+1 ripetizione a seduta) supera sempre il massimale di un 2-3%: il timbro va solo a un carico mai usato o a un massimale oltre quello della proposta
   const k=num(r.kg)||0,rp=num(r.reps)||0;if(k>mk+1e-9)return true;
   let t=null;try{t=tgFor(ex,trainMods(g),g)}catch(e){}if(!t)return true;
-  const pk=num(t.kg)||0,pr=(t.reps||[])[Math.min(j,(t.reps||[]).length-1)]||0;return k>pk+1e-9||(k>=pk-1e-9&&rp>pr)}
+  const pr=(t.reps||[])[Math.min(j,(t.reps||[]).length-1)]||0;return v>metricOf(ex,{kg:t.kg,reps:pr})+1e-9}
 // Carico più alto mai usato su un esercizio (famiglia, convertito all'attrezzo dei cavi di oggi)
 function maxKgEver(exId){const ex=exById(exId);let m=0;for(const s of S.sessions){if(!s.sets)continue;for(const fid of famIds(exId)){const cv=isCable(ex)?stnConv(stnOfSet(s,fid),stationOf(ex)):1;for(const x of (s.sets[fid]||[]))m=Math.max(m,(num(x.kg)||0)*cv)}}return m}
 function tickFx(g,exId,j,rec,wow){
@@ -3250,7 +3269,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   spec.push(`<span>${ex.rest?(ex.rest>=120?fk(ex.rest/60)+"&nbsp;min":ex.rest+"&nbsp;s"):"Subito il prossimo"}</span>`);
   if(mods.has("prePadel")&&ex.strap)chips.push(`<span class="chip adapt">Fasce da polso: risparmi la presa per il padel</span>`);
   if(tg.top&&tg.top>ex.hi&&!mods.has("deload")&&tg.reps.every(r=>r>=ex.lo)&&!["time","nordic","perf"].includes(ex.t)){const mx=eqMax(ex);chips.push(`<span class="chip hot">Range esteso fino a ${tg.top}: ${mx&&(tg.kg||0)>=mx?`${fk(mx)} kg è il massimo del pacco`:`il prossimo gradino è ${pct(Math.round(stepOf(ex)/Math.max(1,tg.kg||lastKg(ex)||1)*100))}`}</span>`)}
-  const stallTxt=!mods.has("deload")&&!tg.hold&&!(tg.kind==="up"&&tg.kg>0&&tg.kg>(lastKg(ex)||0))&&stalled(ex)?(phaseAt()==="def"?`<p class="prog down"><span>In calo</span><span>Massimale sotto del 5% nelle ultime 2 sedute. In definizione basta tenere i carichi: se continua togli una serie o fai lo scarico.</span></p>`:`<p class="prog down"><span>Fermo</span><span>Nessun miglioramento nelle ultime 3 sedute: prova una variante con ⇄ Cambia o togli una serie per due settimane.</span></p>`):"";
+  const stallTxt=!mods.has("deload")&&!tg.hold&&tg.kind!=="down"&&!(tg.kind==="up"&&tg.kg>0&&tg.kg>(lastKg(ex)||0))&&stalled(ex)?(phaseAt()==="def"?`<p class="prog down"><span>In calo</span><span>Massimale sotto del 5% nelle ultime 2 sedute. In definizione basta tenere i carichi: se continua togli una serie o fai lo scarico.</span></p>`:`<p class="prog down"><span>Fermo</span><span>Nessun miglioramento nelle ultime 3 sedute: prova una variante con ⇄ Cambia o togli una serie per due settimane.</span></p>`):"";
   const over=tOn&&tEnd<=Date.now();
   const rest=withRest&&tOn?`<div class="rest ${over?"over":""}" id="restIn" role="timer"><span class="rr"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rk" cx="32" cy="32" r="28"/><circle class="ra rc" cx="32" cy="32" r="28" pathLength="100"/></svg><i class="rh r1" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><i class="rh r2" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><i class="rh rd" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra rc" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><b class="tv"></b></span><span class="tl" aria-live="assertive">${over?"Recupero finito":"Recupero"+(tPlus?"\u00a0·\u00a0+"+tPlus+"\u00a0s":"")}</span><span class="tb"><button data-ts>Chiudi</button><button data-tp>+15 s</button></span></div>`:"";
   // Scheda che si colora: a ogni serie un velo su tutta la scheda si intensifica piano; a esercizio finito passa l'oro in diagonale
@@ -3291,13 +3310,15 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;
   const row=document.querySelector(`.tick[data-ex="${exId}"][data-j="${j}"]`).closest(".set");
   const ins=row.querySelectorAll("input");ins.forEach(i=>{r[i.dataset.f]=i.value.trim()});
   // Carico molto diverso dal solito (errore di battitura?): chiede un secondo tocco prima di segnare la serie
-  if(!r.done){const k=num(r.kg),ref=Math.max(0,...(history(exId)[0]?.sets[exId]||[]).map(x=>num(x.kg)||0))||num(tgFor(ex,mods,g).kg)||0,key=exId+"|"+j+"|"+r.kg;
+  if(!r.done){const k=num(r.kg),pk=num(tgFor(ex,mods,g).kg),ref=Math.max(0,...(history(exId)[0]?.sets[exId]||[]).map(x=>num(x.kg)||0))||pk||0,key=exId+"|"+j+"|"+r.kg;
     const warn=m=>{document.querySelector(".kgchk")?.remove();row.insertAdjacentHTML("afterend",`<p class="kgchk" role="alert">${m}</p>`);buzz(20)};
     // Kg scritti male (es. "1,2,5"): la serie non si segna finché non è un numero
     if(String(r.kg||"").trim()&&k==null){kgChk="";warn("Kg non validi: scrivi un numero, per esempio 52,5.");return}
     const rp=num(r.reps),key2=key+"|"+r.reps;
     if(rp==null&&ex.t!=="perf"){kgChk="";warn(ex.t==="time"?"Scrivi i secondi della tenuta.":"Scrivi le ripetizioni che hai fatto.");return}
-    if(k!=null&&((ref>0&&(k>ref*1.5||k<ref*.5))||(!ref&&(k>250||k>0&&k<stepOf(ex))))&&kgChk!==key){kgChk=key;warn(`${esc(fk(k))} kg? ${ref>0?`L'ultima volta ${esc(fk(ref))}.`:k>250?"È tanto per un primo carico.":"È poco per un primo carico."} Tocca ✓ di nuovo per confermare.`);return}
+    // Il carico proposto dall'app non chiede conferma; per trazioni e dip conta il peso del corpo più la zavorra
+    const tw=x=>ex.t==="bw"?bwNow()+x:x;
+    if(k!=null&&!(pk!=null&&Math.abs(k-pk)<1e-9)&&((ref>0&&(tw(k)>tw(ref)*1.5||tw(k)<tw(ref)*.5))||(!ref&&(k>250||k>0&&k<stepOf(ex))))&&kgChk!==key){kgChk=key;warn(`${esc(fk(k))} kg? ${ref>0?`L'ultima volta ${esc(fk(ref))}.`:k>250?"È tanto per un primo carico.":"È poco per un primo carico."} Tocca ✓ di nuovo per confermare.`);return}
     if(rp!=null&&rp>Math.max(60,(ex.hi||0)*3)&&kgChk!==key2){kgChk=key2;warn(`${rp} ${ex.t==="time"?"secondi":"ripetizioni"}? Tocca ✓ di nuovo per confermare.`);return}}
   kgChk="";
   r.done=!r.done;const dd=draftFor(g);if(r.done&&!dd.start)dd.start=Date.now();if(r.done){const nw=Date.now();if(dd.last&&nw-dd.last>45*6e4)dd.idle=(dd.idle||0)+(nw-dd.last-10*6e4);dd.last=nw;dd.mods=[...mods]}
@@ -3426,8 +3447,8 @@ let swapScope="today";
 function openSwap(g,baseId){
   const base=PLAN[g].ex.find(e=>e.id===baseId);if(!base)return;
   const cur=(S.swaps[g+"|"+baseId]&&effEx(g,base).id!==base.id)?S.swaps[g+"|"+baseId].k:null;
-  // Variante consigliata quando il prossimo peso è un salto troppo grosso (target().alt)
-  let small=null;try{const t=target(effEx(g,base));small=t.alt?t.alt.k:null}catch(e){}
+  // Variante consigliata quando il prossimo peso è un salto troppo grosso (alt della proposta di oggi)
+  let small=null;try{const t=tgFor(effEx(g,base),trainMods(g),g);small=t.alt?t.alt.k:null}catch(e){}
   const opts=[{k:"",n:base.n,sub:[small===""?"Gradino più piccolo":"","Originale della scheda"].filter(Boolean).join(" · ")},...altsOf(base).map(a=>({k:a.k,n:a.n,sub:[small===a.k?"Gradino più piccolo":"",...(a.custom?["Aggiunto da te"]:[TYPES.find(t=>t[0]===(a.o.t||base.t))?.[1],a.o.note])].filter(Boolean).join(" · ")}))];
   const wrap=document.createElement("div");wrap.className="sheet-wrap";
   wrap.innerHTML=`<div class="sheet" role="dialog" aria-modal="true" aria-label="Cambia esercizio"><div class="grab"></div>
@@ -4185,15 +4206,15 @@ function renderSettings(){
     <li>Pacco finito (pulley sul cavo singolo a 50 kg, Selection 700): si sale con le ripetizioni, fino a 5 oltre il range sui multiarticolari e 10 sull'isolamento, poi stesso carico con discesa in 3 secondi e 1 secondo fermo; per più carico ⇄ Cambia. Se l'ultima volta hai segnato più del pacco, riparti dal pacco.</li>
     <li>Una serie sotto il minimo: la volta dopo quella serie punta al minimo, le altre restano come l'ultima volta. Una serie che mancava (seduta con una serie in meno) riparte dall'ultima fatta.</li>
     <li>Due sedute di fila allo stesso carico con almeno 2 ripetizioni sotto il minimo in tutto, ripetizioni medie non salite, ultima serie non Facile e niente energia bassa o partita: -10% e riparti dalle ripetizioni che facevi a quel carico. Nelle prime 3 sedute dopo un aumento stare 1-2 ripetizioni sotto il minimo non conta. Se il -10% vuol dire scendere più del 15% (gradino grosso), carico fermo e una ripetizione in più per serie. Con la zavorra conta anche il tuo peso.</li>
-    <li>Esercizio fermo (nelle ultime 3 sedute non hai battuto il meglio delle sedute prima: né i kg, né il massimale stimato, né le ripetizioni totali al carico più alto): prova una variante o togli una serie per due settimane. Lo scarico non azzera il conto; le sedute con energia bassa o di partita non contano, e un calo chiesto dall'app è ricostruzione. Prevenzione (polso, cuffia, Pallof, woodchop), salti, tenute e Nordic non contano mai come fermi né per lo scarico.</li>
+    <li>Esercizio fermo (nelle ultime 3 sedute non hai battuto il meglio delle sedute prima: né i kg, né il massimale stimato, né le ripetizioni totali al carico più alto): prova una variante o togli una serie per due settimane. Lo scarico non azzera il conto; le sedute con energia bassa o di partita non contano, e dopo un calo di carico (chiesto dall'app o scelto da te) conta solo il meglio da lì in poi: è ricostruzione, non stallo. Prevenzione (polso, cuffia, Pallof, woodchop), salti, tenute e Nordic non contano mai come fermi né per lo scarico.</li>
     <li>Woodchop: ripetizioni fisse ed esplosive; il carico sale quando tutte le serie sono state veloci (non "Al limite") e il gradino non supera il 20%, altrimenti stesso carico più veloce. Multiarticolari a ripetizioni fisse con un gradino oltre il 10% (bulgarian 8 con +2 kg): prima 2 ripetizioni in più, poi il carico. Salti: ripetizioni fisse, si progredisce in altezza o distanza. Nordic: meno aiuto dall'elastico. Pallof: ripetizioni fisse, il carico sale quando l'ultima serie è Facile e il gradino non supera il 25%. Copenhagen (caviglia sulla panca, gamba tesa): +5 s fino a 30, poi fino a 40, poi alzi e abbassi piano la gamba sotto; con la leva corta (ginocchio) a 30 s torni alla caviglia.</li>
     <li>Gambe mai nello stesso giorno del padel e mai il giorno prima di una partita. Partita dopo 2 giorni: niente Nordic e una serie in meno sugli eccentrici.</li>
     <li>Partita domani: almeno 1 ripetizione in canna su tutto (dove la scheda dice 0 diventa 1). Palestra prima del padel: almeno 1 in canna anche sull'isolamento. Serie molto sotto il range (3+ ripetizioni): le serie dopo scendono del 10%.</li>
     <li>Venerdì prima di due partite (sabato e domenica): solo braccia, Copenhagen, cuffia e polso.</li>
-    <li>Padel e palestra nello stesso giorno: una serie in meno sulle spinte sopra la testa. Giorno di partita o energia bassa: una serie in meno su tutto, stessi carichi e stesse ripetizioni dell'ultima volta.</li>
+    <li>Padel e palestra nello stesso giorno: una serie in meno sulle spinte sopra la testa. Giorno di partita o energia bassa: una serie in meno su tutto, stessi carichi e stesse ripetizioni dell'ultima volta. Se quel giorno vai peggio della seduta normale prima, la volta dopo si riparte dalla seduta normale.</li>
     <li>Scarico quando serve, non a calendario: l'app lo propone dopo 6 settimane senza scarico (la scheda dice ogni 5-6: puoi avviarlo prima a mano) o con 3+ esercizi fermi, ma non prima di 4 settimane di lavoro. Le prime 2 sedute di un esercizio servono a trovare il carico e non contano per lo stallo. Serie dimezzate, stessi carichi dell'ultima seduta vera, 3-4 in canna. Le sedute di scarico non contano per la progressione. Una pausa di 7 o più giorni senza sedute vale come scarico.</li>
     <li>Serie di avvicinamento «A» sul primo esercizio di petto, sul primo di dorso e sul primo multiarticolare: carichi a circa 50, 70 e 85% di quello di lavoro, 60 s di pausa.</li>
-    <li>Timbro PR: quando una serie supera il massimale stimato migliore di almeno il 2% e in più usa un carico mai usato prima o fa più di quanto proposto (seguire la progressione da sola non basta). Per trazioni e dip il massimale conta il tuo peso più la zavorra.</li>
+    <li>Timbro PR: quando una serie supera il massimale stimato migliore di almeno il 2% e in più usa un carico mai usato prima o batte il massimale della proposta di oggi, anche con più ripetizioni a un carico più basso (seguire la progressione da sola non basta). Niente timbro su Pallof, woodchop, salti, tenute e Nordic. Per trazioni e dip il massimale conta il tuo peso più la zavorra.</li>
    </ul></section>
   <section class="card"><h3>Backup</h3><p class="note" style="margin:0">I dati stanno solo su questo telefono. Salva un backup ogni tanto.</p>
    <div class="row"><button class="btn" id="exp">Esporta backup</button><label class="btn" style="flex-direction:column;gap:2px;text-align:center">Importa backup<small style="font-size:12px;font-weight:500;opacity:.75">sostituisce i dati attuali</small><input type="file" id="imp" accept="application/json" hidden></label></div>
