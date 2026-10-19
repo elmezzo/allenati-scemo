@@ -498,7 +498,13 @@ body{overflow-x:clip}
 :is(.tr,.rr) .rh .ra{stroke-linecap:butt;stroke-dasharray:50.15 49.85;stroke-dashoffset:50;transition:none}
 :is(.tr,.rr) .rh.r2 .ra{stroke-dasharray:50 50;stroke-dashoffset:0}
 :is(.tr,.rr) .ra.rc{stroke-linecap:round;stroke-dasharray:.01 200;stroke-dashoffset:0;transition:none}
-.rest.over .rr>.rh{opacity:0}
+.rest.over .rr .rh{opacity:0}
+/* Alone dell'anello sul contenitore delle due metà, non sulle metà: ritagliate, ognuna tagliava il suo alone e al centro restava una riga */
+.rg{position:absolute;inset:0;pointer-events:none}
+html:not([data-skin="lavagna"]) :is(.tr,.rr) .rg .ra{filter:none!important}
+html[data-skin="lavagna"] .soon .rg .ra{filter:url(#chalk)!important}
+.soon .rg{filter:drop-shadow(0 0 6px color-mix(in srgb,var(--adapt) 70%,transparent))}
+html[data-skin="carbonio"] :is(.rest,.timer):not(.over) .rg{filter:drop-shadow(0 0 4px rgba(var(--acc-rgb,255,176,0),.8))}
 :is(.tr,.rr).rz .ra{opacity:0}
 .timer .tr .t{font-size:max(22px,1.2941rem);min-width:0;letter-spacing:.02em}
 .rest .rr .tv{font-size:max(22px,1.2941rem);flex:none}
@@ -1234,9 +1240,12 @@ details.more > div > .lnk,details.more > div > .painb{align-self:flex-start}
 :root:not(#z) .wd2 small{padding:0;white-space:normal;text-align:center;line-height:1.15;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;text-overflow:clip}
 :root:not(#z) .rest button{min-height:44px;white-space:nowrap}
 @media (max-width:360px){
-  :root:not(#z) .set{grid-template-columns:14px minmax(0,1fr) minmax(0,1fr) 44px;column-gap:6px}
+  :root:not(#z) .set{grid-template-columns:14px minmax(0,1.3fr) minmax(0,1fr) 44px;column-gap:6px}
   :root:not(#z) .set.now .pm{width:28px}
   :root:not(#z) .set .field input{min-width:2.4ch}
+  /* carichi a 5 caratteri (122,5) un po' più piccoli, così stanno nel campo tra − e + */
+  :root:not(#z) .set .field input.lg{font-size:min(.84em,14.5px);letter-spacing:-.03em}
+  html[data-skin="manga"]:not(#z) .set .field input.lg{font-size:min(.8em,13.5px);letter-spacing:-.05em}
   :root:not(#z) .rest button{padding:8px 7px}
   :root:not(#z) .rest{gap:8px}
 }
@@ -1777,6 +1786,8 @@ html[data-skin="carbonio"]:not(#z):not(#y) .ex.cur.tint .tgt .seg7 .off{fill:rgb
 :root:not(#z):not(#y):not(#x) .ex.cur.tint .rest:not(.over) button{color:var(--fg)}
 /* Eclisse: "Upper C" su una riga anche a 375 px */
 html[data-skin="eclisse"]:not(#z):not(#y) .hero .big{font-size:clamp(40px,11.5vw,62px)}
+/* Schermo stretto: disco più piccolo, così un nome lungo resta su 2 righe senza finirci sotto */
+@media (max-width:360px){html[data-skin="eclisse"]:not(#z):not(#y) .hero .big{max-width:calc(100% - 50px)}html[data-skin="eclisse"]:not(#z):not(#y) .hero::before,html[data-skin="eclisse"]:not(#z):not(#y) .hero::after{width:96px;height:96px;top:-22px;right:-36px}}
 /* Tocchi da almeno 44 px: pallini colore, menu degli esercizi, Regolazioni, salta la domanda; riga intera degli interruttori */
 .vars button{width:44px;height:44px}
 .exsel select{min-height:44px}
@@ -1856,7 +1867,7 @@ html[data-skin="manga"]:not(#z):not(#y):not(#x) .sheet .fxgo,html[data-skin="man
 <main class="app" id="app"></main>
 
 <div class="timer" id="timer" hidden role="timer" tabindex="0" aria-label="Recupero: tocca per tornare all'esercizio">
-  <span class="tr"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rk" cx="32" cy="32" r="28"/><circle class="ra rc" cx="32" cy="32" r="28" pathLength="100"/></svg><i class="rh r1" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><i class="rh r2" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><i class="rh rd" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra rc" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><span class="t" id="tval">0:00</span></span>
+  <span class="tr"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rk" cx="32" cy="32" r="28"/><circle class="ra rc" cx="32" cy="32" r="28" pathLength="100"/></svg><i class="rg" aria-hidden="true"><i class="rh r1" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><i class="rh r2" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><i class="rh rd" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra rc" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i></i><span class="t" id="tval">0:00</span></span>
   <span class="l" id="tlbl" aria-live="assertive">Recupero</span>
   <span class="tb"><button id="tstop">Chiudi</button><button id="tplus">+15 s</button></span>
 </div>
@@ -2953,7 +2964,7 @@ function fitTitle(el,{min=26,avail}={}){if(!el)return;el.style.fontSize="";const
   let fs=fs0*av/tw*.98;if(fs>=fs0*.72){el.style.fontSize=fs.toFixed(1)+"px";return}
   fs=Math.max(min,fs0*.72);el.style.fontSize=fs.toFixed(1)+"px";
   while(lines()>2&&fs>min){fs=Math.max(min,fs*.92);el.style.fontSize=fs.toFixed(1)+"px"}}
-function fitTitles(){fitTitle(document.querySelector(".hero .big"));fitTitle(document.querySelector(".thead h1"),{min:22,avail:e=>e.parentElement.clientWidth})}
+function fitTitles(){fitTitle(document.querySelector(".hero .big"),{min:22});fitTitle(document.querySelector(".thead h1"),{min:22,avail:e=>e.parentElement.clientWidth})}
 addEventListener("resize",()=>{clearTimeout(fitTitles.t);fitTitles.t=setTimeout(fitTitles,120)});
 if(document.fonts)document.fonts.ready.then(()=>fitTitles());
 function renderToday(){
@@ -3081,15 +3092,16 @@ function renderTrain(){
   document.querySelectorAll("#exs input[data-f]").forEach(i=>i.oninput=()=>{const v=i.dataset.f==="kg"?i.value.replace(/[^\d.,]/g,"").replace(/([.,].*?)[.,]/g,"$1").slice(0,6):i.value.replace(/\D/g,"").slice(0,3);if(v!==i.value)i.value=v;cell(g,i.dataset.ex,+i.dataset.j)[i.dataset.f]=v.trim();save()});
   document.querySelectorAll("#exs .tick:not(.mt):not(.rt)").forEach(b=>b.onclick=()=>toggleSet(g,b.dataset.ex,+b.dataset.j,mods));
   document.querySelectorAll("#exs .tick.rt").forEach(b=>b.onclick=()=>rampTick(g,b.dataset.rex,+b.dataset.k));
+  document.querySelectorAll('#exs input[data-f="kg"],#exs input[data-rf="kg"]').forEach(kgFit);
   document.querySelectorAll("#exs input[data-rf]").forEach(i=>i.oninput=()=>{const v=i.dataset.rf==="kg"?i.value.replace(/[^\d.,]/g,"").replace(/([.,].*?)[.,]/g,"$1").slice(0,6):i.value.replace(/\D/g,"").slice(0,3);if(v!==i.value)i.value=v;rcell(g,i.dataset.ex,+i.dataset.k)[i.dataset.rf]=v.trim();save()});
   document.querySelectorAll("#exs [data-rpm]").forEach(b=>b.onclick=e=>{e.preventDefault();const inp=b.parentElement.querySelector("input"),f=b.dataset.rpm,d=+b.dataset.d,ex=exById(b.dataset.ex);let v=num(inp.value)||0;
-    if(f==="kg"){v=Math.max(0,Math.round((v+d*stepOf(ex))*100)/100);inp.value=fk(v)}else{v=Math.max(0,Math.round(v)+d);inp.value=String(v)}
+    if(f==="kg"){v=Math.max(0,Math.round((v+d*stepOf(ex))*100)/100);inp.value=fk(v);kgFit(inp)}else{v=Math.max(0,Math.round(v)+d);inp.value=String(v)}
     rcell(g,b.dataset.ex,+b.dataset.k)[f]=inp.value;save();buzz(8)});
   document.querySelectorAll("#exs [data-myot]").forEach(b=>b.onclick=()=>myoTick(g,b.dataset.myot,+b.dataset.j,mods));
   document.querySelectorAll("#exs [data-myoend]").forEach(b=>b.onclick=()=>myoFinish(g,b.dataset.myoend,+b.dataset.j,mods));
   document.querySelectorAll("#exs .hold").forEach(b=>b.onclick=()=>holdStart(g,b.dataset.ex,+b.dataset.j,mods));
   document.querySelectorAll("#exs [data-pm]").forEach(b=>b.onclick=e=>{e.preventDefault();const inp=b.parentElement.querySelector("input"),f=b.dataset.pm,d=+b.dataset.d,ex=exById(b.dataset.ex);let v=num(inp.value)||0;
-    if(f==="kg"){v=Math.max(0,Math.round((v+d*stepOf(ex))*100)/100);inp.value=fk(v)}else{v=Math.max(0,Math.round(v)+d*(ex.t==="time"?5:1));inp.value=String(v)}
+    if(f==="kg"){v=Math.max(0,Math.round((v+d*stepOf(ex))*100)/100);inp.value=fk(v);kgFit(inp)}else{v=Math.max(0,Math.round(v)+d*(ex.t==="time"?5:1));inp.value=String(v)}
     cell(g,b.dataset.ex,+b.dataset.j)[f]=inp.value;save();buzz(8)});
   document.querySelectorAll("#exs [data-setup]").forEach(b=>b.onclick=()=>setupSheet(exById(b.dataset.setup)));
   document.querySelectorAll("#exs [data-ss]").forEach(b=>b.onclick=()=>{const ex=PLAN[g].ex.map(e=>effEx(g,e)).find(e=>e.id===b.dataset.ss);if(ex)ssSheet(g,ex,mods)});
@@ -3271,7 +3283,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   if(tg.top&&tg.top>ex.hi&&!mods.has("deload")&&tg.reps.every(r=>r>=ex.lo)&&!["time","nordic","perf"].includes(ex.t)){const mx=eqMax(ex);chips.push(`<span class="chip hot">Range esteso fino a ${tg.top}: ${mx&&(tg.kg||0)>=mx?`${fk(mx)} kg è il massimo del pacco`:`il prossimo gradino è ${pct(Math.round(stepOf(ex)/Math.max(1,tg.kg||lastKg(ex)||1)*100))}`}</span>`)}
   const stallTxt=!mods.has("deload")&&!tg.hold&&tg.kind!=="down"&&!(tg.kind==="up"&&tg.kg>0&&tg.kg>(lastKg(ex)||0))&&stalled(ex)?(phaseAt()==="def"?`<p class="prog down"><span>In calo</span><span>Massimale sotto del 5% nelle ultime 2 sedute. In definizione basta tenere i carichi: se continua togli una serie o fai lo scarico.</span></p>`:`<p class="prog down"><span>Fermo</span><span>Nessun miglioramento nelle ultime 3 sedute: prova una variante con ⇄ Cambia o togli una serie per due settimane.</span></p>`):"";
   const over=tOn&&tEnd<=Date.now();
-  const rest=withRest&&tOn?`<div class="rest ${over?"over":""}" id="restIn" role="timer"><span class="rr"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rk" cx="32" cy="32" r="28"/><circle class="ra rc" cx="32" cy="32" r="28" pathLength="100"/></svg><i class="rh r1" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><i class="rh r2" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><i class="rh rd" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra rc" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><b class="tv"></b></span><span class="tl" aria-live="assertive">${over?"Recupero finito":"Recupero"+(tPlus?"\u00a0·\u00a0+"+tPlus+"\u00a0s":"")}</span><span class="tb"><button data-ts>Chiudi</button><button data-tp>+15 s</button></span></div>`:"";
+  const rest=withRest&&tOn?`<div class="rest ${over?"over":""}" id="restIn" role="timer"><span class="rr"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rk" cx="32" cy="32" r="28"/><circle class="ra rc" cx="32" cy="32" r="28" pathLength="100"/></svg><i class="rg" aria-hidden="true"><i class="rh r1" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><i class="rh r2" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><i class="rh rd" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra rc" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i></i><b class="tv"></b></span><span class="tl" aria-live="assertive">${over?"Recupero finito":"Recupero"+(tPlus?"\u00a0·\u00a0+"+tPlus+"\u00a0s":"")}</span><span class="tb"><button data-ts>Chiudi</button><button data-tp>+15 s</button></span></div>`:"";
   // Scheda che si colora: a ogni serie un velo su tutta la scheda si intensifica piano; a esercizio finito passa l'oro in diagonale
   const fN=Math.min(n,rows.filter(r=>r.done).length),fr=n?fN/n:0,isGold=goldHold&&goldHold.ex===ex.id,fa=fillAnim(ex.id,fr),fPrev=fa.from;
   return `<article class="ex cur ${ssP.length?"ss":""} ${isGold?"gold":""} ${fr>0||isGold?"tint":""}" data-ex="${ex.id}" style="--f:${fr.toFixed(3)};--f0:${fPrev.toFixed(3)};--fc:${fillCol(fr)};--fc0:${fillCol(fPrev)};--fd:-${fa.el}ms">${fa.on&&!isGold?'<i class="fl fq" aria-hidden="true"></i>':""}<i class="fl fp ${fa.on?"grow":""}" aria-hidden="true"></i>${isGold?'<i class="fl fg" aria-hidden="true"></i>':""}
@@ -3576,11 +3588,12 @@ function ringParts(c){return [c.querySelector(".r1>b"),c.querySelector(".r2>b"),
 // posa ferma all'angolo di adesso (nessun vuoto mentre l'animazione aspetta il disegno)
 function ringPose(c){const [r1,r2,rd]=ringParts(c);if(!rd)return;const [D,A]=ringA();
   [r1,r2,rd].forEach(e=>e.getAnimations().forEach(a=>a.cancel()));
-  r1.style.transform=`rotate(${Math.min(A,180)}deg)`;r2.style.transform=`rotate(${Math.max(0,A-180)}deg)`;rd.style.transform=`rotate(${A}deg)`;c.classList.toggle("rz",D<=0||A<=0)}
+  // sotto mezzo giro la seconda metà sparisce: ferma, con l'arco fuori dal suo ritaglio, lascerebbe trapelare l'alone in una riga al centro
+  r1.style.transform=`rotate(${Math.min(A,180)}deg)`;r2.style.transform=`rotate(${Math.max(0,A-180)}deg)`;r2.style.opacity=A>180?"1":"0";rd.style.transform=`rotate(${A}deg)`;c.classList.toggle("rz",D<=0||A<=0)}
 function ringAnim(c,k){const [r1,r2,rd]=ringParts(c);if(!rd)return;const [D,A0]=ringA();ringPose(c);if(D<=0||A0<=0)return;
   clearTimeout(c._rz);c._rz=setTimeout(()=>{if(c._rk===k)c.classList.add("rz")},D);const rot=d=>({transform:`rotate(${d}deg)`}),o={duration:D,easing:"linear",fill:"forwards"};
   rd.animate([rot(A0),rot(0)],o);
-  if(A0>180){const of=(A0-180)/A0;r2.animate([rot(A0-180),{...rot(0),offset:of},rot(0)],o);r1.animate([rot(180),{...rot(180),offset:of},rot(0)],o)}
+  if(A0>180){const of=(A0-180)/A0;r2.animate([{...rot(A0-180),opacity:1},{...rot(0),opacity:1,offset:of},{...rot(0),opacity:0,offset:Math.min(1,of+1e-4)},{...rot(0),opacity:0}],o);r1.animate([rot(180),{...rot(180),offset:of},rot(0)],o)}
   else r1.animate([rot(A0),rot(0)],o)}
 // Ultimi 3 secondi: una pallina da padel rimbalza sull'anello, un rimbalzo al secondo; allo zero si schiaccia e sparisce
 function ballFx(left){document.querySelectorAll("#timer .tr,#restIn .rr").forEach(r=>{let b=r.querySelector(".tball");
@@ -3599,7 +3612,12 @@ function syncTimer(dy){if(!tOn)return;const tm=T("timer"),inl=document.getElemen
   if(tm.hidden&&!hide){tShown=performance.now();tm.classList.remove("enter");void tm.offsetWidth;tm.classList.add("enter");clearTimeout(tm.et);tm.et=setTimeout(()=>tm.classList.remove("enter"),200)}
   tm.hidden=hide;if(!hide)tH=tm.offsetHeight||tH;if(inl)inl.classList.toggle("dup",!hide);ringSync()}
 let scrQ=0;addEventListener("scroll",()=>{if(scrQ||!tOn)return;scrQ=requestAnimationFrame(()=>{scrQ=0;if(performance.now()>tLock)syncTimer(0)})},{passive:true});
-function stopTimer(){clearInterval(tInt);tOn=false;document.querySelectorAll(".tball").forEach(b=>b.remove());if(S.timer){delete S.timer;save()}T("timer").hidden=true;const inl=document.getElementById("restIn");if(inl)inl.remove()}
+// Campo kg con un carico lungo (122,5): classe per il carattere un po' più piccolo sugli schermi stretti
+const kgFit=i=>i.classList.toggle("lg",(i.value||"").length>=5);
+document.addEventListener("input",e=>{const t=e.target;if(t&&t.matches&&t.matches('input[data-f="kg"],input[data-rf="kg"]'))kgFit(t)});
+function stopTimer(){clearInterval(tInt);tOn=false;
+  // Recupero chiuso prima della fine: le animazioni dell'anello si fermano (nascosto, girerebbero comunque fino allo zero)
+  document.querySelectorAll("#timer .tr,#restIn .rr").forEach(c=>{c._rk=null;clearTimeout(c._rz);c.querySelectorAll(".rh>b").forEach(e=>e.getAnimations().forEach(a=>a.cancel()))});document.querySelectorAll(".tball").forEach(b=>b.remove());if(S.timer){delete S.timer;save()}T("timer").hidden=true;const inl=document.getElementById("restIn");if(inl)inl.remove()}
 function addRest(){tEnd+=15000;tTot=Math.max(tTot,(tEnd-Date.now())/1000);if(S.timer){S.timer.end=tEnd;S.timer.tot=tTot;save()}T("timer").classList.remove("over");tick()}
 T("tplus").onclick=()=>{if(!tFresh())addRest()};T("tstop").onclick=()=>{if(!tFresh())stopTimer()};
 // Tocco sul timer (fuori dai bottoni): torna all'allenamento, sull'esercizio del recupero o sul successivo se l'hai finito
