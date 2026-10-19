@@ -502,7 +502,7 @@ body{overflow-x:clip}
 /* Alone dell'anello sul contenitore delle due metà, non sulle metà: ritagliate, ognuna tagliava il suo alone e al centro restava una riga */
 .rg{position:absolute;inset:0;pointer-events:none}
 html:not([data-skin="lavagna"]) :is(.tr,.rr) .rg .ra{filter:none!important}
-html[data-skin="lavagna"] .soon .rg .ra{filter:url(#chalk)!important}
+html[data-skin="lavagna"] .soon :is(.tr,.rr) .ra{filter:url(#chalk)!important}
 .soon .rg{filter:drop-shadow(0 0 6px color-mix(in srgb,var(--adapt) 70%,transparent))}
 html[data-skin="carbonio"] :is(.rest,.timer):not(.over) .rg{filter:drop-shadow(0 0 4px rgba(var(--acc-rgb,255,176,0),.8))}
 :is(.tr,.rr).rz .ra{opacity:0}
@@ -1240,14 +1240,18 @@ details.more > div > .lnk,details.more > div > .painb{align-self:flex-start}
 :root:not(#z) .wd2 small{padding:0;white-space:normal;text-align:center;line-height:1.15;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;text-overflow:clip}
 :root:not(#z) .rest button{min-height:44px;white-space:nowrap}
 @media (max-width:360px){
-  :root:not(#z) .set{grid-template-columns:14px minmax(0,1.3fr) minmax(0,1fr) 44px;column-gap:6px}
-  :root:not(#z) .set.now .pm{width:28px}
+  :root:not(#z) .set{grid-template-columns:14px minmax(0,1fr) minmax(0,1fr) 44px;column-gap:6px}
+  :root:not(#z) .set.now .pm{width:24px}
   :root:not(#z) .set .field input{min-width:2.4ch}
   /* carichi a 5 caratteri (122,5) un po' più piccoli, così stanno nel campo tra − e + */
   :root:not(#z) .set .field input.lg{font-size:min(.84em,14.5px);letter-spacing:-.03em}
   html[data-skin="manga"]:not(#z) .set .field input.lg{font-size:min(.8em,13.5px);letter-spacing:-.05em}
   :root:not(#z) .rest button{padding:8px 7px}
   :root:not(#z) .rest{gap:8px}
+}
+@media (max-width:340px){
+  :root:not(#z) .set .field input.lg{font-size:min(.76em,13px)}
+  html[data-skin="manga"]:not(#z) .set .field input.lg{font-size:min(.72em,12px)}
 }
 :root:not(#z) .rk-i::after{inset:-9px}
 .sheet:focus{outline:none}
@@ -2244,7 +2248,7 @@ function target(ex,noMyo){
     if(hReps.some(r=>r<=ex.lo-2)&&kb!=null)return {kg:kb,reps:fix,top:ex.lo,kind:"down",badge:`-${fk(kg-kb)} kg`,hold:true,msg:`${fk(kg)} kg non regge per ${ex.lo}${lp}: torna a ${fk(kb)} kg, ripetizioni ferme senza ruotare.`};
     // Si sale solo se il gradino non supera il 25% (Pallof 15 → 20 è +33%: resta, o ⇄ Cambia con l'elastico)
     if(allOk&&eff==="easy"&&nk>kg&&(nk-kg)/kg<=0.25+1e-9)return {kg:nk,reps:fix,top:ex.lo,kind:"up",badge:`+${fk(nk-kg)} kg`,msg:`Era facile: ${fk(nk)} kg, sempre ${ex.lo}${lp}. Se ruoti il busto, torna a ${fk(kg)} kg.`};
-    return {kg,reps:fix,top:ex.lo,kind:"flat",badge:"=",hold:true,msg:`Ripetizioni fisse: ${fk(kg)} kg, ${ex.lo}${lp}, ferme senza ruotare.${nk>kg&&(nk-kg)/kg>0.25+1e-9?` Il prossimo gradino (${fk(nk)} kg) è un salto del ${Math.round((nk-kg)/kg*100)}%: ${allOk&&eff==="easy"?"":"quando l'ultima serie è Facile, "}per renderlo più duro allontanati di un passo dal cavo, o ⇄ Cambia con l'elastico.`:nk>kg?" Quando l'ultima serie è Facile, sali di carico.":""}`}}
+    return {kg,reps:fix,top:ex.lo,kind:"flat",badge:"=",hold:true,msg:`Ripetizioni fisse: ${fk(kg)} kg, ${ex.lo}${lp}, ferme senza ruotare.${nk>kg&&(nk-kg)/kg>0.25+1e-9?` Il prossimo gradino (${fk(nk)} kg) è un salto del ${Math.round((nk-kg)/kg*100)}%: ${allOk&&eff==="easy"?"":allOk?"quando l'ultima serie è Facile, ":`prima porta tutte le serie a ${ex.lo}${lp}; poi, quando l'ultima è Facile, `}per renderlo più duro allontanati di un passo dal cavo, o ⇄ Cambia con l'elastico.`:nk>kg?" Quando l'ultima serie è Facile, sali di carico.":""}`}}
   // Gradino grosso: isolamento e prevenzione oltre il 15% (oltre il 10% se il range è fisso, es. reverse fly 2×15: 35 → 40 kg), multiarticolari a range fisso oltre il 10%
   const bigC=!atCap&&!mx&&ex.t==="comp"&&ex.lo===ex.hi&&kg>0&&st/kg>0.1;
   const big=!atCap&&!mx&&((ex.t==="iso"||ex.t==="prev")&&kg>0&&st/kg>(ex.lo===ex.hi?0.1:0.15)||bigC);
@@ -2264,10 +2268,10 @@ function target(ex,noMyo){
     // Copenhagen: si parte già con la caviglia (versione piena). A 30 s si allunga la tenuta di 10 s, poi discesa più lenta; la leva corta (ginocchio) torna alla caviglia
     if(allTop){const cop=/copenhagen/i.test(ex.n),lc=/leva corta/i.test(ex.n);
       if(lc)return {kg:null,reps:Array(ex.s).fill(ex.lo),kind:"up",badge:"Livello +",msg:`Hai tenuto ${ex.hi} s su tutte: torna al Copenhagen con la caviglia sulla panca (⇄ Cambia) e riparti da ${ex.lo} s.`};
-      if(cop){const mx2=ex.hi+10,dn2=full&&Math.min(...reps)>=mx2;return {kg:null,reps:dn2?Array(ex.s).fill(mx2):pad(reps.map(r=>Math.min(mx2,r+5)),ex.s),top:mx2,kind:dn2?"flat":"up",badge:dn2?"=":"+5 s",hold:dn2,msg:dn2?`${mx2} s su tutte: tienili, e rendila più dura alzando e abbassando piano la gamba sotto. Mai a sfinimento prima delle partite.`:`Hai tenuto almeno ${ex.hi} s su tutte: aggiungi 5 s, fino a ${mx2}.`}}
+      if(cop){const mx2=ex.hi+10,dn2=full&&Math.min(...reps)>=mx2;return {kg:null,reps:dn2?pad(reps.map(r=>Math.max(r,mx2)),ex.s):pad(reps.map(r=>Math.max(r,Math.min(mx2,r+5))),ex.s),top:mx2,kind:dn2?"flat":"up",badge:dn2?"=":"+5 s",hold:dn2,msg:dn2?`${mx2} s su tutte: tienili, e rendila più dura alzando e abbassando piano la gamba sotto. Mai a sfinimento prima delle partite.`:`Hai tenuto almeno ${ex.hi} s su tutte: aggiungi 5 s, fino a ${mx2}.`}}
       return {kg:null,reps:Array(ex.s).fill(ex.lo),kind:"up",badge:"Livello +",msg:`Hai tenuto ${ex.hi} s su tutte: passa a una versione più dura e riparti da ${ex.lo} s.`}}
     // Copenhagen già oltre i ${ex.hi} s su qualche serie (es. 35/28): si portano su le altre, mai sotto quanto già tenuto
-    const m0=Math.max(...reps);if(/copenhagen/i.test(ex.n)&&m0>ex.hi){const nr=pad(reps.map(r=>Math.min(m0,Math.max(ex.lo,r+5))),ex.s,m0);return {kg:null,reps:nr,top:ex.hi+10,kind:"up",badge:"+5 s",msg:`Aggiungi 5 secondi dove sei sotto i ${m0} s, fino a ${m0} su tutte.`}}
+    const m0=Math.max(...reps);if(/copenhagen/i.test(ex.n)&&!/leva corta/i.test(ex.n)&&m0>ex.hi){const nr=pad(reps.map(r=>Math.min(m0,Math.max(ex.lo,r+5))),ex.s,m0);return {kg:null,reps:nr,top:ex.hi+10,kind:"up",badge:"+5 s",msg:`Aggiungi 5 secondi dove sei sotto i ${m0} s, fino a ${m0} su tutte.`}}
     const nr=reps.map(r=>Math.min(ex.hi,Math.max(ex.lo,r+5)));
     return {kg:null,reps:pad(nr,ex.s),kind:"up",badge:"+5 s",msg:"Aggiungi 5 secondi per serie."};
   }
@@ -3322,15 +3326,15 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;
   const row=document.querySelector(`.tick[data-ex="${exId}"][data-j="${j}"]`).closest(".set");
   const ins=row.querySelectorAll("input");ins.forEach(i=>{r[i.dataset.f]=i.value.trim()});
   // Carico molto diverso dal solito (errore di battitura?): chiede un secondo tocco prima di segnare la serie
-  if(!r.done){const k=num(r.kg),pk=num(tgFor(ex,mods,g).kg),ref=Math.max(0,...(history(exId)[0]?.sets[exId]||[]).map(x=>num(x.kg)||0))||pk||0,key=exId+"|"+j+"|"+r.kg;
+  if(!r.done){const k=num(r.kg),pk=num(tgFor(ex,mods,g).kg),ref=pk||Math.max(0,...(history(exId)[0]?.sets[exId]||[]).map(x=>num(x.kg)||0))||0,key=exId+"|"+j+"|"+r.kg;
     const warn=m=>{document.querySelector(".kgchk")?.remove();row.insertAdjacentHTML("afterend",`<p class="kgchk" role="alert">${m}</p>`);buzz(20)};
     // Kg scritti male (es. "1,2,5"): la serie non si segna finché non è un numero
     if(String(r.kg||"").trim()&&k==null){kgChk="";warn("Kg non validi: scrivi un numero, per esempio 52,5.");return}
     const rp=num(r.reps),key2=key+"|"+r.reps;
     if(rp==null&&ex.t!=="perf"){kgChk="";warn(ex.t==="time"?"Scrivi i secondi della tenuta.":"Scrivi le ripetizioni che hai fatto.");return}
-    // Il carico proposto dall'app non chiede conferma; per trazioni e dip conta il peso del corpo più la zavorra
-    const tw=x=>ex.t==="bw"?bwNow()+x:x;
-    if(k!=null&&!(pk!=null&&Math.abs(k-pk)<1e-9)&&((ref>0&&(tw(k)>tw(ref)*1.5||tw(k)<tw(ref)*.5))||(!ref&&(k>250||k>0&&k<stepOf(ex))))&&kgChk!==key){kgChk=key;warn(`${esc(fk(k))} kg? ${ref>0?`L'ultima volta ${esc(fk(ref))}.`:k>250?"È tanto per un primo carico.":"È poco per un primo carico."} Tocca ✓ di nuovo per confermare.`);return}
+    // Il carico proposto dall'app non chiede conferma e fa da riferimento (anche quando il pacco lo limita); per trazioni e dip conta lo scarto di zavorra (10 kg o più)
+    const far=ex.t==="bw"?Math.abs(k-ref)>=10:(k>ref*1.5||k<ref*.5);
+    if(k!=null&&!(pk!=null&&Math.abs(k-pk)<1e-9)&&((ref>0&&far)||(!ref&&(k>250||k>0&&k<stepOf(ex))))&&kgChk!==key){kgChk=key;warn(`${esc(fk(k))} kg? ${ref>0?`${pk?"Proposti":"L'ultima volta"} ${esc(fk(ref))}.`:k>250?"È tanto per un primo carico.":"È poco per un primo carico."} Tocca ✓ di nuovo per confermare.`);return}
     if(rp!=null&&rp>Math.max(60,(ex.hi||0)*3)&&kgChk!==key2){kgChk=key2;warn(`${rp} ${ex.t==="time"?"secondi":"ripetizioni"}? Tocca ✓ di nuovo per confermare.`);return}}
   kgChk="";
   r.done=!r.done;const dd=draftFor(g);if(r.done&&!dd.start)dd.start=Date.now();if(r.done){const nw=Date.now();if(dd.last&&nw-dd.last>45*6e4)dd.idle=(dd.idle||0)+(nw-dd.last-10*6e4);dd.last=nw;dd.mods=[...mods]}
