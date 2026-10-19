@@ -47,6 +47,7 @@ h3{font-size:22px;line-height:1.05}
 .card{background:var(--card);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
 .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .tabs button{border:0;border-radius:10px;padding:9px 4px;background:var(--card);color:var(--muted);font-weight:700;font-size:max(14px,0.8235rem);display:flex;flex-direction:column;align-items:center;gap:1px;min-width:0}
+.tabs .tn{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;max-width:100%;text-align:center;line-height:1.2;overflow-wrap:anywhere}
 .tabs button small{font-weight:600;font-size:max(12px,0.7059rem);letter-spacing:.08em;text-transform:uppercase;opacity:.75}
 .tabs button[aria-pressed="true"]{background:var(--hot);color:var(--hot-ink)}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
@@ -147,7 +148,7 @@ nav.bar button[aria-current="page"]{color:var(--hot)}
 #restIn.dup{visibility:hidden}
 .timer{cursor:pointer;-webkit-tap-highlight-color:transparent}.timer:active:not(:has(button:active)){transform:scale(.985);transition:transform .12s}
 .timer .t{font:400 38px/1 var(--display);font-variant-numeric:tabular-nums;min-width:74px}
-.timer .l{flex:1;min-width:0;font-size:max(12px,0.7059rem);font-weight:700;line-height:1.25}
+.timer .l{flex:1 1 3.5em;min-width:0;font-size:max(12px,0.7059rem);font-weight:700;line-height:1.25}
 .timer button{border:1.5px solid currentColor;background:transparent;border-radius:9px;padding:8px 10px;font-weight:800;font-size:max(12px,0.7059rem)}
 .timer.over{background:var(--go)}
 
@@ -396,7 +397,7 @@ html[data-skin="manga"] .sbar{background:rgba(15,14,18,.92)}
 :root:not(#z) .ex.cur{--muted:color-mix(in srgb,var(--fg) 84%,var(--card-2));--dim:color-mix(in srgb,var(--fg) 74%,var(--card-2))}
 .set.low .i{color:var(--adapt);position:relative}
 .set.low .i::after{content:"";position:absolute;right:-6px;top:2px;width:6px;height:6px;border-radius:50%;background:var(--adapt)}
-.thead .r{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.thead .r{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:0 10px}
 .thead h1{font-size:36px}
 .thead .r span{font-size:max(14px,0.8235rem);color:var(--muted);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
 .pbar{height:6px;border-radius:6px;background:var(--card-2);overflow:hidden}
@@ -466,6 +467,9 @@ details.more > div{display:flex;flex-direction:column;gap:6px}
 .seg.two{grid-template-columns:1fr 1fr}
 /* illustrazioni esercizi */
 .nmw{flex:1;min-width:0;display:flex;align-items:center;gap:7px}
+.xb{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:center;column-gap:10px;row-gap:2px}
+.xb>.nmw,.xb>.nm{flex:1 1 9em}
+.xb>em{margin-left:auto}
 .nmw .nm{flex:0 1 auto}
 .qm{flex:none;position:relative;width:20px;height:20px;padding:0;border-radius:50%;display:inline-grid;place-items:center;font-size:max(12px,0.7059rem);font-weight:800;line-height:1;color:var(--muted);background:rgba(255,255,255,.07);border:1px solid var(--line);cursor:pointer;vertical-align:middle}
 .qm::after{content:"";position:absolute;inset:-12px}
@@ -484,9 +488,25 @@ body{overflow-x:clip}
 .timer .tr{width:58px;height:58px;margin:-4px 0 -4px -6px}
 .rest .rr{width:62px;height:62px}
 .timer .tr>svg,.rest .rr>svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
+/* Anello del recupero senza ridisegno a ogni fotogramma: due mezzi anelli fissi, ognuno ritagliato sulla sua metà, ruotano con transform
+   (lavoro del compositore, non del processore). Le estremità tonde sono due puntini: uno fermo in alto, uno che ruota con la fine dell'arco */
+.rh{position:absolute;inset:0;pointer-events:none}
+.rh>b{position:absolute;inset:0;will-change:transform}
+.rh svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
+.rh.r1{clip-path:inset(-14px -14px -14px calc(50% - .4px))}
+.rh.r2{clip-path:inset(-14px 50% -14px -14px)}
+:is(.tr,.rr) .rh .ra{stroke-linecap:butt;stroke-dasharray:50.15 49.85;stroke-dashoffset:50;transition:none}
+:is(.tr,.rr) .rh.r2 .ra{stroke-dasharray:50 50;stroke-dashoffset:0}
+:is(.tr,.rr) .ra.rc{stroke-linecap:round;stroke-dasharray:.01 200;stroke-dashoffset:0;transition:none}
+.rest.over .rr>.rh{opacity:0}
+:is(.tr,.rr).rz .ra{opacity:0}
 .timer .tr .t{font-size:max(22px,1.2941rem);min-width:0;letter-spacing:.02em}
 .rest .rr .tv{font-size:max(22px,1.2941rem);flex:none}
-.rest .tl{flex:1}
+.rest .tl{flex:1 1 3.5em;min-width:0}
+/* Testo grande su schermo stretto: i due bottoni vanno a capo insieme, allineati a destra (prima uscivano dallo schermo) */
+:is(.timer,.rest){flex-wrap:wrap}
+:is(.timer,.rest) .tb{display:flex;gap:inherit;flex:none;margin-left:auto}
+:is(.timer,.rest) .tb button{white-space:nowrap}
 html[data-skin="vetro"] .rest:not(.over) .ra{stroke:url(#rgg);filter:drop-shadow(0 0 5px rgba(var(--acc-rgb,255,79,154),.6))}
 html[data-skin="carbonio"] :is(.rest,.timer):not(.over) .ra{stroke:var(--acc,#ffb000);filter:drop-shadow(0 0 4px rgba(var(--acc-rgb,255,176,0),.8))}
 /* 2 spunta a molla */
@@ -513,10 +533,12 @@ nav.bar .ndot::before{content:"";width:34px;height:3px;border-radius:0 0 3px 3px
 .recgo{animation:goldrim 1.6s ease-out}
 @keyframes blade{to{left:140%}}
 /* Animazioni v49 */
-:root{--pr:#ff4d6d;--fil:#ffc35c}
+:root{--pr:var(--hot);--pr-ink:var(--hot-ink);--fil:var(--hot)}
 /* 1 timbro PR sul campo kg della serie che batte il massimale stimato */
 .set .field{position:relative}
-.prs{position:absolute;font-style:normal;right:-7px;top:-11px;z-index:2;pointer-events:none;font:400 13px/1 var(--display);letter-spacing:.08em;color:var(--pr);background:var(--card);border:1.5px solid var(--pr);border-radius:5px;padding:2px 4px 1px;transform:rotate(-12deg)}
+/* timbro pieno nel colore dello stile con il suo inchiostro (contrasto da 4,9:1 in su in tutti gli stili e varianti), bordo del colore della scheda per staccarlo dal velo; cresce col testo grande */
+.prs{position:absolute;font-style:normal;right:-7px;top:-11px;z-index:2;pointer-events:none;font:400 max(13px,.7647rem)/1 var(--display);letter-spacing:.08em;color:var(--pr-ink);background:var(--pr);border-radius:5px;padding:3px 5px 2px;box-shadow:0 0 0 2px var(--card),0 2px 6px rgba(0,0,0,.35);transform:rotate(-12deg)}
+html[data-skin="lavagna"] .prs{font:800 max(12px,.7059rem)/1 var(--ui);letter-spacing:.06em}
 .prs.in{animation:prIn .34s cubic-bezier(.3,1.5,.6,1) both}
 .prs.in::after{content:"";position:absolute;inset:-5px;border-radius:8px;border:1.5px solid var(--pr);opacity:0;animation:prRing .5s .22s ease-out}
 @keyframes prIn{0%{opacity:0;transform:rotate(-4deg) scale(1.7)}70%{opacity:1}100%{opacity:1;transform:rotate(-12deg) scale(1)}}
@@ -542,13 +564,18 @@ nav.bar .ndot::before{content:"";width:34px;height:3px;border-radius:0 0 3px 3px
 /* 4 sagoma nel riepilogo: muscoli allenati che si gonfiano */
 .sumf{display:flex;align-items:center;gap:14px}
 .sumfig{display:flex;gap:4px;flex:none}
-.sumfig .rk-fig{width:56px}
-.sumf p{margin:0;display:flex;flex-direction:column;gap:3px;min-width:0}
+.sumfig .rk-fig{width:76px}
+.sumf{flex-wrap:wrap}
+.sumf p{flex:1 1 9em;margin:0;display:flex;flex-direction:column;gap:3px;min-width:0}
 .sumf p span{color:var(--muted);font-weight:700}
 /* 5 settimana: giorni fatti pieni dal basso; pallino e filo nel margine a sinistra uniscono i giorni di fila */
 .dayr{position:relative;isolation:isolate}
 .dayr>.d,.dayr>.w,.dayr>.ed{position:relative}
-.dayr .fz{position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;background:linear-gradient(180deg,color-mix(in srgb,var(--go) 30%,transparent),color-mix(in srgb,var(--go) 16%,transparent));transform-origin:bottom}
+.days:has(.fz){padding-left:6px}
+.dayr .fz{position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;background:linear-gradient(180deg,color-mix(in srgb,var(--fil) 22%,transparent),color-mix(in srgb,var(--fil) 11%,transparent));transform-origin:bottom}
+/* nei giorni fatti il testo resta del colore del testo (sul fondo colorato l'accento non si leggeva), le icone restano colorate */
+.dayr.done :is(.c-gym,.c-pad,.c-match,.c-rest,.ed){color:var(--fg)}
+.dayr.done .c-gym .ic{color:var(--hot)}.dayr.done .c-pad .ic{color:var(--pad)}.dayr.done .c-match .ic{color:var(--match)}
 .dayr .fz.in{animation:fzIn .7s cubic-bezier(.25,.9,.3,1) both}
 @keyframes fzIn{from{transform:scaleY(0)}to{transform:scaleY(1)}}
 .dayr .fl{position:absolute;left:-10px;width:3px;border-radius:2px;background:var(--fil);pointer-events:none;transform-origin:top}
@@ -556,9 +583,10 @@ nav.bar .ndot::before{content:"";width:34px;height:3px;border-radius:0 0 3px 3px
 .dayr .fl.dn{top:50%;bottom:-1px}
 .dayr .fl.in{animation:flIn .26s cubic-bezier(.23,1,.32,1) both}
 @keyframes flIn{from{transform:scaleY(0)}to{transform:scaleY(1)}}
-.dayr .fd{position:absolute;left:-13px;top:50%;width:9px;height:9px;margin-top:-4.5px;border-radius:50%;background:var(--fil);pointer-events:none}
+/* la spunta del giorno fatto sta sul filo, fuori dal testo: non va a capo e non copre niente a nessuna larghezza */
+.dayr .fd{position:absolute;left:-16.5px;top:50%;width:16px;height:16px;margin-top:-8px;border-radius:50%;background:var(--fil);color:var(--hot-ink);font:900 10px/16px var(--ui);text-align:center;font-style:normal;pointer-events:none;box-shadow:0 0 0 2px var(--bg)}
 .dayr .fd.in{animation:fdIn .3s cubic-bezier(.3,1.5,.6,1) both}
-@keyframes fdIn{from{transform:scale(0)}to{transform:scale(1)}}
+@keyframes fdIn{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
 
 .gold-end{position:fixed;inset:0;z-index:50;pointer-events:none;overflow:hidden;box-shadow:inset 0 0 0 2px rgba(255,214,140,.0);animation:goldframe 1.4s ease-out forwards}
 .gold-end i{position:absolute;top:-20%;bottom:-20%;width:55%;left:-80%;transform:skewX(-18deg);background:linear-gradient(100deg,transparent,rgba(255,226,150,.35),rgba(255,248,220,.75),rgba(255,196,90,.35),transparent);mix-blend-mode:screen;animation:goldsweep 1.15s cubic-bezier(.3,.6,.2,1) forwards}
@@ -863,15 +891,16 @@ html[data-skin="campo"] .rbd .gs{opacity:.5}
 .ex.cur>.fl{position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none}
 @property --fx{syntax:"<number>";inherits:false;initial-value:0}
 @property --cx{syntax:"<color>";inherits:false;initial-value:transparent}
-.ex.cur>.fp{--fx:var(--f);--cx:var(--fc,var(--go));background:radial-gradient(130% 100% at 25% 15%,color-mix(in srgb,var(--cx) 58%,transparent),color-mix(in srgb,var(--cx) 34%,transparent) 70%);opacity:calc(min(1,var(--fx)*6)*(.25 + var(--fx)*.75))}
-.ex.cur.gold>.fp{opacity:0;animation:flOut .6s cubic-bezier(.23,1,.32,1) forwards}
+/* Velo: lo strato nuovo (--fc, --f) entra sopra quello vecchio (--fc0, --f0) animando solo l'opacità (veilFx), niente gradiente ridipinto a ogni fotogramma */
+.ex.cur>.fp{background:radial-gradient(130% 100% at 25% 15%,color-mix(in srgb,var(--fc,var(--go)) 58%,transparent),color-mix(in srgb,var(--fc,var(--go)) 34%,transparent) 70%);opacity:calc(min(1,var(--f)*6)*(.25 + var(--f)*.75))}
+.ex.cur>.fq{background:radial-gradient(130% 100% at 25% 15%,color-mix(in srgb,var(--fc0,var(--go)) 58%,transparent),color-mix(in srgb,var(--fc0,var(--go)) 34%,transparent) 70%);opacity:0}
+.ex.cur.gold>.fq{display:none}
+.ex.cur.gold>.fp{--fc:var(--fc0);opacity:0;animation:flOut .6s cubic-bezier(.23,1,.32,1) forwards}
 @media (prefers-reduced-motion:reduce){.ex.cur.gold>.fp{animation:none}}
 /* Parte da com'era il velo prima dell'ultima serie (--f0, --fc0), così non si schiarisce per un fotogramma */
-@keyframes flOut{from{opacity:calc(min(1,var(--f0)*6)*(.25 + var(--f0)*.75));--cx:var(--fc0)}to{opacity:0;--cx:var(--fc0)}}
-.ex.cur>.fp.grow{animation:flGrow var(--fdur,1.8s) cubic-bezier(.45,0,.25,1) both;animation-delay:var(--fd,0ms)}
+@keyframes flOut{from{opacity:calc(min(1,var(--f0)*6)*(.25 + var(--f0)*.75))}to{opacity:0}}
 /* Scheda dorata: il velo sfuma mentre arriva l'oro (deve vincere su .grow, che ha la stessa specificità) */
 .ex.cur.gold>.fp.grow{animation:flOut .6s cubic-bezier(.23,1,.32,1) forwards}
-@keyframes flGrow{from{--fx:var(--f0);--cx:var(--fc0)}to{--fx:var(--f);--cx:var(--fc)}}
 .ex.cur>.fg{background:linear-gradient(135deg,rgba(255,226,140,.42),rgba(232,170,52,.3) 55%,rgba(196,128,24,.38));clip-path:polygon(0 0,200% 0,0 200%);animation:flGold .68s cubic-bezier(.23,1,.32,1) both}
 .ex.cur>.fg::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,transparent 35%,rgba(255,250,225,.55) 50%,transparent 65%);background-size:300% 300%;animation:flShine .9s .25s cubic-bezier(.23,1,.32,1) both}
 @keyframes flGold{from{clip-path:polygon(0 0,0 0,0 0)}to{clip-path:polygon(0 0,200% 0,0 200%)}}
@@ -1086,6 +1115,7 @@ html[data-skin="eclisse"]:not(#z) .thead .r>span{display:inline-flex;align-items
 html[data-skin="eclisse"]:not(#z) .thead .r>span::after{content:"";width:26px;height:26px;border-radius:50%;flex:none;
   --pm:var(--p,0);background:radial-gradient(circle at calc(50% + var(--pm) * 120%) 50%,#040406 0 44%,transparent 46%),radial-gradient(circle,var(--corona) 0 44%,rgba(var(--acc-rgb),.6) 50%,transparent 68%);
   transition:--pm .5s var(--ease-out)}
+@media (prefers-reduced-motion:reduce){html[data-skin="eclisse"]:not(#z) .thead .r>span::after{transition:none}}
 /* Fine recupero: anello bianco con alone rosa */
 html[data-skin="eclisse"]:not(#z) .ra{stroke:var(--corona);filter:drop-shadow(0 0 4px rgba(var(--acc-rgb),.7))}
 /* Record: la lama di luce diventa bianca */
@@ -1506,7 +1536,7 @@ html[data-skin="lavagna"]:not(#z):not(#y) .tabs button[aria-pressed="true"]{bord
 html[data-skin="lavagna"]:not(#z):not(#y) .tabs button[aria-pressed="true"] *{color:inherit}
 /* campi: si scrive sulla riga */
 html[data-skin="lavagna"]:not(#z):not(#y) :is(.field,select,.inl input,.edx input,.edx select,.ed input,.ed select){background:rgba(0,0,0,.16);border:0;border-bottom:2px solid rgba(var(--chalk-rgb),.38);border-radius:4px 4px 0 0;box-shadow:none}
-html[data-skin="lavagna"]:not(#z):not(#y) .set.done .field{border-bottom-color:rgba(159,230,160,.6);opacity:.85}
+html[data-skin="lavagna"]:not(#z):not(#y) .set.done .field{border-bottom-color:rgba(159,230,160,.6)}
 
 /* bottoni: quello principale è colorato a tratteggio col gesso */
 html[data-skin="lavagna"]:not(#z):not(#y) button.btn.hot,html[data-skin="lavagna"]:not(#z):not(#y) .btn.hot{background:repeating-linear-gradient(-62deg,var(--acc) 0 3px,rgba(var(--acc-rgb),.82) 3px 4.5px);color:var(--hot-ink);border:0;border-radius:6px 4px 7px 5px;box-shadow:none;text-shadow:none}
@@ -1571,7 +1601,9 @@ html[data-skin="lavagna"]:not(#z):not(#y) :is(.tile,.dayr,.xrow,.ctx button,.tab
 /* serie: si scrive sulla riga, + e − sono segni di gesso */
 html[data-skin="lavagna"]:not(#z):not(#y) .set .field,html[data-skin="lavagna"]:not(#z):not(#y) .set .field.pmf{background:transparent;border:0;border-bottom:2px solid rgba(var(--chalk-rgb),.4);border-radius:0;box-shadow:none;outline:0}
 html[data-skin="lavagna"]:not(#z):not(#y) .set .field:focus-within{border-bottom-color:var(--acc)}
-html[data-skin="lavagna"]:not(#z):not(#y) .set.done .field{border-bottom-color:rgba(var(--chalk-rgb),.2);opacity:.8}
+/* serie fatta più tenue, ma non il timbro PR: l'opacità va sui figli, non sul campo che lo contiene */
+html[data-skin="lavagna"]:not(#z):not(#y) .set.done .field{border-bottom-color:rgba(var(--chalk-rgb),.16)}
+html[data-skin="lavagna"]:not(#z):not(#y) .set.done .field>:not(.prs){opacity:.8}
 html[data-skin="lavagna"]:not(#z):not(#y) .pm{background:none;color:var(--muted);font-family:var(--display);font-size:max(22px,1.2941rem)}
 /* spunta fatta: segno di gesso nel colore della variante */
 html[data-skin="lavagna"]:not(#z):not(#y) button.tick[aria-pressed="true"]{background:transparent!important;color:var(--acc)!important;box-shadow:none!important;border:2px solid var(--acc);font-size:max(22px,1.2941rem)}
@@ -1620,6 +1652,8 @@ html[data-skin="lavagna"]:not(#z):not(#y) .wd2.t::before{content:"";position:abs
 html[data-skin="lavagna"]:not(#z):not(#y) nav.bar .ndot::before{width:30px;height:3px;border-radius:0;background:var(--acc);box-shadow:none;filter:url(#chalkb)}
 html[data-skin="lavagna"]:not(#z):not(#y) :is(.timer,.rest) button:not(#q)::before{border-color:rgba(var(--acc-rgb),.7)}
 html[data-skin="lavagna"]:not(#z):not(#y) .rk-fig .rk-mz .mz{filter:saturate(.4) brightness(1.25)}
+html[data-skin="lavagna"]:not(#z):not(#y) .sumfig .rk-fig svg{-webkit-mask:none;mask:none}
+html[data-skin="lavagna"]:not(#z):not(#y):not(#x) .sumfig .rk-fig .rk-mz .mz{filter:none}
 
 /* tenuta a tempo */
 .hold{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;border:0;border-radius:10px;background:var(--hot);color:var(--hot-ink);font-weight:800;font-size:max(14px,0.8235rem);touch-action:manipulation}
@@ -1656,23 +1690,18 @@ html.vt-sed nav.bar{view-transition-name:bar}
 ::view-transition-group(sed){animation-duration:.28s;animation-timing-function:cubic-bezier(.32,.72,0,1);overflow:clip;border-radius:16px;background:color-mix(in srgb,var(--card) 50%,var(--bg))}
 ::view-transition-group(sed-t){animation-duration:.28s;animation-timing-function:cubic-bezier(.32,.72,0,1)}
 ::view-transition-old(sed),::view-transition-new(sed){height:100%;width:100%;object-fit:none;object-position:top left}
-/* La vecchia resta piena sotto, la nuova entra sopra: nessun fotogramma vuoto */
-::view-transition-old(sed){animation:none}
-::view-transition-new(sed){animation:vtIn .16s var(--ease-out) both}
-::view-transition-old(sed-t){animation:vtOut .08s var(--ease-out) both}
-::view-transition-new(sed-t){animation:vtIn .16s var(--ease-out) both}
+/* Dissolvenza incrociata vera: vecchia e nuova con la stessa durata e la stessa curva, tutte e due da 0 ms (nessun ritardo = nessun fotogramma vuoto;
+   la miscelazione plus-lighter di serie fa sommare le due opacità a 1, quindi il fondo non si vede e la pagina vecchia non resta piena sotto) */
+::view-transition-old(sed),::view-transition-old(sed-t){animation:vtOut .14s var(--ease-out) both}
+::view-transition-new(sed),::view-transition-new(sed-t){animation:vtIn .14s var(--ease-out) both}
 ::view-transition-old(sed-t),::view-transition-new(sed-t){height:100%;width:100%}
-/* La pagina vecchia resta sotto finché la nuova la copre: nessun attimo vuoto */
-html.vt-sed::view-transition-old(root){animation:none}
-html.vt-sed::view-transition-new(root){animation:vtRise .2s var(--ease-out) both}
+html.vt-sed::view-transition-old(root){animation:vtOut .14s var(--ease-out) both}
+html.vt-sed::view-transition-new(root){animation:vtIn .14s var(--ease-out) both}
 ::view-transition-group(bar),::view-transition-old(bar),::view-transition-new(bar){animation:none}
 ::view-transition-old(bar){display:none}
 html[data-skin="manga"]::view-transition-group(sed){border-radius:0}
 html.vt-back::view-transition-group(sed),html.vt-back::view-transition-group(sed-t){animation-duration:.28s}
-html.vt-back::view-transition-old(root){animation:none}
-html.vt-back::view-transition-old(sed){animation:none}
-html.vt-back::view-transition-new(sed){animation:vtIn .16s var(--ease-out) both}
-html.vt-back::view-transition-new(root){animation:vtIn .18s var(--ease-out) both}
+
 /* ===== AVATAR: SAGOMA CHE CRESCE (2026-10-13) ===== */
 .rk-fig .mz path{transform-box:fill-box;transform-origin:center;transform:scale(var(--s,1))}
 @media (prefers-reduced-motion:no-preference){
@@ -1689,8 +1718,8 @@ html.vt-back::view-transition-new(root){animation:vtIn .18s var(--ease-out) both
 ::view-transition-new(*.vx){animation:vtIn .16s var(--ease-out) both}
 html[data-skin="manga"]::view-transition-group(*.vx){border-radius:0}
 html.vt-ex nav.bar{view-transition-name:bar}
-html.vt-ex::view-transition-old(root){animation:none}
-html.vt-ex::view-transition-new(root){animation:vtIn .2s var(--ease-out) .12s both}
+html.vt-ex::view-transition-old(root){animation:vtOut .14s var(--ease-out) both}
+html.vt-ex::view-transition-new(root){animation:vtIn .14s var(--ease-out) both}
 /* 2 e 4. Fogli che si aprono dall'elemento toccato (Termina e salva -> riepilogo, muscolo -> dettaglio, seduta fatta -> riepilogo) */
 ::view-transition-group(vt-src){animation-duration:.32s;animation-timing-function:cubic-bezier(.32,.72,0,1);overflow:clip;border-radius:20px 20px 0 0}
 ::view-transition-old(vt-src){animation:vtOut .06s var(--ease-out) both}
@@ -1755,7 +1784,8 @@ html[data-skin="eclisse"]:not(#z):not(#y) .hero .big{font-size:clamp(40px,11.5vw
 .ask .t button{min-height:44px}
 .tgl{cursor:pointer}
 #omsg:empty{display:none}
-@media (max-width:399px){html[data-skin="manga"]:not(#z):not(#y) .pm{width:30px}}
+/* Manga: tasti −/+ larghi 34 px come negli altri stili (sotto 361 px 28 px come gli altri); il bordo da 2 px toglie spazio al numero, che si stringe appena per far stare "122,5" */
+@media (max-width:399px){html[data-skin="manga"]:not(#z):not(#y) .set .field input{letter-spacing:-.04em}}
 
 /* ===== Revisione v46, quarto giro (2026-10-14) ===== */
 /* Seduta libera: il tasto disattivato resta pieno, la lista non si legge attraverso */
@@ -1826,10 +1856,9 @@ html[data-skin="manga"]:not(#z):not(#y):not(#x) .sheet .fxgo,html[data-skin="man
 <main class="app" id="app"></main>
 
 <div class="timer" id="timer" hidden role="timer" tabindex="0" aria-label="Recupero: tocca per tornare all'esercizio">
-  <span class="tr"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rk" cx="32" cy="32" r="28"/><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg><span class="t" id="tval">0:00</span></span>
+  <span class="tr"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rk" cx="32" cy="32" r="28"/><circle class="ra rc" cx="32" cy="32" r="28" pathLength="100"/></svg><i class="rh r1" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><i class="rh r2" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><i class="rh rd" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra rc" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><span class="t" id="tval">0:00</span></span>
   <span class="l" id="tlbl" aria-live="assertive">Recupero</span>
-  <button id="tstop">Chiudi</button>
-  <button id="tplus">+15 s</button>
+  <span class="tb"><button id="tstop">Chiudi</button><button id="tplus">+15 s</button></span>
 </div>
 <div class="hold-ov" id="holdOv" hidden role="dialog" aria-modal="true" aria-labelledby="hoName">
   <div class="ho-top"><b id="hoName"></b><span id="hoSub"></span></div>
@@ -2639,7 +2668,9 @@ function segSVG(str,fixed){let x=0,p="";for(const ch of str){
 function setNum(el,txt){if(!el)return;if(skinNow()==="carbonio"){if(el.dataset.t===txt&&el.querySelector(".seg7"))return;el.dataset.t=txt;el.innerHTML=`<span class="sr">${esc(txt)}</span>`+txt.replace(/([0-9:,\-]+)|([^0-9:,\-]+)/g,(m,d,o)=>d?`<span class="seg7">${segSVG(d,!!el.closest(".tr,.rr"))}</span>`:`<span class="lu" aria-hidden="true">${esc(o)}</span>`)}else{delete el.dataset.t;el.textContent=txt}}
 function ledify(){if(skinNow()!=="carbonio")return;app.querySelectorAll(".tgt b,.kpi b").forEach(b=>{if(!b.querySelector(".seg7"))setNum(b,b.textContent)})}
 // Il carico della prossima volta sale contando, una volta al giorno per esercizio
-const lastPct={},counted=new Set(),recShown=new Set();
+const lastPct={},recShown=new Set();
+// Carichi già fatti scorrere oggi: salvati in S (come la Settimana con S.wkFx), così se iOS ricarica l'app non ripartono tutti
+const counted={has:k=>!!S.odo&&S.odo.d===iso(today())&&S.odo.k.includes(k),add:k=>{const d=iso(today());if(!S.odo||S.odo.d!==d)S.odo={d,k:[]};S.odo.k.push(k);save()}};
 function countUp(b,a,z,rest){if(RM())return;const t0=performance.now();const f=t=>{if(!b.isConnected)return;const k=Math.min(1,(t-t0)/800),e=1-Math.pow(1-k,3);setNum(b,fk(Math.round((a+(z-a)*e)*10)/10)+rest);if(k<1)requestAnimationFrame(f)};setNum(b,fk(a)+rest);setTimeout(()=>requestAnimationFrame(f),250)}
 // Il carico della prossima volta sale come un contachilometri: ogni cifra scorre verso l'alto fino alla nuova (in Carbonio conta sul display a 7 segmenti)
 function rollUp(b,a,z,rest){if(RM())return;if(skinNow()==="carbonio")return countUp(b,a,z,rest);
@@ -2656,10 +2687,16 @@ function rollUp(b,a,z,rest){if(RM())return;if(skinNow()==="carbonio")return coun
     const os=c.querySelector(".os"),k=os.children.length-1,lh=f.getBoundingClientRect().height;os.style.top=(R(g).top-(R(f).top-k*lh))+"px"});
   setTimeout(()=>requestAnimationFrame(()=>b.querySelectorAll(".os,.otl").forEach(x=>x.classList.add("go"))),250);
   setTimeout(()=>{if(b.isConnected&&b.querySelector(".oc"))setNum(b,sz+rest)},1400)}
+// Velo che si intensifica: il nuovo strato sale da 0 alla sua opacità a1, il vecchio scende con o(u)=(1-u)/(1-a1·u): sovrapposti danno a0+(a1-a0)·u, come prima, ma solo con l'opacità
+function veilFx(){app.querySelectorAll(".ex.cur:not(.gold)>.fp.grow").forEach(fp=>{const a=fp.parentElement,st=a.style,f=+st.getPropertyValue("--f")||0,f0=+st.getPropertyValue("--f0")||0,el=Math.max(0,-parseFloat(st.getPropertyValue("--fd"))||0),fq=a.querySelector(":scope>.fq");
+  const op=x=>Math.min(1,x*6)*(.25+x*.75),a0=op(f0),a1=op(f),o={duration:FILL_MS,easing:"cubic-bezier(.45,0,.25,1)",fill:"both"};
+  fp.animate([{opacity:0},{opacity:a1}],o).currentTime=el;
+  if(fq&&a0>.001){const kf=[];for(let i=0;i<=10;i++){const u=i/10,dn=1-a1*u;kf.push({opacity:dn>1e-3?a0*(1-u)/dn:0})}fq.animate(kf,o).currentTime=el}})}
 function trainFx(g,pct){
   const pb=app.querySelector(".pbar i"),was=lastPct[g];
   if(pb&&was!=null&&was!==pct&&!RM()){pb.style.transition="none";pb.style.setProperty("--pw",was);void pb.offsetWidth;pb.style.transition="";pb.style.setProperty("--pw",pct);if(pct>was)popEl(pb.parentElement,"shine",1200)}
   lastPct[g]=pct;document.documentElement.style.setProperty("--p",(pct/100).toFixed(2));
+  veilFx();
   ledify();
   app.querySelectorAll(".tgt b[data-cu]").forEach(b=>{const [a,z,rest,id]=b.dataset.cu.split("|");const k=g+id+iso(today());if(counted.has(k))return;counted.add(k);rollUp(b,+a,+z,rest)});
 }
@@ -2834,7 +2871,9 @@ function sheetFrom(src,open){
   t.finished.finally(()=>{if(sh)sh.style.viewTransitionName=""})}
 // Allenamento: ogni esercizio (riga o scheda) ha lo stesso nome prima e dopo, così si sposta invece di sparire
 const vxN=new Map();const vxName=id=>{if(!vxN.has(id))vxN.set(id,"vx"+vxN.size);return vxN.get(id)};
-function nameEx(on,skip){document.querySelectorAll("#exs [data-open],#exs article.ex[data-ex]").forEach(e=>{const id=e.dataset.open||e.dataset.ex,n=on&&!(skip&&skip.has(id));e.style.viewTransitionName=n?vxName(id):"";e.style.viewTransitionClass=n?"vx":""})}
+function nameEx(on,skip){document.querySelectorAll("#exs [data-open],#exs article.ex[data-ex]").forEach(e=>{const id=e.dataset.open||e.dataset.ex,n=on&&!(skip&&skip.has(id));e.style.viewTransitionName=n?vxName(id):"";e.style.viewTransitionClass=n?"vx":""});
+  // i tasti in fondo (Termina e salva, Svuota la seduta) si spostano con le righe invece di restare fermi sopra di loro
+  ["finish","clear"].forEach(k=>{const e=document.getElementById(k);if(e){e.style.viewTransitionName=on?"vx-"+k:"";e.style.viewTransitionClass=on?"vx":""}})}
 function openExVT(g,id){
   if(!vtOk()){openEx[g]=id;renderTrain();keepFocus(true);return}
   // la scheda che si chiude sparisce in dissolvenza: se si spostasse anche lei si incrocerebbe con quella che si apre
@@ -2852,7 +2891,10 @@ function sheetFx(wrap,close){if(!RM()&&!vtSheet){wrap.classList.add("enter");set
   wrap.addEventListener("pointermove",e=>{if(y0==null)return;const raw=e.clientY-y0;dy=raw<0?raw*.2:raw;const t=performance.now();pts.push([e.clientY,t]);while(pts.length>2&&t-pts[0][1]>80)pts.shift();sh().style.transform=`translateY(${dy}px)`});
   const end=()=>{if(y0==null)return;y0=null;const s=sh();s.style.transition="";const a=pts[0],b=pts[pts.length-1],v=b&&a&&b[1]>a[1]?(b[0]-a[0])/(b[1]-a[1]):0;if(dy>90||(v>.5&&dy>10)){close()}else{s.style.transform=""}};
   wrap.addEventListener("pointerup",end);wrap.addEventListener("pointercancel",end)}
-function sheetOut(wrap){if(!wrap.isConnected)return;if(RM()){wrap.style.transition="opacity .15s";wrap.style.opacity="0";wrap.style.pointerEvents="none";setTimeout(()=>wrap.remove(),160);return}const s=wrap.querySelector(".sheet");if(s){s.style.transition="";s.style.transform=""}wrap.classList.add("out");setTimeout(()=>wrap.remove(),230)}
+function sheetOut(wrap){if(!wrap.isConnected)return;if(RM()){wrap.style.transition="opacity .15s";wrap.style.opacity="0";wrap.style.pointerEvents="none";setTimeout(()=>wrap.remove(),160);return}const s=wrap.querySelector(".sheet");
+  // Se sta ancora salendo, l'entrata (keyframe, non interrompibile) viene fermata dove si trova: la discesa e il fondo partono da lì, senza salti
+  if(wrap.classList.contains("enter")){const bg=getComputedStyle(wrap).backgroundColor,tf=s?getComputedStyle(s).transform:"none";wrap.style.background=bg;if(s){s.style.transition="none";s.style.transform=tf}wrap.classList.remove("enter");void wrap.offsetWidth}
+  if(s){s.style.transition="";s.style.transform=""}wrap.classList.add("out");setTimeout(()=>wrap.remove(),230)}
 // Esc chiude anche i fogli costruiti a mano (Sostituisci)
 document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;const w=[...document.querySelectorAll(".sheet-wrap:not(.out)")].pop();if(w&&!w.dataset.esc)sheetOut(w)});
 function openSheet(build){
@@ -2881,6 +2923,20 @@ async function shareBackup(){const name="allenati-scemo-"+iso(today())+".json";
 function dlBackup(){try{S.lastBackup=iso(today());save();const b=new Blob([JSON.stringify(S,null,1)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="allenati-scemo-"+iso(today())+".json";document.body.appendChild(a);a.click();a.remove();return true}catch(e){return false}}
 function backupDue(){const L=S.sessions||[];if(L.length<3)return null;const k=iso(today());if(S.bkSnooze&&S.bkSnooze>k)return null;
   const from=S.lastBackup||L.map(x=>x.date.slice(0,10)).sort()[0],days=Math.floor((today()-new Date(from+"T00:00:00"))/864e5);return days>=14?{days,never:!S.lastBackup,n:L.length}:null}
+// Titolo che si adatta: prima rimpicciolisce fino a stare su una riga (non sotto il 72% della misura dello stile);
+// se il nome è troppo lungo va su 2 righe, rimpicciolendo ancora fino a un minimo
+function fitTitle(el,{min=26,avail}={}){if(!el)return;el.style.fontSize="";const fs0=parseFloat(getComputedStyle(el).fontSize);if(!fs0)return;
+  const sv=el.getAttribute("style")||"";el.style.display="block";el.style.width="auto";el.style.whiteSpace="nowrap";
+  const cs=getComputedStyle(el),av=(avail?avail(el):el.clientWidth)-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);
+  const rg=document.createRange();rg.selectNodeContents(el);const tw=rg.getBoundingClientRect().width;el.setAttribute("style",sv);
+  if(!av||tw<=av+.5)return;
+  const lines=()=>new Set([...rg.getClientRects()].filter(r=>r.width>1).map(r=>Math.round(r.top))).size;
+  let fs=fs0*av/tw*.98;if(fs>=fs0*.72){el.style.fontSize=fs.toFixed(1)+"px";return}
+  fs=Math.max(min,fs0*.72);el.style.fontSize=fs.toFixed(1)+"px";
+  while(lines()>2&&fs>min){fs=Math.max(min,fs*.92);el.style.fontSize=fs.toFixed(1)+"px"}}
+function fitTitles(){fitTitle(document.querySelector(".hero .big"));fitTitle(document.querySelector(".thead h1"),{min:22,avail:e=>e.parentElement.clientWidth})}
+addEventListener("resize",()=>{clearTimeout(fitTitles.t);fitTitles.t=setTimeout(fitTitles,120)});
+if(document.fonts)document.fonts.ready.then(()=>fitTitles());
 function renderToday(){
   const d=today(),a=assess(d),k=iso(d),hasGym=a.gym in PLAN,tm=dayPlan(addDays(d,1));
   const mods=new Set(a.mods);if(deloadOn())mods.add("deload");
@@ -2942,6 +2998,7 @@ function renderToday(){
   const ss2=document.getElementById("seeSum");if(ss2)ss2.onclick=()=>sheetFrom(ss2.closest(".hero"),()=>summarySheet(doneS));
   const sg=document.getElementById("startGym");if(sg)sg.onclick=()=>{gymSel=a.gym;go("train")};oldDraftBind();
   const sa=document.getElementById("startAlt");if(sa)sa.onclick=()=>{setO(d,"gym",a.gymAlt);gymSel=a.gymAlt;go("train")};
+  fitTitles();
 }
 
 let openEx={};
@@ -2976,15 +3033,15 @@ function renderTrain(){
     const n=setsFor(ex,mods),dc=doneCount(g,ex.id);
     if(open.has(ex.id)){curH.push(exCard(g,ex,mods,dr,base,!restShown));restShown=true;return}
     if(mods.has("prePadel")&&ex.t==="prev"&&!shownPost&&dc<n&&n>0){nextH.push(`<p class="grp">Dopo il padel</p>`);shownPost=true}
-    if(n===0){nextH.push(`<div class="xrow off"><span class="ck o">–</span><span class="nm">${esc(ex.n)}</span><em>salta oggi</em></div>`);return}
+    if(n===0){nextH.push(`<div class="xrow off"><span class="ck o">–</span><span class="xb"><span class="nm">${esc(ex.n)}</span><em>salta oggi</em></span></div>`);return}
     if(dc>=n){
-      html=`<button class="xrow done" data-open="${ex.id}"><span class="ck">✓</span><span class="nmw"><span class="nm">${esc(ex.n)}</span>${qmark(ex)}</span><em>${dc}/${n}</em></button>`;doneH.push(html);
+      html=`<button class="xrow done" data-open="${ex.id}"><span class="ck">✓</span><span class="xb"><span class="nmw"><span class="nm">${esc(ex.n)}</span>${qmark(ex)}</span><em>${dc}/${n}</em></span></button>`;doneH.push(html);
       const ef=(dr.eff||{})[ex.id],skip=(dr.effSkip||{})[ex.id];
       if(!ef&&!skip&&!noEff(ex)&&!mods.has("deload")&&dr.lastDone===ex.id)askH.push(`<div class="ask"><div class="t"><span>${esc(ex.n)}: com'era l'ultima serie?</span><button data-effskip="${ex.id}" aria-label="Salta la domanda">✕</button></div><div class="seg">${[["easy","Facile (3+)"],["ok","Giusta"],["hard","Al limite"]].map(([v,l])=>`<button data-ex="${ex.id}" data-eff="${v}">${l}</button>`).join("")}</div></div>`);
       return;
     }
     const tg=tgFor(ex,mods,g),rng=(ex.lo===ex.hi?ex.lo:ex.lo+"-"+ex.hi)+(ex.t==="time"?" s":"");
-    nextH.push(`<button class="xrow" data-open="${ex.id}"><span class="ck o">${L.filter((x,k)=>k<=i&&setsFor(x.ex,mods)>0).length}</span><span class="nmw"><span class="nm">${esc(ex.n)}</span>${qmark(ex)}</span><em>${n}×${rng}${tg.kg>0&&!noEff(ex)?" · "+fk(tg.kg)+" kg":""}</em></button>`);
+    nextH.push(`<button class="xrow" data-open="${ex.id}"><span class="ck o">${L.filter((x,k)=>k<=i&&setsFor(x.ex,mods)>0).length}</span><span class="xb"><span class="nmw"><span class="nm">${esc(ex.n)}</span>${qmark(ex)}</span><em>${n}×${rng}${tg.kg>0&&!noEff(ex)?" · "+fk(tg.kg)+" kg":""}</em></span></button>`);
   });
   if(curH.length&&askH.length){curH[0]=curH[0].replace("<!--ASK-->",askH.join(""));askH.length=0}
   html=askH.join("")+curH.join("")+(nextH.some(h=>h.startsWith("<button")||h.startsWith("<div"))?`<p class="grp">Prossimi</p>`+nextH.join(""):"")+(doneH.length?`<p class="grp">Fatti</p>`+doneH.join(""):"");
@@ -2992,7 +3049,7 @@ function renderTrain(){
   const savedH=svd?`<section class="card alldone saved"><p><b>${esc(P.name)} salvata</b> alle ${new Date(svd.date).toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"})}.</p><button class="btn" id="seeSv">Vedi il riepilogo</button></section>`:"";
   app.innerHTML=`
   <div class="thead"><div class="r"><h1>${esc(P.title)}</h1><span>${dn} / ${tot} serie${dr.start&&mins>0?` · ${mins} min`:""}</span></div><div class="pbar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Serie fatte"><i style="--pw:${pct}"></i></div></div>
-  <div class="tabs" role="group" aria-label="Scheda">${GYM_ORDER.map(k=>{const wd=Object.entries(S.week).find(([,v])=>v.gym===k);return `<button data-k="${k}" aria-pressed="${k===g}"><small>${wd?WD[wd[0]]:"Extra"}</small>${esc(PLAN[k].name)}</button>`}).join("")}</div>
+  <div class="tabs" role="group" aria-label="Scheda">${GYM_ORDER.map(k=>{const wd=Object.entries(S.week).find(([,v])=>v.gym===k);return `<button data-k="${k}" aria-pressed="${k===g}"><small>${wd?WD[wd[0]]:"Extra"}</small><span class="tn">${esc(PLAN[k].name)}</span></button>`}).join("")}</div>
   ${oldBoxes(g)}
   ${modNote}
   ${warmupHTML(g,P,dr,dn)}
@@ -3040,6 +3097,7 @@ function renderTrain(){
   // Il riflesso del bottone passa una volta sola: dopo ogni spunta la scheda si ridisegna e non deve ripartire
   if(hadFin){const fb=document.getElementById("finish");if(fb)fb.classList.add("noshine")}
   const c=document.getElementById("clear");c.onclick=()=>{if(c.dataset.arm!=="1"){c.dataset.arm="1";c.textContent="Tocca di nuovo per svuotare";setTimeout(()=>{c.dataset.arm="";c.textContent="Svuota la seduta"},3500);return}delete S.draft[g];openEx[g]=null;stopTimer();save();renderTrain()};
+  fitTitles();
   trainFx(g,pct);
   if(tOn)tick();
   wakeSync();
@@ -3194,10 +3252,10 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   if(tg.top&&tg.top>ex.hi&&!mods.has("deload")&&tg.reps.every(r=>r>=ex.lo)&&!["time","nordic","perf"].includes(ex.t)){const mx=eqMax(ex);chips.push(`<span class="chip hot">Range esteso fino a ${tg.top}: ${mx&&(tg.kg||0)>=mx?`${fk(mx)} kg è il massimo del pacco`:`il prossimo gradino è ${pct(Math.round(stepOf(ex)/Math.max(1,tg.kg||lastKg(ex)||1)*100))}`}</span>`)}
   const stallTxt=!mods.has("deload")&&!tg.hold&&!(tg.kind==="up"&&tg.kg>0&&tg.kg>(lastKg(ex)||0))&&stalled(ex)?(phaseAt()==="def"?`<p class="prog down"><span>In calo</span><span>Massimale sotto del 5% nelle ultime 2 sedute. In definizione basta tenere i carichi: se continua togli una serie o fai lo scarico.</span></p>`:`<p class="prog down"><span>Fermo</span><span>Nessun miglioramento nelle ultime 3 sedute: prova una variante con ⇄ Cambia o togli una serie per due settimane.</span></p>`):"";
   const over=tOn&&tEnd<=Date.now();
-  const rest=withRest&&tOn?`<div class="rest ${over?"over":""}" id="restIn" role="timer"><span class="rr"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rk" cx="32" cy="32" r="28"/><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg><b class="tv"></b></span><span class="tl" aria-live="assertive">${over?"Recupero finito":"Recupero"+(tPlus?"\u00a0·\u00a0+"+tPlus+"\u00a0s":"")}</span><button data-ts>Chiudi</button><button data-tp>+15 s</button></div>`:"";
+  const rest=withRest&&tOn?`<div class="rest ${over?"over":""}" id="restIn" role="timer"><span class="rr"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rk" cx="32" cy="32" r="28"/><circle class="ra rc" cx="32" cy="32" r="28" pathLength="100"/></svg><i class="rh r1" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><i class="rh r2" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><i class="rh rd" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra rc" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><b class="tv"></b></span><span class="tl" aria-live="assertive">${over?"Recupero finito":"Recupero"+(tPlus?"\u00a0·\u00a0+"+tPlus+"\u00a0s":"")}</span><span class="tb"><button data-ts>Chiudi</button><button data-tp>+15 s</button></span></div>`:"";
   // Scheda che si colora: a ogni serie un velo su tutta la scheda si intensifica piano; a esercizio finito passa l'oro in diagonale
   const fN=Math.min(n,rows.filter(r=>r.done).length),fr=n?fN/n:0,isGold=goldHold&&goldHold.ex===ex.id,fa=fillAnim(ex.id,fr),fPrev=fa.from;
-  return `<article class="ex cur ${ssP.length?"ss":""} ${isGold?"gold":""} ${fr>0||isGold?"tint":""}" data-ex="${ex.id}" style="--f:${fr.toFixed(3)};--f0:${fPrev.toFixed(3)};--fc:${fillCol(fr)};--fc0:${fillCol(fPrev)};--fd:-${fa.el}ms"><i class="fl fp ${fa.on?"grow":""}" aria-hidden="true"></i>${isGold?'<i class="fl fg" aria-hidden="true"></i>':""}
+  return `<article class="ex cur ${ssP.length?"ss":""} ${isGold?"gold":""} ${fr>0||isGold?"tint":""}" data-ex="${ex.id}" style="--f:${fr.toFixed(3)};--f0:${fPrev.toFixed(3)};--fc:${fillCol(fr)};--fc0:${fillCol(fPrev)};--fd:-${fa.el}ms">${fa.on&&!isGold?'<i class="fl fq" aria-hidden="true"></i>':""}<i class="fl fp ${fa.on?"grow":""}" aria-hidden="true"></i>${isGold?'<i class="fl fg" aria-hidden="true"></i>':""}
     <div class="exhead"><h3>${esc(ex.n)}${(howOf(ex)||errOf(ex)||ex.note)?(IMGEX[ex.id]=ex,`<button class="qm" data-img="${ex.id}" aria-label="Come si fa: ${esc(ex.n)}">?</button>`):""}</h3><button class="swap" data-base="${base.id}" aria-label="Sostituisci ${esc(ex.n)}">⇄ Cambia</button></div>
     <div class="tgt"><b${cu&&!nn?` data-cu="${lk}|${tg.kg}|${esc(" kg × "+r0)}|${ex.id}"`:""}>${nn&&nn.kg!=null&&hasKg?`${fk(nn.kg)} kg × ${rT}`:big}</b>${tg.badge?`<small class="${tg.kind}">${esc(tg.badge)}</small>`:""}</div>
     ${nn?`<p class="prog down"><span>${esc(nn.txt)}</span></p>`:`<p class="prog ${tg.kind}"><span>${esc(tg.msg)}</span></p>`}
@@ -3472,7 +3530,7 @@ let tCtx=null;
 function startTimer(sec,label,plus,end,ctx){tPlus=plus||0;tLbl=label;tCtx=ctx||null;tEnd=end||Date.now()+sec*1000;tTot=sec;S.timer={end:tEnd,tot:sec,lbl:label,plus:tPlus,ctx:tCtx};save();tWarn=sec<=10;tOn=true;T("tlbl").textContent="Recupero · "+label+(tPlus?" · +"+tPlus+"\u00a0s":"");T("timer").classList.remove("over");document.querySelectorAll(".tball").forEach(b=>b.remove());clearInterval(tInt);tick();tInt=setInterval(tick,250)}
 function tick(){if(!tOn)return;const left=Math.round((tEnd-Date.now())/1000),a=Math.abs(left),txt=(left<0?"+":"")+Math.floor(a/60)+":"+String(a%60).padStart(2,"0");
   setNum(T("tval"),txt);const inl=document.getElementById("restIn");if(inl)setNum(inl.querySelector(".tv"),txt);
-  const fr=Math.max(0,Math.min(1,(tEnd-Date.now())/1000/tTot));document.querySelectorAll("#timer .ra,#restIn .ra").forEach(c=>c.style.strokeDashoffset=(100*(1-fr)).toFixed(1));
+  ringSync();
   // Timer in basso nascosto solo se il recupero dentro la scheda si vede davvero (non sotto la barra o sotto l'intestazione).
   // Subito dopo una spunta non cambia niente (la pagina sta ancora scorrendo): si decide una volta sola, a scorrimento finito
   if(performance.now()>tLock)syncTimer(0);else if(inl)inl.classList.toggle("dup",!T("timer").hidden);
@@ -3484,12 +3542,32 @@ function tick(){if(!tOn)return;const left=Math.round((tEnd-Date.now())/1000),a=M
   if(left<=0&&!T("timer").classList.contains("over")){T("timer").classList.add("over");T("tlbl").textContent="Recupero finito";try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}beep()}
   if(left<=0&&inl&&!inl.classList.contains("over")){inl.classList.add("over");inl.querySelector(".tl").textContent="Recupero finito"}
   if(left>0&&inl&&inl.classList.contains("over")){inl.classList.remove("over");inl.querySelector(".tl").textContent="Recupero"}}
+// Anello: angolo che resta A (0-360) = due mezzi anelli + il puntino della fine, ruotati con WAAPI su transform per tutto il tempo che manca
+function ringSync(){const k=tEnd+"|"+tTot;
+  document.querySelectorAll("#timer .tr,#restIn .rr").forEach(c=>{
+    // anello nascosto (timer in basso quando si vede quello nella scheda): niente animazioni, che fuori schermo girerebbero sul processore a ogni fotogramma
+    if(!c.getClientRects().length){if(c._rk){c._rk=null;c.querySelectorAll(".rh>b").forEach(e=>e.getAnimations().forEach(a=>a.cancel()))}return}
+    if(c._rk===k)return;c._rk=k;ringPose(c);
+    // l'animazione parte dopo che l'anello è stato disegnato: creata nello stesso istante in cui nasce (scheda appena ridisegnata) non andrebbe al compositore
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{if(c._rk===k&&c.isConnected)ringAnim(c,k)}))})}
+const ringA=()=>{const D=tEnd-Date.now();return [D,360*Math.max(0,Math.min(1,D/1000/tTot))]};
+function ringParts(c){return [c.querySelector(".r1>b"),c.querySelector(".r2>b"),c.querySelector(".rd>b")]}
+// posa ferma all'angolo di adesso (nessun vuoto mentre l'animazione aspetta il disegno)
+function ringPose(c){const [r1,r2,rd]=ringParts(c);if(!rd)return;const [D,A]=ringA();
+  [r1,r2,rd].forEach(e=>e.getAnimations().forEach(a=>a.cancel()));
+  r1.style.transform=`rotate(${Math.min(A,180)}deg)`;r2.style.transform=`rotate(${Math.max(0,A-180)}deg)`;rd.style.transform=`rotate(${A}deg)`;c.classList.toggle("rz",D<=0||A<=0)}
+function ringAnim(c,k){const [r1,r2,rd]=ringParts(c);if(!rd)return;const [D,A0]=ringA();ringPose(c);if(D<=0||A0<=0)return;
+  clearTimeout(c._rz);c._rz=setTimeout(()=>{if(c._rk===k)c.classList.add("rz")},D);const rot=d=>({transform:`rotate(${d}deg)`}),o={duration:D,easing:"linear",fill:"forwards"};
+  rd.animate([rot(A0),rot(0)],o);
+  if(A0>180){const of=(A0-180)/A0;r2.animate([rot(A0-180),{...rot(0),offset:of},rot(0)],o);r1.animate([rot(180),{...rot(180),offset:of},rot(0)],o)}
+  else r1.animate([rot(A0),rot(0)],o)}
 // Ultimi 3 secondi: una pallina da padel rimbalza sull'anello, un rimbalzo al secondo; allo zero si schiaccia e sparisce
 function ballFx(left){document.querySelectorAll("#timer .tr,#restIn .rr").forEach(r=>{let b=r.querySelector(".tball");
   if(left<=0){if(b&&!b.classList.contains("sq")){b.classList.remove("hop");b.classList.add("sq");setTimeout(()=>b.remove(),450)}return}
   if(left>3||RM()){if(b)b.remove();return}
   if(!b){b=document.createElement("i");b.className="tball";b.setAttribute("aria-hidden","true");r.appendChild(b)}
-  if(b.dataset.s!==String(left)){b.dataset.s=left;b.classList.remove("hop");void b.offsetWidth;b.classList.add("hop")}})}
+  // ritardo negativo = millisecondi già passati in questo secondo: una pallina ricreata (scheda ridisegnata) riprende a metà salto, in fase con quella in basso
+  if(b.dataset.s!==String(left)){b.dataset.s=left;b.style.animationDelay=-Math.round(Math.max(0,Math.min(950,(left+.5)*1000-(tEnd-Date.now()))))+"ms";b.classList.remove("hop");void b.offsetWidth;b.classList.add("hop")}})}
 function restSeen(el,dy){const r=el.getBoundingClientRect(),nb=document.querySelector("nav.bar"),th=document.querySelector(".thead");dy=dy||0;
   const lo=nb?nb.getBoundingClientRect().top:innerHeight,hi=th?th.getBoundingClientRect().bottom:0;return r.height>0&&r.top-dy>=hi-8&&r.bottom-dy<=lo+8}
 const justTicked=()=>performance.now()-lastTk.t<500;
@@ -3498,7 +3576,7 @@ let tShown=0,tH=88,tLock=0;const tFresh=()=>performance.now()-lastTk.t<700||perf
 // Timer in basso o recupero nella scheda: mai tutti e due, mai nessuno. dy = scorrimento appena chiesto (si decide sulla posizione finale, subito)
 function syncTimer(dy){if(!tOn)return;const tm=T("timer"),inl=document.getElementById("restIn"),hide=!!inl&&restSeen(inl,dy||0);
   if(tm.hidden&&!hide){tShown=performance.now();tm.classList.remove("enter");void tm.offsetWidth;tm.classList.add("enter");clearTimeout(tm.et);tm.et=setTimeout(()=>tm.classList.remove("enter"),200)}
-  tm.hidden=hide;if(!hide)tH=tm.offsetHeight||tH;if(inl)inl.classList.toggle("dup",!hide)}
+  tm.hidden=hide;if(!hide)tH=tm.offsetHeight||tH;if(inl)inl.classList.toggle("dup",!hide);ringSync()}
 let scrQ=0;addEventListener("scroll",()=>{if(scrQ||!tOn)return;scrQ=requestAnimationFrame(()=>{scrQ=0;if(performance.now()>tLock)syncTimer(0)})},{passive:true});
 function stopTimer(){clearInterval(tInt);tOn=false;document.querySelectorAll(".tball").forEach(b=>b.remove());if(S.timer){delete S.timer;save()}T("timer").hidden=true;const inl=document.getElementById("restIn");if(inl)inl.remove()}
 function addRest(){tEnd+=15000;tTot=Math.max(tTot,(tEnd-Date.now())/1000);if(S.timer){S.timer.end=tEnd;S.timer.tot=tTot;save()}T("timer").classList.remove("over");tick()}
@@ -4061,7 +4139,7 @@ function renderWeek(){
   const lastD=[...order].reverse().find(d=>fatto.has(d)),lastK=lastD!=null?iso(addDays(mon,(lastD+6)%7)):null,anim=lastK&&S.wkFx!==lastK&&!RM();
   if(lastK&&S.wkFx!==lastK){S.wkFx=lastK;save()}
   const rows=order.map((d,i)=>{const ok=fatto.has(d),up=ok&&i>0&&fatto.has(order[i-1]),dn=ok&&i<6&&fatto.has(order[i+1]),nw=anim&&d===lastD;
-    const fx=ok?`<i class="fz${nw?" in":""}" aria-hidden="true"></i>${up?`<i class="fl up${nw?" in":""}" style="${nw?"animation-delay:1.01s":""}" aria-hidden="true"></i>`:""}${dn?`<i class="fl dn${anim&&order[i+1]===lastD?" in":""}" style="${anim&&order[i+1]===lastD?"animation-delay:.75s":""}" aria-hidden="true"></i>`:""}<i class="fd${nw?" in":""}" style="${nw?"animation-delay:.55s":""}" aria-hidden="true"></i>`:"";
+    const fx=ok?`<i class="fz${nw?" in":""}" aria-hidden="true"></i>${up?`<i class="fl up${nw?" in":""}" style="${nw?"animation-delay:1.01s":""}" aria-hidden="true"></i>`:""}${dn?`<i class="fl dn${anim&&order[i+1]===lastD?" in":""}" style="${anim&&order[i+1]===lastD?"animation-delay:.75s":""}" aria-hidden="true"></i>`:""}<i class="fd${nw?" in":""}" style="${nw?"animation-delay:.55s":""}" aria-hidden="true">✓</i>`:"";
     return rowOf(d,ok,fx)});
   function rowOf(d,ok,fx){const w=S.week[d]||{padel:"none",gym:"none"},lines=[];
     if(w.padel==="train")lines.push(`<div class="c-pad">${I("rac")}Allenamento padel</div>`);
@@ -4069,7 +4147,7 @@ function renderWeek(){
     if(w.gym in PLAN)lines.push(`<div class="c-gym">${I("gym")}${esc(PLAN[w.gym].name)}</div>`);
     if(!lines.length)lines.push(`<div class="c-rest">${I("bed")}Riposo</div>`);
     const rule=legRule(d);
-    return `<button class="dayr ${d===td?"t":""} ${lines.length===1&&!(w.gym in PLAN)&&w.padel==="none"?"none":""}" data-day="${d}" aria-label="Cambia ${WD_LONG[d]}${ok?", seduta fatta questa settimana":""}">${fx}<span class="d">${WD[d]}</span><span class="w">${lines.join("")}${rule}</span><span class="ed">Cambia</span></button>`}
+    return `<button class="dayr ${ok?"done":""} ${d===td?"t":""} ${lines.length===1&&!(w.gym in PLAN)&&w.padel==="none"?"none":""}" data-day="${d}" aria-label="Cambia ${WD_LONG[d]}${ok?", seduta fatta questa settimana":""}">${fx}<span class="d">${WD[d]}</span><span class="w">${lines.join("")}${rule}</span><span class="ed">Cambia</span></button>`}
   const html=rows.join("");
   app.innerHTML=`<header class="head headrow"><div><h1>Settimana</h1></div><button class="gear" id="toImp" aria-label="Impostazioni">${I("gear")}</button></header>
   <div class="days">${html}</div>
