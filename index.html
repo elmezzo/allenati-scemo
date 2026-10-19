@@ -645,8 +645,9 @@ html[data-skin="manga"][data-skin] .ex.cur{box-shadow:5px 5px 0 var(--acc,#ff234
 .wu li em{font-style:normal;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 .wuh{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .wuh span{font-size:max(14px,0.8235rem);font-weight:700;color:var(--muted)}
-.ramp{margin:0;font-size:max(12px,0.7059rem);color:var(--muted);line-height:1.5}
-.ramp b{color:var(--fg);font-weight:700;white-space:nowrap}
+.wcap{margin:4px 0 -2px;font-size:max(12px,0.7059rem);font-weight:700;color:var(--muted);letter-spacing:.02em}
+.wcap:first-of-type{margin-top:0}
+.set.wset .i{font-size:max(15px,.8824rem);color:var(--muted)}
 .painb{align-self:flex-start;border:0;background:none;color:var(--dim);font-size:max(12px,0.7059rem);font-weight:700;padding:6px 0;min-height:36px;text-decoration:underline;text-underline-offset:3px}
 .painb.on{color:var(--stop)}
 .painw{display:flex;align-items:center;gap:10px;padding:9px 8px 9px 12px;border-radius:12px;background:color-mix(in srgb,var(--stop) 12%,transparent);border:1px solid color-mix(in srgb,var(--stop) 35%,transparent);font-size:max(12px,0.7059rem);color:var(--fg);line-height:1.35}
@@ -1943,7 +1944,7 @@ function normS(){const obj=v=>v&&typeof v==="object"&&!Array.isArray(v),arr=v=>A
   // Ogni campo col suo tipo: un backup modificato a mano o rotto non deve bloccare le schermate
   const wk=obj(S.week)?S.week:{};S.week={};for(let i=0;i<7;i++){const w=obj(wk[i])?wk[i]:DEFAULT_WEEK[i];S.week[i]={padel:typeof w.padel==="string"?w.padel:"none",gym:typeof w.gym==="string"?w.gym:"none"}}
   S.overrides=obj(S.overrides)?S.overrides:{};for(const k in S.overrides)if(!obj(S.overrides[k]))delete S.overrides[k];S.energy=obj(S.energy)?S.energy:{};
-  for(const key of ["draft","oldDraft"]){S[key]=obj(S[key])?S[key]:{};for(const g in S[key]){const d=S[key][g];if(!obj(d)||!obj(d.ex)){delete S[key][g];continue}for(const id in d.ex)if(!Array.isArray(d.ex[id]))delete d.ex[id];else d.ex[id]=d.ex[id].map(x=>obj(x)?x:{});if(typeof d.date!=="string")d.date=iso(today());for(const f of ["start","last","idle"])if(d[f]!=null&&!(typeof d[f]==="number"&&isFinite(d[f])))delete d[f];if(d.mods!=null&&!Array.isArray(d.mods))delete d.mods}}
+  for(const key of ["draft","oldDraft"]){S[key]=obj(S[key])?S[key]:{};for(const g in S[key]){const d=S[key][g];if(!obj(d)||!obj(d.ex)){delete S[key][g];continue}for(const id in d.ex)if(!Array.isArray(d.ex[id]))delete d.ex[id];else d.ex[id]=d.ex[id].map(x=>obj(x)?x:{});if(d.ramp!=null){if(!obj(d.ramp))delete d.ramp;else for(const id in d.ramp)if(!Array.isArray(d.ramp[id]))delete d.ramp[id];else d.ramp[id]=d.ramp[id].map(x=>obj(x)?x:{})}if(typeof d.date!=="string")d.date=iso(today());for(const f of ["start","last","idle"])if(d[f]!=null&&!(typeof d[f]==="number"&&isFinite(d[f])))delete d[f];if(d.mods!=null&&!Array.isArray(d.mods))delete d.mods}}
   S.plans=obj(S.plans)?S.plans:{};for(const k in S.plans)if(!obj(S.plans[k])||!Array.isArray(S.plans[k].ex))delete S.plans[k];else S.plans[k].ex=S.plans[k].ex.filter(e=>obj(e)&&e.id&&typeof e.n==="string");
   S.swaps=obj(S.swaps)?S.swaps:{};for(const k in S.swaps)if(!obj(S.swaps[k]))delete S.swaps[k];S.customAlts=obj(S.customAlts)?S.customAlts:{};for(const k in S.customAlts)S.customAlts[k]=arr(S.customAlts[k]).filter(a=>obj(a)&&a.k&&typeof a.n==="string");if(S.skin!=null&&!["vetro","eclisse","carbonio","campo","manga","lavagna"].includes(S.skin))S.skin="vetro";S.pain=obj(S.pain)?S.pain:{};
   for(const key of ["archive","body","phases","cycles"])S[key]=arr(S[key]).filter(obj);if(S.free&&!(obj(S.free)&&Array.isArray(S.free.ex)))delete S.free;if(S.deload&&!(obj(S.deload)&&S.deload.from&&S.deload.to))delete S.deload;if(S.timer&&!obj(S.timer))delete S.timer;for(const key of ["setup","station","eqmax","eqf","vars"])if(S[key]!=null&&!obj(S[key]))delete S[key];
@@ -2427,13 +2428,15 @@ function rampOn(g,ex,mods){if(mods.has("deload"))return false;const L=PLAN[g].ex
   const m=["comp","iso","bw"].includes(ex.t)?rampMu(ex):null;
   // Petto e schiena: solo il primo dei due muscoli, così non si scalda due volte lo stesso muscolo
   if(!m&&L.find(e=>e.t==="comp")?.id===ex.id)return true;return !!m&&L.find(e=>["comp","iso","bw"].includes(e.t)&&rampMu(e)===m)?.id===ex.id}
-function rampHTML(ex,tg){const step=isCable(ex)?stepOf(ex):(EQS.find(q=>q[0]===eqOf(ex))||[])[2]||ex.step||2.5,top=tg.kg||0,out=[],seen=new Set();
+// Serie di avvicinamento proposte: [{kg,reps}], carichi sotto quello di lavoro e arrotondati all'attrezzo
+function rampSets(ex,tg){const step=isCable(ex)?stepOf(ex):(EQS.find(q=>q[0]===eqOf(ex))||[])[2]||ex.step||2.5,top=tg.kg||0,out=[],seen=new Set();
   // Trazioni e dip: kg = zavorra, quindi si parte dal corpo libero
-  if(ex.t==="bw"){out.push(`<b>corpo libero × ${top>0?5:3}</b>`);seen.add(0)}
-  else if(top<=0)return"";
+  if(ex.t==="bw"){out.push({kg:0,reps:top>0?5:3});seen.add(0)}
+  else if(top<=0)return out;
   const plan=ex.t==="bw"?(top>=6?[[.5,3]]:[]):ex.t==="iso"?(top>=40?[[.5,10],[.75,5]]:[[.5,10]]):top>=40?[[.5,8],[.7,4],[.85,2]]:[[.5,8],[.75,3]];
-  for(const [p,r] of plan){const kg=Math.round(top*p/step)*step;if(kg<=0||kg>=top||seen.has(kg))continue;seen.add(kg);out.push(`<b>${fk(kg)} kg × ${r}</b>`)}
-  return out.length?`<p class="ramp">Avvicinamento, non conta: ${out.join("\u00a0· ")}</p>`:""}
+  for(const [p,r] of plan){const kg=Math.round(top*p/step)*step;if(kg<=0||kg>=top||seen.has(kg))continue;seen.add(kg);out.push({kg,reps:r})}
+  return out}
+function rcell(g,exId,k){const d=draftFor(g);d.ramp=d.ramp||{};const a=d.ramp[exId]=d.ramp[exId]||[];while(a.length<=k)a.push({});return a[k]}
 const painList=id=>(S.pain[id]||[]).filter(d=>d>=iso(addDays(today(),-30)));
 function painWarn(ex,base){const L=painList(ex.id);return L.length>=2?`<div class="painw"><span>Fastidio segnato ${L.length} volte nell'ultimo mese. Cambia esercizio per qualche settimana; se continua, fallo vedere a un fisioterapista.</span><button data-painswap="${base.id}">Vedi varianti</button></div>`:""}
 const moreOpen=new Set();
@@ -2860,7 +2863,12 @@ function renderTrain(){
   <p class="msg" id="msg" aria-live="polite"></p>`;
   document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{gymSel=b.dataset.k;S.gym=gymSel;save();renderTrain()});
   document.querySelectorAll("#exs input[data-f]").forEach(i=>i.oninput=()=>{const v=i.dataset.f==="kg"?i.value.replace(/[^\d.,]/g,"").replace(/([.,].*?)[.,]/g,"$1").slice(0,6):i.value.replace(/\D/g,"").slice(0,3);if(v!==i.value)i.value=v;cell(g,i.dataset.ex,+i.dataset.j)[i.dataset.f]=v.trim();save()});
-  document.querySelectorAll("#exs .tick:not(.mt)").forEach(b=>b.onclick=()=>toggleSet(g,b.dataset.ex,+b.dataset.j,mods));
+  document.querySelectorAll("#exs .tick:not(.mt):not(.rt)").forEach(b=>b.onclick=()=>toggleSet(g,b.dataset.ex,+b.dataset.j,mods));
+  document.querySelectorAll("#exs .tick.rt").forEach(b=>b.onclick=()=>rampTick(g,b.dataset.rex,+b.dataset.k));
+  document.querySelectorAll("#exs input[data-rf]").forEach(i=>i.oninput=()=>{const v=i.dataset.rf==="kg"?i.value.replace(/[^\d.,]/g,"").replace(/([.,].*?)[.,]/g,"$1").slice(0,6):i.value.replace(/\D/g,"").slice(0,3);if(v!==i.value)i.value=v;rcell(g,i.dataset.ex,+i.dataset.k)[i.dataset.rf]=v.trim();save()});
+  document.querySelectorAll("#exs [data-rpm]").forEach(b=>b.onclick=e=>{e.preventDefault();const inp=b.parentElement.querySelector("input"),f=b.dataset.rpm,d=+b.dataset.d,ex=exById(b.dataset.ex);let v=num(inp.value)||0;
+    if(f==="kg"){v=Math.max(0,Math.round((v+d*stepOf(ex))*100)/100);inp.value=fk(v)}else{v=Math.max(0,Math.round(v)+d);inp.value=String(v)}
+    rcell(g,b.dataset.ex,+b.dataset.k)[f]=inp.value;save();buzz(8)});
   document.querySelectorAll("#exs [data-myot]").forEach(b=>b.onclick=()=>myoTick(g,b.dataset.myot,+b.dataset.j,mods));
   document.querySelectorAll("#exs [data-myoend]").forEach(b=>b.onclick=()=>myoFinish(g,b.dataset.myoend,+b.dataset.j,mods));
   document.querySelectorAll("#exs .hold").forEach(b=>b.onclick=()=>holdStart(g,b.dataset.ex,+b.dataset.j,mods));
@@ -2995,6 +3003,19 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   const big=ex.t==="perf"?`${n} × ${ex.lo}${ex.side?" per lato":""}`:ex.t==="time"?`${r0} s`:hasKg&&tg.kg>0?`${fk(tg.kg)} kg × ${rT}`:hasKg&&tg.kg==null?`${n} × ${ex.lo===ex.hi?ex.lo:ex.lo+"-"+ex.hi}`:`${rT} rip`;
   const nn=dr.nextNote&&dr.nextNote.ex===ex.id&&rows.filter(r=>r.done).length<n?dr.nextNote:null;
   let sets="",nowSet=false;const myoA=hasKg&&myoOn(g,ex,mods,tg);
+  // Avvicinamento: righe da spuntare prima delle serie, salvate a parte (dr.ramp) così non entrano in progressi, record, scheda colorata né PIPPA.
+  // Iniziate le serie, restano solo quelle già spuntate
+  const wDone=rows.some(r=>r.done),rR=(dr.ramp||{})[ex.id]||[];
+  const rp=hasKg&&tg.kg!=null&&!pre&&rampOn(g,ex,mods)?rampSets(ex,tg).map((x,k)=>({...x,k,r:rR[k]||{}})).filter(x=>!wDone||x.r.done):[];
+  if(rp.length)sets+=`<p class="wcap">Avvicinamento</p>`;
+  for(const {kg,reps,k,r} of rp){const now=!wDone&&!r.done&&!nowSet;if(now)nowSet=true;
+    const kgV=r.kg!=null&&r.kg!==""?r.kg:fk(kg),rpV=r.reps!=null&&r.reps!==""?r.reps:String(reps),fw=r.done?"label":"div";
+    const pm=(f,d)=>r.done?"":`<button class="pm" data-rpm="${f}" data-d="${d}" data-ex="${ex.id}" data-k="${k}" aria-label="${d>0?"Più":"Meno"} ${f==="kg"?"kg":"rip"}, avvicinamento ${k+1}">${d>0?"+":"−"}</button>`;
+    sets+=`<div class="set wset ${r.done?"done":""} ${now?"now":""}"><span class="i" aria-hidden="true">A</span>
+      ${ex.t==="bw"&&!kg&&!num(r.kg)?`<span class="bw">corpo libero</span>`:`<${fw} class="field ${r.done?"":"pmf"}">${pm("kg",-1)}<input inputmode="decimal" value="${esc(kgV)}" placeholder="kg" data-ex="${ex.id}" data-k="${k}" data-rf="kg" aria-label="Kg avvicinamento ${k+1}"><span>kg</span>${pm("kg",1)}</${fw}>`}
+      <${fw} class="field ${r.done?"":"pmf"}">${pm("reps",-1)}<input inputmode="numeric" value="${esc(rpV)}" data-ex="${ex.id}" data-k="${k}" data-rf="reps" aria-label="rip avvicinamento ${k+1}"><span>rip</span>${pm("reps",1)}</${fw}>
+      <button class="tick rt" data-rex="${ex.id}" data-k="${k}" aria-pressed="${!!r.done}" aria-label="Avvicinamento ${k+1} fatto">✓</button></div>`}
+  if(rp.length)sets+=`<p class="wcap">Serie</p>`;
   for(let j=0;j<Math.max(n,rows.filter(r=>r.done).length);j++){
     const r=rows[j]||{};
     const now=!r.done&&!nowSet;if(now)nowSet=true;
@@ -3044,8 +3065,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
     ${chips.length&&!fN?`<div class="chips">${chips.join("")}</div>`:""}
     ${hasKg&&(setupOf(ex)||eqLbl(ex))?setupHTML(ex):""}
     ${stallTxt}
-    ${hasKg&&tg.kg!=null&&!rows.some(r=>r.done)&&!((dr.pre||{})[ex.id]>0)&&rampOn(g,ex,mods)?rampHTML(ex,tg):""}
-    <div class="sets"><div class="set sethd" aria-hidden="true"><span></span><span>${hasKg?"kg":""}</span><span>${unit}</span><span></span></div>${sets}</div>
+        <div class="sets"><div class="set sethd" aria-hidden="true"><span></span><span>${hasKg?"kg":""}</span><span>${unit}</span><span></span></div>${sets}</div>
     ${rest}<!--ASK-->
     ${painWarn(ex,base)}
     <details class="more" data-more="${ex.id}" ${moreOpen.has(ex.id)?"open":""}><summary>${I("info")} Altro<span>${errOf(ex)?"errori, ":""}fastidio, superserie, ultima volta</span></summary><div>${ex.note?`<p class="note">${esc(ex.note)}</p>`:""}${errOf(ex)?`<div class="errs"><b>Errori da evitare</b><ul>${errOf(ex).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}<p class="last">${lastTxt}</p>
@@ -3056,6 +3076,14 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
 let kgChk="",lastTk={t:0,k:"",y:0};
 // Dopo una spunta la pagina scorre: per 1,1 s un secondo tocco non apre quello che è arrivato sotto il dito (es. "⇄ Cambia")
 document.addEventListener("click",e=>{if(view!=="train"||performance.now()-lastTk.t>=1100||Math.abs(scrollY-lastTk.y)<=4)return;const b=e.target.closest("button,a,summary,input");if(!b||b.closest("#timer"))return;if(b.matches(".tick")&&b.dataset.ex+"|"+b.dataset.j===lastTk.k)return;if(b.matches(".tick"))return;e.preventDefault();e.stopPropagation()},true);
+// Spunta di una serie di avvicinamento: vibrazione leggera e 60 s di pausa, niente record, oro o PIPPA
+function rampTick(g,exId,k){const tk="r|"+exId+"|"+k,tn=performance.now(),dt=tn-lastTk.t,mv=Math.abs(scrollY-lastTk.y)>4;if(lastTk.k===tk&&(dt<400||(mv&&dt<1100)))return;if(lastTk.k!==tk&&mv&&dt<500)return;lastTk={t:tn,k:tk,y:scrollY};
+  audioUnlock();const r=rcell(g,exId,k),b=document.querySelector(`#exs .tick.rt[data-rex="${exId}"][data-k="${k}"]`),row=b&&b.closest(".set");
+  if(row)row.querySelectorAll("input").forEach(i=>{r[i.dataset.rf]=i.value.trim()});
+  r.done=!r.done;const dd=draftFor(g);if(r.done){const nw=Date.now();if(!dd.start)dd.start=nw;if(dd.last&&nw-dd.last>45*6e4)dd.idle=(dd.idle||0)+(nw-dd.last-10*6e4);dd.last=nw}
+  save();if(r.done){buzz(20);const ex=exById(exId);startTimer(60,ex.n,0,null,{g,ex:exId,ramp:1})}
+  renderTrain();keepFocus(false,exId);if(tOn)setTimeout(tick,510);
+  const nb=document.querySelector(`#exs .tick.rt[data-rex="${exId}"][data-k="${k}"]`);if(r.done&&nb&&!RM()){nb.classList.remove("pop");void nb.offsetWidth;nb.classList.add("pop")}}
 function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;
   // Doppio tocco: dopo la spunta la pagina scorre e un'altra spunta (o un tasto del recupero) può finire sotto il dito
   // Se la pagina è scivolata sotto il dito: una spunta già fatta (anche la stessa) non si toglie per 1,1 s; una serie ancora da fare si segna dopo 0,5 s. Senza scorrimento: stessa spunta entro 0,4 s è un doppio tocco
@@ -3109,6 +3137,8 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;
     // Recupero adattivo: serie sotto le ripetizioni su un multiarticolare = 30 s in più
     const plus=fail&&ex.t==="comp"&&S.adrest!==false?30:0;
     if(restS&&!sessionDone)startTimer(restS+plus,ex.n,plus,null,{g,ex:exId});
+    // A metà giro di superserie non c'è recupero: si spegne anche quello partito dall'avvicinamento
+    else if(tOn&&tCtx&&tCtx.ramp)stopTimer();
     rec=!fail&&isRecord(g,ex,exId,j,r);wowNow=!fail&&doneN>=N;
   }
   if(wowNow){goldCard(g,exId);tickFx(g,exId,j,rec,wowNow);return}
