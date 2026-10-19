@@ -512,6 +512,54 @@ nav.bar .ndot::before{content:"";width:34px;height:3px;border-radius:0 0 3px 3px
 .blade::after{content:"";position:absolute;top:-30%;bottom:-30%;width:45%;left:-70%;transform:skewX(-18deg);background:linear-gradient(100deg,transparent,rgba(255,236,180,.75),rgba(255,255,255,.9),rgba(255,200,120,.5),transparent);mix-blend-mode:screen;animation:blade 1.1s cubic-bezier(.3,.6,.2,1) forwards}
 .recgo{animation:goldrim 1.6s ease-out}
 @keyframes blade{to{left:140%}}
+/* Animazioni v49 */
+:root{--pr:#ff4d6d;--fil:#ffc35c}
+/* 1 timbro PR sul campo kg della serie che batte il massimale stimato */
+.set .field{position:relative}
+.prs{position:absolute;font-style:normal;right:-7px;top:-11px;z-index:2;pointer-events:none;font:400 13px/1 var(--display);letter-spacing:.08em;color:var(--pr);background:var(--card);border:1.5px solid var(--pr);border-radius:5px;padding:2px 4px 1px;transform:rotate(-12deg)}
+.prs.in{animation:prIn .34s cubic-bezier(.3,1.5,.6,1) both}
+.prs.in::after{content:"";position:absolute;inset:-5px;border-radius:8px;border:1.5px solid var(--pr);opacity:0;animation:prRing .5s .22s ease-out}
+@keyframes prIn{0%{opacity:0;transform:rotate(-4deg) scale(1.7)}70%{opacity:1}100%{opacity:1;transform:rotate(-12deg) scale(1)}}
+@keyframes prRing{0%{opacity:.6;transform:scale(.9)}100%{opacity:0;transform:scale(1.35)}}
+/* 2 carico che sale come un contachilometri */
+/* ogni cifra in una finestra alta 1,8em (margini negativi: la riga resta alta uguale), così non si taglia nessun font e la cifra vicina non si intravede */
+.oc{position:relative;display:inline-block;line-height:1.8;margin-block:-.4em;clip-path:inset(0 -4px)}
+.oc>.og{visibility:hidden}
+.oc>.os{position:absolute;left:0;right:0;top:0;display:flex;flex-direction:column;align-items:center}
+.oc>.os>span{display:block;height:1.8em;line-height:1.8}
+.oc>.os.go{transform:translateY(calc(var(--n) * -1.8em));transition:transform 560ms cubic-bezier(.2,.9,.25,1) var(--d,0ms)}
+.otl{display:inline-block;overflow:hidden;vertical-align:top;line-height:1;max-width:1.6em;white-space:nowrap;transition:max-width 380ms cubic-bezier(.23,1,.32,1) 120ms,opacity 240ms ease-out}
+.otl.go{max-width:0;opacity:0}
+/* 3 pallina da padel sul timer negli ultimi 3 secondi */
+.tball{position:absolute;left:50%;top:-11px;width:14px;height:14px;margin-left:-7px;border-radius:50%;pointer-events:none;z-index:2;background:radial-gradient(circle at 35% 30%,#f4ff9a,#d7f03c 55%,#a9c41c);box-shadow:0 2px 4px rgba(0,0,0,.35)}
+.tball::before{content:"";position:absolute;inset:2px;border-radius:50%;border:1.5px solid rgba(255,255,255,.8);border-left-color:transparent;border-right-color:transparent;transform:rotate(30deg)}
+.tball.hop{animation:tbHop 1s cubic-bezier(.3,0,.7,1)}
+.tball.sq{animation:tbSq .42s cubic-bezier(.23,1,.32,1) forwards}
+@keyframes tbHop{0%{transform:translateY(0) scale(1.18,.82)}12%{transform:translateY(-4px) scale(.95,1.05)}50%{transform:translateY(-18px) scale(1)}88%{transform:translateY(-3px) scale(.97,1.03)}100%{transform:translateY(0) scale(1.18,.82)}}
+.rest .tball{top:-8px}.rest .tball.hop{animation-name:tbHopS}
+@keyframes tbHopS{0%{transform:translateY(0) scale(1.18,.82)}12%{transform:translateY(-3px) scale(.95,1.05)}50%{transform:translateY(-9px) scale(1)}88%{transform:translateY(-2px) scale(.97,1.03)}100%{transform:translateY(0) scale(1.18,.82)}}
+@keyframes tbSq{0%{transform:scale(1.35,.65)}40%{transform:translateY(-5px) scale(.9,1.1)}100%{transform:scale(0);opacity:0}}
+/* 4 sagoma nel riepilogo: muscoli allenati che si gonfiano */
+.sumf{display:flex;align-items:center;gap:14px}
+.sumfig{display:flex;gap:4px;flex:none}
+.sumfig .rk-fig{width:56px}
+.sumf p{margin:0;display:flex;flex-direction:column;gap:3px;min-width:0}
+.sumf p span{color:var(--muted);font-weight:700}
+/* 5 settimana: giorni fatti pieni dal basso; pallino e filo nel margine a sinistra uniscono i giorni di fila */
+.dayr{position:relative;isolation:isolate}
+.dayr>.d,.dayr>.w,.dayr>.ed{position:relative}
+.dayr .fz{position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;background:linear-gradient(180deg,color-mix(in srgb,var(--go) 30%,transparent),color-mix(in srgb,var(--go) 16%,transparent));transform-origin:bottom}
+.dayr .fz.in{animation:fzIn .7s cubic-bezier(.25,.9,.3,1) both}
+@keyframes fzIn{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.dayr .fl{position:absolute;left:-10px;width:3px;border-radius:2px;background:var(--fil);pointer-events:none;transform-origin:top}
+.dayr .fl.up{top:-14px;height:calc(50% + 14px)}
+.dayr .fl.dn{top:50%;bottom:-1px}
+.dayr .fl.in{animation:flIn .26s cubic-bezier(.23,1,.32,1) both}
+@keyframes flIn{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.dayr .fd{position:absolute;left:-13px;top:50%;width:9px;height:9px;margin-top:-4.5px;border-radius:50%;background:var(--fil);pointer-events:none}
+.dayr .fd.in{animation:fdIn .3s cubic-bezier(.3,1.5,.6,1) both}
+@keyframes fdIn{from{transform:scale(0)}to{transform:scale(1)}}
+
 .gold-end{position:fixed;inset:0;z-index:50;pointer-events:none;overflow:hidden;box-shadow:inset 0 0 0 2px rgba(255,214,140,.0);animation:goldframe 1.4s ease-out forwards}
 .gold-end i{position:absolute;top:-20%;bottom:-20%;width:55%;left:-80%;transform:skewX(-18deg);background:linear-gradient(100deg,transparent,rgba(255,226,150,.35),rgba(255,248,220,.75),rgba(255,196,90,.35),transparent);mix-blend-mode:screen;animation:goldsweep 1.15s cubic-bezier(.3,.6,.2,1) forwards}
 @keyframes goldsweep{to{left:140%}}
@@ -2485,6 +2533,11 @@ function nextHTML(sess){if(sess.deload)return "";const out=[];
     const up=t.kg>now+1e-9,txt=t.kg>0&&!["time","perf"].includes(e.t)?`${fk(t.kg)} kg × ${reps.join("/")}`:`${reps.join("/")}${u}`;
     out.push(`<li><span>${esc((sess.names&&sess.names[id])||e.n)}</span><em class="${up?"up":""}">${txt}</em></li>`)}
   return out.length?`<section class="sumr sumn"><b>La prossima volta</b><ul>${out.join("")}</ul></section>`:""}
+// Riepilogo: sagoma fronte e retro con i muscoli allenati in questa seduta, che si gonfiano un attimo all'apertura
+function sumFigHTML(V){const tr=RMU.filter(([k])=>V[k]>0);if(!tr.length)return "";
+  const A={mus:Object.fromEntries(RMU.map(([k,n])=>[k,{k,n,none:true}]))},keep=rView,lbl=v=>`Sagoma ${v==="front"?"di fronte":"di schiena"} con i muscoli allenati`;
+  const fig=v=>{rView=v;const sel=rSel;rSel=null;const h=`<div class="rk-fig">${rFigure(A,V,{col:()=>"var(--hot)",lbl:lbl(v)})}</div>`;rView=keep;rSel=sel;return h};
+  return `<section class="sumf"><div class="sumfig">${fig("front")}${fig("back")}</div><p><b>Muscoli allenati</b><span>${tr.map(([,n])=>n).join(", ")}</span></p></section>`}
 function summarySheet(sess){
   const st=sessStats(sess),others=S.sessions.filter(x=>x.id!==sess.id),ups=rankUps(sess);
   const prev=others.filter(x=>x.day===sess.day&&x.date<sess.date).sort((a,b)=>b.date.localeCompare(a.date))[0];
@@ -2500,6 +2553,7 @@ function summarySheet(sess){
       ${com?`<div><span>Esercizi migliorati</span><em class="${up?"up":""}">${up} su ${com}</em></div>`:""}</section>`}
   openSheet({html:()=>`<h2>${esc(sess.planName||"Seduta")} salvata</h2>
     <div class="tiles"><div class="tile"><b>${sess.dur??"—"}</b><span>${sess.dur===1?"minuto":"minuti"}</span></div><div class="tile"><b>${st.n}</b><span>serie</span></div><div class="tile"><b>${Math.round(st.vol).toLocaleString("it-IT")}</b><span>kg sollevati</span></div></div>
+    ${sumFigHTML(volRange(0,0,[sess]))}
     ${rankPromoHTML(ups)}
     ${recs.length?`<section class="sumr"><b>Record (massimale stimato)</b><ul>${recs.join("")}</ul></section>`:""}
     ${cmp||`<p class="note" style="margin:0">Prima volta con questa seduta: il confronto parte dalla prossima.</p>`}
@@ -2507,6 +2561,7 @@ function summarySheet(sess){
     <p class="note" style="margin:0">I carichi della prossima volta sono già pronti.</p>
     <div class="bks"><button class="btn ghost" id="sumBk">${I("save")}Salva backup in File</button><small id="sumBkM">${S.lastBackup===iso(today())?"Backup di oggi già salvato.":"Scegli \"Salva in File\" e poi iCloud Drive."}</small></div>`,
    bind:w=>{const r=w.querySelector(".sumr:not(.sumn)");if(r)setTimeout(()=>blade(r),450);
+     {const V=volRange(0,0,[sess]),ks=RMU.map(([k])=>k).filter(k=>V[k]>0);if(ks.length)setTimeout(()=>flexMus(ks,w),420)}
      const b=w.querySelector("#sumBk"),m=w.querySelector("#sumBkM");b.onclick=async()=>{const x=await shareBackup();m.textContent=x==="ok"?"Backup salvato.":x==="no"?"Non salvato: puoi riprovare.":"Non riuscito: prova da Impostazioni.";}}})}
 
 /* ================= EFFETTI ================= */
@@ -2529,12 +2584,27 @@ function ledify(){if(skinNow()!=="carbonio")return;app.querySelectorAll(".tgt b,
 // Il carico della prossima volta sale contando, una volta al giorno per esercizio
 const lastPct={},counted=new Set(),recShown=new Set();
 function countUp(b,a,z,rest){if(RM())return;const t0=performance.now();const f=t=>{if(!b.isConnected)return;const k=Math.min(1,(t-t0)/800),e=1-Math.pow(1-k,3);setNum(b,fk(Math.round((a+(z-a)*e)*10)/10)+rest);if(k<1)requestAnimationFrame(f)};setNum(b,fk(a)+rest);setTimeout(()=>requestAnimationFrame(f),250)}
+// Il carico della prossima volta sale come un contachilometri: ogni cifra scorre verso l'alto fino alla nuova (in Carbonio conta sul display a 7 segmenti)
+function rollUp(b,a,z,rest){if(RM())return;if(skinNow()==="carbonio")return countUp(b,a,z,rest);
+  const sz=fk(z),sa=fk(a),[zi,zf=""]=sz.split(","),[ai,af=""]=sa.split(",");
+  const old=i=>{if(i<zi.length){const k=ai.length-(zi.length-i);return k>=0?+ai[k]:null}const k=i-zi.length-1;return k<af.length?+af[k]:null};
+  let h="",col=0;[...sz].forEach((ch,i)=>{if(!/\d/.test(ch)){h+=`<span class="oc">${ch}</span>`;return}
+    const o=old(i),n=+ch,L=o==null?["",n]:Array.from({length:(n-o+10)%10+1},(_,k)=>(o+k)%10);
+    h+=`<span class="oc"><span class="og">${n}</span><span class="os" style="--n:${L.length-1};--d:${col++*45}ms">${L.map(x=>`<span>${x===""?"&nbsp;":x}</span>`).join("")}</span></span>`});
+  const ex=af.length>zf.length?af.slice(zf.length):"",tail=ex?`<span class="otl">${zf?"":","}${ex}</span>`:"";
+  b.innerHTML=`<span class="sr">${esc(sz+rest)}</span><span aria-hidden="true">${h}${tail}${esc(rest)}</span>`;
+  const sm=b.parentElement&&b.parentElement.querySelector("small");if(sm)sm.animate([{opacity:0,transform:"translateY(6px) scale(.95)"},{opacity:1,transform:"none"}],{duration:240,delay:820,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"});
+  // Alcuni font (Syne, Manrope) mettono la cifra del blocco più in basso di quella nel testo: si allinea misurando le due
+  b.querySelectorAll(".oc").forEach(c=>{const g=c.querySelector(".og"),f=c.querySelector(".os>span:last-child");if(!g||!f)return;const R=e=>{const r=document.createRange();r.selectNodeContents(e);return r.getBoundingClientRect()};
+    const os=c.querySelector(".os"),k=os.children.length-1,lh=f.getBoundingClientRect().height;os.style.top=(R(g).top-(R(f).top-k*lh))+"px"});
+  setTimeout(()=>requestAnimationFrame(()=>b.querySelectorAll(".os,.otl").forEach(x=>x.classList.add("go"))),250);
+  setTimeout(()=>{if(b.isConnected&&b.querySelector(".oc"))setNum(b,sz+rest)},1400)}
 function trainFx(g,pct){
   const pb=app.querySelector(".pbar i"),was=lastPct[g];
   if(pb&&was!=null&&was!==pct&&!RM()){pb.style.transition="none";pb.style.setProperty("--pw",was);void pb.offsetWidth;pb.style.transition="";pb.style.setProperty("--pw",pct);if(pct>was)popEl(pb.parentElement,"shine",1200)}
   lastPct[g]=pct;document.documentElement.style.setProperty("--p",(pct/100).toFixed(2));
   ledify();
-  app.querySelectorAll(".tgt b[data-cu]").forEach(b=>{const [a,z,rest,id]=b.dataset.cu.split("|");const k=g+id+iso(today());if(counted.has(k))return;counted.add(k);countUp(b,+a,+z,rest)});
+  app.querySelectorAll(".tgt b[data-cu]").forEach(b=>{const [a,z,rest,id]=b.dataset.cu.split("|");const k=g+id+iso(today());if(counted.has(k))return;counted.add(k);rollUp(b,+a,+z,rest)});
 }
 function isRecord(g,ex,exId,j,r){if(noEff(ex)||!history(exId).length)return false;const v=metricOf(ex,r);if(!(v>0))return false;
   let best=0;const F=famIds(exId);for(const s of S.sessions)for(const fid of F)for(const x of (s.sets[fid]||[]))best=Math.max(best,metricOf(ex,x));
@@ -2542,7 +2612,12 @@ function isRecord(g,ex,exId,j,r){if(noEff(ex)||!history(exId).length)return fals
 function tickFx(g,exId,j,rec,wow){
   const b=document.querySelector(`#exs .tick[data-ex="${exId}"][data-j="${j}"]`)||document.querySelector(`#exs .xrow[data-open="${exId}"] .ck`);
   if(b&&!RM())popEl(b,"pop");
+  if(rec)prStamp(exId,j);
 }
+// Record a metà seduta: timbro "PR" sul carico della serie che ha battuto il massimale stimato (resta sulla serie, si anima solo al momento)
+function prStamp(exId,j){const t=document.querySelector(`#exs .tick[data-ex="${exId}"][data-j="${j}"]`),f=t&&t.closest(".set")&&t.closest(".set").querySelector(".field");if(!f)return;
+  let st=f.querySelector(".prs");if(!st){f.insertAdjacentHTML("beforeend",`<i class="prs" aria-hidden="true">PR</i>`);st=f.querySelector(".prs")}if(!RM())popEl(st,"in",900);
+  let m=document.getElementById("srLive");if(!m){m=document.createElement("p");m.id="srLive";m.className="sr";m.setAttribute("aria-live","polite");document.body.appendChild(m)}m.textContent="";setTimeout(()=>{m.textContent="Nuovo record su questo esercizio."},60)}
 // Fine esercizio (ultima serie completa): lama di luce dorata su tutto lo schermo, senza scritte
 function goldEnd(card){buzz([50,40,50,40,120]);if(RM()||card)return;const slot=document.getElementById("celeSlot");
   slot.innerHTML=`<div class="gold-end" aria-hidden="true"><i></i></div>`;clearTimeout(celebrate.t);celebrate.t=setTimeout(()=>{slot.innerHTML=""},1500)}
@@ -3028,7 +3103,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
     // Serie fatta sotto le ripetizioni previste: numero e puntino gialli (la spunta resta quella normale)
     const low=r.done&&ex.t!=="perf"&&num(r.reps)!=null&&num(r.reps)<(+(tg.reps[j]??ex.lo)||ex.lo);
     sets+=`<div class="set ${r.done?"done":""} ${now?"now":""} ${isM?"myom":""} ${low?"low":""}"><span class="i"${isM?' title="Serie myo-rep"':""}>${isM?"M":j+1}</span>
-      ${hasKg?`<${fw} class="field ${r.done?"":"pmf"}">${pm("kg",-1)}<input inputmode="decimal" value="${esc(kgV)}" placeholder="kg" data-ex="${ex.id}" data-j="${j}" data-f="kg" aria-label="Kg serie ${j+1}"><span>kg</span>${pm("kg",1)}</${fw}>`:(ex.t==="time"&&!r.done?`<button class="hold" data-ex="${ex.id}" data-j="${j}" aria-label="Avvia il cronometro della tenuta, serie ${j+1}">${I("play")}Via</button>`:`<span class="bw">${ex.t==="nordic"?"elastico":ex.t==="time"?"tenuta":"salto"}</span>`)}
+      ${hasKg?`<${fw} class="field ${r.done?"":"pmf"}">${pm("kg",-1)}<input inputmode="decimal" value="${esc(kgV)}" placeholder="kg" data-ex="${ex.id}" data-j="${j}" data-f="kg" aria-label="Kg serie ${j+1}"><span>kg</span>${pm("kg",1)}${r.done&&r.pr?`<i class="prs" aria-hidden="true">PR</i>`:""}</${fw}>`:(ex.t==="time"&&!r.done?`<button class="hold" data-ex="${ex.id}" data-j="${j}" aria-label="Avvia il cronometro della tenuta, serie ${j+1}">${I("play")}Via</button>`:`<span class="bw">${ex.t==="nordic"?"elastico":ex.t==="time"?"tenuta":"salto"}</span>`)}
       <${fw} class="field ${r.done?"":"pmf"}">${pm("reps",-1)}<input inputmode="numeric" value="${esc(rpV)}" data-ex="${ex.id}" data-j="${j}" data-f="reps" aria-label="${unit} serie ${j+1}"><span>${unit}</span>${pm("reps",1)}</${fw}>
       <button class="tick" data-ex="${ex.id}" data-j="${j}" aria-pressed="${!!r.done}" aria-label="Serie ${j+1} fatta">✓</button></div>`;
     if(isM&&r.done){const mm=r.myo||[],open=!r.myoEnd&&mm.length<MYO.max;
@@ -3103,7 +3178,7 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;
     if(rp!=null&&rp>Math.max(60,(ex.hi||0)*3)&&kgChk!==key2){kgChk=key2;warn(`${rp} ${ex.t==="time"?"secondi":"ripetizioni"}? Tocca ✓ di nuovo per confermare.`);return}}
   kgChk="";
   r.done=!r.done;const dd=draftFor(g);if(r.done&&!dd.start)dd.start=Date.now();if(r.done){const nw=Date.now();if(dd.last&&nw-dd.last>45*6e4)dd.idle=(dd.idle||0)+(nw-dd.last-10*6e4);dd.last=nw;dd.mods=[...mods]}
-  if(!r.done){delete r.myo;delete r.myoEnd}
+  if(!r.done){delete r.myo;delete r.myoEnd;delete r.pr}
   if(!r.done&&dd.nextNote&&dd.nextNote.ex===exId&&dd.nextNote.j===j){for(const [k,v] of Object.entries(dd.nextNote.old||{})){const c=cell(g,exId,+k);if(!c.done){if(v==null)delete c.kg;else c.kg=v}}delete dd.nextNote}
   save();
   if(r.done){
@@ -3139,7 +3214,7 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;
     if(restS&&!sessionDone)startTimer(restS+plus,ex.n,plus,null,{g,ex:exId});
     // A metà giro di superserie non c'è recupero: si spegne anche quello partito dall'avvicinamento
     else if(tOn&&tCtx&&tCtx.ramp)stopTimer();
-    rec=!fail&&isRecord(g,ex,exId,j,r);wowNow=!fail&&doneN>=N;
+    rec=!fail&&isRecord(g,ex,exId,j,r);wowNow=!fail&&doneN>=N;if(rec){r.pr=true;save()}
   }
   if(wowNow){goldCard(g,exId);tickFx(g,exId,j,rec,wowNow);return}
   renderTrain();
@@ -3327,7 +3402,7 @@ document.addEventListener("keydown",e=>{if(H&&e.key==="Escape"){e.preventDefault
 document.addEventListener("visibilitychange",()=>{if(H&&document.visibilityState==="visible")holdLoop()});
 
 let tCtx=null;
-function startTimer(sec,label,plus,end,ctx){tPlus=plus||0;tLbl=label;tCtx=ctx||null;tEnd=end||Date.now()+sec*1000;tTot=sec;S.timer={end:tEnd,tot:sec,lbl:label,plus:tPlus,ctx:tCtx};save();tWarn=sec<=10;tOn=true;T("tlbl").textContent="Recupero · "+label+(tPlus?" · +"+tPlus+"\u00a0s":"");T("timer").classList.remove("over");clearInterval(tInt);tick();tInt=setInterval(tick,250)}
+function startTimer(sec,label,plus,end,ctx){tPlus=plus||0;tLbl=label;tCtx=ctx||null;tEnd=end||Date.now()+sec*1000;tTot=sec;S.timer={end:tEnd,tot:sec,lbl:label,plus:tPlus,ctx:tCtx};save();tWarn=sec<=10;tOn=true;T("tlbl").textContent="Recupero · "+label+(tPlus?" · +"+tPlus+"\u00a0s":"");T("timer").classList.remove("over");document.querySelectorAll(".tball").forEach(b=>b.remove());clearInterval(tInt);tick();tInt=setInterval(tick,250)}
 function tick(){if(!tOn)return;const left=Math.round((tEnd-Date.now())/1000),a=Math.abs(left),txt=(left<0?"+":"")+Math.floor(a/60)+":"+String(a%60).padStart(2,"0");
   setNum(T("tval"),txt);const inl=document.getElementById("restIn");if(inl)setNum(inl.querySelector(".tv"),txt);
   const fr=Math.max(0,Math.min(1,(tEnd-Date.now())/1000/tTot));document.querySelectorAll("#timer .ra,#restIn .ra").forEach(c=>c.style.strokeDashoffset=(100*(1-fr)).toFixed(1));
@@ -3338,9 +3413,16 @@ function tick(){if(!tOn)return;const left=Math.round((tEnd-Date.now())/1000),a=M
   const soon=left<=10&&left>0;T("timer").classList.toggle("soon",soon);if(inl)inl.classList.toggle("soon",soon);
   if(soon&&!tWarn){tWarn=true;try{navigator.vibrate&&navigator.vibrate([90,70,90])}catch(e){}}
   if(left>10)tWarn=false;
+  ballFx(left);
   if(left<=0&&!T("timer").classList.contains("over")){T("timer").classList.add("over");T("tlbl").textContent="Recupero finito";try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}beep()}
   if(left<=0&&inl&&!inl.classList.contains("over")){inl.classList.add("over");inl.querySelector(".tl").textContent="Recupero finito"}
   if(left>0&&inl&&inl.classList.contains("over")){inl.classList.remove("over");inl.querySelector(".tl").textContent="Recupero"}}
+// Ultimi 3 secondi: una pallina da padel rimbalza sull'anello, un rimbalzo al secondo; allo zero si schiaccia e sparisce
+function ballFx(left){document.querySelectorAll("#timer .tr,#restIn .rr").forEach(r=>{let b=r.querySelector(".tball");
+  if(left<=0){if(b&&!b.classList.contains("sq")){b.classList.remove("hop");b.classList.add("sq");setTimeout(()=>b.remove(),450)}return}
+  if(left>3||RM()){if(b)b.remove();return}
+  if(!b){b=document.createElement("i");b.className="tball";b.setAttribute("aria-hidden","true");r.appendChild(b)}
+  if(b.dataset.s!==String(left)){b.dataset.s=left;b.classList.remove("hop");void b.offsetWidth;b.classList.add("hop")}})}
 function restSeen(el,dy){const r=el.getBoundingClientRect(),nb=document.querySelector("nav.bar"),th=document.querySelector(".thead");dy=dy||0;
   const lo=nb?nb.getBoundingClientRect().top:innerHeight,hi=th?th.getBoundingClientRect().bottom:0;return r.height>0&&r.top-dy>=hi-8&&r.bottom-dy<=lo+8}
 const justTicked=()=>performance.now()-lastTk.t<500;
@@ -3351,7 +3433,7 @@ function syncTimer(dy){if(!tOn)return;const tm=T("timer"),inl=document.getElemen
   if(tm.hidden&&!hide){tShown=performance.now();tm.classList.remove("enter");void tm.offsetWidth;tm.classList.add("enter");clearTimeout(tm.et);tm.et=setTimeout(()=>tm.classList.remove("enter"),200)}
   tm.hidden=hide;if(!hide)tH=tm.offsetHeight||tH;if(inl)inl.classList.toggle("dup",!hide)}
 let scrQ=0;addEventListener("scroll",()=>{if(scrQ||!tOn)return;scrQ=requestAnimationFrame(()=>{scrQ=0;if(performance.now()>tLock)syncTimer(0)})},{passive:true});
-function stopTimer(){clearInterval(tInt);tOn=false;if(S.timer){delete S.timer;save()}T("timer").hidden=true;const inl=document.getElementById("restIn");if(inl)inl.remove()}
+function stopTimer(){clearInterval(tInt);tOn=false;document.querySelectorAll(".tball").forEach(b=>b.remove());if(S.timer){delete S.timer;save()}T("timer").hidden=true;const inl=document.getElementById("restIn");if(inl)inl.remove()}
 function addRest(){tEnd+=15000;tTot=Math.max(tTot,(tEnd-Date.now())/1000);if(S.timer){S.timer.end=tEnd;S.timer.tot=tTot;save()}T("timer").classList.remove("over");tick()}
 T("tplus").onclick=()=>{if(!tFresh())addRest()};T("tstop").onclick=()=>{if(!tFresh())stopTimer()};
 // Tocco sul timer (fuori dai bottoni): torna all'allenamento, sull'esercizio del recupero o sul successivo se l'hai finito
@@ -3546,26 +3628,26 @@ const R_BACK={
   _n:["M92 46 L92 56 L100 52 L100 46 Z","M51 146 C47 160 45 176 45 192 L54 194 C58 180 62 164 64 148 C60 150 55 150 51 146 Z","M86 278 C80 278 78 283 79 287 C84 290 90 290 93 286 C94 281 92 278 86 278 Z","M80 352 L91 352 L93 372 C88 376 80 376 76 372 Z","M44 197 C41 205 43 214 49 216 C55 214 56 205 54 198 Z"],
 };
 let rView="front",rSel=null;
-function rFigure(A,V){
+function rFigure(A,V,o){
   const P=rView==="front"?R_FRONT:R_BACK;let defs="",g="";
   const LAG=new Set(V||!A.BW?[]:balanceAt().filter(b=>b.kind==="rank").map(b=>b.lo.k));
   if(!V)for(const [k] of RMU){const m=A.mus[k];if(m.none)continue;const [,a,b]=RANKS[m.r];defs+=`<linearGradient id="rmg-${k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient>`}
   for(const k in P){
     const m=A.mus[k];let fill=k==="_n"?"var(--rk-n)":k==="core"?"var(--rk-c)":"var(--rk-0)",op="";
-    if(m&&V){const v=V[k]||0;if(v>0){fill=volCol(v);op=` fill-opacity="${Math.min(1,.45+.55*Math.min(v,10)/10).toFixed(2)}"`}}
+    if(m&&V){const v=V[k]||0;if(v>0){fill=(o&&o.col||volCol)(v);op=` fill-opacity="${Math.min(1,.45+.55*Math.min(v,10)/10).toFixed(2)}"`}}
     else if(m&&!m.none)fill=`url(#rmg-${k})`;
     const paths=P[k].map(d=>`<path d="${d}"/>`).join("");
     // avatar: ogni muscolo è più grande quanto più alto è il suo rango (da 0,86 a 1,10); lampeggia se è indietro
     const sc=m&&!m.none&&m.r!=null?(.86+.03*m.r).toFixed(3):m?".86":"",lag=!V&&LAG.has(k);
     g+=`<g ${m?`class="mz${k===rSel?" sel":""}${lag?" lag":""}" data-rm="${k}" style="--s:${sc}"`:""} fill="${fill}"${op}>${paths}<g transform="matrix(-1 0 0 1 200 0)">${paths}</g></g>`}
-  return `<svg viewBox="38 0 124 380" aria-label="Sagoma con i muscoli colorati per ${V?"serie della settimana":"rango"}"><defs>${defs}<filter id="rkglow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3"/></filter></defs>
+  return `<svg viewBox="38 0 124 380" aria-label="${o&&o.lbl||`Sagoma con i muscoli colorati per ${V?"serie della settimana":"rango"}`}"><defs>${defs}<filter id="rkglow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3"/></filter></defs>
 <g class="rk-br"><ellipse cx="100" cy="28" rx="15" ry="19" fill="var(--rk-n)"/><g class="rk-gl" filter="url(#rkglow)" aria-hidden="true">${g}</g><g class="rk-mz">${g}</g></g></svg>`}
 // serie negli ultimi 7 giorni per ognuno dei 9 muscoli: 1 per il muscolo principale, 0,5 per i secondari
 const VOLMU={"Petto":"petto","Dorso":"dorso","Deltoidi":"spalle","Bicipiti":"bicipiti","Tricipiti":"tricipiti"},VOLNAME={"nordic curl":["femorali"],"face pull":["spalle"]};
 function volMus(){return volRange(addDays(today(),-6),addDays(today(),1))}
-function volRange(from,to){
+function volRange(from,to,list){
   const out={};RMU.forEach(([k])=>out[k]=0);
-  for(const s of S.sessions){const d=new Date(s.date);if(d<from||d>=to||s.deload)continue;for(const id in s.sets){const n=(s.sets[id]||[]).length;if(!n)continue;
+  for(const s of list||S.sessions){const d=new Date(s.date);if(!list&&(d<from||d>=to||s.deload))continue;for(const id in s.sets){const n=(s.sets[id]||[]).length;if(!n)continue;
     const sd=stdOf(id),nm=String(exName(id)).trim().toLowerCase(),mu=muOf(id);
     const L=sd?sd.m:VOLNAME[nm]||(VOLMU[mu]?[VOLMU[mu]]:[]);
     L.forEach((k,i)=>{if(k in out)out[k]+=n*(i?.5:1)})}}
@@ -3623,8 +3705,8 @@ function rankBind(){
   const ib=document.getElementById("rkInfo");if(ib)ib.onclick=rankInfo;
 }
 // Avatar: il muscolo dell'esercizio contrae per un attimo quando c'è un record
-function flexMus(ks){if(RM())return;
-  ks.forEach(k=>document.querySelectorAll(`.rk-fig [data-rm="${k}"]`).forEach(g=>{const sc=parseFloat(g.style.getPropertyValue("--s"))||1;
+function flexMus(ks,root){if(RM())return;
+  ks.forEach(k=>(root||document).querySelectorAll(`.rk-fig [data-rm="${k}"]`).forEach(g=>{const sc=parseFloat(g.style.getPropertyValue("--s"))||1;
     g.querySelectorAll("path").forEach(p=>p.animate([{transform:`scale(${sc})`,filter:"brightness(1)"},{transform:`scale(${sc*1.14})`,filter:"brightness(1.7)",offset:.3},{transform:`scale(${sc})`,filter:"brightness(1)"}],{duration:900,easing:"cubic-bezier(.23,1,.32,1)"}))}))}
 function rankRedraw(){const c=document.querySelector(".card.rank");if(!c)return;const t=document.createElement("div");t.innerHTML=rankCard();c.replaceWith(t.firstElementChild);rankBind()}
 function rankSheet(k){
@@ -3903,15 +3985,23 @@ function daySheet(d){
 }
 function renderWeek(){
   const order=[1,2,3,4,5,6,0],td=today().getDay();
-  const rows=order.map(d=>{const w=S.week[d]||{padel:"none",gym:"none"},lines=[];
+  // Giorni di questa settimana (da lunedì) con una seduta salvata; il più recente si riempie dal basso la prima volta che lo vedi
+  const mon=addDays(today(),-((td+6)%7));mon.setHours(0,0,0,0);const sun=addDays(mon,7),fatto=new Set(S.sessions.filter(x=>{const t=new Date(x.date);return t>=mon&&t<sun}).map(x=>new Date(x.date).getDay()));
+  const lastD=[...order].reverse().find(d=>fatto.has(d)),lastK=lastD!=null?iso(addDays(mon,(lastD+6)%7)):null,anim=lastK&&S.wkFx!==lastK&&!RM();
+  if(lastK&&S.wkFx!==lastK){S.wkFx=lastK;save()}
+  const rows=order.map((d,i)=>{const ok=fatto.has(d),up=ok&&i>0&&fatto.has(order[i-1]),dn=ok&&i<6&&fatto.has(order[i+1]),nw=anim&&d===lastD;
+    const fx=ok?`<i class="fz${nw?" in":""}" aria-hidden="true"></i>${up?`<i class="fl up${nw?" in":""}" style="${nw?"animation-delay:1.01s":""}" aria-hidden="true"></i>`:""}${dn?`<i class="fl dn${anim&&order[i+1]===lastD?" in":""}" style="${anim&&order[i+1]===lastD?"animation-delay:.75s":""}" aria-hidden="true"></i>`:""}<i class="fd${nw?" in":""}" style="${nw?"animation-delay:.55s":""}" aria-hidden="true"></i>`:"";
+    return rowOf(d,ok,fx)});
+  function rowOf(d,ok,fx){const w=S.week[d]||{padel:"none",gym:"none"},lines=[];
     if(w.padel==="train")lines.push(`<div class="c-pad">${I("rac")}Allenamento padel</div>`);
     if(w.padel==="match")lines.push(`<div class="c-match">${I("cup")}Partita</div>`);
     if(w.gym in PLAN)lines.push(`<div class="c-gym">${I("gym")}${esc(PLAN[w.gym].name)}</div>`);
     if(!lines.length)lines.push(`<div class="c-rest">${I("bed")}Riposo</div>`);
     const rule=legRule(d);
-    return `<button class="dayr ${d===td?"t":""} ${lines.length===1&&!(w.gym in PLAN)&&w.padel==="none"?"none":""}" data-day="${d}" aria-label="Cambia ${WD_LONG[d]}"><span class="d">${WD[d]}</span><span class="w">${lines.join("")}${rule}</span><span class="ed">Cambia</span></button>`}).join("");
+    return `<button class="dayr ${d===td?"t":""} ${lines.length===1&&!(w.gym in PLAN)&&w.padel==="none"?"none":""}" data-day="${d}" aria-label="Cambia ${WD_LONG[d]}${ok?", seduta fatta questa settimana":""}">${fx}<span class="d">${WD[d]}</span><span class="w">${lines.join("")}${rule}</span><span class="ed">Cambia</span></button>`}
+  const html=rows.join("");
   app.innerHTML=`<header class="head headrow"><div><h1>Settimana</h1></div><button class="gear" id="toImp" aria-label="Impostazioni">${I("gear")}</button></header>
-  <div class="days">${rows}</div>
+  <div class="days">${html}</div>
   <p class="note">Tocca un giorno per cambiare padel e palestra. Per oggi e domani puoi cambiare anche da Oggi, senza toccare la settimana tipo. Piani, scarico, stile e backup sono nell'ingranaggio in alto.</p>`;
   document.querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>daySheet(+b.dataset.day));
   document.getElementById("toImp").onclick=()=>go("imp");
