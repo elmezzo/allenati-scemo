@@ -1734,7 +1734,11 @@ html.vt-back::view-transition-group(sed),html.vt-back::view-transition-group(sed
 html[data-skin="manga"]::view-transition-group(*.vx){border-radius:0}
 html.vt-ex nav.bar,html.vt-wf nav.bar,html.vt-swap nav.bar{view-transition-name:bar}
 html.vt-ex .thead,html.vt-wf .thead,html.vt-swap .thead{view-transition-name:thd}
-html.vt-ex #timer,html.vt-wf #timer,html.vt-swap #timer{view-transition-name:tmr}
+html.vt-ex #timer:not([hidden]):not(.enter),html.vt-wf #timer:not([hidden]):not(.enter),html.vt-swap #timer:not([hidden]):not(.enter){view-transition-name:tmr}
+/* intestazione e timer in basso restano fermi sopra la transizione: niente dissolvenza tra vecchio e nuovo; l'intestazione di vetro ha sotto il fondo pieno (nella transizione la sfocatura non c'è) */
+::view-transition-group(thd),::view-transition-old(thd),::view-transition-new(thd),::view-transition-group(tmr),::view-transition-old(tmr),::view-transition-new(tmr){animation:none}
+::view-transition-old(thd),::view-transition-old(tmr){display:none}
+::view-transition-new(thd){background:var(--bg)}
 html.vt-ex::view-transition-old(root){animation:vtOut .14s var(--ease-out) both}
 html.vt-ex::view-transition-new(root){animation:vtIn .14s var(--ease-out) both}
 /* 2 e 4. Fogli che si aprono dall'elemento toccato (Termina e salva -> riepilogo, muscolo -> dettaglio, seduta fatta -> riepilogo) */
@@ -1892,6 +1896,7 @@ html.vt-swap::view-transition-new(root){animation:vtIn .14s var(--ease-out) both
 .wpill .wn{color:var(--muted);font-size:max(13px,.7647rem);white-space:nowrap}
 .wpill b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .wpill .wck{flex:none}
+@media (max-width:360px){.wpill{gap:6px;padding:8px 10px}.wpill .i{width:14px}.wpill .wn{display:none}}
 .wpill .wck{margin-left:auto;color:var(--go);font-weight:800}
 html[data-skin="manga"] .wpill{border-radius:0;border:2px solid var(--fg)}
 html[data-skin="lavagna"] .wpill{border-radius:4px}
@@ -3400,7 +3405,9 @@ function rampTick(g,exId,k){const tk="r|"+exId+"|"+k,tn=performance.now(),dt=tn-
         else{const t=e.querySelector(".tick[data-j]");if(t){n="ws-"+t.dataset.j;cl="wmv"}}
         e.style.viewTransitionName=on?n:"";e.style.viewTransitionClass=on&&cl?cl:""})};
     const skip=new Set([exId]);nameEx(true,skip);nm(true);
-    const t=vtRun("vt-wf",()=>{renderTrain();keepFocus(false,exId);nameEx(true,skip);nm(true)});t.finished.finally(()=>{nm(false);nameEx(false)})}
+    // il timer in basso (appena partito) si decide a piega finita: durante la transizione le righe con nome gli passerebbero sopra
+    const tm=T("timer");tm.hidden=true;tm.classList.remove("enter");tHold=true;
+    const t=vtRun("vt-wf",()=>{renderTrain();keepFocus(false,exId);nameEx(true,skip);nm(true)});t.finished.finally(()=>{nm(false);nameEx(false);tHold=false;if(tOn)syncTimer(0)})}
   else{renderTrain();keepFocus(false,exId)}
   if(tOn)setTimeout(tick,510);
   const nb=document.querySelector(`#exs .tick.rt[data-rex="${exId}"][data-k="${k}"]`);if(r.done&&nb&&!RM()){nb.classList.remove("pop");void nb.offsetWidth;nb.classList.add("pop")}}
@@ -3733,7 +3740,8 @@ const justTicked=()=>performance.now()-lastTk.t<500;
 // Dopo una spunta (la pagina scorre) o con il timer appena comparso: per 700 ms "+15 s" e "Chiudi" non rispondono, il dito era lì per la spunta
 let tShown=0,tH=88,tLock=0;const tFresh=()=>performance.now()-lastTk.t<700||performance.now()-tShown<700;
 // Timer in basso o recupero nella scheda: mai tutti e due, mai nessuno. dy = scorrimento appena chiesto (si decide sulla posizione finale, subito)
-function syncTimer(dy){if(!tOn)return;const tm=T("timer"),inl=document.getElementById("restIn"),hide=!!inl&&restSeen(inl,dy||0);
+let tHold=false;
+function syncTimer(dy){if(!tOn)return;if(tHold){T("timer").hidden=true;return}const tm=T("timer"),inl=document.getElementById("restIn"),hide=!!inl&&restSeen(inl,dy||0);
   if(tm.hidden&&!hide){tShown=performance.now();tm.classList.remove("enter");void tm.offsetWidth;tm.classList.add("enter");clearTimeout(tm.et);tm.et=setTimeout(()=>tm.classList.remove("enter"),200)}
   tm.hidden=hide;if(!hide)tH=tm.offsetHeight||tH;if(inl)inl.classList.toggle("dup",!hide);ringSync()}
 let scrQ=0;addEventListener("scroll",()=>{if(scrQ||!tOn)return;scrQ=requestAnimationFrame(()=>{scrQ=0;if(performance.now()>tLock)syncTimer(0)})},{passive:true});
@@ -4000,7 +4008,7 @@ let histIO=null;
 function histFx(){if(histIO){histIO.disconnect();histIO=null}const sv=app.querySelector(".rk-hist svg[data-k]");if(!sv)return;const k=sv.dataset.k;if(!k||S.andSeen===k)return;
   if(S.andSeen==null||RM()){S.andSeen=k;save();return}
   const sg=sv.querySelector(".and-new"),dt=sv.querySelector(".and-dot");if(sg)sg.style.strokeDashoffset="1";if(dt)dt.style.opacity="0";
-  if(typeof IntersectionObserver==="function"){histIO=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting&&e.intersectionRatio>=.6)){histIO.disconnect();histIO=null;if(sv.isConnected)histPlay(sv,k)}},{threshold:[.6]});histIO.observe(sv)}else histPlay(sv,k)}
+  if(typeof IntersectionObserver==="function"){histIO=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting&&e.intersectionRatio>=.35)){histIO.disconnect();histIO=null;if(sv.isConnected)histPlay(sv,k)}else if(!sv.isConnected){histIO.disconnect();histIO=null}},{threshold:[.35]});histIO.observe(sv)}else histPlay(sv,k)}
 function histPlay(sv,k){S.andSeen=k;save();const seg=sv.querySelector(".and-new"),dot=sv.querySelector(".and-dot");if(seg)seg.style.strokeDashoffset="";if(dot)dot.style.opacity="";
   if(seg)seg.animate([{strokeDashoffset:1},{strokeDashoffset:0}],{duration:520,delay:220,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"});
   if(dot){dot.style.transformBox="fill-box";dot.style.transformOrigin="center";dot.animate([{transform:"scale(0)",opacity:0},{transform:"scale(1.5)",opacity:1,offset:.6},{transform:"scale(1)"}],{duration:420,delay:640,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"})}}
@@ -4250,7 +4258,7 @@ function lineChart(el,data,unit,noRec,opt){
   const area=fx?aOf(data.slice(0,-1)):aOf(data),wedge=fx?aOf(data.slice(-2)):"";
   const xl=[data[0],data[Math.floor((data.length-1)/2)],data[data.length-1]].filter((d,i,a)=>a.indexOf(d)===i);
   el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Andamento in ${unit}">
-   <defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--hot);stop-opacity:.28"/><stop offset="1" style="stop-color:var(--hot);stop-opacity:0"/></linearGradient></defs>
+   <defs><linearGradient id="ga" gradientUnits="userSpaceOnUse" x1="0" y1="${Y(Math.max(...ys)).toFixed(1)}" x2="0" y2="${Y(y0).toFixed(1)}"><stop offset="0" style="stop-color:var(--hot);stop-opacity:.28"/><stop offset="1" style="stop-color:var(--hot);stop-opacity:0"/></linearGradient></defs>
    ${ticks.map(t=>`<line x1="${m.l}" x2="${W-m.r}" y1="${Y(t)}" y2="${Y(t)}" style="stroke:color-mix(in srgb,var(--line) 35%,transparent)" stroke-width="1"/><text x="${m.l-6}" y="${Y(t)+4}" text-anchor="end" font-size="12" style="fill:var(--muted)">${fk(t)}</text>`).join("")}
    ${xl.map(d=>`<text x="${X(d.x)}" y="${H-8}" text-anchor="middle" font-size="12" style="fill:var(--muted)">${fmtShort(d.x)}</text>`).join("")}
  ${phaseBands(new Date(x0),new Date(x1)).map(b=>`<rect x="${X(b.a).toFixed(1)}" y="${m.t}" width="${(X(b.b)-X(b.a)).toFixed(1)}" height="${H-m.t-m.b}" style="fill:${PH[b.ph].col};opacity:.12"/><text x="${(X(b.a)+3).toFixed(1)}" y="${m.t+10}" font-size="11" font-weight="700" style="fill:${PH[b.ph].col}">${PH[b.ph].n}</text>`).join("")}
