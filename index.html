@@ -1864,6 +1864,43 @@ html[data-skin="manga"]:not(#z):not(#y):not(#x) .sheet .fxgo,html[data-skin="man
 :root:not(#z):not(#y):not(#x) .wd2 small{font-size:clamp(12px,.7059rem,13px);letter-spacing:-.03em;padding:0;white-space:normal;overflow-wrap:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;text-overflow:clip;text-align:center;line-height:1.1;max-width:100%;overflow-wrap:break-word;-webkit-hyphens:auto;hyphens:auto}
 :root:not(#z):not(#y):not(#x) .wd2 b{font-size:clamp(12px,.7059rem,15px)}
 @media (max-width:360px){:root:not(#z):not(#y):not(#x) .wd2 small{font-size:12px;letter-spacing:-.04em}:root:not(#z):not(#y):not(#x) .wk{padding-inline:2px!important;gap:1px!important}}
+
+/* ===== ANIMAZIONI v51 (2026-10-20) ===== */
+/* 2 fine recupero: la prossima serie si accende una volta */
+.set.cue{position:relative}
+.set.cue::after{content:"";position:absolute;inset:-4px -6px;border-radius:12px;border:2px solid var(--go);pointer-events:none;animation:cueIn 1.1s var(--ease-out) both}
+@keyframes cueIn{0%{opacity:0;transform:scale(.97)}22%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.02)}}
+@media (prefers-reduced-motion:reduce){.set.cue::after{animation:cueRM 1.1s ease both}}
+@keyframes cueRM{0%,100%{opacity:0}25%,60%{opacity:1}}
+html[data-skin="manga"] .set.cue::after{border-radius:0}
+/* 3 ⇄ Cambia: l'esercizio vecchio esce di lato, la variante entra nello stesso posto */
+::view-transition-group(swp){animation-duration:.3s;animation-timing-function:var(--ease-out);overflow:clip;border-radius:16px}
+::view-transition-old(swp),::view-transition-new(swp){height:100%;width:100%;object-fit:none;object-position:top left}
+::view-transition-old(swp){animation:swOut .2s var(--ease-out) both}
+::view-transition-new(swp){animation:swIn .3s var(--ease-out) both}
+@keyframes swOut{to{opacity:0;transform:translateX(-18%)}}
+@keyframes swIn{from{opacity:0;transform:translateX(18%)}}
+html[data-skin="manga"]::view-transition-group(swp){border-radius:0}
+html.vt-swap::view-transition-old(root){animation:vtOut .14s var(--ease-out) both}
+html.vt-swap::view-transition-new(root){animation:vtIn .14s var(--ease-out) both}
+/* 4 avvicinamento fatto: le righe A si richiudono in una pillola */
+.wpill{display:flex;align-items:center;gap:8px;width:100%;min-height:44px;padding:8px 12px;margin:2px 0;border-radius:12px;border:1px solid color-mix(in srgb,var(--go) 45%,transparent);background:color-mix(in srgb,var(--go) 12%,transparent);color:var(--fg);font:inherit;text-align:left;cursor:pointer}
+.wpill .i{font-weight:800;color:var(--muted);width:18px;text-align:center}
+.wpill b{font-weight:700}
+.wpill .wn{color:var(--muted);font-size:max(13px,.7647rem)}
+.wpill .wck{margin-left:auto;color:var(--go);font-weight:800}
+html[data-skin="manga"] .wpill{border-radius:0;border:2px solid var(--fg)}
+html[data-skin="lavagna"] .wpill{border-radius:4px}
+::view-transition-group(*.wmv){animation-duration:.32s;animation-timing-function:var(--ease-out)}
+::view-transition-old(*.wmv){display:none}
+::view-transition-new(*.wmv){animation:none}
+::view-transition-group(*.wfold){animation-duration:.24s;animation-timing-function:var(--ease-out)}
+::view-transition-old(*.wfold){animation:wFold .22s var(--ease-out) both}
+@keyframes wFold{to{opacity:0;transform:translateY(-10px) scaleY(.85)}}
+::view-transition-new(wpill){animation:wPill .3s var(--ease-out) .06s both}
+@keyframes wPill{from{opacity:0;transform:scale(.94)}}
+html.vt-wf::view-transition-old(root){animation:vtOut .14s var(--ease-out) both}
+html.vt-wf::view-transition-new(root){animation:vtIn .14s var(--ease-out) both}
 </style>
 <!--APP-HEAD-END-->
 </head>
@@ -2625,7 +2662,9 @@ function bodySheet(after){const L=bodyLast(),k=iso(today()),cur=S.body.find(x=>x
    bind:(w,draw,close)=>{w.querySelector("#bSave").onclick=()=>{const v=id=>{const x=num(w.querySelector(id).value.replace(",","."));return x!=null&&x>0?x:null};
      const e={d:k,kg:v("#bKg"),arm:v("#bArm"),chest:v("#bChest"),waist:v("#bWaist")};
      if(e.kg==null&&e.arm==null&&e.chest==null&&e.waist==null){const m=w.querySelector("#bMsg");m.className="msg err";m.textContent="Scrivi almeno il peso o una misura.";return}
-     Object.keys(e).forEach(x=>e[x]==null&&delete e[x]);S.body=S.body.filter(x=>x.d!==k);S.body.push(e);save();close();after&&after()}}})}
+     Object.keys(e).forEach(x=>e[x]==null&&delete e[x]);S.body=S.body.filter(x=>x.d!==k);S.body.push(e);if(e.kg!=null)bodyFx=k;save();close();after&&after()}}})}
+// Peso nuovo: il punto cade sul grafico e la linea lo raggiunge (solo se è l'ultimo punto)
+let bodyFx=null;
 function bodyBanner(){const L=S.body.filter(x=>x.kg!=null).sort((a,b)=>b.d.localeCompare(a.d))[0];if(L&&daysAgo(L.d)<7)return"";if(S.bodySnooze&&S.bodySnooze>=iso(today()))return"";
   return `<div class="banner">${I("info")}<div><b>Peso della settimana</b><span>${L?`Ultimo: ${fk(L.kg)} kg, ${daysAgo(L.d)} giorni fa.`:"Serve per capire se stai mettendo massa."}</span></div><button id="bodyGo">Segna</button><button id="bodyNo">Non ora</button></div>`}
 function liftTrend(from,to){// variazione media del massimale stimato sui multiarticolari tra due finestre di 14 giorni
@@ -2666,7 +2705,7 @@ function summarySheet(sess){
   const prev=others.filter(x=>x.day===sess.day&&x.date<sess.date).sort((a,b)=>b.date.localeCompare(a.date))[0];
   // Record = le serie che hanno avuto il timbro PR (stessa regola: +2%, niente salti/tenute/Nordic, niente serie PIPPA); sedute vecchie senza timbri: stessa soglia sul massimale
   const recs=[];for(const id in sess.sets){const e=exById(id),now=bestIn(sess,id),pb=Math.max(0,...others.map(x=>bestIn(x,id))),st=sess.sets[id].filter(x=>x.pr);
-    if(sess.prv?st.length:!noEff(e)&&pb>0&&now>=pb*PR_MIN-1e-9){const kg=e.t==="bw"||sess.sets[id].some(x=>num(x.kg)>0)&&!["time","perf","nordic"].includes(e.t);recs.push(`<li><span>${esc((sess.names&&sess.names[id])||e.n)}</span><em>${fk(Math.round(now*10)/10)} ${kg?"kg":e.t==="time"?"s":"rip"}</em></li>`)}}
+    if(sess.prv?st.length:!noEff(e)&&pb>0&&now>=pb*PR_MIN-1e-9){const kg=e.t==="bw"||sess.sets[id].some(x=>num(x.kg)>0)&&!["time","perf","nordic"].includes(e.t);recs.push(`<li><span>${esc((sess.names&&sess.names[id])||e.n)}</span><em data-a="${Math.round(pb*10)/10}" data-z="${Math.round(now*10)/10}" data-u="${kg?"kg":e.t==="time"?"s":"rip"}">${fk(Math.round(now*10)/10)} ${kg?"kg":e.t==="time"?"s":"rip"}</em></li>`)}}
   let cmp="";
   if(prev){const ps=sessStats(prev),dv=ps.vol?Math.round((st.vol-ps.vol)/ps.vol*100):null;let up=0,com=0;
     for(const id in sess.sets)if(prev.sets[id]){com++;if(bestIn(sess,id)>bestIn(prev,id)+1e-9)up++}
@@ -2685,6 +2724,9 @@ function summarySheet(sess){
     <p class="note" style="margin:0">I carichi della prossima volta sono già pronti.</p>
     <div class="bks"><button class="btn ghost" id="sumBk">${I("save")}Salva backup in File</button><small id="sumBkM">${S.lastBackup===iso(today())?"Backup di oggi già salvato.":"Scegli \"Salva in File\" e poi iCloud Drive."}</small></div>`,
    bind:w=>{const r=w.querySelector(".sumr:not(.sumn)");if(r)setTimeout(()=>blade(r),450);
+     // Record: entrano uno dopo l'altro e il massimale scorre dal vecchio al nuovo
+     if(r&&!RM())r.querySelectorAll("li").forEach((li,i)=>{const d=320+i*110;li.animate([{opacity:0,transform:"translateY(8px)"},{opacity:1,transform:"none"}],{duration:280,delay:d,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"});
+       const em=li.querySelector("em[data-z]");if(em&&+em.dataset.a>0&&+em.dataset.z>+em.dataset.a)setTimeout(()=>{if(em.isConnected)(skinNow()==="carbonio"?txtUp:rollUp)(em,+em.dataset.a,+em.dataset.z," "+em.dataset.u)},d)});
      {const V=volRange(0,0,[sess]),ks=RMU.map(([k])=>k).filter(k=>V[k]>0);if(ks.length)setTimeout(()=>flexMus(ks,w),420)}
      const b=w.querySelector("#sumBk"),m=w.querySelector("#sumBkM");b.onclick=async()=>{const x=await shareBackup();m.textContent=x==="ok"?"Backup salvato.":x==="no"?"Non salvato: puoi riprovare.":"Non riuscito: prova da Impostazioni.";}}})}
 
@@ -2710,6 +2752,8 @@ const lastPct={},recShown=new Set();
 // Carichi già fatti scorrere oggi: salvati in S (come la Settimana con S.wkFx), così se iOS ricarica l'app non ripartono tutti
 const counted={has:k=>!!S.odo&&S.odo.d===iso(today())&&S.odo.k.includes(k),add:k=>{const d=iso(today());if(!S.odo||S.odo.d!==d)S.odo={d,k:[]};S.odo.k.push(k);save()}};
 function countUp(b,a,z,rest){if(RM())return;const t0=performance.now();const f=t=>{if(!b.isConnected)return;const k=Math.min(1,(t-t0)/800),e=1-Math.pow(1-k,3);setNum(b,fk(Math.round((a+(z-a)*e)*10)/10)+rest);if(k<1)requestAnimationFrame(f)};setNum(b,fk(a)+rest);setTimeout(()=>requestAnimationFrame(f),250)}
+// Come countUp ma in testo normale (riepilogo in Carbonio: le cifre restano quelle della lista, non il display a 7 segmenti)
+function txtUp(b,a,z,rest){if(RM())return;const t0=performance.now(),f=t=>{if(!b.isConnected)return;const k=Math.min(1,(t-t0)/700),e=1-Math.pow(1-k,3);b.textContent=fk(Math.round((a+(z-a)*e)*10)/10)+rest;if(k<1)requestAnimationFrame(f)};b.textContent=fk(a)+rest;requestAnimationFrame(f)}
 // Il carico della prossima volta sale come un contachilometri: ogni cifra scorre verso l'alto fino alla nuova (in Carbonio conta sul display a 7 segmenti)
 function rollUp(b,a,z,rest){if(RM())return;if(skinNow()==="carbonio")return countUp(b,a,z,rest);
   const sz=fk(z),sa=fk(a),[zi,zf=""]=sz.split(","),[ai,af=""]=sa.split(",");
@@ -2753,7 +2797,19 @@ function tickFx(g,exId,j,rec,wow){
   const b=document.querySelector(`#exs .tick[data-ex="${exId}"][data-j="${j}"]`)||document.querySelector(`#exs .xrow[data-open="${exId}"] .ck`);
   if(b&&!RM())popEl(b,"pop");
   if(rec)prStamp(exId,j);
+  if(brkNow.has(exId)){brkNow.delete(exId);const el=document.querySelector(`#exs article.ex[data-ex="${exId}"] .prog.fermo`);if(el)breakFermo(el)}
 }
+// "Fermo" sbloccato: l'etichetta si crepa a zig-zag e le due metà cadono, poi lo spazio si richiude
+const brkNow=new Set();
+function breakFermo(el){const shut=()=>{if(!el.isConnected)return;const h=el.offsetHeight,cs=getComputedStyle(el);
+    el.animate([{height:h+"px",marginTop:cs.marginTop,marginBottom:cs.marginBottom,paddingTop:cs.paddingTop,paddingBottom:cs.paddingBottom},{height:"0px",marginTop:"0px",marginBottom:"0px",paddingTop:"0px",paddingBottom:"0px"}],{duration:RM()?1:260,easing:"cubic-bezier(.23,1,.32,1)"}).finished.then(()=>el.remove(),()=>el.remove())};
+  if(RM()){el.animate([{opacity:1},{opacity:0}],{duration:220,fill:"forwards"}).finished.then(shut,shut);return}
+  const p=el.parentElement,r=el.getBoundingClientRect(),pr=p.getBoundingClientRect();if(getComputedStyle(p).position==="static")p.style.position="relative";
+  const L="polygon(0 0,52% 0,47% 36%,53% 62%,48% 100%,0 100%)",Rt="polygon(52% 0,100% 0,100% 100%,48% 100%,53% 62%,47% 36%)";
+  const half=(cp,sx,rz,dy)=>{const c=el.cloneNode(true);c.classList.remove("fermo");c.setAttribute("aria-hidden","true");
+    c.style.cssText=`position:absolute;left:${r.left-pr.left}px;top:${r.top-pr.top}px;width:${r.width}px;height:${r.height}px;margin:0;box-sizing:border-box;pointer-events:none;z-index:3;clip-path:${cp}`;p.appendChild(c);
+    c.animate([{transform:"none",opacity:1,easing:"cubic-bezier(.23,1,.32,1)"},{transform:`translateX(${sx*3}px) rotate(${sx*2}deg)`,opacity:1,offset:.2,easing:"cubic-bezier(.5,0,.75,0)"},{transform:`translate(${sx*16}px,${dy}px) rotate(${rz}deg)`,opacity:0}],{duration:720,fill:"forwards"}).finished.then(()=>c.remove(),()=>c.remove())};
+  half(L,-1,-16,64);half(Rt,1,19,72);el.style.visibility="hidden";setTimeout(shut,520)}
 // Record a metà seduta: timbro "PR" sul carico della serie che ha battuto il massimale stimato (resta sulla serie, si anima solo al momento)
 function prStamp(exId,j){const t=document.querySelector(`#exs .tick[data-ex="${exId}"][data-j="${j}"]`),f=t&&t.closest(".set")&&t.closest(".set").querySelector(".field");if(!f)return;
   let st=f.querySelector(".prs");if(!st){f.insertAdjacentHTML("beforeend",`<i class="prs" aria-hidden="true">PR</i>`);st=f.querySelector(".prs")}if(!RM())popEl(st,"in",900);
@@ -3100,6 +3156,7 @@ function renderTrain(){
   document.querySelectorAll("#exs input[data-f]").forEach(i=>i.oninput=()=>{const v=i.dataset.f==="kg"?i.value.replace(/[^\d.,]/g,"").replace(/([.,].*?)[.,]/g,"$1").slice(0,6):i.value.replace(/\D/g,"").slice(0,3);if(v!==i.value)i.value=v;cell(g,i.dataset.ex,+i.dataset.j)[i.dataset.f]=v.trim();save()});
   document.querySelectorAll("#exs .tick:not(.mt):not(.rt)").forEach(b=>b.onclick=()=>toggleSet(g,b.dataset.ex,+b.dataset.j,mods));
   document.querySelectorAll("#exs .tick.rt").forEach(b=>b.onclick=()=>rampTick(g,b.dataset.rex,+b.dataset.k));
+  document.querySelectorAll("#exs [data-wopen]").forEach(b=>b.onclick=()=>{wOpen.add(b.dataset.wopen);renderTrain()});
   document.querySelectorAll('#exs input[data-f="kg"],#exs input[data-rf="kg"]').forEach(kgFit);
   document.querySelectorAll("#exs input[data-rf]").forEach(i=>i.oninput=()=>{const v=i.dataset.rf==="kg"?i.value.replace(/[^\d.,]/g,"").replace(/([.,].*?)[.,]/g,"$1").slice(0,6):i.value.replace(/\D/g,"").slice(0,3);if(v!==i.value)i.value=v;rcell(g,i.dataset.ex,+i.dataset.k)[i.dataset.rf]=v.trim();save()});
   document.querySelectorAll("#exs [data-rpm]").forEach(b=>b.onclick=e=>{e.preventDefault();const inp=b.parentElement.querySelector("input"),f=b.dataset.rpm,d=+b.dataset.d,ex=exById(b.dataset.ex);let v=num(inp.value)||0;
@@ -3244,8 +3301,11 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   // Iniziate le serie, restano solo quelle già spuntate
   const wDone=rows.some(r=>r.done),rR=(dr.ramp||{})[ex.id]||[];
   const rp=hasKg&&tg.kg!=null&&!pre&&rampOn(g,ex,mods)?rampSets(ex,tg).map((x,k)=>({...x,k,r:rR[k]||{}})).filter(x=>!wDone||x.r.done):[];
-  if(rp.length)sets+=`<p class="wcap">Avvicinamento</p>`;
-  for(const {kg,reps,k,r} of rp){const now=!wDone&&!r.done&&!nowSet;if(now)nowSet=true;
+  // Tutte le righe A spuntate: si richiudono in una pillola (toccandola si riaprono)
+  const wPill=rp.length&&rp.every(x=>x.r.done)&&!wOpen.has(ex.id);
+  const wpH=wPill?`<button class="wpill" data-wopen="${ex.id}" aria-label="Avvicinamento fatto, ${rp.length} ${rp.length===1?"serie":"serie"}. Tocca per rivederlo"><span class="i" aria-hidden="true">A</span><b>Avvicinamento</b><span class="wn">${rp.length} ${rp.length===1?"serie":"serie"}</span><span class="wck" aria-hidden="true">✓</span></button>`:"";
+  if(!wPill&&rp.length)sets+=`<p class="wcap">Avvicinamento</p>`;
+  for(const {kg,reps,k,r} of (wPill?[]:rp)){const now=!wDone&&!r.done&&!nowSet;if(now)nowSet=true;
     const kgV=r.kg!=null&&r.kg!==""?r.kg:fk(kg),rpV=r.reps!=null&&r.reps!==""?r.reps:String(reps),fw=r.done?"label":"div";
     const pm=(f,d)=>r.done?"":`<button class="pm" data-rpm="${f}" data-d="${d}" data-ex="${ex.id}" data-k="${k}" aria-label="${d>0?"Più":"Meno"} ${f==="kg"?"kg":"rip"}, avvicinamento ${k+1}">${d>0?"+":"−"}</button>`;
     sets+=`<div class="set wset ${r.done?"done":""} ${now?"now":""}"><span class="i" aria-hidden="true">A</span>
@@ -3289,7 +3349,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   spec.push(`<span>${ex.rest?(ex.rest>=120?fk(ex.rest/60)+"&nbsp;min":ex.rest+"&nbsp;s"):"Subito il prossimo"}</span>`);
   if(mods.has("prePadel")&&ex.strap)chips.push(`<span class="chip adapt">Fasce da polso: risparmi la presa per il padel</span>`);
   if(tg.top&&tg.top>ex.hi&&!mods.has("deload")&&tg.reps.every(r=>r>=ex.lo)&&!["time","nordic","perf"].includes(ex.t)){const mx=eqMax(ex);chips.push(`<span class="chip hot">Range esteso fino a ${tg.top}: ${mx&&(tg.kg||0)>=mx?`${fk(mx)} kg è il massimo del pacco`:`il prossimo gradino è ${pct(Math.round(stepOf(ex)/Math.max(1,tg.kg||lastKg(ex)||1)*100))}`}</span>`)}
-  const stallTxt=!mods.has("deload")&&!tg.hold&&tg.kind!=="down"&&!(tg.kind==="up"&&tg.kg>0&&tg.kg>(lastKg(ex)||0))&&stalled(ex)?(phaseAt()==="def"?`<p class="prog down"><span>In calo</span><span>Massimale sotto del 5% nelle ultime 2 sedute. In definizione basta tenere i carichi: se continua togli una serie o fai lo scarico.</span></p>`:`<p class="prog down"><span>Fermo</span><span>Nessun miglioramento nelle ultime 3 sedute: prova una variante con ⇄ Cambia o togli una serie per due settimane.</span></p>`):"";
+  const stallTxt=!mods.has("deload")&&!tg.hold&&tg.kind!=="down"&&!(tg.kind==="up"&&tg.kg>0&&tg.kg>(lastKg(ex)||0))&&!((draftFor(g).ex[ex.id]||[]).some(x=>x.done&&x.pr)&&!brkNow.has(ex.id))&&stalled(ex)?(phaseAt()==="def"?`<p class="prog down"><span>In calo</span><span>Massimale sotto del 5% nelle ultime 2 sedute. In definizione basta tenere i carichi: se continua togli una serie o fai lo scarico.</span></p>`:`<p class="prog down fermo"><span>Fermo</span><span>Nessun miglioramento nelle ultime 3 sedute: prova una variante con ⇄ Cambia o togli una serie per due settimane.</span></p>`):"";
   const over=tOn&&tEnd<=Date.now();
   const rest=withRest&&tOn?`<div class="rest ${over?"over":""}" id="restIn" role="timer"><span class="rr"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rk" cx="32" cy="32" r="28"/><circle class="ra rc" cx="32" cy="32" r="28" pathLength="100"/></svg><i class="rg" aria-hidden="true"><i class="rh r1" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><i class="rh r2" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><i class="rh rd" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra rc" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i></i><b class="tv"></b></span><span class="tl" aria-live="assertive">${over?"Recupero finito":"Recupero"+(tPlus?"\u00a0·\u00a0+"+tPlus+"\u00a0s":"")}</span><span class="tb"><button data-ts>Chiudi</button><button data-tp>+15 s</button></span></div>`:"";
   // Scheda che si colora: a ogni serie un velo su tutta la scheda si intensifica piano; a esercizio finito passa l'oro in diagonale
@@ -3302,7 +3362,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
     ${chips.length&&!fN?`<div class="chips">${chips.join("")}</div>`:""}
     ${hasKg&&(setupOf(ex)||eqLbl(ex))?setupHTML(ex):""}
     ${stallTxt}
-        <div class="sets"><div class="set sethd" aria-hidden="true"><span></span><span>${hasKg?"kg":""}</span><span>${unit}</span><span></span></div>${sets}</div>
+        <div class="sets">${wpH}<div class="set sethd" aria-hidden="true"><span></span><span>${hasKg?"kg":""}</span><span>${unit}</span><span></span></div>${sets}</div>
     ${rest}<!--ASK-->
     ${painWarn(ex,base)}
     <details class="more" data-more="${ex.id}" ${moreOpen.has(ex.id)?"open":""}><summary>${I("info")} Altro<span>${errOf(ex)?"errori, ":""}fastidio, superserie, ultima volta</span></summary><div>${ex.note?`<p class="note">${esc(ex.note)}</p>`:""}${errOf(ex)?`<div class="errs"><b>Errori da evitare</b><ul>${errOf(ex).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}<p class="last">${lastTxt}</p>
@@ -3314,12 +3374,31 @@ let kgChk="",lastTk={t:0,k:"",y:0};
 // Dopo una spunta la pagina scorre: per 1,1 s un secondo tocco non apre quello che è arrivato sotto il dito (es. "⇄ Cambia")
 document.addEventListener("click",e=>{if(view!=="train"||performance.now()-lastTk.t>=1100||Math.abs(scrollY-lastTk.y)<=4)return;const b=e.target.closest("button,a,summary,input");if(!b||b.closest("#timer"))return;if(b.matches(".tick")&&b.dataset.ex+"|"+b.dataset.j===lastTk.k)return;if(b.matches(".tick"))return;e.preventDefault();e.stopPropagation()},true);
 // Spunta di una serie di avvicinamento: vibrazione leggera e 60 s di pausa, niente record, oro o PIPPA
+const wOpen=new Set();
 function rampTick(g,exId,k){const tk="r|"+exId+"|"+k,tn=performance.now(),dt=tn-lastTk.t,mv=Math.abs(scrollY-lastTk.y)>4;if(lastTk.k===tk&&(dt<400||(mv&&dt<1100)))return;if(lastTk.k!==tk&&mv&&dt<500)return;lastTk={t:tn,k:tk,y:scrollY};
   audioUnlock();const r=rcell(g,exId,k),b=document.querySelector(`#exs .tick.rt[data-rex="${exId}"][data-k="${k}"]`),row=b&&b.closest(".set");
   if(row)row.querySelectorAll("input").forEach(i=>{r[i.dataset.rf]=i.value.trim()});
   r.done=!r.done;const dd=draftFor(g);if(r.done){const nw=Date.now();if(!dd.start)dd.start=nw;if(dd.last&&nw-dd.last>45*6e4)dd.idle=(dd.idle||0)+(nw-dd.last-10*6e4);dd.last=nw}
   save();if(r.done){buzz(20);const ex=exById(exId);startTimer(60,ex.n,0,null,{g,ex:exId,ramp:1})}
-  renderTrain();keepFocus(false,exId);if(tOn)setTimeout(tick,510);
+  // Ultima riga A spuntata: le righe si richiudono nella pillola, le serie sotto salgono al loro posto
+  const card=document.querySelector(`#exs article.ex[data-ex="${exId}"]`),rows=card?[...card.querySelectorAll(".set.wset")]:[];
+  if(r.done)wOpen.delete(exId);
+  const fold=r.done&&rows.length&&rows.every(x=>x.classList.contains("done")||x===row)&&vtOk();
+  if(fold){const nm=(on)=>{const c=document.querySelector(`#exs article.ex[data-ex="${exId}"]`);if(!c)return;
+      [...c.children].forEach((e,i)=>{if(!e.classList.contains("sets")){e.style.viewTransitionName=on?"wc-"+i:"";e.style.viewTransitionClass=on?"wmv":""}});
+      const st=c.querySelector(".sets");if(!st)return;let f=0;
+      [...st.children].forEach(e=>{let n="",cl="";
+        if(e.classList.contains("wset")||(e.classList.contains("wcap")&&e.textContent==="Avvicinamento")){n="wf-"+f++;cl="wfold"}
+        else if(e.classList.contains("wpill")){n="wpill"}
+        else if(e.id==="restIn"){n="ws-rest";cl="wmv"}
+        else if(e.classList.contains("sethd")){n="ws-hd";cl="wmv"}
+        else if(e.classList.contains("wcap")){n="ws-cap";cl="wmv"}
+        else{const t=e.querySelector(".tick[data-j]");if(t){n="ws-"+t.dataset.j;cl="wmv"}}
+        e.style.viewTransitionName=on?n:"";e.style.viewTransitionClass=on&&cl?cl:""})};
+    const skip=new Set([exId]);nameEx(true,skip);nm(true);
+    const t=vtRun("vt-wf",()=>{renderTrain();keepFocus(false,exId);nameEx(true,skip);nm(true)});t.finished.finally(()=>{nm(false);nameEx(false)})}
+  else{renderTrain();keepFocus(false,exId)}
+  if(tOn)setTimeout(tick,510);
   const nb=document.querySelector(`#exs .tick.rt[data-rex="${exId}"][data-k="${k}"]`);if(r.done&&nb&&!RM()){nb.classList.remove("pop");void nb.offsetWidth;nb.classList.add("pop")}}
 function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;
   // Doppio tocco: dopo la spunta la pagina scorre e un'altra spunta (o un tasto del recupero) può finire sotto il dito
@@ -3381,6 +3460,8 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;
     // A metà giro di superserie non c'è recupero: si spegne anche quello partito dall'avvicinamento
     else if(tOn&&tCtx&&tCtx.ramp)stopTimer();
     rec=!fail&&isRecord(g,ex,exId,j,r);wowNow=!fail&&doneN>=N;if(rec){r.pr=true;save()}
+    // Record su un esercizio "Fermo": l'etichetta resta un attimo per spezzarsi, poi non torna più in questa seduta
+    if(rec&&document.querySelector(`#exs article.ex[data-ex="${exId}"] .prog.fermo`))brkNow.add(exId);
   }
   if(wowNow){goldCard(g,exId);tickFx(g,exId,j,rec,wowNow);return}
   renderTrain();
@@ -3493,7 +3574,14 @@ function openSwap(g,baseId){
     if(nw!==old&&keep){const od=famDone(d,nw);if(od)d.pre[nw]=od}
     // "Le rifaccio tutte": le serie di prima non contano più e non vengono salvate
     if(nw!==old&&keep===false)fam(d).forEach(id=>{if(d.ex[id])d.ex[id]=d.ex[id].filter(x=>!x.done)});
-    openEx[g]=nw;save();close();renderTrain();requestAnimationFrame(()=>keepFocus(false,nw))};
+    openEx[g]=nw;save();close();
+    const go=()=>{renderTrain();requestAnimationFrame(()=>keepFocus(false,nw))};
+    if(nw===old||!vtOk()){go();return}
+    // a foglio chiuso: la scheda vecchia esce di lato e la variante entra nello stesso posto; le altre schede si spostano invece di saltare
+    setTimeout(()=>{const oc=document.querySelector(`#exs article.ex[data-ex="${old}"]`);if(!oc){go();return}
+      const skip=new Set([old,nw]);nameEx(true,skip);oc.style.viewTransitionName="swp";
+      const t=vtRun("vt-swap",()=>{oc.style.viewTransitionName="";renderTrain();keepFocus(false,nw);nameEx(true,skip);const nc=document.querySelector(`#exs article.ex[data-ex="${nw}"]`);if(nc)nc.style.viewTransitionName="swp"});
+      t.finished.finally(()=>{nameEx(false);const nc=document.querySelector(`#exs article.ex[data-ex="${nw}"]`);if(nc)nc.style.viewTransitionName=""})},240)};
   // Serie già fatte con l'esercizio di prima: si chiede se contano (si fanno solo le restanti) o se si ricomincia
   const pick=k=>{const old=effEx(g,base).id,d=draftFor(g),od=famDone(d);
     const nwId=k&&EX[base.id+"~"+k]?base.id+"~"+k:base.id;if(!od||nwId===old){doPick(k);return}
@@ -3571,8 +3659,12 @@ document.addEventListener("visibilitychange",()=>{if(H&&document.visibilityState
 
 let tCtx=null;
 function startTimer(sec,label,plus,end,ctx){tPlus=plus||0;tLbl=label;tCtx=ctx||null;tEnd=end||Date.now()+sec*1000;tTot=sec;S.timer={end:tEnd,tot:sec,lbl:label,plus:tPlus,ctx:tCtx};save();tWarn=sec<=10;tOn=true;T("tlbl").textContent="Recupero · "+label+(tPlus?" · +"+tPlus+"\u00a0s":"");T("timer").classList.remove("over");document.querySelectorAll(".tball").forEach(b=>b.remove());clearInterval(tInt);tick();tInt=setInterval(tick,250)}
-function tick(){if(!tOn)return;const left=Math.round((tEnd-Date.now())/1000),a=Math.abs(left),txt=(left<0?"+":"")+Math.floor(a/60)+":"+String(a%60).padStart(2,"0");
-  setNum(T("tval"),txt);const inl=document.getElementById("restIn");if(inl)setNum(inl.querySelector(".tv"),txt);
+function tTxt(){const left=Math.round((tEnd-Date.now())/1000);let v=left;
+  if(tTw){const k=(performance.now()-tTw.t)/380;if(k>=1)tTw=null;else v=Math.round(tTw.a+(left-tTw.a)*(1-Math.pow(1-k,3)))}
+  const a=Math.abs(v),txt=(v<0?"+":"")+Math.floor(a/60)+":"+String(a%60).padStart(2,"0");
+  setNum(T("tval"),txt);const inl=document.getElementById("restIn");if(inl)setNum(inl.querySelector(".tv"),txt)}
+function tick(){if(!tOn)return;const left=Math.round((tEnd-Date.now())/1000);
+  tTxt();const inl=document.getElementById("restIn");
   ringSync();
   // Timer in basso nascosto solo se il recupero dentro la scheda si vede davvero (non sotto la barra o sotto l'intestazione).
   // Subito dopo una spunta non cambia niente (la pagina sta ancora scorrendo): si decide una volta sola, a scorrimento finito
@@ -3582,7 +3674,7 @@ function tick(){if(!tOn)return;const left=Math.round((tEnd-Date.now())/1000),a=M
   if(soon&&!tWarn){tWarn=true;try{navigator.vibrate&&navigator.vibrate([90,70,90])}catch(e){}}
   if(left>10)tWarn=false;
   ballFx(left);
-  if(left<=0&&!T("timer").classList.contains("over")){T("timer").classList.add("over");T("tlbl").textContent="Recupero finito";try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}beep()}
+  if(left<=0&&!T("timer").classList.contains("over")){if(left>-3)cueNext();T("timer").classList.add("over");T("tlbl").textContent="Recupero finito";try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}beep()}
   if(left<=0&&inl&&!inl.classList.contains("over")){inl.classList.add("over");inl.querySelector(".tl").textContent="Recupero finito"}
   if(left>0&&inl&&inl.classList.contains("over")){inl.classList.remove("over");inl.querySelector(".tl").textContent="Recupero"}}
 // Anello: angolo che resta A (0-360) = due mezzi anelli + il puntino della fine, ruotati con WAAPI su transform per tutto il tempo che manca
@@ -3590,21 +3682,37 @@ function ringSync(){const k=tEnd+"|"+tTot;
   document.querySelectorAll("#timer .tr,#restIn .rr").forEach(c=>{
     // anello nascosto (timer in basso quando si vede quello nella scheda): niente animazioni, che fuori schermo girerebbero sul processore a ogni fotogramma
     if(!c.getClientRects().length){if(c._rk){c._rk=null;c.querySelectorAll(".rh>b").forEach(e=>e.getAnimations().forEach(a=>a.cancel()))}return}
-    if(c._rk===k)return;c._rk=k;ringPose(c);
+    if(c._rk===k)return;c._rk=k;const gw=tGrow&&performance.now()-tGrow.t<250?tGrow:null;ringPose(c,gw?gw.a:null);
     // l'animazione parte dopo che l'anello è stato disegnato: creata nello stesso istante in cui nasce (scheda appena ridisegnata) non andrebbe al compositore
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{if(c._rk===k&&c.isConnected)ringAnim(c,k)}))})}
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{if(c._rk===k&&c.isConnected)ringAnim(c,k,gw)}))})}
 const ringA=()=>{const D=tEnd-Date.now();return [D,360*Math.max(0,Math.min(1,D/1000/tTot))]};
 function ringParts(c){return [c.querySelector(".r1>b"),c.querySelector(".r2>b"),c.querySelector(".rd>b")]}
 // posa ferma all'angolo di adesso (nessun vuoto mentre l'animazione aspetta il disegno)
-function ringPose(c){const [r1,r2,rd]=ringParts(c);if(!rd)return;const [D,A]=ringA();
+function ringPose(c,Ag){const [r1,r2,rd]=ringParts(c);if(!rd)return;const [D,A1]=ringA(),A=Ag!=null?Ag:A1;
   [r1,r2,rd].forEach(e=>e.getAnimations().forEach(a=>a.cancel()));
   // sotto mezzo giro la seconda metà sparisce: ferma, con l'arco fuori dal suo ritaglio, lascerebbe trapelare l'alone in una riga al centro
   r1.style.transform=`rotate(${Math.min(A,180)}deg)`;r2.style.transform=`rotate(${Math.max(0,A-180)}deg)`;r2.style.opacity=A>180?"1":"0";rd.style.transform=`rotate(${A}deg)`;c.classList.toggle("rz",D<=0||A<=0)}
-function ringAnim(c,k){const [r1,r2,rd]=ringParts(c);if(!rd)return;const [D,A0]=ringA();ringPose(c);if(D<=0||A0<=0)return;
+function ringAnim(c,k,gw){const [r1,r2,rd]=ringParts(c);if(!rd)return;const [D,A0]=ringA();
+  if(gw&&D>500&&A0>0){ringGrow(c,k,gw.a,D,A0);return}
+  ringPose(c);if(D<=0||A0<=0)return;
   clearTimeout(c._rz);c._rz=setTimeout(()=>{if(c._rk===k)c.classList.add("rz")},D);const rot=d=>({transform:`rotate(${d}deg)`}),o={duration:D,easing:"linear",fill:"forwards"};
   rd.animate([rot(A0),rot(0)],o);
   if(A0>180){const of=(A0-180)/A0;r2.animate([{...rot(A0-180),opacity:1},{...rot(0),opacity:1,offset:of},{...rot(0),opacity:0,offset:Math.min(1,of+1e-4)},{...rot(0),opacity:0}],o);r1.animate([rot(180),{...rot(180),offset:of},rot(0)],o)}
   else r1.animate([rot(A0),rot(0)],o)}
+// Fine recupero: la prossima serie da fare si accende una volta (bordo che pulsa), così si vede da dove riprendere
+function cueNext(){const r=document.querySelector("#exs article.ex .set.now");if(!r)return;r.classList.remove("cue");void r.offsetWidth;r.classList.add("cue");clearTimeout(r._cue);r._cue=setTimeout(()=>r.classList.remove("cue"),1200)}
+// +15 s: dall'angolo di prima a quello giusto in 320 ms (ease-out, a campioni), poi lineare fino a zero. Le due metà seguono l'angolo, con un punto esatto dove passa i 180°
+function ringGrow(c,k,Aa,D,A0){const [r1,r2,rd]=ringParts(c),G=320,AG=A0*(1-G/D),pts=[];
+  for(let i=0;i<=10;i++){const u=i/10;pts.push([G*u,Aa+(AG-Aa)*(1-Math.pow(1-u,3))])}pts.push([D,0]);
+  const P=[pts[0]];for(let i=1;i<pts.length;i++){const [t0,a0]=pts[i-1],[t1,a1]=pts[i];if((a0-180)*(a1-180)<0){const f=(180-a0)/(a1-a0);P.push([t0+(t1-t0)*f,180])}P.push(pts[i])}
+  const rot=d=>`rotate(${d}deg)`,o={duration:D,easing:"linear",fill:"forwards"};
+  rd.animate(P.map(([t,a])=>({transform:rot(a),offset:t/D})),o);
+  r1.animate(P.map(([t,a])=>({transform:rot(Math.min(a,180)),offset:t/D})),o);
+  r2.animate(P.map(([t,a])=>({transform:rot(Math.max(0,a-180)),offset:t/D})),o);
+  // la seconda metà si accende e si spegne a scatto dove l'angolo passa i 180° (sfumata, a 0° lascerebbe trapelare l'alone al centro)
+  const on=i=>(P[i][1]+P[i+1][1])/2>180,O=[];for(let i=0;i<P.length-1;i++){const t=P[i][0]/D,v=on(i)?1:0;if(!O.length)O.push({opacity:v,offset:t});else if(O[O.length-1].opacity!==v){O.push({opacity:1-v,offset:t},{opacity:v,offset:Math.min(1,t+1e-4)})}}
+  O.push({opacity:O[O.length-1].opacity,offset:1});r2.animate(O,{...o,composite:"replace"});
+  clearTimeout(c._rz);c.classList.remove("rz");c._rz=setTimeout(()=>{if(c._rk===k)c.classList.add("rz")},D)}
 // Ultimi 3 secondi: una pallina da padel rimbalza sull'anello, un rimbalzo al secondo; allo zero si schiaccia e sparisce
 function ballFx(left){document.querySelectorAll("#timer .tr,#restIn .rr").forEach(r=>{let b=r.querySelector(".tball");
   if(left<=0){if(b&&!b.classList.contains("sq")){b.classList.remove("hop");b.classList.add("sq");setTimeout(()=>b.remove(),450)}return}
@@ -3628,7 +3736,10 @@ document.addEventListener("input",e=>{const t=e.target;if(t&&t.matches&&t.matche
 function stopTimer(){clearInterval(tInt);tOn=false;
   // Recupero chiuso prima della fine: le animazioni dell'anello si fermano (nascosto, girerebbero comunque fino allo zero)
   document.querySelectorAll("#timer .tr,#restIn .rr").forEach(c=>{c._rk=null;clearTimeout(c._rz);c.querySelectorAll(".rh>b").forEach(e=>e.getAnimations().forEach(a=>a.cancel()))});document.querySelectorAll(".tball").forEach(b=>b.remove());if(S.timer){delete S.timer;save()}T("timer").hidden=true;const inl=document.getElementById("restIn");if(inl)inl.remove()}
-function addRest(){tEnd+=15000;tTot=Math.max(tTot,(tEnd-Date.now())/1000);if(S.timer){S.timer.end=tEnd;S.timer.tot=tTot;save()}T("timer").classList.remove("over");tick()}
+// +15 s: l'anello si riallunga in 0,32 s invece di saltare e il tempo scorre fino al valore nuovo
+let tGrow=null,tTw=null;
+function addRest(){const l0=Math.round((tEnd-Date.now())/1000),A0=ringA()[1];tEnd+=15000;tTot=Math.max(tTot,(tEnd-Date.now())/1000);
+  if(!RM()){const t=performance.now();tGrow={a:A0,t};tTw={a:l0,t};const f=()=>{if(!tTw||!tOn)return;tTxt();requestAnimationFrame(f)};requestAnimationFrame(f)}if(S.timer){S.timer.end=tEnd;S.timer.tot=tTot;save()}T("timer").classList.remove("over");tick()}
 T("tplus").onclick=()=>{if(!tFresh())addRest()};T("tstop").onclick=()=>{if(!tFresh())stopTimer()};
 // Tocco sul timer (fuori dai bottoni): torna all'allenamento, sull'esercizio del recupero o sul successivo se l'hai finito
 function timerGo(){const c=tCtx;if(c&&PLAN[c.g]){gymSel=c.g;const d=S.draft[c.g],ex=exById(c.ex),n=ex?setsFor(ex,trainMods(c.g)):0,dn=((d&&d.ex[c.ex])||[]).filter(x=>x&&x.done).length;openEx[c.g]=ex&&dn<n?c.ex:null}
@@ -3866,12 +3977,18 @@ function rankHist(){
   const lo=Math.max(0,Math.floor(Math.min(...pts.map(p=>p.v)))),hi=Math.min(9,Math.ceil(Math.max(...pts.map(p=>p.v)))+ (Math.max(...pts.map(p=>p.v))%1===0?1:0)),W=300,H=96,L=68;
   const x=i=>L+(W-L-6)*(pts.length===1?0:i/(pts.length-1)),y=v=>6+(H-12)*(1-(v-lo)/Math.max(1,hi-lo));
   let bands="";for(let r=lo;r<hi;r++){bands+=`<rect x="${L}" y="${y(r+1)}" width="${W-L-6}" height="${y(r)-y(r+1)}" fill="${RANKS[r][2]}" opacity=".16"/><text x="${L-6}" y="${(y(r)+y(r+1))/2+4}" text-anchor="end">${RANKS[r][0]}</text>`}
-  const d=pts.map((p,i)=>`${i?"L":"M"}${x(i).toFixed(1)} ${y(p.v).toFixed(1)}`).join(" "),last=pts[pts.length-1],first=pts[0],dv=Math.round((last.v-first.v)*100);
+  const P=pts.map((p,i)=>`${x(i).toFixed(1)} ${y(p.v).toFixed(1)}`),d0="M"+P.slice(0,-1).join(" L"),d1=`M${P[P.length-2]} L${P[P.length-1]}`,last=pts[pts.length-1],first=pts[0],dv=Math.round((last.v-first.v)*100);
   const t0=+pts[0].at,t1=+pts[pts.length-1].at,xt=t=>L+(W-L-6)*((t-t0)/((t1-t0)||1));
   bands+=phaseBands(new Date(t0),new Date(t1)).map(b=>`<rect x="${xt(b.a).toFixed(1)}" y="6" width="${(xt(b.b)-xt(b.a)).toFixed(1)}" height="${H-12}" fill="none" stroke="${PH[b.ph].col}" stroke-dasharray="3 3"/><text x="${(xt(b.a)+3).toFixed(1)}" y="15" style="fill:${PH[b.ph].col};font-weight:700">${PH[b.ph].n}</text>`).join("");
   return `<div class="rk-hist"><div class="l"><b>Andamento</b><span>${perS?`${dv>0?"+":""}${dv} pt in ${pts.length} sedute`:(wk=>`${dv>0?"+":""}${dv} pt in ${wk===1?"1 settimana":wk+" settimane"}`)(Math.max(1,Math.round((last.at-first.at)/(7*864e5))))}</span></div>
-  <svg viewBox="0 0 ${W} ${H+20}" aria-label="Rango generale nelle ultime ${pts.length} settimane">${bands}<path d="${d}" fill="none" stroke="var(--hot)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>${pts.map((p,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="${i===pts.length-1?4:2.5}" fill="${i===pts.length-1?"var(--hot)":"var(--fg)"}"/>`).join("")}
+  <svg viewBox="0 0 ${W} ${H+20}" data-k="${andKey()}" aria-label="Rango generale nelle ultime ${pts.length} settimane">${bands}<path d="${d0}" fill="none" stroke="var(--hot)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><path class="and-new" d="${d1}" pathLength="1" stroke-dasharray="1" fill="none" stroke="var(--hot)" stroke-width="2.5" stroke-linecap="round"/>${pts.map((p,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="${i===pts.length-1?4:2.5}" fill="${i===pts.length-1?"var(--hot)":"var(--fg)"}"${i===pts.length-1?' class="and-dot"':""}/>`).join("")}
   <text x="${L}" y="${H+14}">${fmtShort(first.at)}</text><text x="${W-6}" y="${H+14}" text-anchor="end">${perS&&iso(last.at)!==iso(today())?fmtShort(last.at):"oggi"}</text></svg></div>`}
+// Andamento: dopo una seduta nuova si disegna solo l'ultimo tratto, poi il punto nuovo si accende (una volta per seduta)
+const andKey=()=>{const l=S.sessions.filter(x=>!x.deload&&!x.demo).sort((a,b)=>a.date.localeCompare(b.date)).pop();return l?l.id:""};
+function histFx(){const sv=app.querySelector(".rk-hist svg[data-k]");if(!sv)return;const k=sv.dataset.k;if(!k||S.andSeen===k)return;const first=S.andSeen==null;S.andSeen=k;save();
+  if(first||RM())return;const seg=sv.querySelector(".and-new"),dot=sv.querySelector(".and-dot");
+  if(seg)seg.animate([{strokeDashoffset:1},{strokeDashoffset:0}],{duration:520,delay:220,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"});
+  if(dot){dot.style.transformBox="fill-box";dot.style.transformOrigin="center";dot.animate([{transform:"scale(0)",opacity:0},{transform:"scale(1.5)",opacity:1,offset:.6},{transform:"scale(1)"}],{duration:420,delay:640,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"})}}
 let rMode="rank";
 function rankCard(){
   const A=rankAll();
@@ -4069,10 +4186,10 @@ function renderProg(){
   const hm=document.getElementById("histMore");if(hm)hm.onclick=()=>{histN+=10;renderProg();setTimeout(()=>document.querySelector(".hist details:nth-child("+(histN-9)+")")?.scrollIntoView({block:"center"}),0)};
   document.getElementById("exSel").onchange=e=>{progEx=e.target.value;renderProg()};
   const nd=document.getElementById("noDemo");if(nd)nd.onclick=()=>{clearDemo();save();renderProg()};
-  rankBind();balBind();
+  rankBind();balBind();histFx();
   const rvo=document.getElementById("rvOpen");if(rvo)rvo.onclick=()=>reviewSheet(S.cycles[S.cycles.length-1]);
   const ba=document.getElementById("bodyAdd");if(ba)ba.onclick=()=>bodySheet(renderProg);
-  const bc=document.getElementById("bodyChart");if(bc){const W=S.body.filter(x=>x.kg!=null).sort((a,b)=>a.d.localeCompare(b.d));lineChart(bc,W.map(x=>({x:new Date(x.d+"T12:00:00"),y:x.kg,label:fk(x.kg)+" kg"})),"kg",true)}
+  const bc=document.getElementById("bodyChart");if(bc){const W=S.body.filter(x=>x.kg!=null).sort((a,b)=>a.d.localeCompare(b.d));lineChart(bc,W.map(x=>({x:new Date(x.d+"T12:00:00"),y:x.kg,label:fk(x.kg)+" kg"})),"kg",true,{fx:!!bodyFx&&W.length>1&&W[W.length-1].d===bodyFx});bodyFx=null}
   const lp=pts[pts.length-1];if(pts.length>1&&lp.v>Math.max(...pts.slice(0,-1).map(p=>p.v))){const k=progEx+lp.date;if(!recShown.has(k)){recShown.add(k);setTimeout(()=>blade(app.querySelector(".card.ph")),350);setTimeout(()=>flexMus((stdOf(progEx)||{}).m||[]),350)}}
   ledify();
   lineChart(document.getElementById("lineChart"),pts.map(p=>({x:new Date(p.date),y:p.v,dl:p.dl,label:p.x?(num(p.x.kg)?fk(num(p.x.kg))+" kg × ":"")+p.x.reps+(ex.t==="time"?" s":""):""})),unit);
@@ -4106,7 +4223,7 @@ function weeklySets(){
 }
 const SVGNS="http://www.w3.org/2000/svg";
 function niceTicks(min,max,n=4){const span=max-min||1,step0=span/n,mag=Math.pow(10,Math.floor(Math.log10(step0))),err=step0/mag,step=(err>=7.5?10:err>=3.5?5:err>=1.5?2:1)*mag;const lo=Math.floor(min/step)*step,hi=Math.ceil(max/step)*step;const t=[];for(let v=lo;v<=hi+1e-9;v+=step)t.push(+v.toFixed(6));return t}
-function lineChart(el,data,unit,noRec){
+function lineChart(el,data,unit,noRec,opt){
   const W=340,H=200,m={l:36,r:14,t:16,b:26};
   if(data.length<2){el.innerHTML=`<p class="note">Serve almeno una seconda seduta per disegnare la linea. Per ora: ${data[0]?fk(Math.round(data[0].y*10)/10)+" "+unit:"—"}.</p>`;return}
   const ys=data.map(d=>d.y),ticks=niceTicks(Math.min(...ys)*0.97,Math.max(...ys)*1.02);
@@ -4122,11 +4239,15 @@ function lineChart(el,data,unit,noRec){
  ${phaseBands(new Date(x0),new Date(x1)).map(b=>`<rect x="${X(b.a).toFixed(1)}" y="${m.t}" width="${(X(b.b)-X(b.a)).toFixed(1)}" height="${H-m.t-m.b}" style="fill:${PH[b.ph].col};opacity:.12"/><text x="${(X(b.a)+3).toFixed(1)}" y="${m.t+10}" font-size="11" font-weight="700" style="fill:${PH[b.ph].col}">${PH[b.ph].n}</text>`).join("")}
    ${data.map(d=>d.dl?`<rect x="${X(d.x)-9}" y="${m.t}" width="18" height="${H-m.t-m.b}" rx="4" style="fill:var(--pad);opacity:.14"/>`:"").join("")}
    <path d="${area}" fill="url(#ga)"/>
-   <path d="${path}" fill="none" style="stroke:var(--hot)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-   ${(()=>{const bi=ys.lastIndexOf(Math.max(...ys));return data.map((d,i)=>{const hi=i===data.length-1||i===bi;return `<circle cx="${X(d.x)}" cy="${Y(d.y)}" r="${hi?5.5:3.5}" style="fill:${hi?"var(--hot)":"var(--bg)"};stroke:var(--hot)" stroke-width="2"/>`}).join("")+`<text x="${Math.min(Math.max(X(data[bi].x),m.l+20),W-m.r-20)}" y="${Math.max(Y(data[bi].y)-11,10)}" text-anchor="middle" font-size="12" font-weight="800" style="fill:var(--fg);paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">${noRec?"":"Record"}</text>`})()}
+   <path d="${data.slice(0,-1).map((d,i)=>(i?"L":"M")+X(d.x).toFixed(1)+" "+Y(d.y).toFixed(1)).join(" ")}" fill="none" style="stroke:var(--hot)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+   <path class="lc-seg" d="M${X(data[data.length-2].x).toFixed(1)} ${Y(data[data.length-2].y).toFixed(1)} L${X(data[data.length-1].x).toFixed(1)} ${Y(data[data.length-1].y).toFixed(1)}" pathLength="1" stroke-dasharray="1" fill="none" style="stroke:var(--hot)" stroke-width="2" stroke-linecap="round"/>
+   ${(()=>{const bi=ys.lastIndexOf(Math.max(...ys));return data.map((d,i)=>{const hi=i===data.length-1||i===bi;return `<circle cx="${X(d.x)}" cy="${Y(d.y)}" r="${hi?5.5:3.5}" style="fill:${hi?"var(--hot)":"var(--bg)"};stroke:var(--hot)" stroke-width="2"${i===data.length-1?' class="lc-dot"':""}/>`}).join("")+`<text x="${Math.min(Math.max(X(data[bi].x),m.l+20),W-m.r-20)}" y="${Math.max(Y(data[bi].y)-11,10)}" text-anchor="middle" font-size="12" font-weight="800" style="fill:var(--fg);paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">${noRec?"":"Record"}</text>`})()}
    <line id="xh" y1="${m.t}" y2="${H-m.b}" stroke="#8b97a6" stroke-width="1" stroke-dasharray="3 3" visibility="hidden"/>
    <rect x="${m.l}" y="0" width="${W-m.l-m.r}" height="${H}" fill="transparent" id="hit"/>
   </svg><div class="tip" hidden></div>`;
+  if(opt&&opt.fx&&!RM()){const dot=el.querySelector(".lc-dot"),seg=el.querySelector(".lc-seg");
+   if(dot){dot.style.transformBox="fill-box";dot.style.transformOrigin="center";dot.animate([{transform:"translateY(-36px)",opacity:0},{transform:"none",opacity:1}],{duration:460,delay:200,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"})}
+   if(seg)seg.animate([{strokeDashoffset:1},{strokeDashoffset:0}],{duration:380,delay:560,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"})}
   const svg=el.querySelector("svg"),tip=el.querySelector(".tip"),xh=el.querySelector("#xh");
   const show=ev=>{const r=svg.getBoundingClientRect(),px=(ev.clientX-r.left)*W/r.width;let bi=0,bd=1e9;data.forEach((d,i)=>{const dd=Math.abs(X(d.x)-px);if(dd<bd){bd=dd;bi=i}});
     const d=data[bi];xh.setAttribute("x1",X(d.x));xh.setAttribute("x2",X(d.x));xh.setAttribute("visibility","visible");
