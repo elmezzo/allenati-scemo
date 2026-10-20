@@ -2639,12 +2639,17 @@ const WARMUP={up:[["Rotazioni delle braccia avanti e indietro","30 s"],["Band pu
   legs:[["Cyclette o corsa leggera","3 min"],["Squat a corpo libero","10"],["Affondi camminati","6 per lato"],["Ponte glutei","10"],["Saltelli sulle caviglie","20 s"]]};
 function warmupHTML(g,P,dr,dn){if(dn>0||dr.wu)return"";const L=WARMUP[P.legs?"legs":"up"];
   return `<details class="card wu"><summary><span class="wut"><h3>Riscaldamento</h3><small>5 min · ${L.length} esercizi</small></span><span class="wub"><button class="btn" data-wu="1">Fatto</button><button class="btn ghost" data-wu="0">Salta</button></span></summary><ol>${L.map(([n,d])=>`<li><span>${esc(n)}</span><em>${esc(d)}</em></li>`).join("")}</ol></details>`}
-// Avvicinamento: sul primo multiarticolare della seduta e sul primo esercizio di petto e di schiena (anche varianti, piani propri e seduta libera)
-const rampMu=e=>{const sd=STD[(e.n||"").trim().toLowerCase()],m=sd?sd.m[0]:VOLMU[e.mu||muOf(e.id)];return m==="petto"||m==="dorso"?m:null};
+// Avvicinamento: sul primo esercizio di petto e di schiena, sul primo multiarticolare di quadricipiti e di catena posteriore (squat, stacco rumeno)
+// e sul primo multiarticolare degli altri muscoli (anche varianti, piani propri e seduta libera)
+// Nomi fuori tabella (piani propri) con muscolo Gambe: gruppo dedotto dal nome
+const legGrp=n=>/stacco|deadlift|good morning|hip thrust|rdl|ponte/i.test(n)?"femorali":/squat|pressa|leg press|affond|split|step-up|lunge/i.test(n)?"quadricipiti":null;
+const rampMu=e=>{const sd=STD[(e.n||"").trim().toLowerCase()],mu=e.mu||muOf(e.id),m=sd?sd.m[0]:mu==="Gambe"?legGrp(e.n||""):VOLMU[mu];
+  if(m==="petto"||m==="dorso")return ["comp","iso","bw"].includes(e.t)?m:null;
+  return e.t!=="comp"?null:m==="quadricipiti"?"quad":m==="femorali"||m==="glutei"?"post":null};
 function rampOn(g,ex,mods){if(mods.has("deload"))return false;const L=PLAN[g].ex.map(e=>effEx(g,e)).filter(e=>setsFor(e,mods)>0);
-  const m=["comp","iso","bw"].includes(ex.t)?rampMu(ex):null;
-  // Petto e schiena: solo il primo dei due muscoli, così non si scalda due volte lo stesso muscolo
-  if(!m&&L.find(e=>e.t==="comp")?.id===ex.id)return true;return !!m&&L.find(e=>["comp","iso","bw"].includes(e.t)&&rampMu(e)===m)?.id===ex.id}
+  const m=rampMu(ex);
+  // Un gruppo muscolare si scalda una volta sola: il primo esercizio del gruppo; il primo multiarticolare senza gruppo (es. landmine press) lo prende comunque
+  if(!m&&L.find(e=>e.t==="comp")?.id===ex.id)return true;return !!m&&L.find(e=>rampMu(e)===m)?.id===ex.id}
 // Serie di avvicinamento proposte: [{kg,reps}], carichi sotto quello di lavoro e arrotondati all'attrezzo
 function rampSets(ex,tg){const step=isCable(ex)?stepOf(ex):(EQS.find(q=>q[0]===eqOf(ex))||[])[2]||ex.step||2.5,top=tg.kg||0,out=[],seen=new Set();
   // Trazioni e dip: kg = zavorra, quindi si parte dal corpo libero
@@ -3117,6 +3122,9 @@ const doneCount=(g,id)=>(draftFor(g).ex[id]||[]).filter(x=>x.done).length+((draf
 function exDone(g,ex,mods){const n=setsFor(ex,mods);if(n===0)return true;if(doneCount(g,ex.id)<n)return false;
   const r=(draftFor(g).ex[ex.id]||[])[n-1];return !(r&&r.done&&Array.isArray(r.myo)&&!r.myoEnd)}
 const noEff=ex=>["perf","time","nordic"].includes(ex.t);
+// Voto dell'ultima serie: sempre modificabile (resta acceso fino alla prossima spunta e nella scheda dell'esercizio finito)
+const EFFS=[["easy","Facile (3+)"],["ok","Giusta"],["hard","Al limite"]],EFFL={easy:"Facile",ok:"Giusta",hard:"Al limite"};
+const effSeg=(id,cur)=>`<div class="seg" role="group" aria-label="Com'era l'ultima serie">${EFFS.map(([v,l])=>`<button data-ex="${id}" data-eff="${v}" aria-pressed="${cur===v}">${l}</button>`).join("")}</div>`;
 function renderTrain(){
   const hadFin=!!document.getElementById("finish");
   const g=currentGym(),P=PLAN[g],mc=modsCtx(g),a=mc.a;
@@ -3138,9 +3146,10 @@ function renderTrain(){
     if(mods.has("prePadel")&&ex.t==="prev"&&!shownPost&&dc<n&&n>0){nextH.push(`<p class="grp">Dopo il padel</p>`);shownPost=true}
     if(n===0){nextH.push(`<div class="xrow off"><span class="ck o">–</span><span class="xb"><span class="nm">${esc(ex.n)}</span><em>salta oggi</em></span></div>`);return}
     if(dc>=n){
-      html=`<button class="xrow done" data-open="${ex.id}"><span class="ck">✓</span><span class="xb"><span class="nmw"><span class="nm">${esc(ex.n)}</span>${qmark(ex)}</span><em>${dc}/${n}</em></span></button>`;doneH.push(html);
-      const ef=(dr.eff||{})[ex.id],skip=(dr.effSkip||{})[ex.id];
-      if(!ef&&!skip&&!noEff(ex)&&!mods.has("deload")&&dr.lastDone===ex.id)askH.push(`<div class="ask"><div class="t"><span>${esc(ex.n)}: com'era l'ultima serie?</span><button data-effskip="${ex.id}" aria-label="Salta la domanda">✕</button></div><div class="seg">${[["easy","Facile (3+)"],["ok","Giusta"],["hard","Al limite"]].map(([v,l])=>`<button data-ex="${ex.id}" data-eff="${v}">${l}</button>`).join("")}</div></div>`);
+      const ef=(dr.eff||{})[ex.id],skip=(dr.effSkip||{})[ex.id],eAt=(dr.effAt||{})[ex.id];
+      html=`<button class="xrow done" data-open="${ex.id}"><span class="ck">✓</span><span class="xb"><span class="nmw"><span class="nm">${esc(ex.n)}</span>${qmark(ex)}</span><em>${dc}/${n}${ef&&!noEff(ex)?" · "+EFFL[ef]:""}</em></span></button>`;doneH.push(html);
+      // Dopo il voto la domanda resta (con la scelta segnata) finché non spunti un'altra serie: un tocco sbagliato si corregge subito
+      if((!ef||(eAt&&!(dr.last>eAt)))&&!skip&&!noEff(ex)&&!mods.has("deload")&&dr.lastDone===ex.id)askH.push(`<div class="ask"><div class="t"><span>${esc(ex.n)}: ${ef?"ultima serie":"com'era l'ultima serie?"}</span><button data-effskip="${ex.id}" aria-label="${ef?"Chiudi":"Salta la domanda"}">✕</button></div>${effSeg(ex.id,ef)}</div>`);
       return;
     }
     const tg=tgFor(ex,mods,g),rng=(ex.lo===ex.hi?ex.lo:ex.lo+"-"+ex.hi)+(ex.t==="time"?" s":"");
@@ -3186,9 +3195,11 @@ function renderTrain(){
   document.querySelectorAll("#exs [data-pain]").forEach(b=>b.onclick=()=>{const y=b.getBoundingClientRect().top,id=b.dataset.pain;togglePain(id);renderTrain();const nb=document.querySelector(`#exs [data-pain="${id}"]`);if(nb)window.scrollBy(0,nb.getBoundingClientRect().top-y)});
   document.querySelectorAll("#exs [data-painswap]").forEach(b=>b.onclick=()=>openSwap(g,b.dataset.painswap));
   document.querySelectorAll("#exs [data-open]").forEach(b=>b.onclick=()=>openExVT(g,b.dataset.open));
-  document.querySelectorAll("#exs [data-eff]").forEach(b=>b.onclick=()=>{const d=draftFor(g);d.eff=d.eff||{};d.eff[b.dataset.ex]=b.dataset.eff;
+  document.querySelectorAll("#exs [data-eff]").forEach(b=>b.onclick=()=>{const d=draftFor(g);d.eff=d.eff||{};const was=d.eff[b.dataset.ex];if(was===b.dataset.eff)return;d.eff[b.dataset.ex]=b.dataset.eff;d.effAt=d.effAt||{};d.effAt[b.dataset.ex]=Date.now();buzz(8);
     const ex=PLAN[g].ex.map(e=>effEx(g,e)).find(e=>e.id===b.dataset.ex)||exById(b.dataset.ex);
-    if(b.dataset.eff==="hard"&&(ex.t==="comp"||ex.t==="bw")&&S.adrest!==false&&tOn&&tEnd>Date.now()&&!(d.restPlus||{})[ex.id]){d.restPlus=d.restPlus||{};d.restPlus[ex.id]=1;tEnd+=30000;tTot+=30;tPlus+=30;if(S.timer){S.timer.end=tEnd;S.timer.tot=tTot;S.timer.plus=tPlus}save();T("tlbl").textContent="Recupero · "+tLbl+" · +"+tPlus+"\u00a0s"}
+    // Cambiato idea su "Al limite": tolti i 30 s di recupero in più
+    if(was==="hard"&&(d.restPlus||{})[ex.id]){delete d.restPlus[ex.id];if(tOn&&tEnd>Date.now()&&tCtx&&tCtx.ex===ex.id){tEnd-=30000;tTot-=30;tPlus=Math.max(0,tPlus-30);if(S.timer){S.timer.end=tEnd;S.timer.tot=tTot;S.timer.plus=tPlus}T("tlbl").textContent="Recupero · "+tLbl+(tPlus?" · +"+tPlus+"\u00a0s":"")}}
+    if(b.dataset.eff==="hard"&&(ex.t==="comp"||ex.t==="bw")&&S.adrest!==false&&tOn&&tEnd>Date.now()&&tCtx&&tCtx.ex===ex.id&&!(d.restPlus||{})[ex.id]){d.restPlus=d.restPlus||{};d.restPlus[ex.id]=1;tEnd+=30000;tTot+=30;tPlus+=30;if(S.timer){S.timer.end=tEnd;S.timer.tot=tTot;S.timer.plus=tPlus}save();T("tlbl").textContent="Recupero · "+tLbl+" · +"+tPlus+"\u00a0s"}
     save();renderTrain()});
   document.querySelectorAll("#exs [data-effskip]").forEach(b=>b.onclick=()=>{const d=draftFor(g);d.effSkip=d.effSkip||{};d.effSkip[b.dataset.effskip]=1;save();renderTrain()});
   const rp=document.querySelector("#restIn [data-tp]");if(rp)rp.onclick=()=>{if(!tFresh())addRest()};
@@ -3373,6 +3384,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
     ${stallTxt}
         <div class="sets">${wpH}<div class="set sethd" aria-hidden="true"><span></span><span>${hasKg?"kg":""}</span><span>${unit}</span><span></span></div>${sets}</div>
     ${rest}<!--ASK-->
+    ${n>0&&fN>=n&&exDone(g,ex,mods)&&!noEff(ex)&&!mods.has("deload")?`<div class="ask effc"><div class="t"><span>Com'era l'ultima serie?</span></div>${effSeg(ex.id,(dr.eff||{})[ex.id])}</div>`:""}
     ${painWarn(ex,base)}
     <details class="more" data-more="${ex.id}" ${moreOpen.has(ex.id)?"open":""}><summary>${I("info")} Altro<span>${errOf(ex)?"errori, ":""}fastidio, superserie, ultima volta</span></summary><div>${ex.note?`<p class="note">${esc(ex.note)}</p>`:""}${errOf(ex)?`<div class="errs"><b>Errori da evitare</b><ul>${errOf(ex).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}<p class="last">${lastTxt}</p>
     ${hasKg&&!(setupOf(ex)||eqLbl(ex))?setupHTML(ex):""}
