@@ -3406,7 +3406,7 @@ function rampTick(g,exId,k){const tk="r|"+exId+"|"+k,tn=performance.now(),dt=tn-
         e.style.viewTransitionName=on?n:"";e.style.viewTransitionClass=on&&cl?cl:""})};
     const skip=new Set([exId]);nameEx(true,skip);nm(true);
     // il timer in basso (appena partito) si decide a piega finita: durante la transizione le righe con nome gli passerebbero sopra
-    const tm=T("timer");tm.hidden=true;tm.classList.remove("enter");tHold=true;
+    const tm=T("timer");if(tm.hidden||tm.classList.contains("enter")){tm.hidden=true;tm.classList.remove("enter");tHold=true}
     const t=vtRun("vt-wf",()=>{renderTrain();keepFocus(false,exId);nameEx(true,skip);nm(true)});t.finished.finally(()=>{nm(false);nameEx(false);tHold=false;if(tOn)syncTimer(0)})}
   else{renderTrain();keepFocus(false,exId)}
   if(tOn)setTimeout(tick,510);
@@ -4255,15 +4255,15 @@ function lineChart(el,data,unit,noRec,opt){
   const path=data.map((d,i)=>(i?"L":"M")+X(d.x).toFixed(1)+" "+Y(d.y).toFixed(1)).join(" ");
   // peso nuovo che cade: l'ultimo spicchio d'ombra entra dopo la linea (a parte), così l'area non arriva prima del punto
   const fx=!!(opt&&opt.fx&&!RM()),aOf=a=>a.map((d,i)=>(i?"L":"M")+X(d.x).toFixed(1)+" "+Y(d.y).toFixed(1)).join(" ")+` L${X(a[a.length-1].x).toFixed(1)} ${Y(y0)} L${X(a[0].x).toFixed(1)} ${Y(y0)} Z`;
-  const area=fx?aOf(data.slice(0,-1)):aOf(data),wedge=fx?aOf(data.slice(-2)):"";
+  const area=fx?aOf(data.slice(0,-1)):aOf(data),wedge=fx?aOf(data.slice(-2)):"",gid="ga-"+(el.id||"c");
   const xl=[data[0],data[Math.floor((data.length-1)/2)],data[data.length-1]].filter((d,i,a)=>a.indexOf(d)===i);
   el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Andamento in ${unit}">
-   <defs><linearGradient id="ga" gradientUnits="userSpaceOnUse" x1="0" y1="${Y(Math.max(...ys)).toFixed(1)}" x2="0" y2="${Y(y0).toFixed(1)}"><stop offset="0" style="stop-color:var(--hot);stop-opacity:.28"/><stop offset="1" style="stop-color:var(--hot);stop-opacity:0"/></linearGradient></defs>
+   <defs><linearGradient id="${gid}" gradientUnits="userSpaceOnUse" x1="0" y1="${Y(Math.max(...ys)).toFixed(1)}" x2="0" y2="${Y(y0).toFixed(1)}"><stop offset="0" style="stop-color:var(--hot);stop-opacity:.28"/><stop offset="1" style="stop-color:var(--hot);stop-opacity:0"/></linearGradient></defs>
    ${ticks.map(t=>`<line x1="${m.l}" x2="${W-m.r}" y1="${Y(t)}" y2="${Y(t)}" style="stroke:color-mix(in srgb,var(--line) 35%,transparent)" stroke-width="1"/><text x="${m.l-6}" y="${Y(t)+4}" text-anchor="end" font-size="12" style="fill:var(--muted)">${fk(t)}</text>`).join("")}
    ${xl.map(d=>`<text x="${X(d.x)}" y="${H-8}" text-anchor="middle" font-size="12" style="fill:var(--muted)">${fmtShort(d.x)}</text>`).join("")}
  ${phaseBands(new Date(x0),new Date(x1)).map(b=>`<rect x="${X(b.a).toFixed(1)}" y="${m.t}" width="${(X(b.b)-X(b.a)).toFixed(1)}" height="${H-m.t-m.b}" style="fill:${PH[b.ph].col};opacity:.12"/><text x="${(X(b.a)+3).toFixed(1)}" y="${m.t+10}" font-size="11" font-weight="700" style="fill:${PH[b.ph].col}">${PH[b.ph].n}</text>`).join("")}
    ${data.map(d=>d.dl?`<rect x="${X(d.x)-9}" y="${m.t}" width="18" height="${H-m.t-m.b}" rx="4" style="fill:var(--pad);opacity:.14"/>`:"").join("")}
-   <path d="${area}" fill="url(#ga)"/>${wedge?`<path class="lc-wedge" d="${wedge}" fill="url(#ga)"/>`:""}
+   <path d="${area}" fill="url(#${gid})"/>${wedge?`<path class="lc-wedge" d="${wedge}" fill="url(#${gid})"/>`:""}
    <path d="${data.slice(0,-1).map((d,i)=>(i?"L":"M")+X(d.x).toFixed(1)+" "+Y(d.y).toFixed(1)).join(" ")}" fill="none" style="stroke:var(--hot)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
    <path class="lc-seg" d="M${X(data[data.length-2].x).toFixed(1)} ${Y(data[data.length-2].y).toFixed(1)} L${X(data[data.length-1].x).toFixed(1)} ${Y(data[data.length-1].y).toFixed(1)}" pathLength="1" stroke-dasharray="1" fill="none" style="stroke:var(--hot)" stroke-width="2" stroke-linecap="round"/>
    ${(()=>{const bi=ys.lastIndexOf(Math.max(...ys));return data.map((d,i)=>{const hi=i===data.length-1||i===bi;return `<circle cx="${X(d.x)}" cy="${Y(d.y)}" r="${hi?5.5:3.5}" style="fill:${hi?"var(--hot)":"var(--bg)"};stroke:var(--hot)" stroke-width="2"${i===data.length-1?' class="lc-dot"':""}/>`}).join("")+`<text x="${Math.min(Math.max(X(data[bi].x),m.l+20),W-m.r-20)}" y="${Math.max(Y(data[bi].y)-11,10)}" text-anchor="middle" font-size="12" font-weight="800" style="fill:var(--fg);paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">${noRec?"":"Record"}</text>`})()}
