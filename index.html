@@ -3057,6 +3057,9 @@ const doneCount=(g,id)=>(draftFor(g).ex[id]||[]).filter(x=>x.done).length+((draf
 function exDone(g,ex,mods){const n=setsFor(ex,mods);if(n===0)return true;if(doneCount(g,ex.id)<n)return false;
   const r=(draftFor(g).ex[ex.id]||[])[n-1];return !(r&&r.done&&Array.isArray(r.myo)&&!r.myoEnd)}
 const noEff=ex=>["perf","time","nordic"].includes(ex.t);
+// Voto dell'ultima serie: sempre modificabile (resta acceso fino alla prossima spunta e nella scheda dell'esercizio finito)
+const EFFS=[["easy","Facile (3+)"],["ok","Giusta"],["hard","Al limite"]],EFFL={easy:"Facile",ok:"Giusta",hard:"Al limite"};
+const effSeg=(id,cur)=>`<div class="seg" role="group" aria-label="Com'era l'ultima serie">${EFFS.map(([v,l])=>`<button data-ex="${id}" data-eff="${v}" aria-pressed="${cur===v}">${l}</button>`).join("")}</div>`;
 function renderTrain(){
   const hadFin=!!document.getElementById("finish");
   const g=currentGym(),P=PLAN[g],mc=modsCtx(g),a=mc.a;
@@ -3078,9 +3081,10 @@ function renderTrain(){
     if(mods.has("prePadel")&&ex.t==="prev"&&!shownPost&&dc<n&&n>0){nextH.push(`<p class="grp">Dopo il padel</p>`);shownPost=true}
     if(n===0){nextH.push(`<div class="xrow off"><span class="ck o">–</span><span class="xb"><span class="nm">${esc(ex.n)}</span><em>salta oggi</em></span></div>`);return}
     if(dc>=n){
-      html=`<button class="xrow done" data-open="${ex.id}"><span class="ck">✓</span><span class="xb"><span class="nmw"><span class="nm">${esc(ex.n)}</span>${qmark(ex)}</span><em>${dc}/${n}</em></span></button>`;doneH.push(html);
-      const ef=(dr.eff||{})[ex.id],skip=(dr.effSkip||{})[ex.id];
-      if(!ef&&!skip&&!noEff(ex)&&!mods.has("deload")&&dr.lastDone===ex.id)askH.push(`<div class="ask"><div class="t"><span>${esc(ex.n)}: com'era l'ultima serie?</span><button data-effskip="${ex.id}" aria-label="Salta la domanda">✕</button></div><div class="seg">${[["easy","Facile (3+)"],["ok","Giusta"],["hard","Al limite"]].map(([v,l])=>`<button data-ex="${ex.id}" data-eff="${v}">${l}</button>`).join("")}</div></div>`);
+      const ef=(dr.eff||{})[ex.id],skip=(dr.effSkip||{})[ex.id],eAt=(dr.effAt||{})[ex.id];
+      html=`<button class="xrow done" data-open="${ex.id}"><span class="ck">✓</span><span class="xb"><span class="nmw"><span class="nm">${esc(ex.n)}</span>${qmark(ex)}</span><em>${dc}/${n}${ef&&!noEff(ex)?" · "+EFFL[ef]:""}</em></span></button>`;doneH.push(html);
+      // Dopo il voto la domanda resta (con la scelta segnata) finché non spunti un'altra serie: un tocco sbagliato si corregge subito
+      if((!ef||(eAt&&!(dr.last>eAt)))&&!skip&&!noEff(ex)&&!mods.has("deload")&&dr.lastDone===ex.id)askH.push(`<div class="ask"><div class="t"><span>${esc(ex.n)}: ${ef?"ultima serie":"com'era l'ultima serie?"}</span><button data-effskip="${ex.id}" aria-label="${ef?"Chiudi":"Salta la domanda"}">✕</button></div>${effSeg(ex.id,ef)}</div>`);
       return;
     }
     const tg=tgFor(ex,mods,g),rng=(ex.lo===ex.hi?ex.lo:ex.lo+"-"+ex.hi)+(ex.t==="time"?" s":"");
@@ -3125,8 +3129,10 @@ function renderTrain(){
   document.querySelectorAll("#exs [data-pain]").forEach(b=>b.onclick=()=>{const y=b.getBoundingClientRect().top,id=b.dataset.pain;togglePain(id);renderTrain();const nb=document.querySelector(`#exs [data-pain="${id}"]`);if(nb)window.scrollBy(0,nb.getBoundingClientRect().top-y)});
   document.querySelectorAll("#exs [data-painswap]").forEach(b=>b.onclick=()=>openSwap(g,b.dataset.painswap));
   document.querySelectorAll("#exs [data-open]").forEach(b=>b.onclick=()=>openExVT(g,b.dataset.open));
-  document.querySelectorAll("#exs [data-eff]").forEach(b=>b.onclick=()=>{const d=draftFor(g);d.eff=d.eff||{};d.eff[b.dataset.ex]=b.dataset.eff;
+  document.querySelectorAll("#exs [data-eff]").forEach(b=>b.onclick=()=>{const d=draftFor(g);d.eff=d.eff||{};const was=d.eff[b.dataset.ex];if(was===b.dataset.eff)return;d.eff[b.dataset.ex]=b.dataset.eff;d.effAt=d.effAt||{};d.effAt[b.dataset.ex]=Date.now();buzz(8);
     const ex=PLAN[g].ex.map(e=>effEx(g,e)).find(e=>e.id===b.dataset.ex)||exById(b.dataset.ex);
+    // Cambiato idea su "Al limite": tolti i 30 s di recupero in più
+    if(was==="hard"&&(d.restPlus||{})[ex.id]){delete d.restPlus[ex.id];if(tOn&&tEnd>Date.now()){tEnd-=30000;tTot-=30;tPlus=Math.max(0,tPlus-30);if(S.timer){S.timer.end=tEnd;S.timer.tot=tTot;S.timer.plus=tPlus}T("tlbl").textContent="Recupero · "+tLbl+(tPlus?" · +"+tPlus+"\u00a0s":"")}}
     if(b.dataset.eff==="hard"&&(ex.t==="comp"||ex.t==="bw")&&S.adrest!==false&&tOn&&tEnd>Date.now()&&!(d.restPlus||{})[ex.id]){d.restPlus=d.restPlus||{};d.restPlus[ex.id]=1;tEnd+=30000;tTot+=30;tPlus+=30;if(S.timer){S.timer.end=tEnd;S.timer.tot=tTot;S.timer.plus=tPlus}save();T("tlbl").textContent="Recupero · "+tLbl+" · +"+tPlus+"\u00a0s"}
     save();renderTrain()});
   document.querySelectorAll("#exs [data-effskip]").forEach(b=>b.onclick=()=>{const d=draftFor(g);d.effSkip=d.effSkip||{};d.effSkip[b.dataset.effskip]=1;save();renderTrain()});
@@ -3309,6 +3315,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
     ${stallTxt}
         <div class="sets"><div class="set sethd" aria-hidden="true"><span></span><span>${hasKg?"kg":""}</span><span>${unit}</span><span></span></div>${sets}</div>
     ${rest}<!--ASK-->
+    ${n>0&&fN>=n&&!noEff(ex)&&!mods.has("deload")?`<div class="ask effc"><div class="t"><span>Com'era l'ultima serie?</span></div>${effSeg(ex.id,(dr.eff||{})[ex.id])}</div>`:""}
     ${painWarn(ex,base)}
     <details class="more" data-more="${ex.id}" ${moreOpen.has(ex.id)?"open":""}><summary>${I("info")} Altro<span>${errOf(ex)?"errori, ":""}fastidio, superserie, ultima volta</span></summary><div>${ex.note?`<p class="note">${esc(ex.note)}</p>`:""}${errOf(ex)?`<div class="errs"><b>Errori da evitare</b><ul>${errOf(ex).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}<p class="last">${lastTxt}</p>
     ${hasKg&&!(setupOf(ex)||eqLbl(ex))?setupHTML(ex):""}
