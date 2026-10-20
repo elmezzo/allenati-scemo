@@ -1732,7 +1732,9 @@ html.vt-back::view-transition-group(sed),html.vt-back::view-transition-group(sed
 ::view-transition-old(*.vx){animation:vtOut .16s var(--ease-out) both}
 ::view-transition-new(*.vx){animation:vtIn .16s var(--ease-out) both}
 html[data-skin="manga"]::view-transition-group(*.vx){border-radius:0}
-html.vt-ex nav.bar{view-transition-name:bar}
+html.vt-ex nav.bar,html.vt-wf nav.bar,html.vt-swap nav.bar{view-transition-name:bar}
+html.vt-ex .thead,html.vt-wf .thead,html.vt-swap .thead{view-transition-name:thd}
+html.vt-ex #timer,html.vt-wf #timer,html.vt-swap #timer{view-transition-name:tmr}
 html.vt-ex::view-transition-old(root){animation:vtOut .14s var(--ease-out) both}
 html.vt-ex::view-transition-new(root){animation:vtIn .14s var(--ease-out) both}
 /* 2 e 4. Fogli che si aprono dall'elemento toccato (Termina e salva -> riepilogo, muscolo -> dettaglio, seduta fatta -> riepilogo) */
@@ -1887,7 +1889,9 @@ html.vt-swap::view-transition-new(root){animation:vtIn .14s var(--ease-out) both
 .wpill{display:flex;align-items:center;gap:8px;width:100%;min-height:44px;padding:8px 12px;margin:2px 0;border-radius:12px;border:1px solid color-mix(in srgb,var(--go) 45%,transparent);background:color-mix(in srgb,var(--go) 12%,transparent);color:var(--fg);font:inherit;text-align:left;cursor:pointer}
 .wpill .i{font-weight:800;color:var(--muted);width:18px;text-align:center}
 .wpill b{font-weight:700}
-.wpill .wn{color:var(--muted);font-size:max(13px,.7647rem)}
+.wpill .wn{color:var(--muted);font-size:max(13px,.7647rem);white-space:nowrap}
+.wpill b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wpill .wck{flex:none}
 .wpill .wck{margin-left:auto;color:var(--go);font-weight:800}
 html[data-skin="manga"] .wpill{border-radius:0;border:2px solid var(--fg)}
 html[data-skin="lavagna"] .wpill{border-radius:4px}
@@ -2662,7 +2666,7 @@ function bodySheet(after){const L=bodyLast(),k=iso(today()),cur=S.body.find(x=>x
    bind:(w,draw,close)=>{w.querySelector("#bSave").onclick=()=>{const v=id=>{const x=num(w.querySelector(id).value.replace(",","."));return x!=null&&x>0?x:null};
      const e={d:k,kg:v("#bKg"),arm:v("#bArm"),chest:v("#bChest"),waist:v("#bWaist")};
      if(e.kg==null&&e.arm==null&&e.chest==null&&e.waist==null){const m=w.querySelector("#bMsg");m.className="msg err";m.textContent="Scrivi almeno il peso o una misura.";return}
-     Object.keys(e).forEach(x=>e[x]==null&&delete e[x]);S.body=S.body.filter(x=>x.d!==k);S.body.push(e);if(e.kg!=null)bodyFx=k;save();close();after&&after()}}})}
+     Object.keys(e).forEach(x=>e[x]==null&&delete e[x]);S.body=S.body.filter(x=>x.d!==k);S.body.push(e);if(e.kg!=null&&e.kg!==cur.kg)bodyFx=k;save();close();after&&after()}}})}
 // Peso nuovo: il punto cade sul grafico e la linea lo raggiunge (solo se è l'ultimo punto)
 let bodyFx=null;
 function bodyBanner(){const L=S.body.filter(x=>x.kg!=null).sort((a,b)=>b.d.localeCompare(a.d))[0];if(L&&daysAgo(L.d)<7)return"";if(S.bodySnooze&&S.bodySnooze>=iso(today()))return"";
@@ -2704,8 +2708,8 @@ function summarySheet(sess){
   const st=sessStats(sess),others=S.sessions.filter(x=>x.id!==sess.id),ups=rankUps(sess);
   const prev=others.filter(x=>x.day===sess.day&&x.date<sess.date).sort((a,b)=>b.date.localeCompare(a.date))[0];
   // Record = le serie che hanno avuto il timbro PR (stessa regola: +2%, niente salti/tenute/Nordic, niente serie PIPPA); sedute vecchie senza timbri: stessa soglia sul massimale
-  const recs=[];for(const id in sess.sets){const e=exById(id),now=bestIn(sess,id),pb=Math.max(0,...others.map(x=>bestIn(x,id))),st=sess.sets[id].filter(x=>x.pr);
-    if(sess.prv?st.length:!noEff(e)&&pb>0&&now>=pb*PR_MIN-1e-9){const kg=e.t==="bw"||sess.sets[id].some(x=>num(x.kg)>0)&&!["time","perf","nordic"].includes(e.t);recs.push(`<li><span>${esc((sess.names&&sess.names[id])||e.n)}</span><em data-a="${Math.round(pb*10)/10}" data-z="${Math.round(now*10)/10}" data-u="${kg?"kg":e.t==="time"?"s":"rip"}">${fk(Math.round(now*10)/10)} ${kg?"kg":e.t==="time"?"s":"rip"}</em></li>`)}}
+  const recs=[];for(const id in sess.sets){const e=exById(id),now=bestIn(sess,id),pb=Math.max(0,...others.map(x=>bestIn(x,id))),pa=Math.max(0,...others.filter(x=>x.date<sess.date||x.date===sess.date&&S.sessions.indexOf(x)<S.sessions.indexOf(sess)).map(x=>bestIn(x,id))),st=sess.sets[id].filter(x=>x.pr);
+    if(sess.prv?st.length:!noEff(e)&&pb>0&&now>=pb*PR_MIN-1e-9){const kg=e.t==="bw"||sess.sets[id].some(x=>num(x.kg)>0)&&!["time","perf","nordic"].includes(e.t);recs.push(`<li><span>${esc((sess.names&&sess.names[id])||e.n)}</span><em data-a="${Math.round(pa*10)/10}" data-z="${Math.round(now*10)/10}" data-u="${kg?"kg":e.t==="time"?"s":"rip"}">${fk(Math.round(now*10)/10)} ${kg?"kg":e.t==="time"?"s":"rip"}</em></li>`)}}
   let cmp="";
   if(prev){const ps=sessStats(prev),dv=ps.vol?Math.round((st.vol-ps.vol)/ps.vol*100):null;let up=0,com=0;
     for(const id in sess.sets)if(prev.sets[id]){com++;if(bestIn(sess,id)>bestIn(prev,id)+1e-9)up++}
@@ -2808,7 +2812,7 @@ function breakFermo(el){const shut=()=>{if(!el.isConnected)return;const h=el.off
   const L="polygon(0 0,52% 0,47% 36%,53% 62%,48% 100%,0 100%)",Rt="polygon(52% 0,100% 0,100% 100%,48% 100%,53% 62%,47% 36%)";
   const half=(cp,sx,rz,dy)=>{const c=el.cloneNode(true);c.classList.remove("fermo");c.setAttribute("aria-hidden","true");
     c.style.cssText=`position:absolute;left:${r.left-pr.left}px;top:${r.top-pr.top}px;width:${r.width}px;height:${r.height}px;margin:0;box-sizing:border-box;pointer-events:none;z-index:3;clip-path:${cp}`;p.appendChild(c);
-    c.animate([{transform:"none",opacity:1,easing:"cubic-bezier(.23,1,.32,1)"},{transform:`translateX(${sx*3}px) rotate(${sx*2}deg)`,opacity:1,offset:.2,easing:"cubic-bezier(.5,0,.75,0)"},{transform:`translate(${sx*16}px,${dy}px) rotate(${rz}deg)`,opacity:0}],{duration:720,fill:"forwards"}).finished.then(()=>c.remove(),()=>c.remove())};
+    c.animate([{transform:"none",opacity:1,easing:"cubic-bezier(.23,1,.32,1)"},{transform:`translateX(${sx*3}px) rotate(${sx*2}deg)`,opacity:1,offset:.2,easing:"cubic-bezier(.45,0,.55,1)"},{transform:`translate(${sx*16}px,${dy}px) rotate(${rz}deg)`,opacity:0}],{duration:720,fill:"forwards"}).finished.then(()=>c.remove(),()=>c.remove())};
   half(L,-1,-16,64);half(Rt,1,19,72);el.style.visibility="hidden";setTimeout(shut,520)}
 // Record a metà seduta: timbro "PR" sul carico della serie che ha battuto il massimale stimato (resta sulla serie, si anima solo al momento)
 function prStamp(exId,j){const t=document.querySelector(`#exs .tick[data-ex="${exId}"][data-j="${j}"]`),f=t&&t.closest(".set")&&t.closest(".set").querySelector(".field");if(!f)return;
@@ -3303,7 +3307,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   const rp=hasKg&&tg.kg!=null&&!pre&&rampOn(g,ex,mods)?rampSets(ex,tg).map((x,k)=>({...x,k,r:rR[k]||{}})).filter(x=>!wDone||x.r.done):[];
   // Tutte le righe A spuntate: si richiudono in una pillola (toccandola si riaprono)
   const wPill=rp.length&&rp.every(x=>x.r.done)&&!wOpen.has(ex.id);
-  const wpH=wPill?`<button class="wpill" data-wopen="${ex.id}" aria-label="Avvicinamento fatto, ${rp.length} ${rp.length===1?"serie":"serie"}. Tocca per rivederlo"><span class="i" aria-hidden="true">A</span><b>Avvicinamento</b><span class="wn">${rp.length} ${rp.length===1?"serie":"serie"}</span><span class="wck" aria-hidden="true">✓</span></button>`:"";
+  const wpH=wPill?`<button class="wpill" data-wopen="${ex.id}" aria-label="Avvicinamento fatto, ${rp.length} serie. Tocca per rivederlo"><span class="i" aria-hidden="true">A</span><b>Avvicinamento</b><span class="wn">${rp.length} serie</span><span class="wck" aria-hidden="true">✓</span></button>`:"";
   if(!wPill&&rp.length)sets+=`<p class="wcap">Avvicinamento</p>`;
   for(const {kg,reps,k,r} of (wPill?[]:rp)){const now=!wDone&&!r.done&&!nowSet;if(now)nowSet=true;
     const kgV=r.kg!=null&&r.kg!==""?r.kg:fk(kg),rpV=r.reps!=null&&r.reps!==""?r.reps:String(reps),fw=r.done?"label":"div";
@@ -3578,7 +3582,9 @@ function openSwap(g,baseId){
     const go=()=>{renderTrain();requestAnimationFrame(()=>keepFocus(false,nw))};
     if(nw===old||!vtOk()){go();return}
     // a foglio chiuso: la scheda vecchia esce di lato e la variante entra nello stesso posto; le altre schede si spostano invece di saltare
-    setTimeout(()=>{const oc=document.querySelector(`#exs article.ex[data-ex="${old}"]`);if(!oc){go();return}
+    // nei 240 ms la scheda vecchia è ancora lì ma il programma punta già alla variante: niente tocchi finché non è ridisegnata
+    const ls=document.getElementById("exs");if(ls)ls.inert=true;
+    setTimeout(()=>{if(ls)ls.inert=false;if(view!=="train")return;const oc=document.querySelector(`#exs article.ex[data-ex="${old}"]`);if(!oc||!ls||!ls.isConnected){go();return}
       const skip=new Set([old,nw]);nameEx(true,skip);oc.style.viewTransitionName="swp";
       const t=vtRun("vt-swap",()=>{oc.style.viewTransitionName="";renderTrain();keepFocus(false,nw);nameEx(true,skip);const nc=document.querySelector(`#exs article.ex[data-ex="${nw}"]`);if(nc)nc.style.viewTransitionName="swp"});
       t.finished.finally(()=>{nameEx(false);const nc=document.querySelector(`#exs article.ex[data-ex="${nw}"]`);if(nc)nc.style.viewTransitionName=""})},240)};
@@ -3659,8 +3665,9 @@ document.addEventListener("visibilitychange",()=>{if(H&&document.visibilityState
 
 let tCtx=null;
 function startTimer(sec,label,plus,end,ctx){tPlus=plus||0;tLbl=label;tCtx=ctx||null;tEnd=end||Date.now()+sec*1000;tTot=sec;S.timer={end:tEnd,tot:sec,lbl:label,plus:tPlus,ctx:tCtx};save();tWarn=sec<=10;tOn=true;T("tlbl").textContent="Recupero · "+label+(tPlus?" · +"+tPlus+"\u00a0s":"");T("timer").classList.remove("over");document.querySelectorAll(".tball").forEach(b=>b.remove());clearInterval(tInt);tick();tInt=setInterval(tick,250)}
-function tTxt(){const left=Math.round((tEnd-Date.now())/1000);let v=left;
-  if(tTw){const k=(performance.now()-tTw.t)/380;if(k>=1)tTw=null;else v=Math.round(tTw.a+(left-tTw.a)*(1-Math.pow(1-k,3)))}
+// secondi mostrati adesso (durante lo scorrimento del +15 s: il valore a metà strada, non quello d'arrivo)
+function tVal(){const left=Math.round((tEnd-Date.now())/1000);if(!tTw)return left;const k=(performance.now()-tTw.t)/380;if(k>=1){tTw=null;return left}return Math.round(tTw.a+(left-tTw.a)*(1-Math.pow(1-k,3)))}
+function tTxt(){const v=tVal();
   const a=Math.abs(v),txt=(v<0?"+":"")+Math.floor(a/60)+":"+String(a%60).padStart(2,"0");
   setNum(T("tval"),txt);const inl=document.getElementById("restIn");if(inl)setNum(inl.querySelector(".tv"),txt)}
 function tick(){if(!tOn)return;const left=Math.round((tEnd-Date.now())/1000);
@@ -3700,7 +3707,7 @@ function ringAnim(c,k,gw){const [r1,r2,rd]=ringParts(c);if(!rd)return;const [D,A
   if(A0>180){const of=(A0-180)/A0;r2.animate([{...rot(A0-180),opacity:1},{...rot(0),opacity:1,offset:of},{...rot(0),opacity:0,offset:Math.min(1,of+1e-4)},{...rot(0),opacity:0}],o);r1.animate([rot(180),{...rot(180),offset:of},rot(0)],o)}
   else r1.animate([rot(A0),rot(0)],o)}
 // Fine recupero: la prossima serie da fare si accende una volta (bordo che pulsa), così si vede da dove riprendere
-function cueNext(){const r=document.querySelector("#exs article.ex .set.now");if(!r)return;r.classList.remove("cue");void r.offsetWidth;r.classList.add("cue");clearTimeout(r._cue);r._cue=setTimeout(()=>r.classList.remove("cue"),1200)}
+function cueNext(){const r=(tCtx&&document.querySelector(`#exs article.ex[data-ex="${tCtx.ex}"] .set.now`))||document.querySelector("#exs article.ex .set.now");if(!r)return;r.classList.remove("cue");void r.offsetWidth;r.classList.add("cue");clearTimeout(r._cue);r._cue=setTimeout(()=>r.classList.remove("cue"),1200)}
 // +15 s: dall'angolo di prima a quello giusto in 320 ms (ease-out, a campioni), poi lineare fino a zero. Le due metà seguono l'angolo, con un punto esatto dove passa i 180°
 function ringGrow(c,k,Aa,D,A0){const [r1,r2,rd]=ringParts(c),G=320,AG=A0*(1-G/D),pts=[];
   for(let i=0;i<=10;i++){const u=i/10;pts.push([G*u,Aa+(AG-Aa)*(1-Math.pow(1-u,3))])}pts.push([D,0]);
@@ -3738,7 +3745,10 @@ function stopTimer(){clearInterval(tInt);tOn=false;
   document.querySelectorAll("#timer .tr,#restIn .rr").forEach(c=>{c._rk=null;clearTimeout(c._rz);c.querySelectorAll(".rh>b").forEach(e=>e.getAnimations().forEach(a=>a.cancel()))});document.querySelectorAll(".tball").forEach(b=>b.remove());if(S.timer){delete S.timer;save()}T("timer").hidden=true;const inl=document.getElementById("restIn");if(inl)inl.remove()}
 // +15 s: l'anello si riallunga in 0,32 s invece di saltare e il tempo scorre fino al valore nuovo
 let tGrow=null,tTw=null;
-function addRest(){const l0=Math.round((tEnd-Date.now())/1000),A0=ringA()[1];tEnd+=15000;tTot=Math.max(tTot,(tEnd-Date.now())/1000);
+// angolo dell'anello che si vede adesso (a metà di un +15 s non è quello calcolato): dal puntino della fine, con il giro intero risolto vicino al valore giusto
+function ringShown(){const A=ringA()[1],c=[...document.querySelectorAll("#timer .tr,#restIn .rr")].find(x=>x.getClientRects().length),rd=c&&c.querySelector(".rd>b");if(!rd)return A;
+  const m=new DOMMatrix(getComputedStyle(rd).transform);let a=Math.atan2(m.b,m.a)*180/Math.PI;if(a<0)a+=360;return Math.abs(a+360-A)<Math.abs(a-A)?a+360:a}
+function addRest(){const l0=Math.max(0,tVal()),A0=Math.min(360,ringShown());tEnd+=15000;tTot=Math.max(tTot,(tEnd-Date.now())/1000);
   if(!RM()){const t=performance.now();tGrow={a:A0,t};tTw={a:l0,t};const f=()=>{if(!tTw||!tOn)return;tTxt();requestAnimationFrame(f)};requestAnimationFrame(f)}if(S.timer){S.timer.end=tEnd;S.timer.tot=tTot;save()}T("timer").classList.remove("over");tick()}
 T("tplus").onclick=()=>{if(!tFresh())addRest()};T("tstop").onclick=()=>{if(!tFresh())stopTimer()};
 // Tocco sul timer (fuori dai bottoni): torna all'allenamento, sull'esercizio del recupero o sul successivo se l'hai finito
@@ -3985,8 +3995,13 @@ function rankHist(){
   <text x="${L}" y="${H+14}">${fmtShort(first.at)}</text><text x="${W-6}" y="${H+14}" text-anchor="end">${perS&&iso(last.at)!==iso(today())?fmtShort(last.at):"oggi"}</text></svg></div>`}
 // Andamento: dopo una seduta nuova si disegna solo l'ultimo tratto, poi il punto nuovo si accende (una volta per seduta)
 const andKey=()=>{const l=S.sessions.filter(x=>!x.deload&&!x.demo).sort((a,b)=>a.date.localeCompare(b.date)).pop();return l?l.id:""};
-function histFx(){const sv=app.querySelector(".rk-hist svg[data-k]");if(!sv)return;const k=sv.dataset.k;if(!k||S.andSeen===k)return;const first=S.andSeen==null;S.andSeen=k;save();
-  if(first||RM())return;const seg=sv.querySelector(".and-new"),dot=sv.querySelector(".and-dot");
+// parte quando il grafico si vede davvero (sotto la piega aspetta lo scorrimento); se esci prima resta da vedere la volta dopo
+let histIO=null;
+function histFx(){if(histIO){histIO.disconnect();histIO=null}const sv=app.querySelector(".rk-hist svg[data-k]");if(!sv)return;const k=sv.dataset.k;if(!k||S.andSeen===k)return;
+  if(S.andSeen==null||RM()){S.andSeen=k;save();return}
+  const sg=sv.querySelector(".and-new"),dt=sv.querySelector(".and-dot");if(sg)sg.style.strokeDashoffset="1";if(dt)dt.style.opacity="0";
+  if(typeof IntersectionObserver==="function"){histIO=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting&&e.intersectionRatio>=.6)){histIO.disconnect();histIO=null;if(sv.isConnected)histPlay(sv,k)}},{threshold:[.6]});histIO.observe(sv)}else histPlay(sv,k)}
+function histPlay(sv,k){S.andSeen=k;save();const seg=sv.querySelector(".and-new"),dot=sv.querySelector(".and-dot");if(seg)seg.style.strokeDashoffset="";if(dot)dot.style.opacity="";
   if(seg)seg.animate([{strokeDashoffset:1},{strokeDashoffset:0}],{duration:520,delay:220,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"});
   if(dot){dot.style.transformBox="fill-box";dot.style.transformOrigin="center";dot.animate([{transform:"scale(0)",opacity:0},{transform:"scale(1.5)",opacity:1,offset:.6},{transform:"scale(1)"}],{duration:420,delay:640,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"})}}
 let rMode="rank";
@@ -4230,7 +4245,9 @@ function lineChart(el,data,unit,noRec,opt){
   const y0=ticks[0],y1=ticks[ticks.length-1],x0=+data[0].x,x1=+data[data.length-1].x;
   const X=v=>m.l+(W-m.l-m.r)*((+v-x0)/((x1-x0)||1)),Y=v=>m.t+(H-m.t-m.b)*(1-(v-y0)/((y1-y0)||1));
   const path=data.map((d,i)=>(i?"L":"M")+X(d.x).toFixed(1)+" "+Y(d.y).toFixed(1)).join(" ");
-  const area=path+` L${X(data[data.length-1].x).toFixed(1)} ${Y(y0)} L${X(data[0].x).toFixed(1)} ${Y(y0)} Z`;
+  // peso nuovo che cade: l'ultimo spicchio d'ombra entra dopo la linea (a parte), così l'area non arriva prima del punto
+  const fx=!!(opt&&opt.fx&&!RM()),aOf=a=>a.map((d,i)=>(i?"L":"M")+X(d.x).toFixed(1)+" "+Y(d.y).toFixed(1)).join(" ")+` L${X(a[a.length-1].x).toFixed(1)} ${Y(y0)} L${X(a[0].x).toFixed(1)} ${Y(y0)} Z`;
+  const area=fx?aOf(data.slice(0,-1)):aOf(data),wedge=fx?aOf(data.slice(-2)):"";
   const xl=[data[0],data[Math.floor((data.length-1)/2)],data[data.length-1]].filter((d,i,a)=>a.indexOf(d)===i);
   el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Andamento in ${unit}">
    <defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--hot);stop-opacity:.28"/><stop offset="1" style="stop-color:var(--hot);stop-opacity:0"/></linearGradient></defs>
@@ -4238,14 +4255,15 @@ function lineChart(el,data,unit,noRec,opt){
    ${xl.map(d=>`<text x="${X(d.x)}" y="${H-8}" text-anchor="middle" font-size="12" style="fill:var(--muted)">${fmtShort(d.x)}</text>`).join("")}
  ${phaseBands(new Date(x0),new Date(x1)).map(b=>`<rect x="${X(b.a).toFixed(1)}" y="${m.t}" width="${(X(b.b)-X(b.a)).toFixed(1)}" height="${H-m.t-m.b}" style="fill:${PH[b.ph].col};opacity:.12"/><text x="${(X(b.a)+3).toFixed(1)}" y="${m.t+10}" font-size="11" font-weight="700" style="fill:${PH[b.ph].col}">${PH[b.ph].n}</text>`).join("")}
    ${data.map(d=>d.dl?`<rect x="${X(d.x)-9}" y="${m.t}" width="18" height="${H-m.t-m.b}" rx="4" style="fill:var(--pad);opacity:.14"/>`:"").join("")}
-   <path d="${area}" fill="url(#ga)"/>
+   <path d="${area}" fill="url(#ga)"/>${wedge?`<path class="lc-wedge" d="${wedge}" fill="url(#ga)"/>`:""}
    <path d="${data.slice(0,-1).map((d,i)=>(i?"L":"M")+X(d.x).toFixed(1)+" "+Y(d.y).toFixed(1)).join(" ")}" fill="none" style="stroke:var(--hot)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
    <path class="lc-seg" d="M${X(data[data.length-2].x).toFixed(1)} ${Y(data[data.length-2].y).toFixed(1)} L${X(data[data.length-1].x).toFixed(1)} ${Y(data[data.length-1].y).toFixed(1)}" pathLength="1" stroke-dasharray="1" fill="none" style="stroke:var(--hot)" stroke-width="2" stroke-linecap="round"/>
    ${(()=>{const bi=ys.lastIndexOf(Math.max(...ys));return data.map((d,i)=>{const hi=i===data.length-1||i===bi;return `<circle cx="${X(d.x)}" cy="${Y(d.y)}" r="${hi?5.5:3.5}" style="fill:${hi?"var(--hot)":"var(--bg)"};stroke:var(--hot)" stroke-width="2"${i===data.length-1?' class="lc-dot"':""}/>`}).join("")+`<text x="${Math.min(Math.max(X(data[bi].x),m.l+20),W-m.r-20)}" y="${Math.max(Y(data[bi].y)-11,10)}" text-anchor="middle" font-size="12" font-weight="800" style="fill:var(--fg);paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">${noRec?"":"Record"}</text>`})()}
    <line id="xh" y1="${m.t}" y2="${H-m.b}" stroke="#8b97a6" stroke-width="1" stroke-dasharray="3 3" visibility="hidden"/>
    <rect x="${m.l}" y="0" width="${W-m.l-m.r}" height="${H}" fill="transparent" id="hit"/>
   </svg><div class="tip" hidden></div>`;
-  if(opt&&opt.fx&&!RM()){const dot=el.querySelector(".lc-dot"),seg=el.querySelector(".lc-seg");
+  if(fx){const dot=el.querySelector(".lc-dot"),seg=el.querySelector(".lc-seg"),wd=el.querySelector(".lc-wedge");
+   if(wd)wd.animate([{opacity:0},{opacity:1}],{duration:320,delay:820,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"});
    if(dot){dot.style.transformBox="fill-box";dot.style.transformOrigin="center";dot.animate([{transform:"translateY(-36px)",opacity:0},{transform:"none",opacity:1}],{duration:460,delay:200,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"})}
    if(seg)seg.animate([{strokeDashoffset:1},{strokeDashoffset:0}],{duration:380,delay:560,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"})}
   const svg=el.querySelector("svg"),tip=el.querySelector(".tip"),xh=el.querySelector("#xh");
