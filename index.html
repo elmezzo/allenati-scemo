@@ -1874,6 +1874,8 @@ html[data-skin="manga"]:not(#z):not(#y):not(#x) .sheet .fxgo,html[data-skin="man
 /* ===== ANIMAZIONI v54 (2026-10-21) ===== */
 /* Serie fatta: riga più bassa (il tasto resta 44 px) */
 :root:not(#z) .set.done>.field{height:44px;min-height:0}
+:root:not(#z) .set.done>.field input{padding-block:0;height:100%}
+.thead .dnc{display:inline-block}
 .set.dlx .field{opacity:.55}.set.dlx{text-decoration:line-through;text-decoration-color:var(--muted)}
 .set.dlx .field input{text-decoration:inherit}
 .ic.bkok.abs{position:absolute;top:8px;right:8px;width:16px;height:16px}
@@ -2094,6 +2096,7 @@ function normS(){const obj=v=>v&&typeof v==="object"&&!Array.isArray(v),arr=v=>A
   S.plans=obj(S.plans)?S.plans:{};for(const k in S.plans)if(!obj(S.plans[k])||!Array.isArray(S.plans[k].ex))delete S.plans[k];else S.plans[k].ex=S.plans[k].ex.filter(e=>obj(e)&&e.id&&typeof e.n==="string");
   S.swaps=obj(S.swaps)?S.swaps:{};for(const k in S.swaps)if(!obj(S.swaps[k]))delete S.swaps[k];S.customAlts=obj(S.customAlts)?S.customAlts:{};for(const k in S.customAlts)S.customAlts[k]=arr(S.customAlts[k]).filter(a=>obj(a)&&a.k&&typeof a.n==="string");if(S.skin!=null&&!["vetro","eclisse","carbonio","campo","manga","lavagna"].includes(S.skin))S.skin="vetro";S.pain=obj(S.pain)?S.pain:{};
   for(const key of ["archive","body","phases","cycles"])S[key]=arr(S[key]).filter(obj);if(S.free&&!(obj(S.free)&&Array.isArray(S.free.ex)))delete S.free;if(S.deload&&!(obj(S.deload)&&S.deload.from&&S.deload.to))delete S.deload;if(S.timer&&!obj(S.timer))delete S.timer;for(const key of ["setup","station","eqmax","eqf","vars"])if(S[key]!=null&&!obj(S[key]))delete S[key];
+  if(S.rkSeen!=null&&(typeof S.rkSeen!=="object"||Array.isArray(S.rkSeen)))delete S.rkSeen;if(S.dlFx!=null&&(typeof S.dlFx!=="object"||!Array.isArray(S.dlFx.ex)))delete S.dlFx;
   for(const key of ["lastDeload","fullDay","deloadSnooze","bkSnooze","bodySnooze","lastBackup"])if(S[key]!=null&&typeof S[key]!=="string")delete S[key];if(S.view!=null&&!["oggi","train","prog","set","imp","edit"].includes(S.view))S.view="oggi";if(S.vars)for(const k in S.vars)if(![0,1,2].includes(S.vars[k]))delete S.vars[k]}
 let bootMsg="";
 function boot(){normS();for(const P of Object.values(S.plans))for(const e of P.ex||[])if(/^Alzate laterali al cavo/i.test(e.n||"")&&(e.eq||"mac")==="mac"){e.eq="cavl";e.step=2.5}for(const P of Object.values(S.plans))for(const e of P.ex||[])if(e.n==="Curl panca Scott"&&e.eq==="db"){e.n="Curl Scott con manubri";e.note=e.note||"Kg = un manubrio."}
@@ -2448,7 +2451,7 @@ function deloadAdvice(){
   return why.length?why:null;
 }
 function startDeload(){const from=cycleStart()||iso(today());S.cycles=S.cycles||[];if(!S.cycles.some(c=>c.to===iso(today())))S.cycles.push({from,to:iso(today())});S.deload={from:iso(today()),to:iso(addDays(today(),6))};delete S.deloadSnooze;save()}
-function endDeload(){S.lastDeload=iso(today());delete S.deload;save()}
+function endDeload(){S.lastDeload=iso(today());delete S.deload;delete S.dlFx;save()}
 function pad(a,n,fill){const r=a.slice(0,n);while(r.length<n)r.push(fill??r[r.length-1]??0);return r}
 
 /* ================= RECORDS ================= */
@@ -2771,20 +2774,41 @@ function ledify(){if(skinNow()!=="carbonio")return;app.querySelectorAll(".tgt b,
 const lastPct={},lastDn={},recShown=new Set();let lastRow={g:null,m:new Map()};
 // Carichi già fatti scorrere oggi: salvati in S (come la Settimana con S.wkFx), così se iOS ricarica l'app non ripartono tutti
 // Serie spuntata: la riga si abbassa (fatta = più bassa) in 200 ms invece di saltare; vale anche togliendo la spunta. Solo righe già viste nello stesso disegno di prima
-function rowFx(g){const m=new Map();document.querySelectorAll("#exs .set").forEach(r=>{const t=r.querySelector(".tick[data-j],.tick.rt");if(!t)return;const k=(t.dataset.ex||t.dataset.rex)+"|"+(t.dataset.j??"r"+t.dataset.k);m.set(k,{h:r.getBoundingClientRect().height,d:r.classList.contains("done"),r})});
-  if(lastRow.g===g&&!RM())m.forEach((v,k)=>{const o=lastRow.m.get(k);if(!o||o.d===v.d||Math.abs(o.h-v.h)<2)return;v.r.querySelectorAll(":scope>.field").forEach(f=>{const h=f.getBoundingClientRect().height;f.animate([{height:(h+o.h-v.h)+"px"},{height:h+"px"}],{duration:200,easing:"cubic-bezier(.23,1,.32,1)"})})});
-  m.forEach(v=>delete v.r);lastRow={g,m}}
-// Settimana di scarico: la prima volta che apri un esercizio, le serie tolte compaiono un attimo e si sbiadiscono una per una
-function dlFx(g,mods){if(!mods.has("deload")||!S.deload||RM())return;if(!S.dlFx||S.dlFx.from!==S.deload.from)S.dlFx={from:S.deload.from,ex:[]};
-  const full=new Set([...mods].filter(x=>x!=="deload")),L=trainList(g,mods);
-  document.querySelectorAll("#exs article.ex[data-ex]").forEach(card=>{const id=card.dataset.ex;if(S.dlFx.ex.includes(id))return;const it=L.find(x=>x.ex.id===id);if(!it)return;
-    const half=setsFor(it.ex,mods),all=setsFor(it.ex,full);S.dlFx.ex.push(id);save();if(all<=half)return;
+function rowFx(g){const m=new Map(),wm=new Map(),E="cubic-bezier(.23,1,.32,1)";document.querySelectorAll("#exs .set").forEach(r=>{const t=r.querySelector(".tick[data-j],.tick.rt");if(!t)return;const k=(t.dataset.ex||t.dataset.rex)+"|"+(t.dataset.j??"r"+t.dataset.k);m.set(k,{h:r.getBoundingClientRect().height,d:r.classList.contains("done"),r})});
+  // Righe A dell'avvicinamento: quanto spazio occupano sopra le serie (iniziate le serie, quelle non spuntate spariscono)
+  document.querySelectorAll("#exs article.ex[data-ex]").forEach(card=>{const st=card.querySelector(".sets");if(!st)return;const seg=[...st.querySelectorAll(":scope>.wset,:scope>.wcap")],w1=st.querySelector(":scope>.set:not(.wset):not(.sethd)");
+    wm.set(card.dataset.ex,{n:st.querySelectorAll(":scope>.wset").length,h:seg.length&&w1?w1.getBoundingClientRect().top-seg[0].getBoundingClientRect().top:0,html:seg.map(x=>x.outerHTML),pill:!!st.querySelector(".wpill"),d:st.querySelectorAll(":scope>.set.done:not(.wset)").length})});
+  if(lastRow.g===g&&!RM()){m.forEach((v,k)=>{const o=lastRow.m.get(k);if(!o||o.d===v.d||Math.abs(o.h-v.h)<2)return;v.r.querySelectorAll(":scope>.field").forEach(f=>{const h=f.getBoundingClientRect().height;f.animate([{height:(h+o.h-v.h)+"px"},{height:h+"px"}],{duration:200,easing:E})})});
+    wm.forEach((v,id)=>{const o=lastRow.w&&lastRow.w.get(id);if(!o||v.pill||o.pill||v.n>=o.n||v.d<=o.d||o.h-v.h<2)return;const card=document.querySelector(`#exs article.ex[data-ex="${CSS.escape(id)}"]`),st=card&&card.querySelector(".sets"),w1=st&&st.querySelector(":scope>.set:not(.wset):not(.sethd)");if(!w1)return;
+      const gap=parseFloat(getComputedStyle(st).rowGap)||0,w=document.createElement("div");w.className="dlg";w.setAttribute("aria-hidden","true");w.inert=true;
+      w.style.cssText=`display:flex;flex-direction:column;gap:${gap}px;overflow:hidden;height:${o.h-v.h}px;margin-bottom:${-gap}px`;
+      // Tutte le righe A saltate: le stesse righe si sbiadiscono e lo spazio si chiude. Solo alcune: si chiude lo spazio
+      if(!v.n){w.innerHTML=o.html.join("");w.querySelectorAll("input,button").forEach(x=>{x.tabIndex=-1;x.removeAttribute("data-ex");x.removeAttribute("data-rex");x.removeAttribute("data-rf")});w.querySelectorAll(".now").forEach(x=>x.classList.remove("now"))}
+      w1.before(w);[...w.children].forEach(c=>c.animate([{opacity:1},{opacity:0}],{duration:140,easing:E,fill:"forwards"}));
+      w.animate([{height:(o.h-v.h)+"px"},{height:"0px"}],{duration:220,delay:v.n?0:100,easing:E,fill:"forwards"}).finished.then(()=>w.remove(),()=>w.remove())})}
+  m.forEach(v=>delete v.r);lastRow={g,m,w:wm}}
+// Settimana di scarico: le serie tolte restano un attimo barrate sotto le altre; quando si vedono (sopra la barra in basso) si sbiadiscono una per una e lo spazio si chiude.
+// Conta come vista solo quando parte davvero; se l'esercizio si ridisegna a metà (spunta), lo spazio si chiude invece di saltare
+let dlIO=null;const dlLive=new Set();
+function dlFx(g,mods){if(dlIO){dlIO.disconnect();dlIO=null}
+  if(!mods.has("deload")||!S.deload||RM()||typeof IntersectionObserver!=="function")return;if(!S.dlFx||S.dlFx.from!==S.deload.from)S.dlFx={from:S.deload.from,ex:[]};
+  const full=new Set([...mods].filter(x=>x!=="deload")),L=trainList(g,mods),E="cubic-bezier(.23,1,.32,1)",go=[];
+  const close=(w,gap,id)=>w.animate([{height:w.offsetHeight+"px",marginTop:"0px"},{height:"0px",marginTop:-gap+"px"}],{duration:220,easing:E,fill:"forwards"}).finished.then(()=>{w.remove();dlLive.delete(id)},()=>{w.remove();dlLive.delete(id)});
+  document.querySelectorAll("#exs article.ex[data-ex]").forEach(card=>{const id=card.dataset.ex,live=dlLive.has(id);if(!live&&S.dlFx.ex.includes(id))return;const it=L.find(x=>x.ex.id===id);if(!it)return;
+    const half=setsFor(it.ex,mods),all=setsFor(it.ex,full);if(all<=half){S.dlFx.ex.push(id);save();return}
     const rows=[...card.querySelectorAll(".sets>.set")].filter(r=>r.querySelector(".tick[data-j]"));const last=rows[rows.length-1];if(!last)return;
-    const st=last.parentElement,gap=parseFloat(getComputedStyle(st).rowGap)||0,w=document.createElement("div");w.className="dlg";w.setAttribute("aria-hidden","true");w.style.cssText=`display:flex;flex-direction:column;gap:${gap}px;overflow:hidden`;
-    for(let k=half;k<all;k++){const c=last.cloneNode(true);c.className="set dlx";c.querySelectorAll("button,.prs").forEach(b=>b.remove());c.querySelectorAll("input").forEach(i=>{i.disabled=true;i.removeAttribute("data-f");i.removeAttribute("data-ex");i.tabIndex=-1});const ix=c.querySelector(".i");if(ix)ix.textContent=k+1;w.appendChild(c)}
-    last.after(w);const n=all-half,t0=420;
-    [...w.children].forEach((c,i)=>c.animate([{opacity:1,transform:"none"},{opacity:0,transform:"translateX(14px)"}],{duration:240,delay:t0+i*110,easing:"cubic-bezier(.23,1,.32,1)",fill:"forwards"}));
-    setTimeout(()=>{if(!w.isConnected)return;const h=w.offsetHeight;w.animate([{height:h+"px",marginTop:"0px"},{height:"0px",marginTop:-gap+"px"}],{duration:220,easing:"cubic-bezier(.23,1,.32,1)",fill:"forwards"}).finished.then(()=>w.remove(),()=>w.remove())},t0+(n-1)*110+260)})}
+    const st=last.parentElement,gap=parseFloat(getComputedStyle(st).rowGap)||0,w=document.createElement("div");w.className="dlg";w.setAttribute("aria-hidden","true");w.inert=true;w.style.cssText=`display:flex;flex-direction:column;gap:${gap}px;overflow:hidden`;
+    for(let k=half;k<all;k++){const c=last.cloneNode(true);c.className="set dlx";c.querySelectorAll("button,.prs").forEach(b=>b.remove());c.querySelectorAll("input").forEach(i=>{i.disabled=true;i.removeAttribute("data-f");i.removeAttribute("data-ex");i.removeAttribute("data-j");i.tabIndex=-1});const ix=c.querySelector(".i");if(ix)ix.textContent=k+1;w.appendChild(c)}
+    last.after(w);
+    if(live){[...w.children].forEach(c=>c.style.opacity=0);close(w,gap,id);return}
+    go.push({w,gap,id,n:all-half})});
+  if(!go.length)return;
+  const bar=document.querySelector("nav.bar"),bh=bar?Math.max(0,Math.ceil(innerHeight-bar.getBoundingClientRect().top)):0,hd=document.querySelector(".thead"),th=hd?Math.max(0,Math.ceil(hd.getBoundingClientRect().bottom)):0;
+  dlIO=new IntersectionObserver(es=>es.forEach(en=>{const x=go.find(o=>o.w===en.target);if(!x||!en.isIntersecting||en.intersectionRatio<.9||!x.w.isConnected)return;dlIO&&dlIO.unobserve(x.w);
+    S.dlFx.ex.push(x.id);save();dlLive.add(x.id);const t0=300;
+    [...x.w.children].forEach((c,i)=>c.animate([{opacity:1,transform:"none"},{opacity:0,transform:"translateX(14px)"}],{duration:240,delay:t0+i*110,easing:E,fill:"forwards"}).finished.then(()=>{c.style.opacity=0},()=>{}));
+    setTimeout(()=>{if(x.w.isConnected)close(x.w,x.gap,x.id);else dlLive.delete(x.id)},t0+(x.n-1)*110+260)}),{threshold:[.9],rootMargin:`${-th}px 0px ${-bh}px 0px`});
+  go.forEach(o=>dlIO.observe(o.w))}
 const counted={has:k=>!!S.odo&&S.odo.d===iso(today())&&S.odo.k.includes(k),add:k=>{const d=iso(today());if(!S.odo||S.odo.d!==d)S.odo={d,k:[]};S.odo.k.push(k);save()}};
 function countUp(b,a,z,rest){if(RM())return;const t0=performance.now();const f=t=>{if(!b.isConnected)return;const k=Math.min(1,(t-t0)/800),e=1-Math.pow(1-k,3);setNum(b,fk(Math.round((a+(z-a)*e)*10)/10)+rest);if(k<1)requestAnimationFrame(f)};setNum(b,fk(a)+rest);setTimeout(()=>requestAnimationFrame(f),250)}
 // Come countUp ma in testo normale (riepilogo in Carbonio: le cifre restano quelle della lista, non il display a 7 segmenti)
@@ -2810,8 +2834,8 @@ function veilFx(){app.querySelectorAll(".ex.cur:not(.gold)>.fp.grow").forEach(fp
   fp.animate([{opacity:0},{opacity:a1}],o).currentTime=el;
   if(fq&&a0>.001){const kf=[];for(let i=0;i<=10;i++){const u=i/10,dn=1-a1*u;kf.push({opacity:dn>1e-3?a0*(1-u)/dn:0})}fq.animate(kf,o).currentTime=el}})}
 function trainFx(g,pct,mods){
-  // Serie fatte in alto: il numero scorre come il contachilometri quando sale (in Carbonio resta fermo: il titolo non è a 7 segmenti)
-  const dc=app.querySelector(".thead .dnc"),dw=lastDn[g];if(dc){const v=+dc.textContent;if(dw!=null&&v>dw&&v-dw<=3&&skinNow()!=="carbonio")rollUp(dc,dw,v,"");lastDn[g]=v}
+  // Serie fatte in alto: la cifra nuova entra dal basso in 180 ms (dall'alto se togli una spunta); breve perché si spunta decine di volte
+  const dc=app.querySelector(".thead .dnc"),dw=lastDn[g];if(dc){const v=+dc.textContent;if(dw!=null&&v!==dw&&Math.abs(v-dw)<=3&&!RM()){const u=v>dw?1:-1;dc.animate([{transform:`translateY(${u*.45}em)`,opacity:0},{transform:"none",opacity:1}],{duration:180,easing:"cubic-bezier(.23,1,.32,1)"})}lastDn[g]=v}
   rowFx(g);if(mods)dlFx(g,mods);
   const pb=app.querySelector(".pbar i"),was=lastPct[g];
   if(pb&&was!=null&&was!==pct&&!RM()){pb.style.transition="none";pb.style.setProperty("--pw",was);void pb.offsetWidth;pb.style.transition="";pb.style.setProperty("--pw",pct);if(pct>was)popEl(pb.parentElement,"shine",1200)}
@@ -3053,9 +3077,9 @@ async function shareBackup(){const name="allenati-scemo-"+iso(today())+".json";
   catch(e){if(e&&e.name==="AbortError")return "no"}
   return dlBackup()?"ok":"err"}
 // Backup salvato: l'icona del tasto diventa una spunta che si disegna
-function bkOk(b){if(!b||!b.isConnected)return;const old=b.querySelector(":scope>svg.ic");const t=document.createElement("div");
+function bkOk(b){if(!b||!b.isConnected)return;const old=b.querySelector(":scope>svg.ic");const wasAbs=!!(old&&old.classList.contains("abs"));const t=document.createElement("div");
   t.innerHTML=`<svg class="ic bkok" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7" pathLength="1" stroke-dasharray="1"/></svg>`;const ck=t.firstElementChild;
-  if(old)old.replaceWith(ck);else{ck.classList.add("abs");if(getComputedStyle(b).position==="static")b.style.position="relative";b.append(ck)}if(RM())return;const pa=ck.firstElementChild;
+  if(old){if(wasAbs)ck.classList.add("abs");old.replaceWith(ck)}else{ck.classList.add("abs");if(getComputedStyle(b).position==="static")b.style.position="relative";b.append(ck)}if(RM())return;const pa=ck.firstElementChild;
   ck.animate([{opacity:0,transform:"scale(.6)"},{opacity:1,transform:"none"}],{duration:200,easing:"cubic-bezier(.23,1,.32,1)"});
   pa.animate([{strokeDashoffset:1},{strokeDashoffset:0}],{duration:320,delay:80,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"})}
 function dlBackup(){try{S.lastBackup=iso(today());save();const b=new Blob([JSON.stringify(S,null,1)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="allenati-scemo-"+iso(today())+".json";document.body.appendChild(a);a.click();a.remove();return true}catch(e){return false}}
@@ -3190,7 +3214,7 @@ function renderTrain(){
   const svd=dn?null:S.sessions.filter(x=>x.day===g&&iso(x.date)===iso(today())).slice(-1)[0];
   const savedH=svd?`<section class="card alldone saved"><p><b>${esc(P.name)} salvata</b> alle ${new Date(svd.date).toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"})}.</p><button class="btn" id="seeSv">Vedi il riepilogo</button></section>`:"";
   app.innerHTML=`
-  <div class="thead"><div class="r"><h1>${esc(P.title)}</h1><span><span class="dnc">${dn}</span> / ${tot} serie${dr.start&&mins>0?` · ${mins} min`:""}</span></div><div class="pbar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Serie fatte"><i style="--pw:${pct}"></i></div></div>
+  <div class="thead"><div class="r"><h1>${esc(P.title)}</h1><span><span class="dnw"><span class="dnc">${dn}</span> / ${tot} serie${dr.start&&mins>0?` · ${mins} min`:""}</span></span></div><div class="pbar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Serie fatte"><i style="--pw:${pct}"></i></div></div>
   <div class="tabs" role="group" aria-label="Scheda">${GYM_ORDER.map(k=>{const wd=Object.entries(S.week).find(([,v])=>v.gym===k);return `<button data-k="${k}" aria-pressed="${k===g}"><small>${wd?WD[wd[0]]:"Extra"}</small><span class="tn">${esc(PLAN[k].name)}</span></button>`}).join("")}</div>
   ${oldBoxes(g)}
   ${modNote}
@@ -4086,15 +4110,23 @@ function rankBind(){
 }
 // Rango salito dall'ultima volta che l'hai visto: la medaglia vecchia gira e mostra la nuova, una volta, quando la medaglia si vede
 let rkIO=null;
+// Fino al giro la medaglia e il nome restano quelli vecchi (messi subito, prima che la pagina si veda: niente lampo del rango nuovo)
+const rkLbl=e=>e.classList.contains("rk-gen")?e.querySelector(":scope>b"):e.querySelector("small>span");
+function rkSet(e,r,ap){const nb=e.querySelector(".rbd"),t=document.createElement("div");t.innerHTML=rBadge(r,[...nb.classList].filter(c=>c!=="rbd").join(" "));const ob=t.firstElementChild;nb.replaceWith(ob);const l=rkLbl(e);if(l)l.textContent=(ap?"≈ ":"")+RANKS[r][0];return ob}
 function rkFx(card){if(rkIO){rkIO.disconnect();rkIO=null}const els=[...card.querySelectorAll("[data-rk][data-r]")];if(!els.length)return;
-  if(!S.rkSeen||RM()){S.rkSeen={...(S.rkSeen||{}),...Object.fromEntries(els.map(e=>[e.dataset.rk,+e.dataset.r]))};save();return}
-  const sn=S.rkSeen,up=[];let ch=false;els.forEach(e=>{const k=e.dataset.rk,r=+e.dataset.r;if(sn[k]!=null&&r>sn[k])up.push(e);else if(sn[k]!==r){sn[k]=r;ch=true}});if(ch)save();
-  if(!up.length||typeof IntersectionObserver!=="function"){up.forEach(e=>{sn[e.dataset.rk]=+e.dataset.r});if(up.length)save();return}
+  if(!S.rkSeen||RM()||typeof IntersectionObserver!=="function"){S.rkSeen={...(S.rkSeen||{}),...Object.fromEntries(els.map(e=>[e.dataset.rk,+e.dataset.r]))};save();return}
+  const sn=S.rkSeen,up=[];let ch=false;els.forEach(e=>{const k=e.dataset.rk,r=+e.dataset.r;if(sn[k]!=null&&r>sn[k]&&RANKS[sn[k]])up.push(e);else if(sn[k]!==r){sn[k]=r;ch=true}});if(ch)save();
+  if(!up.length)return;
+  up.forEach(e=>{const l=rkLbl(e);e._rk={nb:e.querySelector(".rbd"),txt:l?l.textContent:""};rkSet(e,sn[e.dataset.rk],/^≈/.test(e._rk.txt))});
+  // La barra in basso copre il fondo dello schermo: conta come visibile solo sopra di lei
+  const bar=document.querySelector("nav.bar"),bh=bar?Math.ceil(innerHeight-bar.getBoundingClientRect().top):0;
   rkIO=new IntersectionObserver(es=>es.forEach(en=>{const e=en.target;if(!e.isConnected){rkIO&&rkIO.unobserve(e);return}if(!en.isIntersecting||en.intersectionRatio<.6)return;rkIO.unobserve(e);
-    const k=e.dataset.rk,from=sn[k],to=+e.dataset.r;sn[k]=to;save();rkFlip(e,from,to)}),{threshold:[.6]});up.forEach(e=>rkIO.observe(e))}
-function rkFlip(e,from,to){const nb=e.querySelector(".rbd");if(!nb||from==null)return;const t=document.createElement("div");t.innerHTML=rBadge(from,[...nb.classList].filter(c=>c!=="rbd").join(" "));const ob=t.firstElementChild;if(!ob)return;
-  const P="perspective(600px) ";nb.replaceWith(ob);const back=()=>{if(ob.isConnected)ob.replaceWith(nb)};
-  ob.animate([{transform:P+"rotateY(0deg)"},{transform:P+"rotateY(90deg)"}],{duration:200,delay:160,easing:"cubic-bezier(.77,0,.175,1)",fill:"forwards"}).finished.then(()=>{back();nb.animate([{transform:P+"rotateY(-90deg)"},{transform:P+"rotateY(0deg) scale(1.08)",offset:.7},{transform:P+"rotateY(0deg)"}],{duration:380,easing:"cubic-bezier(.23,1,.32,1)"})},back)}
+    const k=e.dataset.rk;sn[k]=+e.dataset.r;save();rkFlip(e)}),{threshold:[.6],rootMargin:`0px 0px ${-Math.max(0,bh)}px 0px`});up.forEach(e=>rkIO.observe(e))}
+function rkFlip(e){const ob=e.querySelector(".rbd"),st=e._rk;if(!ob||!st)return;const P="perspective(600px) ",E="cubic-bezier(.23,1,.32,1)";
+  const done=()=>{if(ob.isConnected)ob.replaceWith(st.nb);const l=rkLbl(e);if(l)l.textContent=st.txt;e._rk=null};
+  ob.animate([{transform:P+"rotateY(0deg)"},{transform:P+"rotateY(90deg)"}],{duration:150,delay:120,easing:E,fill:"forwards"}).finished.then(()=>{done();
+    st.nb.animate([{transform:P+"rotateY(-90deg)"},{transform:P+"rotateY(0deg) scale(1.06)",offset:.7},{transform:P+"rotateY(0deg)"}],{duration:300,easing:E});
+    const l=rkLbl(e);if(l)l.animate([{opacity:0,transform:"translateY(4px)"},{opacity:1,transform:"none"}],{duration:200,easing:E})},done)}
 // Avatar: il muscolo dell'esercizio contrae per un attimo quando c'è un record
 function flexMus(ks,root){if(RM())return;
   ks.forEach(k=>(root||document).querySelectorAll(`.rk-fig [data-rm="${k}"]`).forEach(g=>{const sc=parseFloat(g.style.getPropertyValue("--s"))||1;
@@ -4111,7 +4143,7 @@ function rankSheet(k){
       <p>Mancano ${100-m.pt} pt per ${nx}.${near.length?` I più vicini a salire: ${near.map(e=>`<b>${esc(e.n)} ${e.need.txt}</b>`).join(" oppure ")}.`:""}</p></div>`:""}
     <div class="rk-xl">${m.L.slice().sort((a,b)=>b.v-a.v).map(row).join("")}</div>
     <p class="note" style="margin:0">Il rango del muscolo è la media di questi esercizi. Conta la serie migliore delle ultime 6 settimane.${m.L.some(e=>e.approx)?" ≈ = soglia indicativa: macchina o cavo, oppure esercizio stimato da uno simile.":""}</p>`},
-   bind:w=>{const i=w.querySelector(".rk-goal .rk-bar i");if(i&&!RM())i.animate([{clipPath:"inset(0 100% 0 0)"},{clipPath:"inset(0 0 0 0)"}],{duration:520,delay:260,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"})}});
+   bind:w=>{const i=w.querySelector(".rk-goal .rk-bar i");if(i&&!RM()){const rr=getComputedStyle(i).borderTopRightRadius||"0px";i.animate([{clipPath:`inset(0 100% 0 0 round ${rr})`},{clipPath:`inset(0 0 0 0 round ${rr})`}],{duration:300,delay:180,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"})}}});
 }
 function rankInfo(){
   openSheet({html:()=>`<h2>Come si calcola</h2>
@@ -4446,7 +4478,7 @@ function renderSettings(){
     <li>Timbro PR: quando una serie supera il massimale stimato migliore di almeno il 2% e in più usa un carico mai usato prima o batte il massimale della proposta di oggi, anche con più ripetizioni a un carico più basso (seguire la progressione da sola non basta). Niente timbro su Pallof, woodchop, salti, tenute e Nordic. Per trazioni e dip il massimale conta il tuo peso più la zavorra.</li>
    </ul></section>
   <section class="card"><h3>Backup</h3><p class="note" style="margin:0">I dati stanno solo su questo telefono. Salva un backup ogni tanto.</p>
-   <div class="row"><button class="btn" id="exp">Esporta backup</button><label class="btn" style="flex-direction:column;gap:2px;text-align:center">Importa backup<small style="font-size:12px;font-weight:500;opacity:.75">sostituisce i dati attuali</small><input type="file" id="imp" accept="application/json" hidden></label></div>
+   <div class="row"><button class="btn" id="exp">${I("save")}Esporta backup</button><label class="btn" style="flex-direction:column;gap:2px;text-align:center">Importa backup<small style="font-size:12px;font-weight:500;opacity:.75">sostituisce i dati attuali</small><input type="file" id="imp" accept="application/json" hidden></label></div>
    <button class="btn danger" id="wipe">Cancella tutti i dati</button><p class="msg" id="bmsg" aria-live="polite"></p></section>`;
   document.getElementById("back").onclick=()=>go("set");
   document.querySelectorAll("#segOrd button").forEach(b=>b.onclick=()=>{S.order=b.dataset.v;save();renderSettings()});
@@ -4467,7 +4499,7 @@ function renderSettings(){
   document.querySelectorAll("[data-dup]").forEach(b=>b.onclick=()=>{const P=PLAN[b.dataset.dup];editPlan=JSON.parse(JSON.stringify({key:null,name:P.name+" (copia)",sub:P.sub||"",legs:!!P.legs,ex:P.ex.map(e=>({...e,lib:e.lib||e.id}))}));go("edit")});
   document.querySelectorAll("[data-delp]").forEach(b=>b.onclick=()=>{if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Sicuro?";return}const k=b.dataset.delp;archivePlan(k,"eliminato");delete S.plans[k];for(const d in S.week)if(S.week[d].gym===k)S.week[d]={...S.week[d],gym:"none"};for(const d in S.overrides)if(S.overrides[d].gym===k)delete S.overrides[d].gym;delete S.draft[k];rebuild();save();renderSettings()});
   const bm=document.getElementById("bmsg");
-  document.getElementById("exp").onclick=async e=>{const x=await shareBackup();if(x==="ok"){bkOk(e.currentTarget||document.getElementById("exp"));bm.className="msg ok";bm.textContent="Backup salvato."}else if(x==="no"){bm.className="msg";bm.textContent="Backup non salvato."}else{bm.className="msg err";bm.textContent="Salvataggio non riuscito su questo browser."}};
+  document.getElementById("exp").onclick=async e=>{const eb=e.currentTarget,x=await shareBackup();if(x==="ok"){bkOk(eb);bm.className="msg ok";bm.textContent="Backup salvato."}else if(x==="no"){bm.className="msg";bm.textContent="Backup non salvato."}else{bm.className="msg err";bm.textContent="Salvataggio non riuscito su questo browser."}};
   // Prima di cancellare o importare: copia dei dati attuali e "Annulla" per 10 secondi
   document.getElementById("imp").onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{const j=JSON.parse(t);if(!j||!Array.isArray(j.sessions))throw 0;const prev=S;snap();
     // Prima si prova il backup; se qualcosa non va si rimettono i dati di prima e non si salva niente
