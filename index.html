@@ -1882,6 +1882,8 @@ html[data-skin="manga"]:not(#z):not(#y):not(#x) .sheet .fxgo,html[data-skin="man
 /* ===== ANIMAZIONI v51 (2026-10-20) ===== */
 /* 2 fine recupero: la prossima serie resta illuminata finché non la spunti (v54) */
 .set.lit{position:relative}
+/* Lavagna: bordo a gesso come le spunte */
+html[data-skin="lavagna"]:not(#z) .set.lit::after{border-radius:7px 5px 8px 4px;box-shadow:none;border-color:var(--acc);opacity:.9}
 .set.lit::after{content:"";position:absolute;inset:-4px -6px;border-radius:12px;border:2px solid var(--go);box-shadow:0 0 14px color-mix(in srgb,var(--go) 35%,transparent);pointer-events:none}
 .set.lit.litin::after{animation:litIn .32s var(--ease-out) both}
 @keyframes litIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
@@ -2854,7 +2856,7 @@ function veilFx(){app.querySelectorAll(".ex.cur:not(.gold)>.fp.grow").forEach(fp
 function trainFx(g,pct,mods){
   // Serie fatte in alto: la cifra nuova entra dal basso in 180 ms (dall'alto se togli una spunta); breve perché si spunta decine di volte
   const dc=app.querySelector(".thead .dnc"),dw=lastDn[g];if(dc){const v=+dc.textContent;if(dw!=null&&v!==dw&&Math.abs(v-dw)<=3&&!RM()){const u=v>dw?1:-1;dc.animate([{transform:`translateY(${u*.45}em)`,opacity:0},{transform:"none",opacity:1}],{duration:180,easing:"cubic-bezier(.23,1,.32,1)"})}lastDn[g]=v}
-  rowFx(g);if(mods)dlFx(g,mods);
+  rowFx(g);if(mods)dlFx(g,mods);litApply();
   const pb=app.querySelector(".pbar i"),was=lastPct[g];
   if(pb&&was!=null&&was!==pct&&!RM()){pb.style.transition="none";pb.style.setProperty("--pw",was);void pb.offsetWidth;pb.style.transition="";pb.style.setProperty("--pw",pct);if(pct>was)popEl(pb.parentElement,"shine",1200)}
   lastPct[g]=pct;document.documentElement.style.setProperty("--p",(pct/100).toFixed(2));
@@ -3416,7 +3418,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
     const isM=myoA&&j===n-1;
     // Serie fatta sotto le ripetizioni previste: numero e puntino gialli (la spunta resta quella normale)
     const low=r.done&&ex.t!=="perf"&&num(r.reps)!=null&&num(r.reps)<(+(tg.reps[j]??ex.lo)||ex.lo);
-    sets+=`<div class="set ${r.done?"done":""} ${now?"now":""}${now&&litEx===ex.id?" lit":""} ${isM?"myom":""} ${low?"low":""}"><span class="i"${isM?' title="Serie myo-rep"':""}>${isM?"M":j+1}</span>
+    sets+=`<div class="set ${r.done?"done":""} ${now?"now":""} ${isM?"myom":""} ${low?"low":""}"><span class="i"${isM?' title="Serie myo-rep"':""}>${isM?"M":j+1}</span>
       ${hasKg?`<${fw} class="field ${r.done?"":"pmf"}">${pm("kg",-1)}<input inputmode="decimal" value="${esc(kgV)}" placeholder="kg" data-ex="${ex.id}" data-j="${j}" data-f="kg" aria-label="Kg serie ${j+1}"><span>kg</span>${pm("kg",1)}${r.done&&r.pr?`<i class="prs" aria-hidden="true">PR</i>`:""}</${fw}>`:(ex.t==="time"&&!r.done?`<button class="hold" data-ex="${ex.id}" data-j="${j}" aria-label="Avvia il cronometro della tenuta, serie ${j+1}">${I("play")}Via</button>`:`<span class="bw">${ex.t==="nordic"?"elastico":ex.t==="time"?"tenuta":"salto"}</span>`)}
       <${fw} class="field ${r.done?"":"pmf"}">${pm("reps",-1)}<input inputmode="numeric" value="${esc(rpV)}" data-ex="${ex.id}" data-j="${j}" data-f="reps" aria-label="${unit} serie ${j+1}"><span>${unit}</span>${pm("reps",1)}</${fw}>
       <button class="tick" data-ex="${ex.id}" data-j="${j}" aria-pressed="${!!r.done}" aria-label="Serie ${j+1} fatta">✓</button></div>`;
@@ -3755,7 +3757,7 @@ document.addEventListener("keydown",e=>{if(H&&e.key==="Escape"){e.preventDefault
 document.addEventListener("visibilitychange",()=>{if(H&&document.visibilityState==="visible")holdLoop()});
 
 let tCtx=null;
-function startTimer(sec,label,plus,end,ctx){litEx=null;document.querySelectorAll("#exs .set.lit").forEach(x=>x.classList.remove("lit"));tPlus=plus||0;tLbl=label;tCtx=ctx||null;tEnd=end||Date.now()+sec*1000;tTot=sec;S.timer={end:tEnd,tot:sec,lbl:label,plus:tPlus,ctx:tCtx};save();tWarn=sec<=10;tOn=true;T("tlbl").textContent="Recupero · "+label+(tPlus?" · +"+tPlus+"\u00a0s":"");T("timer").classList.remove("over");document.querySelectorAll(".tball").forEach(b=>b.remove());clearInterval(tInt);tick();tInt=setInterval(tick,250)}
+function startTimer(sec,label,plus,end,ctx){litOff();tPlus=plus||0;tLbl=label;tCtx=ctx||null;tEnd=end||Date.now()+sec*1000;tTot=sec;S.timer={end:tEnd,tot:sec,lbl:label,plus:tPlus,ctx:tCtx};save();tWarn=sec<=10;tOn=true;T("tlbl").textContent="Recupero · "+label+(tPlus?" · +"+tPlus+"\u00a0s":"");T("timer").classList.remove("over");document.querySelectorAll(".tball").forEach(b=>b.remove());clearInterval(tInt);tick();tInt=setInterval(tick,250)}
 // secondi mostrati adesso (durante lo scorrimento del +15 s: il valore a metà strada, non quello d'arrivo)
 function tVal(){const left=Math.round((tEnd-Date.now())/1000);if(!tTw)return left;const k=(performance.now()-tTw.t)/380;if(k>=1){tTw=null;return left}return Math.round(tTw.a+(left-tTw.a)*(1-Math.pow(1-k,3)))}
 function tTxt(){const v=tVal();
@@ -3799,9 +3801,13 @@ function ringAnim(c,k,gw){const [r1,r2,rd]=ringParts(c);if(!rd)return;const [D,A
   else r1.animate([rot(A0),rot(0)],o)}
 // Fine recupero: la prossima serie da fare si accende una volta (bordo che pulsa), così si vede da dove riprendere
 // Recupero finito: il timer si toglie da solo (dopo un attimo per leggere "Recupero finito") e resta illuminata la serie da fare, finché non la spunti
-let litEx=null;
-function litNext(live){const r=(tCtx&&document.querySelector(`#exs article.ex[data-ex="${tCtx.ex}"] .set.now`))||document.querySelector("#exs article.ex .set.now");
-  litEx=r?r.closest("article.ex").dataset.ex:(tCtx&&tCtx.ex)||null;
+let litEx=null,litOn=false;
+// La serie da fare: quella dell'esercizio del recupero se ne ha ancora (anche una riga A); finito quell'esercizio, quella della scheda aperta adesso
+const litRow=()=>(litEx&&document.querySelector(`#exs article.ex[data-ex="${CSS.escape(litEx)}"] .sets>.set.now`))||document.querySelector("#exs article.ex .sets>.set.now");
+function litOff(){litOn=false;litEx=null;document.querySelectorAll("#exs .set.lit").forEach(x=>x.classList.remove("lit","litin"))}
+// dopo ogni disegno di Allenamento
+function litApply(){if(!litOn)return;const r=litRow();if(r)r.classList.add("lit")}
+function litNext(live){litOn=true;litEx=(tCtx&&tCtx.ex)||null;const r=litRow();
   if(r&&!r.classList.contains("lit")){r.classList.add("lit");if(live&&!RM()){r.classList.add("litin");setTimeout(()=>r.classList.remove("litin"),400)}}
   const te=tEnd;setTimeout(()=>{if(tOn&&tEnd===te)closeRest()},live?900:0)}
 // +15 s: dall'angolo di prima a quello giusto in 320 ms (ease-out, a campioni), poi lineare fino a zero. Le due metà seguono l'angolo, con un punto esatto dove passa i 180°
@@ -3854,7 +3860,7 @@ let tGrow=null,tTw=null;
 // angolo dell'anello che si vede adesso (a metà di un +15 s non è quello calcolato): dal puntino della fine, con il giro intero risolto vicino al valore giusto
 function ringShown(){const A=ringA()[1],c=[...document.querySelectorAll("#timer .tr,#restIn .rr")].find(x=>x.getClientRects().length),rd=c&&c.querySelector(".rd>b");if(!rd)return A;
   const m=new DOMMatrix(getComputedStyle(rd).transform);let a=Math.atan2(m.b,m.a)*180/Math.PI;if(a<0)a+=360;return Math.abs(a+360-A)<Math.abs(a-A)?a+360:a}
-function addRest(){const l0=Math.max(0,tVal()),A0=Math.min(360,ringShown());tEnd+=15000;tTot=Math.max(tTot,(tEnd-Date.now())/1000);
+function addRest(){litOff();const l0=Math.max(0,tVal()),A0=Math.min(360,ringShown());tEnd+=15000;tTot=Math.max(tTot,(tEnd-Date.now())/1000);
   if(!RM()){const t=performance.now();tGrow={a:A0,t};tTw={a:l0,t};const f=()=>{if(!tTw||!tOn)return;tTxt();requestAnimationFrame(f)};requestAnimationFrame(f)}if(S.timer){S.timer.end=tEnd;S.timer.tot=tTot;save()}T("timer").classList.remove("over");tick()}
 T("tplus").onclick=()=>{if(!tFresh())addRest()};T("tstop").onclick=()=>{if(!tFresh())closeRest()};
 // Tocco sul timer (fuori dai bottoni): torna all'allenamento, sull'esercizio del recupero o sul successivo se l'hai finito
