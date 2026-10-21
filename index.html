@@ -3839,11 +3839,11 @@ function stopTimer(){clearInterval(tInt);tOn=false;
 let tClosing=false;
 function closeRest(){if(tClosing)return;const tm=T("timer"),inl=document.getElementById("restIn");if(RM()||(tm.hidden&&!inl)){stopTimer();return}
   tClosing=true;clearInterval(tInt);const E="cubic-bezier(.23,1,.32,1)",an=[],te=tEnd;
-  if(!tm.hidden)an.push(tm.animate([{transform:"none",opacity:1},{transform:"translateY(calc(100% + 16px))",opacity:0}],{duration:200,easing:E,fill:"forwards"}));
+  if(!tm.hidden){tm.inert=true;an.push(tm.animate([{transform:"none",opacity:1},{transform:"translateY(calc(100% + 16px))",opacity:0}],{duration:200,easing:E,fill:"forwards"}))}
   if(inl){const cs=getComputedStyle(inl),pc=getComputedStyle(inl.parentElement),gp=/flex|grid/.test(pc.display)&&inl.previousElementSibling?parseFloat(pc.rowGap)||0:0,h=inl.offsetHeight;inl.style.overflow="hidden";inl.style.boxSizing="border-box";inl.inert=true;
     // si chiude tutto lo spazio: altezza, margini e lo spazio fra gli elementi della scheda (il bordo resta e lo compensa il margine)
     an.push(inl.animate([{height:h+"px",opacity:1,marginTop:cs.marginTop,marginBottom:cs.marginBottom,paddingTop:cs.paddingTop,paddingBottom:cs.paddingBottom},{height:"0px",opacity:0,marginTop:(-gp-(parseFloat(cs.borderTopWidth)||0)-(parseFloat(cs.borderBottomWidth)||0))+"px",marginBottom:"0px",paddingTop:"0px",paddingBottom:"0px"}],{duration:200,easing:E,fill:"forwards"}))}
-  Promise.all(an.map(a=>a.finished.catch(()=>{}))).then(()=>{tClosing=false;if(tOn&&tEnd===te)stopTimer();an.forEach(a=>a.cancel())})}
+  Promise.all(an.map(a=>a.finished.catch(()=>{}))).then(()=>{tClosing=false;tm.inert=false;if(tOn&&tEnd===te)stopTimer();else if(tOn){clearInterval(tInt);tInt=setInterval(tick,250);tick()}an.forEach(a=>a.cancel())})}
 // +15 s: l'anello si riallunga in 0,32 s invece di saltare e il tempo scorre fino al valore nuovo
 let tGrow=null,tTw=null;
 // angolo dell'anello che si vede adesso (a metà di un +15 s non è quello calcolato): dal puntino della fine, con il giro intero risolto vicino al valore giusto
