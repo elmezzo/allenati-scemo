@@ -2685,9 +2685,14 @@ function bodySheet(after){const L=bodyLast(),k=iso(today()),cur=S.body.find(x=>x
    bind:(w,draw,close)=>{w.querySelector("#bSave").onclick=()=>{const v=id=>{const x=num(w.querySelector(id).value.replace(",","."));return x!=null&&x>0?x:null};
      const e={d:k,kg:v("#bKg"),arm:v("#bArm"),chest:v("#bChest"),waist:v("#bWaist")};
      if(e.kg==null&&e.arm==null&&e.chest==null&&e.waist==null){const m=w.querySelector("#bMsg");m.className="msg err";m.textContent="Scrivi almeno il peso o una misura.";return}
-     Object.keys(e).forEach(x=>e[x]==null&&delete e[x]);S.body=S.body.filter(x=>x.d!==k);S.body.push(e);if(e.kg!=null&&e.kg!==cur.kg)bodyFx=k;save();close();after&&after()}}})}
+     Object.keys(e).forEach(x=>e[x]==null&&delete e[x]);const lastM=f=>{const a=S.body.filter(x=>x[f]!=null).sort((a,b)=>a.d.localeCompare(b.d));return a.length?a[a.length-1][f]:null};measFx={};["arm","chest","waist"].forEach(f=>{const o=lastM(f);if(e[f]!=null&&o!=null&&o!==e[f])measFx[f]=o});
+     S.body=S.body.filter(x=>x.d!==k);S.body.push(e);if(e.kg!=null&&e.kg!==cur.kg)bodyFx=k;save();close();after&&after()}}})}
 // Peso nuovo: il punto cade sul grafico e la linea lo raggiunge (solo se è l'ultimo punto)
 let bodyFx=null;
+// Misure nuove: braccio, petto e vita contano dal valore che c'era al nuovo, poi compare la differenza (una volta, dopo Salva)
+let measFx=null;
+function measPlay(){const m=measFx;measFx=null;if(!m||RM())return;for(const f in m){const b=document.querySelector(`.card.body [data-mf="${f}"]`);if(!b)continue;const z=num(b.textContent.replace(",","."));if(z==null)continue;
+  txtUp(b,m[f],z,"");const sp=b.nextElementSibling;if(sp)sp.animate([{opacity:0},{opacity:1}],{duration:200,delay:600,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"})}}
 function bodyBanner(){const L=S.body.filter(x=>x.kg!=null).sort((a,b)=>b.d.localeCompare(a.d))[0];if(L&&daysAgo(L.d)<7)return"";if(S.bodySnooze&&S.bodySnooze>=iso(today()))return"";
   return `<div class="banner">${I("info")}<div><b>Peso della settimana</b><span>${L?`Ultimo: ${fk(L.kg)} kg, ${daysAgo(L.d)} giorni fa.`:"Serve per capire se stai mettendo massa."}</span></div><button id="bodyGo">Segna</button><button id="bodyNo">Non ora</button></div>`}
 function liftTrend(from,to){// variazione media del massimale stimato sui multiarticolari tra due finestre di 14 giorni
@@ -2702,7 +2707,7 @@ function bodyCard(){const W=S.body.filter(x=>x.kg!=null).sort((a,b)=>a.d.localeC
     const sg=phaseAt()==="def"?-dk:phaseAt()==="mant"?-Math.abs(dk):dk;trend=`<span class="pill ${sg>0.1?"go":sg<-0.1?"stop":""}">${dk>=0?"+":""}${fk(Math.round(dk*10)/10)} kg in ${Math.max(1,Math.round(dd/7))} sett.</span>`;
     if(dd>=14){const pct=dk/ref.kg*100/(dd/7);calo+=`<p class="note" style="margin:6px 0 0">${pct>0?"+":pct<0?"−":""}${fk(Math.abs(Math.round(pct*100)/100))}% a settimana. ${bandTxt(phaseAt(),pct)}</p>`}
     if(phaseAt()==="massa"&&dd>=28&&dk<=0.25){const lt=liftTrend(new Date(ref.d+"T00:00:00"),new Date(L.d+"T00:00:00"));if(lt!=null&&lt>0.02)calo+=`<p class="prog down"><span>Carichi su del ${fk(Math.round(lt*100))}% in ${Math.round(dd/7)} settimane, peso fermo: per mettere massa adesso il limite sono le calorie.</span></p>`}}
-  const mk=(f,l)=>{const a=M.filter(x=>x[f]!=null);if(!a.length)return"";const z=a[a.length-1],p=a[a.length-2];return `<div class="tile"><b>${fk(z[f])}</b><span>${l}${p?` · ${z[f]-p[f]>=0?"+":""}${fk(Math.round((z[f]-p[f])*10)/10)}`:""}</span></div>`};
+  const mk=(f,l)=>{const a=M.filter(x=>x[f]!=null);if(!a.length)return"";const z=a[a.length-1],p=a[a.length-2];return `<div class="tile"><b data-mf="${f}">${fk(z[f])}</b><span>${l}${p?` · ${z[f]-p[f]>=0?"+":""}${fk(Math.round((z[f]-p[f])*10)/10)}`:""}</span></div>`};
   const tiles=[mk("arm","Braccio cm"),mk("chest","Petto cm"),mk("waist","Vita cm")].join("");
   return `<section class="card body"><div class="wuh"><h3>Peso e misure</h3><button class="sbtn" id="bodyAdd">Segna</button></div>
     ${L?`<div class="kpi"><b>${fk(L.kg)}<small>kg</small></b>${trend}</div><span class="cap">Ultima pesata il ${fmtShort(L.d+"T12:00:00")}</span>`:`<p class="note" style="margin:0">Segna il peso una volta a settimana: vedrai se i chili salgono insieme ai carichi.</p>`}
@@ -3257,7 +3262,7 @@ function renderTrain(){
     save();renderTrain()});
   document.querySelectorAll("#exs [data-effskip]").forEach(b=>b.onclick=()=>{const d=draftFor(g);d.effSkip=d.effSkip||{};d.effSkip[b.dataset.effskip]=1;save();renderTrain()});
   const rp=document.querySelector("#restIn [data-tp]");if(rp)rp.onclick=()=>{if(!tFresh())addRest()};
-  const rs=document.querySelector("#restIn [data-ts]");if(rs)rs.onclick=()=>{if(!tFresh())stopTimer()};
+  const rs=document.querySelector("#restIn [data-ts]");if(rs)rs.onclick=()=>{if(!tFresh())closeRest()};
   const tb=document.querySelector('.tabs button[aria-pressed="true"]');if(tb)tb.scrollIntoView({block:"nearest",inline:"center"});
   const fb=document.getElementById("finish");fb.onclick=()=>{const miss=tot-dn;
     if(miss>0&&fb.dataset.arm!=="1"){fb.dataset.arm="1";fb.textContent=`Mancano ${miss} serie · tocca ancora`;clearTimeout(fb.t);fb.t=setTimeout(()=>{fb.dataset.arm="";fb.textContent="Termina e salva"},4000);return}
@@ -3817,6 +3822,15 @@ document.addEventListener("input",e=>{const t=e.target;if(t&&t.matches&&t.matche
 function stopTimer(){clearInterval(tInt);tOn=false;
   // Recupero chiuso prima della fine: le animazioni dell'anello si fermano (nascosto, girerebbero comunque fino allo zero)
   document.querySelectorAll("#timer .tr,#restIn .rr").forEach(c=>{c._rk=null;clearTimeout(c._rz);c.querySelectorAll(".rh>b").forEach(e=>e.getAnimations().forEach(a=>a.cancel()))});document.querySelectorAll(".tball").forEach(b=>b.remove());if(S.timer){delete S.timer;save()}T("timer").hidden=true;const inl=document.getElementById("restIn");if(inl)inl.remove()}
+// Chiudi sul recupero: il timer in basso scende e sparisce, il recupero nella scheda si richiude (200 ms), poi si ferma davvero
+let tClosing=false;
+function closeRest(){if(tClosing)return;const tm=T("timer"),inl=document.getElementById("restIn");if(RM()||(tm.hidden&&!inl)){stopTimer();return}
+  tClosing=true;const E="cubic-bezier(.23,1,.32,1)",an=[];
+  if(!tm.hidden)an.push(tm.animate([{transform:"none",opacity:1},{transform:"translateY(calc(100% + 16px))",opacity:0}],{duration:200,easing:E,fill:"forwards"}));
+  if(inl){const cs=getComputedStyle(inl),pc=getComputedStyle(inl.parentElement),gp=/flex|grid/.test(pc.display)&&inl.previousElementSibling?parseFloat(pc.rowGap)||0:0,h=inl.offsetHeight;inl.style.overflow="hidden";inl.style.boxSizing="border-box";inl.inert=true;
+    // si chiude tutto lo spazio: altezza, margini e lo spazio fra gli elementi della scheda (il bordo resta e lo compensa il margine)
+    an.push(inl.animate([{height:h+"px",opacity:1,marginTop:cs.marginTop,marginBottom:cs.marginBottom,paddingTop:cs.paddingTop,paddingBottom:cs.paddingBottom},{height:"0px",opacity:0,marginTop:(-gp-(parseFloat(cs.borderTopWidth)||0)-(parseFloat(cs.borderBottomWidth)||0))+"px",marginBottom:"0px",paddingTop:"0px",paddingBottom:"0px"}],{duration:200,easing:E,fill:"forwards"}))}
+  Promise.all(an.map(a=>a.finished.catch(()=>{}))).then(()=>{tClosing=false;if(tOn)stopTimer();an.forEach(a=>a.cancel())})}
 // +15 s: l'anello si riallunga in 0,32 s invece di saltare e il tempo scorre fino al valore nuovo
 let tGrow=null,tTw=null;
 // angolo dell'anello che si vede adesso (a metà di un +15 s non è quello calcolato): dal puntino della fine, con il giro intero risolto vicino al valore giusto
@@ -3824,7 +3838,7 @@ function ringShown(){const A=ringA()[1],c=[...document.querySelectorAll("#timer 
   const m=new DOMMatrix(getComputedStyle(rd).transform);let a=Math.atan2(m.b,m.a)*180/Math.PI;if(a<0)a+=360;return Math.abs(a+360-A)<Math.abs(a-A)?a+360:a}
 function addRest(){const l0=Math.max(0,tVal()),A0=Math.min(360,ringShown());tEnd+=15000;tTot=Math.max(tTot,(tEnd-Date.now())/1000);
   if(!RM()){const t=performance.now();tGrow={a:A0,t};tTw={a:l0,t};const f=()=>{if(!tTw||!tOn)return;tTxt();requestAnimationFrame(f)};requestAnimationFrame(f)}if(S.timer){S.timer.end=tEnd;S.timer.tot=tTot;save()}T("timer").classList.remove("over");tick()}
-T("tplus").onclick=()=>{if(!tFresh())addRest()};T("tstop").onclick=()=>{if(!tFresh())stopTimer()};
+T("tplus").onclick=()=>{if(!tFresh())addRest()};T("tstop").onclick=()=>{if(!tFresh())closeRest()};
 // Tocco sul timer (fuori dai bottoni): torna all'allenamento, sull'esercizio del recupero o sul successivo se l'hai finito
 function timerGo(){const c=tCtx;if(c&&PLAN[c.g]){gymSel=c.g;const d=S.draft[c.g],ex=exById(c.ex),n=ex?setsFor(ex,trainMods(c.g)):0,dn=((d&&d.ex[c.ex])||[]).filter(x=>x&&x.done).length;openEx[c.g]=ex&&dn<n?c.ex:null}
   if(view!=="train")go("train");else renderTrain();requestAnimationFrame(()=>keepFocus(false,openEx[c&&c.g]||undefined))}
@@ -4298,7 +4312,7 @@ function renderProg(){
   rankBind();balBind();histFx();
   const rvo=document.getElementById("rvOpen");if(rvo)rvo.onclick=()=>reviewSheet(S.cycles[S.cycles.length-1]);
   const ba=document.getElementById("bodyAdd");if(ba)ba.onclick=()=>bodySheet(renderProg);
-  const bc=document.getElementById("bodyChart");if(bc){const W=S.body.filter(x=>x.kg!=null).sort((a,b)=>a.d.localeCompare(b.d));lineChart(bc,W.map(x=>({x:new Date(x.d+"T12:00:00"),y:x.kg,label:fk(x.kg)+" kg"})),"kg",true,{fx:!!bodyFx&&W.length>1&&W[W.length-1].d===bodyFx});bodyFx=null}
+  const bc=document.getElementById("bodyChart");if(bc){const W=S.body.filter(x=>x.kg!=null).sort((a,b)=>a.d.localeCompare(b.d));lineChart(bc,W.map(x=>({x:new Date(x.d+"T12:00:00"),y:x.kg,label:fk(x.kg)+" kg"})),"kg",true,{fx:!!bodyFx&&W.length>1&&W[W.length-1].d===bodyFx});bodyFx=null}measPlay();
   const lp=pts[pts.length-1];if(pts.length>1&&lp.v>Math.max(...pts.slice(0,-1).map(p=>p.v))){const k=progEx+lp.date;if(!recShown.has(k)){recShown.add(k);setTimeout(()=>blade(app.querySelector(".card.ph")),350);setTimeout(()=>flexMus((stdOf(progEx)||{}).m||[]),350)}}
   ledify();
   lineChart(document.getElementById("lineChart"),pts.map(p=>({x:new Date(p.date),y:p.v,dl:p.dl,label:p.x?(num(p.x.kg)?fk(num(p.x.kg))+" kg × ":"")+p.x.reps+(ex.t==="time"?" s":""):""})),unit);
