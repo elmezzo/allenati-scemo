@@ -1871,6 +1871,12 @@ html[data-skin="manga"]:not(#z):not(#y):not(#x) .sheet .fxgo,html[data-skin="man
 :root:not(#z):not(#y):not(#x) .wd2 b{font-size:clamp(12px,.7059rem,15px)}
 @media (max-width:360px){:root:not(#z):not(#y):not(#x) .wd2 small{font-size:12px;letter-spacing:-.04em}:root:not(#z):not(#y):not(#x) .wk{padding-inline:2px!important;gap:1px!important}}
 
+/* ===== ANIMAZIONI v54 (2026-10-21) ===== */
+/* Serie fatta: riga più bassa (il tasto resta 44 px) */
+:root:not(#z) .set.done>.field{height:44px;min-height:0}
+.set.dlx .field{opacity:.55}.set.dlx{text-decoration:line-through;text-decoration-color:var(--muted)}
+.set.dlx .field input{text-decoration:inherit}
+.ic.bkok.abs{position:absolute;top:8px;right:8px;width:16px;height:16px}
 /* ===== ANIMAZIONI v51 (2026-10-20) ===== */
 /* 2 fine recupero: la prossima serie si accende una volta */
 .set.cue{position:relative}
@@ -2742,7 +2748,7 @@ function summarySheet(sess){
      if(r&&!RM())r.querySelectorAll("li").forEach((li,i)=>{const d=320+i*110;li.animate([{opacity:0,transform:"translateY(8px)"},{opacity:1,transform:"none"}],{duration:280,delay:d,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"});
        const em=li.querySelector("em[data-z]");if(em&&+em.dataset.a>0&&+em.dataset.z>+em.dataset.a)setTimeout(()=>{if(em.isConnected)(skinNow()==="carbonio"?txtUp:rollUp)(em,+em.dataset.a,+em.dataset.z," "+em.dataset.u)},d)});
      {const V=volRange(0,0,[sess]),ks=RMU.map(([k])=>k).filter(k=>V[k]>0);if(ks.length)setTimeout(()=>flexMus(ks,w),420)}
-     const b=w.querySelector("#sumBk"),m=w.querySelector("#sumBkM");b.onclick=async()=>{const x=await shareBackup();m.textContent=x==="ok"?"Backup salvato.":x==="no"?"Non salvato: puoi riprovare.":"Non riuscito: prova da Impostazioni.";}}})}
+     const b=w.querySelector("#sumBk"),m=w.querySelector("#sumBkM");b.onclick=async()=>{const x=await shareBackup();if(x==="ok")bkOk(b);m.textContent=x==="ok"?"Backup salvato.":x==="no"?"Non salvato: puoi riprovare.":"Non riuscito: prova da Impostazioni.";}}})}
 
 /* ================= EFFETTI ================= */
 const RM=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -2762,8 +2768,23 @@ function segSVG(str,fixed){let x=0,p="";for(const ch of str){
 function setNum(el,txt){if(!el)return;if(skinNow()==="carbonio"){if(el.dataset.t===txt&&el.querySelector(".seg7"))return;el.dataset.t=txt;el.innerHTML=`<span class="sr">${esc(txt)}</span>`+txt.replace(/([0-9:,\-]+)|([^0-9:,\-]+)/g,(m,d,o)=>d?`<span class="seg7">${segSVG(d,!!el.closest(".tr,.rr"))}</span>`:`<span class="lu" aria-hidden="true">${esc(o)}</span>`)}else{delete el.dataset.t;el.textContent=txt}}
 function ledify(){if(skinNow()!=="carbonio")return;app.querySelectorAll(".tgt b,.kpi b").forEach(b=>{if(!b.querySelector(".seg7"))setNum(b,b.textContent)})}
 // Il carico della prossima volta sale contando, una volta al giorno per esercizio
-const lastPct={},recShown=new Set();
+const lastPct={},lastDn={},recShown=new Set();let lastRow={g:null,m:new Map()};
 // Carichi già fatti scorrere oggi: salvati in S (come la Settimana con S.wkFx), così se iOS ricarica l'app non ripartono tutti
+// Serie spuntata: la riga si abbassa (fatta = più bassa) in 200 ms invece di saltare; vale anche togliendo la spunta. Solo righe già viste nello stesso disegno di prima
+function rowFx(g){const m=new Map();document.querySelectorAll("#exs .set").forEach(r=>{const t=r.querySelector(".tick[data-j],.tick.rt");if(!t)return;const k=(t.dataset.ex||t.dataset.rex)+"|"+(t.dataset.j??"r"+t.dataset.k);m.set(k,{h:r.getBoundingClientRect().height,d:r.classList.contains("done"),r})});
+  if(lastRow.g===g&&!RM())m.forEach((v,k)=>{const o=lastRow.m.get(k);if(!o||o.d===v.d||Math.abs(o.h-v.h)<2)return;v.r.querySelectorAll(":scope>.field").forEach(f=>{const h=f.getBoundingClientRect().height;f.animate([{height:(h+o.h-v.h)+"px"},{height:h+"px"}],{duration:200,easing:"cubic-bezier(.23,1,.32,1)"})})});
+  m.forEach(v=>delete v.r);lastRow={g,m}}
+// Settimana di scarico: la prima volta che apri un esercizio, le serie tolte compaiono un attimo e si sbiadiscono una per una
+function dlFx(g,mods){if(!mods.has("deload")||!S.deload||RM())return;if(!S.dlFx||S.dlFx.from!==S.deload.from)S.dlFx={from:S.deload.from,ex:[]};
+  const full=new Set([...mods].filter(x=>x!=="deload")),L=trainList(g,mods);
+  document.querySelectorAll("#exs article.ex[data-ex]").forEach(card=>{const id=card.dataset.ex;if(S.dlFx.ex.includes(id))return;const it=L.find(x=>x.ex.id===id);if(!it)return;
+    const half=setsFor(it.ex,mods),all=setsFor(it.ex,full);S.dlFx.ex.push(id);save();if(all<=half)return;
+    const rows=[...card.querySelectorAll(".sets>.set")].filter(r=>r.querySelector(".tick[data-j]"));const last=rows[rows.length-1];if(!last)return;
+    const st=last.parentElement,gap=parseFloat(getComputedStyle(st).rowGap)||0,w=document.createElement("div");w.className="dlg";w.setAttribute("aria-hidden","true");w.style.cssText=`display:flex;flex-direction:column;gap:${gap}px;overflow:hidden`;
+    for(let k=half;k<all;k++){const c=last.cloneNode(true);c.className="set dlx";c.querySelectorAll("button,.prs").forEach(b=>b.remove());c.querySelectorAll("input").forEach(i=>{i.disabled=true;i.removeAttribute("data-f");i.removeAttribute("data-ex");i.tabIndex=-1});const ix=c.querySelector(".i");if(ix)ix.textContent=k+1;w.appendChild(c)}
+    last.after(w);const n=all-half,t0=420;
+    [...w.children].forEach((c,i)=>c.animate([{opacity:1,transform:"none"},{opacity:0,transform:"translateX(14px)"}],{duration:240,delay:t0+i*110,easing:"cubic-bezier(.23,1,.32,1)",fill:"forwards"}));
+    setTimeout(()=>{if(!w.isConnected)return;const h=w.offsetHeight;w.animate([{height:h+"px",marginTop:"0px"},{height:"0px",marginTop:-gap+"px"}],{duration:220,easing:"cubic-bezier(.23,1,.32,1)",fill:"forwards"}).finished.then(()=>w.remove(),()=>w.remove())},t0+(n-1)*110+260)})}
 const counted={has:k=>!!S.odo&&S.odo.d===iso(today())&&S.odo.k.includes(k),add:k=>{const d=iso(today());if(!S.odo||S.odo.d!==d)S.odo={d,k:[]};S.odo.k.push(k);save()}};
 function countUp(b,a,z,rest){if(RM())return;const t0=performance.now();const f=t=>{if(!b.isConnected)return;const k=Math.min(1,(t-t0)/800),e=1-Math.pow(1-k,3);setNum(b,fk(Math.round((a+(z-a)*e)*10)/10)+rest);if(k<1)requestAnimationFrame(f)};setNum(b,fk(a)+rest);setTimeout(()=>requestAnimationFrame(f),250)}
 // Come countUp ma in testo normale (riepilogo in Carbonio: le cifre restano quelle della lista, non il display a 7 segmenti)
@@ -2788,7 +2809,10 @@ function veilFx(){app.querySelectorAll(".ex.cur:not(.gold)>.fp.grow").forEach(fp
   const op=x=>Math.min(1,x*6)*(.25+x*.75),a0=op(f0),a1=op(f),o={duration:FILL_MS,easing:"cubic-bezier(.45,0,.25,1)",fill:"both"};
   fp.animate([{opacity:0},{opacity:a1}],o).currentTime=el;
   if(fq&&a0>.001){const kf=[];for(let i=0;i<=10;i++){const u=i/10,dn=1-a1*u;kf.push({opacity:dn>1e-3?a0*(1-u)/dn:0})}fq.animate(kf,o).currentTime=el}})}
-function trainFx(g,pct){
+function trainFx(g,pct,mods){
+  // Serie fatte in alto: il numero scorre come il contachilometri quando sale (in Carbonio resta fermo: il titolo non è a 7 segmenti)
+  const dc=app.querySelector(".thead .dnc"),dw=lastDn[g];if(dc){const v=+dc.textContent;if(dw!=null&&v>dw&&v-dw<=3&&skinNow()!=="carbonio")rollUp(dc,dw,v,"");lastDn[g]=v}
+  rowFx(g);if(mods)dlFx(g,mods);
   const pb=app.querySelector(".pbar i"),was=lastPct[g];
   if(pb&&was!=null&&was!==pct&&!RM()){pb.style.transition="none";pb.style.setProperty("--pw",was);void pb.offsetWidth;pb.style.transition="";pb.style.setProperty("--pw",pct);if(pct>was)popEl(pb.parentElement,"shine",1200)}
   lastPct[g]=pct;document.documentElement.style.setProperty("--p",(pct/100).toFixed(2));
@@ -3028,6 +3052,12 @@ async function shareBackup(){const name="allenati-scemo-"+iso(today())+".json";
     if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:"Backup Allenati Scemo"});S.lastBackup=iso(today());save();return "ok"}}
   catch(e){if(e&&e.name==="AbortError")return "no"}
   return dlBackup()?"ok":"err"}
+// Backup salvato: l'icona del tasto diventa una spunta che si disegna
+function bkOk(b){if(!b||!b.isConnected)return;const old=b.querySelector(":scope>svg.ic");const t=document.createElement("div");
+  t.innerHTML=`<svg class="ic bkok" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7" pathLength="1" stroke-dasharray="1"/></svg>`;const ck=t.firstElementChild;
+  if(old)old.replaceWith(ck);else{ck.classList.add("abs");if(getComputedStyle(b).position==="static")b.style.position="relative";b.append(ck)}if(RM())return;const pa=ck.firstElementChild;
+  ck.animate([{opacity:0,transform:"scale(.6)"},{opacity:1,transform:"none"}],{duration:200,easing:"cubic-bezier(.23,1,.32,1)"});
+  pa.animate([{strokeDashoffset:1},{strokeDashoffset:0}],{duration:320,delay:80,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"})}
 function dlBackup(){try{S.lastBackup=iso(today());save();const b=new Blob([JSON.stringify(S,null,1)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="allenati-scemo-"+iso(today())+".json";document.body.appendChild(a);a.click();a.remove();return true}catch(e){return false}}
 function backupDue(){const L=S.sessions||[];if(L.length<3)return null;const k=iso(today());if(S.bkSnooze&&S.bkSnooze>k)return null;
   const from=S.lastBackup||L.map(x=>x.date.slice(0,10)).sort()[0],days=Math.floor((today()-new Date(from+"T00:00:00"))/864e5);return days>=14?{days,never:!S.lastBackup,n:L.length}:null}
@@ -3160,7 +3190,7 @@ function renderTrain(){
   const svd=dn?null:S.sessions.filter(x=>x.day===g&&iso(x.date)===iso(today())).slice(-1)[0];
   const savedH=svd?`<section class="card alldone saved"><p><b>${esc(P.name)} salvata</b> alle ${new Date(svd.date).toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"})}.</p><button class="btn" id="seeSv">Vedi il riepilogo</button></section>`:"";
   app.innerHTML=`
-  <div class="thead"><div class="r"><h1>${esc(P.title)}</h1><span>${dn} / ${tot} serie${dr.start&&mins>0?` · ${mins} min`:""}</span></div><div class="pbar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Serie fatte"><i style="--pw:${pct}"></i></div></div>
+  <div class="thead"><div class="r"><h1>${esc(P.title)}</h1><span><span class="dnc">${dn}</span> / ${tot} serie${dr.start&&mins>0?` · ${mins} min`:""}</span></div><div class="pbar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Serie fatte"><i style="--pw:${pct}"></i></div></div>
   <div class="tabs" role="group" aria-label="Scheda">${GYM_ORDER.map(k=>{const wd=Object.entries(S.week).find(([,v])=>v.gym===k);return `<button data-k="${k}" aria-pressed="${k===g}"><small>${wd?WD[wd[0]]:"Extra"}</small><span class="tn">${esc(PLAN[k].name)}</span></button>`}).join("")}</div>
   ${oldBoxes(g)}
   ${modNote}
@@ -3214,7 +3244,7 @@ function renderTrain(){
   if(hadFin){const fb=document.getElementById("finish");if(fb)fb.classList.add("noshine")}
   const c=document.getElementById("clear");c.onclick=()=>{if(c.dataset.arm!=="1"){c.dataset.arm="1";c.textContent="Tocca di nuovo per svuotare";setTimeout(()=>{c.dataset.arm="";c.textContent="Svuota la seduta"},3500);return}delete S.draft[g];openEx[g]=null;stopTimer();save();renderTrain()};
   fitTitles();
-  trainFx(g,pct);
+  trainFx(g,pct,mods);
   if(tOn)tick();
   wakeSync();
 }
@@ -4023,7 +4053,7 @@ function histFx(){if(histIO){histIO.disconnect();histIO=null}const sv=app.queryS
   if(typeof IntersectionObserver==="function"){histIO=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting&&e.intersectionRatio>=.35)){histIO.disconnect();histIO=null;if(sv.isConnected)histPlay(sv,k)}else if(!sv.isConnected){histIO.disconnect();histIO=null}},{threshold:[.35]});histIO.observe(sv)}else histPlay(sv,k)}
 function histPlay(sv,k){S.andSeen=k;save();const seg=sv.querySelector(".and-new"),dot=sv.querySelector(".and-dot");if(seg)seg.style.strokeDashoffset="";if(dot)dot.style.opacity="";
   if(seg)seg.animate([{strokeDashoffset:1},{strokeDashoffset:0}],{duration:520,delay:220,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"});
-  if(dot){dot.style.transformBox="fill-box";dot.style.transformOrigin="center";dot.animate([{transform:"scale(0)",opacity:0},{transform:"scale(1.5)",opacity:1,offset:.6},{transform:"scale(1)"}],{duration:420,delay:640,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"})}}
+  if(dot){dot.style.transformBox="fill-box";dot.style.transformOrigin="center";dot.animate([{transform:"scale(.5)",opacity:0},{transform:"scale(1.5)",opacity:1,offset:.6},{transform:"scale(1)"}],{duration:420,delay:640,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"})}}
 let rMode="rank";
 function rankCard(){
   const A=rankAll();
@@ -4038,10 +4068,10 @@ function rankCard(){
   const G=A.gen,nx=G.r<8?RANKS[G.r+1][0]:null;
   return `<section class="card rank">${head}
   <div class="rk-g"><div class="rk-fig">${rFigure(A)}</div>
-    <div class="rk-gen" style="--rc:${RANKS[G.r][2]}">${rBadge(G.r,"big")}<b>${RANKS[G.r][0]}</b><span>${G.pt}/100 pt</span><div class="rk-bar"><i style="width:${G.pt}%"></i></div><small>${nx?`${100-G.pt} pt a ${nx}`:"Rango massimo"}</small>${(()=>{const e=A.ex.filter(x=>x.need&&!x.need.cap).sort((a,b)=>a.need.pct-b.need.pct)[0];return e?`<p class="rk-next">Il passo più vicino: <b>${esc(e.n)} <span class="nw">${e.need.txt}</span></b> porta quell'esercizio a ${RANKS[Math.min(8,e.r+1)][0]}.</p>`:""})()}</div></div>
+    <div class="rk-gen" data-rk="gen" data-r="${G.r}" style="--rc:${RANKS[G.r][2]}">${rBadge(G.r,"big")}<b>${RANKS[G.r][0]}</b><span>${G.pt}/100 pt</span><div class="rk-bar"><i style="width:${G.pt}%"></i></div><small>${nx?`${100-G.pt} pt a ${nx}`:"Rango massimo"}</small>${(()=>{const e=A.ex.filter(x=>x.need&&!x.need.cap).sort((a,b)=>a.need.pct-b.need.pct)[0];return e?`<p class="rk-next">Il passo più vicino: <b>${esc(e.n)} <span class="nw">${e.need.txt}</span></b> porta quell'esercizio a ${RANKS[Math.min(8,e.r+1)][0]}.</p>`:""})()}</div></div>
   <div class="rk-tr">${RANKS.map((r,i)=>`<span class="${i>G.r?"off":""}${i===G.r?" cur":""}">${rBadge(i)}<em>${r[0]}</em></span>`).join("")}</div>
   ${rankHist()}
-  <div class="rk-mus">${RMU.map(([k,n])=>{const m=A.mus[k];return `<button class="rk-m${m.none?" none":""}" data-rm="${k}">${m.none?rNone():rBadge(m.r)}<b>${n}</b><small>${m.none?"Nessun dato":`<span>${m.approx?"≈ ":""}${RANKS[m.r][0]}</span><span>${m.pt}/100</span>`}</small></button>`}).join("")}</div>
+  <div class="rk-mus">${RMU.map(([k,n])=>{const m=A.mus[k];return `<button class="rk-m${m.none?" none":""}" data-rm="${k}"${m.none?"":` data-rk="${k}" data-r="${m.r}"`}>${m.none?rNone():rBadge(m.r)}<b>${n}</b><small>${m.none?"Nessun dato":`<span>${m.approx?"≈ ":""}${RANKS[m.r][0]}</span><span>${m.pt}/100</span>`}</small></button>`}).join("")}</div>
   <p class="rk-note">100 pt = un rango.${RMU.some(([k])=>A.mus[k].approx)?" ≈ = soglia indicativa (macchine e cavi).":""} Tocca un muscolo per i dettagli.</p>
 </section>`}
 function rankBind(){
@@ -4052,7 +4082,19 @@ function rankBind(){
   card.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{const k=b.dataset.rm;rSel=k;
     if(!(k in (rView==="front"?R_FRONT:R_BACK)))rView=rView==="front"?"back":"front";if(rMode==="rank")sheetFrom(b,()=>{rankRedraw();rankSheet(k)});else rankRedraw()});
   const ib=document.getElementById("rkInfo");if(ib)ib.onclick=rankInfo;
+  rkFx(card);
 }
+// Rango salito dall'ultima volta che l'hai visto: la medaglia vecchia gira e mostra la nuova, una volta, quando la medaglia si vede
+let rkIO=null;
+function rkFx(card){if(rkIO){rkIO.disconnect();rkIO=null}const els=[...card.querySelectorAll("[data-rk][data-r]")];if(!els.length)return;
+  if(!S.rkSeen||RM()){S.rkSeen={...(S.rkSeen||{}),...Object.fromEntries(els.map(e=>[e.dataset.rk,+e.dataset.r]))};save();return}
+  const sn=S.rkSeen,up=[];let ch=false;els.forEach(e=>{const k=e.dataset.rk,r=+e.dataset.r;if(sn[k]!=null&&r>sn[k])up.push(e);else if(sn[k]!==r){sn[k]=r;ch=true}});if(ch)save();
+  if(!up.length||typeof IntersectionObserver!=="function"){up.forEach(e=>{sn[e.dataset.rk]=+e.dataset.r});if(up.length)save();return}
+  rkIO=new IntersectionObserver(es=>es.forEach(en=>{const e=en.target;if(!e.isConnected){rkIO&&rkIO.unobserve(e);return}if(!en.isIntersecting||en.intersectionRatio<.6)return;rkIO.unobserve(e);
+    const k=e.dataset.rk,from=sn[k],to=+e.dataset.r;sn[k]=to;save();rkFlip(e,from,to)}),{threshold:[.6]});up.forEach(e=>rkIO.observe(e))}
+function rkFlip(e,from,to){const nb=e.querySelector(".rbd");if(!nb||from==null)return;const t=document.createElement("div");t.innerHTML=rBadge(from,[...nb.classList].filter(c=>c!=="rbd").join(" "));const ob=t.firstElementChild;if(!ob)return;
+  const P="perspective(600px) ";nb.replaceWith(ob);const back=()=>{if(ob.isConnected)ob.replaceWith(nb)};
+  ob.animate([{transform:P+"rotateY(0deg)"},{transform:P+"rotateY(90deg)"}],{duration:200,delay:160,easing:"cubic-bezier(.77,0,.175,1)",fill:"forwards"}).finished.then(()=>{back();nb.animate([{transform:P+"rotateY(-90deg)"},{transform:P+"rotateY(0deg) scale(1.08)",offset:.7},{transform:P+"rotateY(0deg)"}],{duration:380,easing:"cubic-bezier(.23,1,.32,1)"})},back)}
 // Avatar: il muscolo dell'esercizio contrae per un attimo quando c'è un record
 function flexMus(ks,root){if(RM())return;
   ks.forEach(k=>(root||document).querySelectorAll(`.rk-fig [data-rm="${k}"]`).forEach(g=>{const sc=parseFloat(g.style.getPropertyValue("--s"))||1;
@@ -4069,7 +4111,7 @@ function rankSheet(k){
       <p>Mancano ${100-m.pt} pt per ${nx}.${near.length?` I più vicini a salire: ${near.map(e=>`<b>${esc(e.n)} ${e.need.txt}</b>`).join(" oppure ")}.`:""}</p></div>`:""}
     <div class="rk-xl">${m.L.slice().sort((a,b)=>b.v-a.v).map(row).join("")}</div>
     <p class="note" style="margin:0">Il rango del muscolo è la media di questi esercizi. Conta la serie migliore delle ultime 6 settimane.${m.L.some(e=>e.approx)?" ≈ = soglia indicativa: macchina o cavo, oppure esercizio stimato da uno simile.":""}</p>`},
-   bind:()=>{}});
+   bind:w=>{const i=w.querySelector(".rk-goal .rk-bar i");if(i&&!RM())i.animate([{clipPath:"inset(0 100% 0 0)"},{clipPath:"inset(0 0 0 0)"}],{duration:520,delay:260,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"})}});
 }
 function rankInfo(){
   openSheet({html:()=>`<h2>Come si calcola</h2>
@@ -4425,7 +4467,7 @@ function renderSettings(){
   document.querySelectorAll("[data-dup]").forEach(b=>b.onclick=()=>{const P=PLAN[b.dataset.dup];editPlan=JSON.parse(JSON.stringify({key:null,name:P.name+" (copia)",sub:P.sub||"",legs:!!P.legs,ex:P.ex.map(e=>({...e,lib:e.lib||e.id}))}));go("edit")});
   document.querySelectorAll("[data-delp]").forEach(b=>b.onclick=()=>{if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Sicuro?";return}const k=b.dataset.delp;archivePlan(k,"eliminato");delete S.plans[k];for(const d in S.week)if(S.week[d].gym===k)S.week[d]={...S.week[d],gym:"none"};for(const d in S.overrides)if(S.overrides[d].gym===k)delete S.overrides[d].gym;delete S.draft[k];rebuild();save();renderSettings()});
   const bm=document.getElementById("bmsg");
-  document.getElementById("exp").onclick=async()=>{const x=await shareBackup();if(x==="ok"){bm.className="msg ok";bm.textContent="Backup salvato."}else if(x==="no"){bm.className="msg";bm.textContent="Backup non salvato."}else{bm.className="msg err";bm.textContent="Salvataggio non riuscito su questo browser."}};
+  document.getElementById("exp").onclick=async e=>{const x=await shareBackup();if(x==="ok"){bkOk(e.currentTarget||document.getElementById("exp"));bm.className="msg ok";bm.textContent="Backup salvato."}else if(x==="no"){bm.className="msg";bm.textContent="Backup non salvato."}else{bm.className="msg err";bm.textContent="Salvataggio non riuscito su questo browser."}};
   // Prima di cancellare o importare: copia dei dati attuali e "Annulla" per 10 secondi
   document.getElementById("imp").onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{const j=JSON.parse(t);if(!j||!Array.isArray(j.sessions))throw 0;const prev=S;snap();
     // Prima si prova il backup; se qualcosa non va si rimettono i dati di prima e non si salva niente
