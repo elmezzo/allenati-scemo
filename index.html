@@ -2691,7 +2691,14 @@ function bodySheet(after){const L=bodyLast(),k=iso(today()),cur=S.body.find(x=>x
 let bodyFx=null;
 // Misure nuove: braccio, petto e vita contano dal valore che c'era al nuovo, poi compare la differenza (una volta, dopo Salva)
 let measFx=null;
-function measPlay(){const m=measFx;measFx=null;if(!m||RM())return;for(const f in m){const b=document.querySelector(`.card.body [data-mf="${f}"]`);if(!b)continue;const z=num(b.textContent.replace(",","."));if(z==null)continue;
+let msIO=null;
+function measPlay(){if(msIO){msIO.disconnect();msIO=null}const m=measFx;if(!m)return;if(RM()||typeof IntersectionObserver!=="function"){measFx=null;return}const tl=document.querySelector(".card.body .tiles");if(!tl)return;
+  // Fino alla partenza i riquadri mostrano il valore di prima (niente lampo del nuovo) e la differenza è nascosta
+  for(const f in m){const b=tl.querySelector(`[data-mf="${f}"]`);if(!b)continue;b.dataset.to=b.textContent;b.textContent=fk(m[f]);if(b.nextElementSibling)b.nextElementSibling.style.opacity=0}
+  const bar=document.querySelector("nav.bar"),bh=bar?Math.max(0,Math.ceil(innerHeight-bar.getBoundingClientRect().top)):0;
+  // Parte solo quando i riquadri si vedono sopra la barra e il foglio è chiuso
+  msIO=new IntersectionObserver(es=>{if(!es.some(en=>en.isIntersecting&&en.intersectionRatio>=.9))return;msIO.disconnect();msIO=null;const go=()=>{if(!tl.isConnected)return;if(document.querySelector(".sheet")){setTimeout(go,120);return}measFx=null;measRun(m)};go()},{threshold:[.9],rootMargin:`0px 0px ${-bh}px 0px`});msIO.observe(tl)}
+function measRun(m){for(const f in m){const b=document.querySelector(`.card.body [data-mf="${f}"]`);if(!b)continue;const sp0=b.nextElementSibling;if(sp0)sp0.style.opacity="";const z=num((b.dataset.to||b.textContent).replace(",","."));delete b.dataset.to;if(z==null)continue;
   txtUp(b,m[f],z,"");const sp=b.nextElementSibling;if(sp)sp.animate([{opacity:0},{opacity:1}],{duration:200,delay:600,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"})}}
 function bodyBanner(){const L=S.body.filter(x=>x.kg!=null).sort((a,b)=>b.d.localeCompare(a.d))[0];if(L&&daysAgo(L.d)<7)return"";if(S.bodySnooze&&S.bodySnooze>=iso(today()))return"";
   return `<div class="banner">${I("info")}<div><b>Peso della settimana</b><span>${L?`Ultimo: ${fk(L.kg)} kg, ${daysAgo(L.d)} giorni fa.`:"Serve per capire se stai mettendo massa."}</span></div><button id="bodyGo">Segna</button><button id="bodyNo">Non ora</button></div>`}
@@ -2791,6 +2798,12 @@ function rowFx(g){const m=new Map(),wm=new Map(),E="cubic-bezier(.23,1,.32,1)";d
       if(!v.n){w.innerHTML=o.html.join("");w.querySelectorAll("input,button").forEach(x=>{x.tabIndex=-1;x.removeAttribute("data-ex");x.removeAttribute("data-rex");x.removeAttribute("data-rf")});w.querySelectorAll(".now").forEach(x=>x.classList.remove("now"))}
       w1.before(w);[...w.children].forEach(c=>c.animate([{opacity:1},{opacity:0}],{duration:140,easing:E,fill:"forwards"}));
       w.animate([{height:(o.h-v.h)+"px"},{height:"0px"}],{duration:220,delay:v.n?0:100,easing:E,fill:"forwards"}).finished.then(()=>w.remove(),()=>w.remove())})}
+    // Tolta l'unica serie fatta: le righe A tornano aprendosi invece di comparire di colpo
+  if(lastRow.g===g&&!RM())wm.forEach((v,id)=>{const o=lastRow.w&&lastRow.w.get(id);if(!o||v.pill||o.pill||v.n<=o.n||v.d>=o.d||v.h-o.h<2)return;const card=document.querySelector(`#exs article.ex[data-ex="${CSS.escape(id)}"]`),st=card&&card.querySelector(".sets");if(!st)return;
+      const seg=[...st.querySelectorAll(":scope>.wset,:scope>.wcap")];if(!seg.length)return;const gap=parseFloat(getComputedStyle(st).rowGap)||0,w=document.createElement("div");
+      w.style.cssText=`display:flex;flex-direction:column;gap:${gap}px;overflow:hidden;margin-bottom:${-gap}px`;seg[0].before(w);seg.forEach(x=>w.appendChild(x));
+      const unwrap=()=>{if(!w.isConnected)return;[...w.children].forEach(x=>w.before(x));w.remove()};
+      w.animate([{height:o.h+"px",opacity:o.n?1:0},{height:v.h+"px",opacity:1}],{duration:220,easing:E}).finished.then(unwrap,unwrap)})
   m.forEach(v=>delete v.r);lastRow={g,m,w:wm}}
 // Settimana di scarico: le serie tolte restano un attimo barrate sotto le altre; quando si vedono (sopra la barra in basso) si sbiadiscono una per una e lo spazio si chiude.
 // Conta come vista solo quando parte davvero; se l'esercizio si ridisegna a metà (spunta), lo spazio si chiude invece di saltare
@@ -3825,12 +3838,12 @@ function stopTimer(){clearInterval(tInt);tOn=false;
 // Chiudi sul recupero: il timer in basso scende e sparisce, il recupero nella scheda si richiude (200 ms), poi si ferma davvero
 let tClosing=false;
 function closeRest(){if(tClosing)return;const tm=T("timer"),inl=document.getElementById("restIn");if(RM()||(tm.hidden&&!inl)){stopTimer();return}
-  tClosing=true;const E="cubic-bezier(.23,1,.32,1)",an=[];
+  tClosing=true;clearInterval(tInt);const E="cubic-bezier(.23,1,.32,1)",an=[],te=tEnd;
   if(!tm.hidden)an.push(tm.animate([{transform:"none",opacity:1},{transform:"translateY(calc(100% + 16px))",opacity:0}],{duration:200,easing:E,fill:"forwards"}));
   if(inl){const cs=getComputedStyle(inl),pc=getComputedStyle(inl.parentElement),gp=/flex|grid/.test(pc.display)&&inl.previousElementSibling?parseFloat(pc.rowGap)||0:0,h=inl.offsetHeight;inl.style.overflow="hidden";inl.style.boxSizing="border-box";inl.inert=true;
     // si chiude tutto lo spazio: altezza, margini e lo spazio fra gli elementi della scheda (il bordo resta e lo compensa il margine)
     an.push(inl.animate([{height:h+"px",opacity:1,marginTop:cs.marginTop,marginBottom:cs.marginBottom,paddingTop:cs.paddingTop,paddingBottom:cs.paddingBottom},{height:"0px",opacity:0,marginTop:(-gp-(parseFloat(cs.borderTopWidth)||0)-(parseFloat(cs.borderBottomWidth)||0))+"px",marginBottom:"0px",paddingTop:"0px",paddingBottom:"0px"}],{duration:200,easing:E,fill:"forwards"}))}
-  Promise.all(an.map(a=>a.finished.catch(()=>{}))).then(()=>{tClosing=false;if(tOn)stopTimer();an.forEach(a=>a.cancel())})}
+  Promise.all(an.map(a=>a.finished.catch(()=>{}))).then(()=>{tClosing=false;if(tOn&&tEnd===te)stopTimer();an.forEach(a=>a.cancel())})}
 // +15 s: l'anello si riallunga in 0,32 s invece di saltare e il tempo scorre fino al valore nuovo
 let tGrow=null,tTw=null;
 // angolo dell'anello che si vede adesso (a metà di un +15 s non è quello calcolato): dal puntino della fine, con il giro intero risolto vicino al valore giusto
@@ -4134,11 +4147,11 @@ function rkFx(card){if(rkIO){rkIO.disconnect();rkIO=null}const els=[...card.quer
   up.forEach(e=>{const l=rkLbl(e);e._rk={nb:e.querySelector(".rbd"),txt:l?l.textContent:""};rkSet(e,sn[e.dataset.rk],/^≈/.test(e._rk.txt))});
   // La barra in basso copre il fondo dello schermo: conta come visibile solo sopra di lei
   const bar=document.querySelector("nav.bar"),bh=bar?Math.ceil(innerHeight-bar.getBoundingClientRect().top):0;
-  rkIO=new IntersectionObserver(es=>es.forEach(en=>{const e=en.target;if(!e.isConnected){rkIO&&rkIO.unobserve(e);return}if(!en.isIntersecting||en.intersectionRatio<.6)return;rkIO.unobserve(e);
-    const k=e.dataset.rk;sn[k]=+e.dataset.r;save();rkFlip(e)}),{threshold:[.6],rootMargin:`0px 0px ${-Math.max(0,bh)}px 0px`});up.forEach(e=>rkIO.observe(e))}
+  rkIO=new IntersectionObserver(es=>es.forEach(en=>{const bd=en.target,e=bd.closest("[data-rk]");if(!bd.isConnected||!e){rkIO&&rkIO.unobserve(bd);return}if(!en.isIntersecting||en.intersectionRatio<.9)return;rkIO.unobserve(bd);
+    const k=e.dataset.rk;sn[k]=+e.dataset.r;save();rkFlip(e)}),{threshold:[.9],rootMargin:`0px 0px ${-Math.max(0,bh)}px 0px`});up.forEach(e=>rkIO.observe(e.querySelector(".rbd")))}
 function rkFlip(e){const ob=e.querySelector(".rbd"),st=e._rk;if(!ob||!st)return;const P="perspective(600px) ",E="cubic-bezier(.23,1,.32,1)";
   const done=()=>{if(ob.isConnected)ob.replaceWith(st.nb);const l=rkLbl(e);if(l)l.textContent=st.txt;e._rk=null};
-  ob.animate([{transform:P+"rotateY(0deg)"},{transform:P+"rotateY(90deg)"}],{duration:150,delay:120,easing:E,fill:"forwards"}).finished.then(()=>{done();
+  ob.animate([{transform:P+"rotateY(0deg)"},{transform:P+"rotateY(90deg)"}],{duration:130,delay:120,easing:"linear",fill:"forwards"}).finished.then(()=>{done();
     st.nb.animate([{transform:P+"rotateY(-90deg)"},{transform:P+"rotateY(0deg) scale(1.06)",offset:.7},{transform:P+"rotateY(0deg)"}],{duration:300,easing:E});
     const l=rkLbl(e);if(l)l.animate([{opacity:0,transform:"translateY(4px)"},{opacity:1,transform:"none"}],{duration:200,easing:E})},done)}
 // Avatar: il muscolo dell'esercizio contrae per un attimo quando c'è un record
