@@ -3,7 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0a0920">
+<meta name="theme-color" content="#edf1f5">
+<script>/* stile giusto prima del primo disegno, niente lampo scuro all'avvio */
+try{var _s=JSON.parse(localStorage.getItem("allenati-scemo.v1")||"{}"),_h=document.documentElement,_k=_s.skin||"vetro",_m=_s.sera||"auto",_o=new Date().getHours();_h.dataset.skin=_k;_h.dataset.var=String((_s.vars||{})[_k]||0);if(_k==="vetro"&&(_m==="sera"||(_m==="auto"&&(_o>=19||_o<7))))_h.dataset.sera="";var _t=document.querySelector('meta[name="theme-color"]');if(_t)_t.content=_k!=="vetro"?"#10151d":_h.hasAttribute("data-sera")?"#0f1932":"#edf1f5"}catch(e){}</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,7 +17,7 @@
 <title>Allenati Scemo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Big+Shoulders+Display:wght@700;800&family=Cabin+Sketch:wght@400;700&family=Manrope:wght@400;500;600;700;800&family=Dela+Gothic+One&family=Syne:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bodoni+Moda:opsz,wght@6..96,500..900&family=Big+Shoulders+Display:wght@700;800&family=Cabin+Sketch:wght@400;700&family=Manrope:wght@400;500;600;700;800&family=Dela+Gothic+One&family=Syne:wght@600;700;800&display=swap">
 <style>
 /* Layout: app a schermo intero da telefono, scuro per scelta (stile "Notte"). Header con giorno, contenuto scorrevole, timer sopra la barra di navigazione in basso. */
 :root{
@@ -1920,6 +1922,94 @@ html[data-skin="lavagna"] .wpill{border-radius:4px}
 @keyframes wPill{from{opacity:0;transform:scale(.94)}}
 html.vt-wf::view-transition-old(root){animation:vtOut .14s var(--ease-out) both}
 html.vt-wf::view-transition-new(root){animation:vtIn .14s var(--ease-out) both}
+/* ===== VETRO "MURANO" (2026-10-21): vetro lattimo, inchiostro blu notte, lastra di vetro colorato; di sera la stessa fornace al buio ===== */
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4){color-scheme:light;
+ --m-bg:#edf1f5;--m-card:#fbfcfd;--m-card2:#e6ebf1;--m-field:#f3f6f9;--m-line:rgba(16,33,63,.12);--m-line2:rgba(16,33,63,.18);
+ --m-ink:#10213f;--m-mut:#46536c;--m-dim:#5d6982;--m-shadow:rgba(16,33,63,.18);--m-hi:rgba(255,255,255,.9);
+ --m-acc:#1e3fae;--m-acc-rgb:30,63,174;--m-s1:#3158d4;--m-s2:#1a37a0;--m-s3:#122a7e;--m-cane:#5d7cf0;
+ --bg:var(--m-bg);--card:var(--m-card);--card-2:var(--m-card2);--cardbg:var(--m-card);--tilebg:var(--m-card);--field:var(--m-field);--line:var(--m-line);
+ --fg:var(--m-ink);--muted:var(--m-mut);--dim:var(--m-dim);--acc:var(--m-acc);--acc-rgb:var(--m-acc-rgb);--hot:var(--m-acc);--hot-ink:#fff;
+ --go:#0d7148;--adapt:#9a4a08;--stop:#b3202b;--info:var(--m-acc);--pad:#0b6a74;--match:#8a2a80;--hl:rgba(var(--m-acc-rgb),.08);
+ --grad:linear-gradient(var(--m-acc),var(--m-acc));--title:linear-gradient(var(--m-ink),var(--m-ink));--navbg:rgba(251,252,253,.86);--glow:transparent;
+ --display:"Bodoni Moda","Bodoni 72",Didot,"Times New Roman",serif;--bgimg:none;
+ --rk-n:rgba(16,33,63,.16);--rk-0:rgba(16,33,63,.05);--rk-c:rgba(16,33,63,.16)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4)[data-var="1"]{--m-acc:#a3162f;--m-acc-rgb:163,22,47;--m-s1:#c8314b;--m-s2:#9c1830;--m-s3:#760f22;--m-cane:#e6687e}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4)[data-var="2"]{--m-acc:#0a6670;--m-acc-rgb:10,102,112;--m-s1:#16909a;--m-s2:#0b6d77;--m-s3:#06525b;--m-cane:#4cc3c9}
+/* di sera: stesso vetro, fornace spenta. Fondo blu inchiostro, mai nero */
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4)[data-sera]{color-scheme:dark;
+ --m-bg:#0f1932;--m-card:#172443;--m-card2:#1f2e52;--m-field:#0c1529;--m-line:rgba(214,226,255,.12);--m-line2:rgba(214,226,255,.2);
+ --m-ink:#eef2f8;--m-mut:#b8c3da;--m-dim:#9ba8c4;--m-shadow:rgba(2,6,18,.6);--m-hi:rgba(255,255,255,.08);
+ --m-acc:#9fb4ff;--m-acc-rgb:159,180,255;--m-s1:#3a62e0;--m-s2:#2547b8;--m-s3:#1a3591;--m-cane:#7f9cff;
+ --go:#7fe0a6;--adapt:#ffbe72;--stop:#ff8f8f;--pad:#7fd8e2;--match:#e6a6ff;--navbg:rgba(19,30,56,.86);
+ --rk-n:rgba(214,226,255,.10);--rk-0:rgba(214,226,255,.05);--rk-c:rgba(214,226,255,.18)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4)[data-sera][data-var="1"]{--m-bg:#221019;--m-card:#321a26;--m-card2:#3e2230;--m-field:#1b0c14;--m-acc:#ff9aae;--m-acc-rgb:255,154,174;--m-s1:#d03a55;--m-s2:#a8203a;--m-s3:#80162b;--m-cane:#ff7d95;--m-mut:#dcc2ca;--m-dim:#c0a3ad;--navbg:rgba(40,20,30,.86)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4)[data-sera][data-var="2"]{--m-bg:#0b2226;--m-card:#123137;--m-card2:#183c43;--m-field:#081b1f;--m-acc:#79dde0;--m-acc-rgb:121,221,224;--m-s1:#12808a;--m-s2:#0f7680;--m-s3:#095a63;--m-cane:#5fd3d8;--navbg:rgba(14,40,45,.86)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) body{background:var(--m-bg)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) body::before{display:none!important;animation:none!important}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) #aurw{display:none}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .sbar{background:var(--m-ink)!important}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4)[data-sera] .sbar{background:var(--m-bg)!important}
+/* schede: vetro lattimo pieno, bordo sottile, ombra corta */
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) :is(.card,.ex,.status,details.h,.banner,.hero,.tile,.tabs button,.ctx button,.xrow,.dayr,.rest:not(.over)){background:var(--m-card);-webkit-backdrop-filter:none;backdrop-filter:none;border:1px solid var(--m-line);box-shadow:inset 0 1px 0 var(--m-hi),0 1px 2px rgba(16,33,63,.05),0 8px 20px -12px var(--m-shadow)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) :is(.card,.ex,.status,details.h)::before{display:none}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .tabs button[aria-pressed="true"]{background:var(--m-ink);color:var(--m-bg);border-color:var(--m-ink)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .ex.cur{border-color:rgba(var(--m-acc-rgb),.5);box-shadow:0 0 0 3px rgba(var(--m-acc-rgb),.12),0 8px 20px -12px var(--m-shadow)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .field{background:var(--m-field);border-color:var(--m-line2)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .tick{background:var(--m-card2);color:var(--m-dim)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .chip{background:var(--m-card2);color:var(--m-mut)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .seg{background:var(--m-card2)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .seg button[aria-pressed="true"]{background:var(--m-card);color:var(--m-ink);box-shadow:0 1px 3px var(--m-shadow)}
+/* Bodoni su titoli e numeri grandi */
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) :is(h1,h2,h3,.hero .big,.tgt b,.kpi b,.dayr .d,.timer .t,.rest .tv){font-family:var(--display);font-weight:800;letter-spacing:-.01em;font-optical-sizing:auto;font-variant-numeric:lining-nums}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) :is(h1,.hero .big){font-weight:900}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) div.timer .t{font-size:.84em;font-variant-numeric:lining-nums tabular-nums}
+/* bottone principale: una goccia di vetro colorato */
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .btn.hot{color:#fff;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.26),rgba(255,255,255,0) 48%),var(--m-s2);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -2px 0 rgba(0,0,0,.18),0 6px 16px -6px rgba(var(--m-acc-rgb),.5)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4)[data-sera] .btn.hot{background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 48%),var(--m-s1);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -2px 0 rgba(0,0,0,.25),0 6px 16px -6px rgba(0,0,0,.6)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .btn.hot::before,html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .btn.hot::after{display:none}
+/* la lastra: la seduta di oggi è un pezzo di vetro colorato */
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .card.hero{background:radial-gradient(120% 70% at 18% 0%,rgba(255,255,255,.22),transparent 55%),linear-gradient(160deg,var(--m-s1),var(--m-s2) 55%,var(--m-s3));border:1px solid var(--m-s3);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -1px 0 rgba(0,0,0,.25),0 18px 34px -16px rgba(var(--m-acc-rgb),.55)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4)[data-sera] .card.hero{box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -1px 0 rgba(0,0,0,.3),0 18px 34px -16px rgba(0,0,0,.7)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .card.hero :is(.big,h1,h2,h3){color:#fff;background:none;-webkit-text-fill-color:#fff}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .card.hero :is(p,.meta,.meta span,.meta b,.hn,small){color:rgba(255,255,255,.9)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .card.hero .pill{background:rgba(255,255,255,.16);color:#fff}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .card.hero .pill .dot{background:#fff}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .card.hero .btn.hot{background:linear-gradient(180deg,#fff,#e8edf7);color:var(--m-s2);box-shadow:inset 0 -2px 0 rgba(16,33,63,.12),0 6px 16px -6px rgba(0,0,0,.4)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .card.hero .btn:not(.hot),html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .card.hero .link{color:#fff}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .card.hero .btn:not(.hot){border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.08)}
+/* firma: la canna di vetro a filigrana sulle barre di avanzamento */
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) :is(.pbar i,.rk-bar i){background:repeating-linear-gradient(115deg,rgba(255,255,255,.5) 0 2px,transparent 2px 9px),linear-gradient(180deg,var(--m-cane),var(--m-s2) 55%,var(--m-s3))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.55)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .rk-bar{background:var(--m-card2);border-color:var(--m-line)}
+/* serie fatta: una perla di vetro */
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) button.tick[aria-pressed="true"]{background:radial-gradient(60% 50% at 35% 25%,rgba(255,255,255,.5),transparent 60%),linear-gradient(160deg,#1f9a68,#0d7148)!important;color:#fff!important;box-shadow:inset 0 -2px 0 rgba(0,0,0,.2),0 6px 14px -6px rgba(13,113,72,.55)!important}
+/* il vetro vero resta solo su ciò che galleggia */
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) nav.bar{background:var(--navbg);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);border-top:1px solid var(--m-line)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .thead{background:var(--m-bg)!important;-webkit-backdrop-filter:none;backdrop-filter:none;border-bottom:1px solid var(--m-line)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) div.timer:not(.over){background:color-mix(in srgb,var(--m-card) 84%,transparent);-webkit-backdrop-filter:blur(20px) saturate(170%);backdrop-filter:blur(20px) saturate(170%);border:1px solid var(--m-line2);box-shadow:inset 0 1px 0 var(--m-hi),0 14px 30px -10px var(--m-shadow);color:var(--m-ink)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .sheet{background:color-mix(in srgb,var(--m-card) 94%,transparent);-webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);border-top:1px solid var(--m-line2);color:var(--m-ink)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) :is(.dayr .d,.ho-t,.ho-top b,.kpi b,.pitem b,.pl b,.prs,.rk-gen>b,.target,.tile b,details.h summary b){font-family:var(--display);font-weight:800;font-variant-numeric:lining-nums}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .wd b{font-family:var(--ui);font-weight:800}
+/* PIPPA e oro restano come sono */
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .cele .txt{font-family:"Big Shoulders Display","Bebas Neue",sans-serif}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .rk-seg{background:var(--m-card2);border-color:var(--m-line)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .rk-seg button[aria-pressed="true"]{background:var(--m-card);color:var(--m-ink);box-shadow:0 1px 3px var(--m-shadow)}
+/* Bodoni è più largo del condensato di prima: il carico resta su una riga anche sugli iPhone piccoli */
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .ex .tgt b{font-size:min(46px,11.8vw);letter-spacing:-.02em}
+/* revisione 2026-10-21 */
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) :is(.set .i,.edx .top b){font-family:var(--ui);font-weight:800;font-variant-numeric:tabular-nums}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .rk-pr>b{font-family:var(--ui);font-weight:800}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .card.hero .big{font-size:clamp(40px,15vw,74px);overflow-wrap:anywhere;hyphens:auto}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4)[data-sera] div.timer.over{background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 48%),#0d7148;color:#fff}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .wu .wub .btn:not(.ghost){background:rgba(var(--m-acc-rgb),.12);color:var(--m-acc);border-color:rgba(var(--m-acc-rgb),.45);box-shadow:none}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .btn.hot:disabled{background:var(--m-card2);color:var(--m-dim);box-shadow:none}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .sheet{background:var(--m-card)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .sheet .fxgo,html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4)[data-sera] .sheet .fxgo{border-radius:14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -2px 0 rgba(0,0,0,.18),0 -12px 24px -8px var(--m-shadow),0 40px 0 30px var(--m-card)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .sheet .fxgo:disabled,html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4)[data-sera] .sheet .fxgo:disabled{border-radius:14px;box-shadow:0 -12px 24px -8px var(--m-shadow),0 40px 0 30px var(--m-card)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .seg button[aria-pressed="true"],html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .rk-seg button[aria-pressed="true"]{border:1px solid var(--m-line2)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4)[data-sera] .seg button[aria-pressed="true"],html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4)[data-sera] .rk-seg button[aria-pressed="true"]{background:rgba(var(--m-acc-rgb),.24);color:#fff;border-color:rgba(var(--m-acc-rgb),.5);box-shadow:none}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4)[data-sera] .ex.cur.gold span.ad{color:var(--m-ink)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .rk-h button{white-space:nowrap}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .rk-next b{font-family:var(--ui);font-weight:800}
 </style>
 <!--APP-HEAD-END-->
 </head>
@@ -3589,7 +3679,7 @@ function fillAnim(id,fr){const now=Date.now();let m=fillMem[id];
   if(!m||typeof m!=="object")m=fillMem[id]={from:fr,to:fr,t0:0};
   if(m.to!==fr){const k=Math.min(1,(now-m.t0)/FILL_MS),cur=m.from+(m.to-m.from)*k;m.from=cur;m.to=fr;m.t0=now}
   const el=now-m.t0;return {from:m.from,el,on:!RM()&&el<FILL_MS&&m.from!==fr}}
-function fillCol(f){const v=S.fillv||"tramonto",L=FILLV[v];if(!L)return v==="stile"?"var(--hot)":"var(--go)";
+function fillCol(f){const v=S.fillv||(S.skin==="vetro"?"stile":"tramonto"),L=FILLV[v];if(!L)return v==="stile"?"var(--hot)":"var(--go)";
   let i=0;while(i<L.length-2&&f>L[i+1][0])i++;const [a,ca]=L[i],[b,cb]=L[i+1],t=Math.max(0,Math.min(1,(f-a)/(b-a)));return "rgb("+ca.map((x,k)=>Math.round(x+(cb[k]-x)*t)).join(",")+")"}
 // Fine esercizio: la scheda resta in primo piano il tempo della passata dorata, poi passa al prossimo
 function goldCard(g,exId,after){goldHold={g,ex:exId};openEx[g]=exId;renderTrain();keepFocus(false,exId);
@@ -4422,14 +4512,18 @@ function barChart(el,data){
 }
 
 /* ================= WEEK / SETTINGS ================= */
-const SKINS=[["vetro","Vetro","linear-gradient(135deg,#ff7d66 45%,#4b46b8 55%)"],["carbonio","Carbonio","repeating-linear-gradient(45deg,#2a2f36 0 3px,#14171b 3px 6px),#ffb000"],["campo","Campo","linear-gradient(135deg,#12306a 50%,#e4ff3a 50%)"],["manga","Manga","radial-gradient(circle,rgba(255,255,255,.35) 1.1px,transparent 1.5px) 0 0/6px 6px,linear-gradient(135deg,#1a191e 58%,#ff2340 58%)"],["lavagna","Lavagna","linear-gradient(135deg,#1d2521 55%,#ffd84d 55%)"],["eclisse","Eclisse","radial-gradient(circle at 50% 50%,#040406 0 34%,#fffaf2 36%,#ff5277 48%,#040406 66%)"]];
-const SKVARS={vetro:[["Viola","linear-gradient(135deg,#ff7d66 45%,#4b46b8 55%)"],["Oceano","linear-gradient(135deg,#5cc8ff 45%,#3b3fa8 55%)"],["Smeraldo","linear-gradient(135deg,#3fe0b0 45%,#1d4f8a 55%)"]],
+const SKINS=[["vetro","Vetro","linear-gradient(135deg,#edf1f5 50%,#1e3fae 50%)"],["carbonio","Carbonio","repeating-linear-gradient(45deg,#2a2f36 0 3px,#14171b 3px 6px),#ffb000"],["campo","Campo","linear-gradient(135deg,#12306a 50%,#e4ff3a 50%)"],["manga","Manga","radial-gradient(circle,rgba(255,255,255,.35) 1.1px,transparent 1.5px) 0 0/6px 6px,linear-gradient(135deg,#1a191e 58%,#ff2340 58%)"],["lavagna","Lavagna","linear-gradient(135deg,#1d2521 55%,#ffd84d 55%)"],["eclisse","Eclisse","radial-gradient(circle at 50% 50%,#040406 0 34%,#fffaf2 36%,#ff5277 48%,#040406 66%)"]];
+const SKVARS={vetro:[["Cobalto","linear-gradient(135deg,#edf1f5 45%,#1e3fae 55%)"],["Rubino","linear-gradient(135deg,#edf1f5 45%,#a3162f 55%)"],["Acquamare","linear-gradient(135deg,#edf1f5 45%,#0a6670 55%)"]],
  lavagna:[["Giallo","linear-gradient(135deg,#1d2521 55%,#ffd84d 55%)"],["Azzurro","linear-gradient(135deg,#1d2521 55%,#7fd0ff 55%)"],["Rosa","linear-gradient(135deg,#1d2521 55%,#ff94bd 55%)"]],
  eclisse:[["Rosa","radial-gradient(circle,#040406 0 34%,#fffaf2 36%,#ff5277 50%,#040406 68%)"],["Oro","radial-gradient(circle,#050403 0 34%,#fff1d2 36%,#ffb347 50%,#050403 68%)"],["Plasma","radial-gradient(circle,#02040a 0 34%,#e2f4ff 36%,#8f7bff 50%,#02040a 68%)"]],
  carbonio:[["Ambra","radial-gradient(circle,#ffd257,#ffb000 60%,#14171b 62%)"],["Rosso","radial-gradient(circle,#ff9a90,#ff3b30 60%,#14171b 62%)"],["Ciano","radial-gradient(circle,#a6f6ff,#19e3ff 60%,#14171b 62%)"]],
  campo:[["Cemento","linear-gradient(135deg,#12306a 55%,#e4ff3a 55%)"],["Terra rossa","linear-gradient(135deg,#a8441f 55%,#e4ff3a 55%)"],["Erba","linear-gradient(135deg,#1f6a38 55%,#e4ff3a 55%)"]],
  manga:[["Rosso","linear-gradient(135deg,#1a191e 55%,#ff2340 55%)"],["Blu","linear-gradient(135deg,#1a191e 55%,#2f7bff 55%)"],["Giallo","linear-gradient(135deg,#1a191e 55%,#ffd400 55%)"]]};
-function applySkin(){const h=document.documentElement;if(!SKINS.some(x=>x[0]===S.skin))S.skin="vetro";const sk=S.skin;h.dataset.var=String((S.vars||{})[sk]||0);h.dataset.skin=sk;
+// Vetro di sera: "auto" = scuro dalle 19 alle 7, oppure sempre giorno / sempre sera
+function seraOn(){const m=S.sera||"auto";if(m==="sera")return true;if(m==="giorno")return false;const h=new Date().getHours();return h>=19||h<7}
+function seraSync(){if(S.skin!=="vetro")return;const on=seraOn();if(on!==document.documentElement.hasAttribute("data-sera"))applySkin()}
+setInterval(seraSync,60000);document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")seraSync()});
+function applySkin(){const h=document.documentElement;if(!SKINS.some(x=>x[0]===S.skin))S.skin="vetro";const sk=S.skin;h.dataset.var=String((S.vars||{})[sk]||0);h.dataset.skin=sk;if(sk==="vetro"&&seraOn())h.dataset.sera="";else delete h.dataset.sera;
   if(sk==="campo"){const c=T("court");c.classList.remove("draw");void c.getBoundingClientRect();c.classList.add("draw")}
   if(sk==="carbonio"&&!RM()){h.classList.remove("boot");void h.offsetWidth;h.classList.add("boot");clearTimeout(applySkin.t);applySkin.t=setTimeout(()=>h.classList.remove("boot"),1000)}
   if(tOn)tick();const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=getComputedStyle(document.documentElement).getPropertyValue("--bg").trim()||"#10151d"}
@@ -4495,7 +4589,7 @@ function renderSettings(){
    <div class="tgl"><div><b>Recupero adattivo</b><small>30 s in più dopo una serie sotto le ripetizioni o segnata "Al limite" su un multiarticolare, trazioni comprese.</small></div><button role="switch" data-tg="adrest" aria-checked="${S.adrest!==false}" aria-label="Recupero adattivo"></button></div>
   </section>
   <section class="card"><h3>Stile</h3><div class="skins" id="skins">${SKINS.map(([k,l,g])=>`<button data-s="${k}" aria-pressed="${(S.skin||"vetro")===k}"><i style="background:${g}"></i>${l}</button>`).join("")}</div>
-   <div class="vars" role="group" aria-label="Colore dello stile"><span>Colore: ${SKVARS[S.skin||"vetro"][(S.vars||{})[S.skin||"vetro"]||0][0]}</span>${SKVARS[S.skin||"vetro"].map(([l,g],i)=>`<button data-var="${i}" aria-label="${l}" aria-pressed="${((S.vars||{})[S.skin||"vetro"]||0)===i}" style="background:${g}"></button>`).join("")}</div></section>
+   <div class="vars" role="group" aria-label="Colore dello stile"><span>Colore: ${SKVARS[S.skin||"vetro"][(S.vars||{})[S.skin||"vetro"]||0][0]}</span>${SKVARS[S.skin||"vetro"].map(([l,g],i)=>`<button data-var="${i}" aria-label="${l}" aria-pressed="${((S.vars||{})[S.skin||"vetro"]||0)===i}" style="background:${g}"></button>`).join("")}</div>${(S.skin||"vetro")==="vetro"?`<div class="q"><span class="lab">Giorno e sera</span><div class="seg" id="segSera">${[["auto","Automatico"],["giorno","Giorno"],["sera","Sera"]].map(([v,l])=>`<button data-sera="${v}" aria-pressed="${(S.sera||"auto")===v}">${l}</button>`).join("")}</div><p class="note" style="margin:0">Automatico: chiaro di giorno, scuro dalle 19 alle 7.</p></div>`:""}</section>
   <section class="card"><h3>Regole che l'app applica</h3>
    <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px">
     <li>Ripetizioni prima, carico poi: +1 ripetizione per serie finché chiudi tutto al limite alto del range, poi aumenta il carico e riparti dal basso. L'aumento segue l'attrezzo: +5 kg macchine e stazione cavi (pacco pesi), +2,5 kg cavo singolo (alzate, extrarotazione, pulley), bilanciere e Smith, +2 kg manubri e zavorra con kettlebell. Sui multiarticolari pesanti, se il 2,5% (parte alta) o il 5% (gambe) del carico è più del gradino, sale di quello, arrotondato al gradino.</li>
@@ -4528,6 +4622,7 @@ function renderSettings(){
   // Tutta la riga accende o spegne l'interruttore
   document.querySelectorAll(".tgl").forEach(r=>{const b=r.querySelector("[data-tg]");if(b)r.onclick=e=>{if(!e.target.closest("[data-tg]"))b.click()}});
   document.querySelectorAll("[data-tg]").forEach(b=>b.onclick=()=>{const k=b.dataset.tg;S[k]=S[k]===false;save();if(k==="sound"&&S.sound){audioUnlock();beep()}renderSettings()});
+  document.querySelectorAll("#segSera [data-sera]").forEach(b=>b.onclick=e=>{if((S.sera||"auto")===b.dataset.sera)return;skinVT(e,()=>{S.sera=b.dataset.sera;save();applySkin();renderSettings()})});
   document.querySelectorAll(".vars [data-var]").forEach(b=>b.onclick=e=>{S.vars=S.vars||{};if((S.vars[S.skin||"vetro"]||0)===+b.dataset.var)return;skinVT(e,()=>{S.vars[S.skin||"vetro"]=+b.dataset.var;save();applySkin();renderSettings()})});
   document.getElementById("newPlan").onclick=()=>{editPlan={key:null,name:"",sub:"",legs:false,ex:[blankEx()]};go("edit")};
   document.querySelectorAll("[data-ed]").forEach(b=>b.onclick=()=>{const k=b.dataset.ed,P=PLAN[k];editPlan=JSON.parse(JSON.stringify({key:k,name:P.name,sub:P.sub||"",legs:!!P.legs,ex:P.ex}));go("edit")});
