@@ -1006,7 +1006,7 @@ details.wu summary::-webkit-details-marker{display:none}
 details.wu[open] ol{margin-top:12px}
 /* Link secondari e Svuota staccato da Termina e salva */
 .lnk{border:0;background:none;color:var(--muted);font-weight:700;font-size:max(14px,0.8235rem);min-height:44px;padding:0 2px;text-decoration:underline;text-underline-offset:3px;align-self:flex-start;text-align:left}
-.lnk.clr{align-self:center;margin-top:-4px}
+.lnk.clr{align-self:center;margin-top:10px}
 .ex .lnk.setup0{margin-block:-6px}
 /* Bottoni a misura di dito (44 pt) */
 :root:not(#z) .pm{width:32px;height:44px;position:relative}
@@ -2201,6 +2201,9 @@ try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}ca
 function archivePlan(key,why){if(!PLAN[key])return;S.archive.unshift({id:"v"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),key,at:new Date().toISOString(),why,plan:JSON.parse(JSON.stringify(PLAN[key]))});S.archive=S.archive.slice(0,60)}
 // Prima di cancellare, importare o scartare: copia dei dati attuali e "Annulla" per 10 secondi nel messaggio della schermata
 const snap=()=>{try{localStorage.setItem(KEY+".bak",JSON.stringify(S))}catch(e){}};
+// Conferma con due tocchi (Termina con serie mancanti, Svuota, Elimina seduta): il secondo vale solo se arriva dopo 0,6 s, così un doppio tocco involontario non conferma; dopo 4 s il tasto torna normale
+function arm2(b,txt,lbl){const n=performance.now();if(b.dataset.arm!=="1"){b.dataset.arm="1";b._at=n;b.textContent=txt;clearTimeout(b._t);b._t=setTimeout(()=>{if(b.dataset.arm==="1"){b.dataset.arm="";b.textContent=lbl}},4000);return false}
+  if(n-b._at<600)return false;clearTimeout(b._t);b.dataset.arm="";return true}
 function undoable(txt){const m=document.getElementById("bmsg")||document.getElementById("omsg")||document.getElementById("msg");if(!m)return;m.className="msg ok";m.innerHTML=`${esc(txt)} <button class="lnk" id="undoD">Annulla</button>`;
   const u=document.getElementById("undoD");const t=setTimeout(()=>{if(u.isConnected)u.remove()},10000);
   u.onclick=()=>{clearTimeout(t);try{S=JSON.parse(localStorage.getItem(KEY+".bak"));normS();rebuild();save();applySkin();render();const mm=document.getElementById("bmsg")||document.getElementById("omsg")||document.getElementById("msg");if(mm){mm.className="msg ok";mm.textContent="Dati ripristinati."}}catch(e){}}}
@@ -2591,7 +2594,8 @@ function render(){
   if(tOn)tick();
   wakeSync();
 }
-function go(v){const from=view,upd=()=>{view=v;if(v!=="edit"){S.view=v;save()}render();window.scrollTo(0,0)};
+let trainArrive=false;
+function go(v){goldFlush();const from=view,upd=()=>{view=v;if(v!=="edit"){S.view=v;save()}render();window.scrollTo(0,0);if(trainArrive){trainArrive=false;if(v==="train")nowReveal(false)}};
   // Oggi <-> Allenamento: la scheda della seduta si trasforma nell'intestazione (e ritorno)
   const pair=(from==="oggi"&&v==="train")||(from==="train"&&v==="oggi");
   if(pair&&document.startViewTransition&&!RM()){const h=document.documentElement;h.classList.add("vt-sed");h.classList.toggle("vt-back",v==="oggi");
@@ -3113,7 +3117,6 @@ const HOW={
 const howOf=ex=>HOW[(ex.n||"").toLowerCase().trim()]||null;
 const errOf=ex=>(typeof ERRS!=="undefined"&&ERRS[(ex.n||"").toLowerCase().trim()])||null;
 const IMGEX={};
-const qmark=ex=>(howOf(ex)||errOf(ex)||ex.note)?(IMGEX[ex.id]=ex,`<span class="qm" role="button" tabindex="0" data-img="${ex.id}" aria-label="Come si fa: ${esc(ex.n)}">?</span>`):"";
 function imgSheet(ex){const how=howOf(ex),k=(ex.n||"").toLowerCase().trim();const mu=muscOf(ex)||(ex.mu||muOf(ex.id)?muLbl(ex.mu||muOf(ex.id)):"");
   openSheet({html:()=>`<h2>${esc(ex.n)}</h2>${mu?`<p class="note"><b>Muscolo:</b> ${esc(mu)}</p>`:""}${PWHY[k]?`<p class="note">${esc(PWHY[k])}</p>`:""}${how?`<div class="how"><p><b>Posizione</b>${esc(how[0])}</p><p><b>Movimento</b>${esc(how[1])}</p></div>`:""}${errOf(ex)?`<div class="errs"><b>Errori da evitare</b><ul>${errOf(ex).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}${ex.note?`<p class="note">${esc(ex.note)}</p>`:""}`,bind:()=>{}})}
 const EN_LBL={low:"Stanco",ok:"Normale",high:"In forma"};
@@ -3140,7 +3143,7 @@ const vxN=new Map();const vxName=id=>{if(!vxN.has(id))vxN.set(id,"vx"+vxN.size);
 function nameEx(on,skip){document.querySelectorAll("#exs [data-open],#exs article.ex[data-ex]").forEach(e=>{const id=e.dataset.open||e.dataset.ex,n=on&&!(skip&&skip.has(id));e.style.viewTransitionName=n?vxName(id):"";e.style.viewTransitionClass=n?"vx":""});
   // i tasti in fondo (Termina e salva, Svuota la seduta) si spostano con le righe invece di restare fermi sopra di loro
   ["finish","clear"].forEach(k=>{const e=document.getElementById(k);if(e){e.style.viewTransitionName=on?"vx-"+k:"";e.style.viewTransitionClass=on?"vx":""}})}
-function openExVT(g,id){
+function openExVT(g,id){goldFlush();
   if(!vtOk()){openEx[g]=id;renderTrain();keepFocus(true);return}
   // la scheda che si chiude sparisce in dissolvenza: se si spostasse anche lei si incrocerebbe con quella che si apre
   const skip=new Set([...document.querySelectorAll("#exs article.ex[data-ex]")].map(e=>e.dataset.ex));skip.delete(id);
@@ -3268,7 +3271,7 @@ function renderToday(){
   const bg=document.getElementById("bodyGo");if(bg)bg.onclick=()=>bodySheet(renderToday);
   const bn=document.getElementById("bodyNo");if(bn)bn.onclick=()=>{S.bodySnooze=iso(addDays(today(),2));save();renderToday()};
   const ss2=document.getElementById("seeSum");if(ss2)ss2.onclick=()=>sheetFrom(ss2.closest(".hero"),()=>summarySheet(doneS));
-  const sg=document.getElementById("startGym");if(sg)sg.onclick=()=>{gymSel=a.gym;go("train")};oldDraftBind();
+  const sg=document.getElementById("startGym");if(sg)sg.onclick=()=>{gymSel=a.gym;trainArrive=true;go("train")};oldDraftBind();
   const sa=document.getElementById("startAlt");if(sa)sa.onclick=()=>{setO(d,"gym",a.gymAlt);gymSel=a.gymAlt;go("train")};
   fitTitles();
 }
@@ -3311,13 +3314,13 @@ function renderTrain(){
     if(n===0){nextH.push(`<div class="xrow off"><span class="ck o">–</span><span class="xb"><span class="nm">${esc(ex.n)}</span><em>salta oggi</em></span></div>`);return}
     if(dc>=n){
       const ef=(dr.eff||{})[ex.id],skip=(dr.effSkip||{})[ex.id],eAt=(dr.effAt||{})[ex.id];
-      html=`<button class="xrow done" data-open="${ex.id}"><span class="ck">✓</span><span class="xb"><span class="nmw"><span class="nm">${esc(ex.n)}</span>${qmark(ex)}</span><em>${dc}/${n}${ef&&!noEff(ex)?" · "+EFFL[ef]:""}</em></span></button>`;doneH.push(html);
+      html=`<button class="xrow done" data-open="${ex.id}"><span class="ck">✓</span><span class="xb"><span class="nmw"><span class="nm">${esc(ex.n)}</span></span><em>${dc}/${n}${ef&&!noEff(ex)?" · "+EFFL[ef]:""}</em></span></button>`;doneH.push(html);
       // Dopo il voto la domanda resta (con la scelta segnata) finché non spunti un'altra serie: un tocco sbagliato si corregge subito
       if((!ef||(eAt&&!(dr.last>eAt)))&&!skip&&!noEff(ex)&&!mods.has("deload")&&dr.lastDone===ex.id)askH.push(`<div class="ask"><div class="t"><span>${esc(ex.n)}: ${ef?"ultima serie":"com'era l'ultima serie?"}</span><button data-effskip="${ex.id}" aria-label="${ef?"Chiudi":"Salta la domanda"}">✕</button></div>${effSeg(ex.id,ef)}</div>`);
       return;
     }
     const tg=tgFor(ex,mods,g),rng=(ex.lo===ex.hi?ex.lo:ex.lo+"-"+ex.hi)+(ex.t==="time"?" s":"");
-    nextH.push(`<button class="xrow" data-open="${ex.id}"><span class="ck o">${L.filter((x,k)=>k<=i&&setsFor(x.ex,mods)>0).length}</span><span class="xb"><span class="nmw"><span class="nm">${esc(ex.n)}</span>${qmark(ex)}</span><em>${n}×${rng}${tg.kg>0&&!noEff(ex)?" · "+fk(tg.kg)+" kg":""}</em></span></button>`);
+    nextH.push(`<button class="xrow" data-open="${ex.id}"><span class="ck o">${L.filter((x,k)=>k<=i&&setsFor(x.ex,mods)>0).length}</span><span class="xb"><span class="nmw"><span class="nm">${esc(ex.n)}</span></span><em>${n}×${rng}${tg.kg>0&&!noEff(ex)?" · "+fk(tg.kg)+" kg":""}</em></span></button>`);
   });
   if(curH.length&&askH.length){curH[0]=curH[0].replace("<!--ASK-->",askH.join(""));askH.length=0}
   html=askH.join("")+curH.join("")+(nextH.some(h=>h.startsWith("<button")||h.startsWith("<div"))?`<p class="grp">Prossimi</p>`+nextH.join(""):"")+(doneH.length?`<p class="grp">Fatti</p>`+doneH.join(""):"");
@@ -3334,7 +3337,7 @@ function renderTrain(){
   <div id="exs" class="exs">${html}</div>
   ${!first&&dn?"":`<button class="btn hot" id="finish">Termina e salva</button>`}<button class="lnk clr" id="clear">Svuota la seduta</button>
   <p class="msg" id="msg" aria-live="polite"></p>`;
-  document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{gymSel=b.dataset.k;S.gym=gymSel;save();renderTrain()});
+  document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{goldFlush();gymSel=b.dataset.k;S.gym=gymSel;save();renderTrain()});
   document.querySelectorAll("#exs input[data-f]").forEach(i=>i.oninput=()=>{const v=i.dataset.f==="kg"?i.value.replace(/[^\d.,]/g,"").replace(/([.,].*?)[.,]/g,"$1").slice(0,6):i.value.replace(/\D/g,"").slice(0,3);if(v!==i.value)i.value=v;cell(g,i.dataset.ex,+i.dataset.j)[i.dataset.f]=v.trim();save()});
   document.querySelectorAll("#exs .tick:not(.mt):not(.rt)").forEach(b=>b.onclick=()=>toggleSet(g,b.dataset.ex,+b.dataset.j,mods));
   document.querySelectorAll("#exs .tick.rt").forEach(b=>b.onclick=()=>rampTick(g,b.dataset.rex,+b.dataset.k));
@@ -3355,7 +3358,7 @@ function renderTrain(){
   swipeBind(g,L,curId,mods);
   document.querySelectorAll("#exs [data-img]").forEach(b=>{const go=e=>{e.stopPropagation();e.preventDefault();imgSheet(IMGEX[b.dataset.img])};b.onclick=go;b.onkeydown=e=>{if(e.key==="Enter"||e.key===" ")go(e)}});
   document.querySelectorAll("#exs .swap").forEach(b=>b.onclick=()=>openSwap(g,b.dataset.base));
-  document.querySelectorAll("[data-wu]").forEach(b=>b.onclick=e=>{e.preventDefault();draftFor(g).wu=1;save();renderTrain()});
+  document.querySelectorAll("[data-wu]").forEach(b=>b.onclick=e=>{e.preventDefault();draftFor(g).wu=1;save();renderTrain();nowReveal(true)});
   document.querySelectorAll("#exs [data-pain]").forEach(b=>b.onclick=()=>{const y=b.getBoundingClientRect().top,id=b.dataset.pain;togglePain(id);renderTrain();const nb=document.querySelector(`#exs [data-pain="${id}"]`);if(nb)window.scrollBy(0,nb.getBoundingClientRect().top-y)});
   document.querySelectorAll("#exs [data-painswap]").forEach(b=>b.onclick=()=>openSwap(g,b.dataset.painswap));
   document.querySelectorAll("#exs [data-open]").forEach(b=>b.onclick=()=>openExVT(g,b.dataset.open));
@@ -3370,13 +3373,13 @@ function renderTrain(){
   const rs=document.querySelector("#restIn [data-ts]");if(rs)rs.onclick=()=>{if(!tFresh())closeRest()};
   const tb=document.querySelector('.tabs button[aria-pressed="true"]');if(tb)tb.scrollIntoView({block:"nearest",inline:"center"});
   const fb=document.getElementById("finish");fb.onclick=()=>{const miss=tot-dn;
-    if(miss>0&&fb.dataset.arm!=="1"){fb.dataset.arm="1";fb.textContent=`Mancano ${miss} serie · tocca ancora`;clearTimeout(fb.t);fb.t=setTimeout(()=>{fb.dataset.arm="";fb.textContent="Termina e salva"},4000);return}
-    finish(g,mods)};
+    if(miss>0&&!arm2(fb,`Mancano ${miss} serie · tocca ancora`,"Termina e salva"))return;
+    finish(g,mods,null,miss)};
   const sv=document.getElementById("seeSv");if(sv)sv.onclick=()=>sheetFrom(sv.closest(".card"),()=>summarySheet(svd));
   oldDraftBind();
   // Il riflesso del bottone passa una volta sola: dopo ogni spunta la scheda si ridisegna e non deve ripartire
   if(hadFin){const fb=document.getElementById("finish");if(fb)fb.classList.add("noshine")}
-  const c=document.getElementById("clear");c.onclick=()=>{if(c.dataset.arm!=="1"){c.dataset.arm="1";c.textContent="Tocca di nuovo per svuotare";setTimeout(()=>{c.dataset.arm="";c.textContent="Svuota la seduta"},3500);return}delete S.draft[g];openEx[g]=null;stopTimer();save();renderTrain()};
+  const c=document.getElementById("clear");c.onclick=()=>{if(!arm2(c,"Tocca di nuovo per svuotare","Svuota la seduta"))return;snap();delete S.draft[g];openEx[g]=null;stopTimer();save();renderTrain();undoable("Seduta svuotata.")};
   fitTitles();
   trainFx(g,pct,mods);
   if(tOn)tick();
@@ -3445,7 +3448,7 @@ function audioUnlock(){if(S.sound===false)return;try{if(navigator.audioSession)n
 function beep(){if(S.sound===false||!actx)return;try{const t=actx.currentTime+.02;[[0,880],[.2,880],[.4,1320]].forEach(([d,f])=>{const o=actx.createOscillator(),gn=actx.createGain();o.type="sine";o.frequency.value=f;gn.gain.setValueAtTime(.0001,t+d);gn.gain.exponentialRampToValueAtTime(.4,t+d+.02);gn.gain.exponentialRampToValueAtTime(.0001,t+d+(d>.3?.32:.16));o.connect(gn);gn.connect(actx.destination);o.start(t+d);o.stop(t+d+.35)})}catch(e){}}
 function swipeBind(g,L,curId,mods){
   const ids=L.filter(x=>setsFor(x.ex,mods)>0).map(x=>x.ex.id),i=ids.indexOf(curId);if(i<0)return;
-  const go=dir=>{const k=i+dir;if(k<0||k>=ids.length)return;openEx[g]=ids[k];renderTrain();keepFocus(false);const c=document.querySelector("#exs .ex.cur");if(c){c.classList.add(RM()?"rmfade":dir>0?"sw-n":"sw-p")}buzz(10)};
+  const go=dir=>{const k=i+dir;if(k<0||k>=ids.length)return;goldFlush();openEx[g]=ids[k];renderTrain();keepFocus(false);const c=document.querySelector("#exs .ex.cur");if(c){c.classList.add(RM()?"rmfade":dir>0?"sw-n":"sw-p")}buzz(10)};
   const c=document.querySelector("#exs .ex.cur");if(!c)return;
   c.insertAdjacentHTML("afterbegin",`<div class="pgr"><button data-sw="-1" aria-label="Esercizio precedente" ${i===0?"disabled":""}>‹</button><span>${i+1} di ${ids.length}</span><button data-sw="1" aria-label="Esercizio successivo" ${i===ids.length-1?"disabled":""}>›</button></div>`);
   c.querySelectorAll("[data-sw]").forEach(b=>b.onclick=()=>go(+b.dataset.sw));
@@ -3463,7 +3466,7 @@ function swipeBind(g,L,curId,mods){
     if((Math.abs(dx)>60||flick)&&k>=0&&k<ids.length){
       if(RM()){c.style.transform="";go(dir);return}
       // La scheda esce dal punto in cui l'hai lasciata, poi entra la prossima
-      c.style.transition="transform .14s cubic-bezier(.23,1,.32,1),opacity .14s";c.style.transform=`translateX(${(dx+(dx<0?-90:90)).toFixed(1)}px)`;c.style.opacity="0";setTimeout(()=>go(dir),120)}
+      c.style.transition="transform .14s cubic-bezier(.23,1,.32,1),opacity .14s";c.style.transform=`translateX(${(dx+(dx<0?-90:90)).toFixed(1)}px)`;c.style.opacity="0";goldFlush();setTimeout(()=>{if(view==="train"&&currentGym()===g)go(dir)},120)}
     else back()},{passive:true});
   c.addEventListener("touchcancel",()=>{if(x0!=null){x0=null;back()}},{passive:true});
 }
@@ -3598,6 +3601,8 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;
   // Carico molto diverso dal solito (errore di battitura?): chiede un secondo tocco prima di segnare la serie
   if(!r.done){const k=num(r.kg),pk=num(tgFor(ex,mods,g).kg),ref=pk||Math.max(0,...(history(exId)[0]?.sets[exId]||[]).map(x=>num(x.kg)||0))||0,key=exId+"|"+j+"|"+r.kg;
     const warn=m=>{document.querySelector(".kgchk")?.remove();row.insertAdjacentHTML("afterend",`<p class="kgchk" role="alert">${m}</p>`);buzz(20)};
+    // Campo kg vuoto (prima volta o variante nuova): senza carico la volta dopo l'app non saprebbe cosa proporre. Non vale a corpo libero né con l'elastico (kg lasciati vuoti)
+    if(!String(r.kg||"").trim()&&ex.t!=="bw"&&eqOf(ex)!=="altro"&&row.querySelector('input[data-f="kg"]')){kgChk="";warn("Scrivi il carico, poi ✓.");return}
     // Kg scritti male (es. "1,2,5"): la serie non si segna finché non è un numero
     if(String(r.kg||"").trim()&&k==null){kgChk="";warn("Kg non validi: scrivi un numero, per esempio 52,5.");return}
     const rp=num(r.reps),key2=key+"|"+r.reps;
@@ -3682,8 +3687,10 @@ function fillAnim(id,fr){const now=Date.now();let m=fillMem[id];
 function fillCol(f){const v=S.fillv||(S.skin==="vetro"?"stile":"tramonto"),L=FILLV[v];if(!L)return v==="stile"?"var(--hot)":"var(--go)";
   let i=0;while(i<L.length-2&&f>L[i+1][0])i++;const [a,ca]=L[i],[b,cb]=L[i+1],t=Math.max(0,Math.min(1,(f-a)/(b-a)));return "rgb("+ca.map((x,k)=>Math.round(x+(cb[k]-x)*t)).join(",")+")"}
 // Fine esercizio: la scheda resta in primo piano il tempo della passata dorata, poi passa al prossimo
-function goldCard(g,exId,after){goldHold={g,ex:exId};openEx[g]=exId;renderTrain();keepFocus(false,exId);
-  clearTimeout(goldCard.t);goldCard.t=setTimeout(()=>{goldHold=null;delete fillMem[exId];if(openEx[g]===exId)openEx[g]=ssGo[g]&&ssGo[g]!==exId?ssGo[g]:null;after&&after();renderTrain();keepFocus(false);{const c=document.querySelector("#exs .ex.cur");if(c)c.classList.add(RM()?"rmfade":"sw-n")}},RM()?450:1050)}
+// Se intanto cambi schermata, esercizio o scheda, la passata si chiude subito: stato finale senza ridisegnare, e il timer non ridisegna più l'Allenamento sopra un'altra schermata
+function goldFlush(){const p=goldCard.p;if(!p)return;clearTimeout(goldCard.t);goldCard.p=null;goldHold=null;delete fillMem[p.exId];if(openEx[p.g]===p.exId)openEx[p.g]=ssGo[p.g]&&ssGo[p.g]!==p.exId?ssGo[p.g]:null;p.after&&p.after()}
+function goldCard(g,exId,after){goldFlush();goldHold={g,ex:exId};openEx[g]=exId;goldCard.p={g,exId,after};renderTrain();keepFocus(false,exId);
+  goldCard.t=setTimeout(()=>{goldFlush();if(view!=="train"||currentGym()!==g)return;renderTrain();keepFocus(false);{const c=document.querySelector("#exs .ex.cur");if(c)c.classList.add(RM()?"rmfade":"sw-n")}},RM()?450:1050)}
 // Superserie: quella del piano, oppure quella scelta solo per la seduta di oggi (draft.ss, "" = sciolta)
 const ssOf=(g,ex)=>{const o=(S.draft&&S.draft[g]&&S.draft[g].ss)||{};return ex.id in o?o[ex.id]:(ex.ss||"")};
 function ssSheet(g,ex,mods){
@@ -3710,9 +3717,16 @@ function keepFocus(changed,exId){
   // Il timer si decide adesso sulla posizione finale: niente salto mezzo secondo dopo la spunta
   syncTimer(Math.abs(dy)>2?dy:0);tLock=performance.now()+(sm?600:80);
   if(Math.abs(dy)>2)window.scrollBy({top:dy,behavior:sm?"smooth":"auto"})}
+// Prima serie da fare sotto la barra in basso (320 px, testo grande): la scheda sale sotto l'intestazione e, se non basta, quanto serve perché la serie si veda
+function nowReveal(sm){const c=document.querySelector("#exs .ex.cur"),nw=c&&c.querySelector(".sets>.set.now"),nb=document.querySelector("nav.bar");if(!nw||!nb)return;
+  const lo=nb.getBoundingClientRect().top-8;if(nw.getBoundingClientRect().bottom<=lo)return;
+  if(tOn){keepFocus(sm);return}
+  const th=document.querySelector(".thead"),off=(th?(parseFloat(getComputedStyle(th).top)||0)+th.offsetHeight:0)+16;let dy=c.getBoundingClientRect().top-off;
+  const over=nw.getBoundingClientRect().bottom-dy-lo;if(over>0)dy+=over;
+  if(Math.abs(dy)>2)window.scrollBy({top:dy,behavior:sm&&!RM()?"smooth":"auto"})}
 // Durata: dall'inizio all'ultima serie se la seduta è ferma da più di 45 minuti, senza le pause lunghe in mezzo
 function sesMin(d,stale){if(!d||!d.start)return null;const l=d.last||d.start,end=stale||Date.now()-l>45*6e4?l:Date.now();return Math.max(1,Math.round((end-d.start-(d.idle||0))/6e4))}
-function finish(g,mods,oldKey){
+function finish(g,mods,oldKey,miss){
   const d=oldKey?S.oldDraft[oldKey]:draftFor(g),sets={};let n=0;
   const names={};
   const order=(PLAN[g]?PLAN[g].ex:[]).flatMap(e=>[e.id,...altsOf(e).map(a=>e.id+"~"+a.k)]);
@@ -3723,12 +3737,20 @@ function finish(g,mods,oldKey){
   // Seduta di un altro giorno: data dell'inizio e durata fino all'ultima serie
   const old=oldKey?{d,stale:true}:draftOld(g),when=d.start?new Date(d.start):old?new Date(d.date+"T12:00:00"):new Date();
   const dur=sesMin(d,old&&old.stale);
+  // Salvata con serie mancanti: "Riapri" rimette la bozza com'era e toglie la seduta salvata (anche i dati di esempio, se c'erano)
+  const bk=miss>0&&!oldKey?JSON.parse(JSON.stringify({d,free:g==="LIB"?S.free:null,ds:S.sessions.filter(x=>x.demo),db:(S.body||[]).filter(x=>x.demo)})):null;
   clearDemo();
   S.sessions.push({id:"s"+Date.now(),day:g,planName:PLAN[g]?PLAN[g].name:"Seduta libera",date:when.toISOString(),sets,names,eff,mods:[...mods],deload:mods.has("deload"),dur,prv:1,...(stn?{stn}:{}),...(d.pre&&Object.values(d.pre).some(v=>v>0)?{pre:{...d.pre}}:{})});
   if(oldKey)delete S.oldDraft[oldKey];else{delete S.draft[g];openEx[g]=null;if(g==="LIB"){delete S.free;rebuild();gymSel=null}stopTimer()}save();sheetFrom(document.getElementById("finish"),()=>{renderTrain();
   const mm=document.getElementById("msg");mm.className="msg ok";mm.textContent=`Seduta salvata: ${n} serie. I carichi della prossima volta sono già pronti.`;
   if(!storageOk){mm.className="msg err";mm.textContent="Non riesco a salvare su questo dispositivo: controlla che il browser non sia in navigazione privata."}
-  summarySheet(S.sessions[S.sessions.length-1])});
+  const ss=S.sessions[S.sessions.length-1];
+  if(bk&&storageOk){mm.innerHTML=`${esc(mm.textContent)} <button class="lnk" id="reopen">Riapri</button>`;const rb=document.getElementById("reopen");
+    // i 10 secondi partono quando il messaggio si vede (chiuso il riepilogo)
+    const wait=()=>{if(!rb.isConnected)return;if(document.querySelector(".sheet-wrap")){setTimeout(wait,300);return}setTimeout(()=>{if(rb.isConnected)rb.remove()},10000)};wait();
+    rb.onclick=()=>{S.sessions=S.sessions.filter(x=>x.id!==ss.id);S.sessions.unshift(...bk.ds);S.body=[...bk.db,...(S.body||[])];S.draft[g]=bk.d;if(g==="LIB"&&bk.free){S.free=bk.free;rebuild();gymSel="LIB"}save();renderTrain();
+      const m2=document.getElementById("msg");if(m2){m2.className="msg ok";m2.textContent=`Seduta riaperta: mancano ${miss} serie.`}}}
+  summarySheet(ss)});
 }
 
 
@@ -3864,7 +3886,7 @@ function tick(){if(!tOn)return;const left=Math.round((tEnd-Date.now())/1000);
   if(soon&&!tWarn){tWarn=true;try{navigator.vibrate&&navigator.vibrate([90,70,90])}catch(e){}}
   if(left>10)tWarn=false;
   ballFx(left);
-  if(left<=0&&!T("timer").classList.contains("over")){litNext(left>-3);T("timer").classList.add("over");T("tlbl").textContent="Recupero finito";try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}beep()}
+  if(left<=0&&!T("timer").classList.contains("over")){const live=left>-3;litNext(live);T("timer").classList.add("over");T("tlbl").textContent="Recupero finito";try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}if(live)beep()}
   if(left<=0&&inl&&!inl.classList.contains("over")){inl.classList.add("over");inl.querySelector(".tl").textContent="Recupero finito"}
   if(left>0&&inl&&inl.classList.contains("over")){inl.classList.remove("over");inl.querySelector(".tl").textContent="Recupero"}}
 // Anello: angolo che resta A (0-360) = due mezzi anelli + il puntino della fine, ruotati con WAAPI su transform per tutto il tempo che manca
@@ -3933,6 +3955,8 @@ let scrQ=0;addEventListener("scroll",()=>{if(scrQ||!tOn)return;scrQ=requestAnima
 // Campo kg con un carico lungo (122,5): classe per il carattere un po' più piccolo sugli schermi stretti
 const kgFit=i=>i.classList.toggle("lg",(i.value||"").length>=5);
 document.addEventListener("input",e=>{const t=e.target;if(t&&t.matches&&t.matches('input[data-f="kg"],input[data-rf="kg"]'))kgFit(t)});
+// Tocco su kg o ripetizioni di una serie: il numero si seleziona tutto e si scrive sopra (dopo il focus: su iOS select() dentro focus non tiene)
+document.addEventListener("focusin",e=>{const t=e.target;if(!t||!t.matches||!t.matches("#exs input[data-f],#exs input[data-rf],#exs input[data-myo]"))return;const sel=()=>{try{if(document.activeElement===t)t.setSelectionRange(0,t.value.length)}catch(_){}};requestAnimationFrame(sel);setTimeout(sel,60)});
 function stopTimer(){clearInterval(tInt);tOn=false;
   // Recupero chiuso prima della fine: le animazioni dell'anello si fermano (nascosto, girerebbero comunque fino allo zero)
   document.querySelectorAll("#timer .tr,#restIn .rr").forEach(c=>{c._rk=null;clearTimeout(c._rz);c.querySelectorAll(".rh>b").forEach(e=>e.getAnimations().forEach(a=>a.cancel()))});document.querySelectorAll(".tball").forEach(b=>b.remove());if(S.timer){delete S.timer;save()}T("timer").hidden=true;const inl=document.getElementById("restIn");if(inl)inl.remove()}
@@ -3954,7 +3978,7 @@ function addRest(){litOff();const l0=Math.max(0,tVal()),A0=Math.min(360,ringShow
   if(!RM()){const t=performance.now();tGrow={a:A0,t};tTw={a:l0,t};const f=()=>{if(!tTw||!tOn)return;tTxt();requestAnimationFrame(f)};requestAnimationFrame(f)}if(S.timer){S.timer.end=tEnd;S.timer.tot=tTot;save()}T("timer").classList.remove("over");tick()}
 T("tplus").onclick=()=>{if(!tFresh())addRest()};T("tstop").onclick=()=>{if(!tFresh())closeRest()};
 // Tocco sul timer (fuori dai bottoni): torna all'allenamento, sull'esercizio del recupero o sul successivo se l'hai finito
-function timerGo(){const c=tCtx;if(c&&PLAN[c.g]){gymSel=c.g;const d=S.draft[c.g],ex=exById(c.ex),n=ex?setsFor(ex,trainMods(c.g)):0,dn=((d&&d.ex[c.ex])||[]).filter(x=>x&&x.done).length;openEx[c.g]=ex&&dn<n?c.ex:null}
+function timerGo(){goldFlush();const c=tCtx;if(c&&PLAN[c.g]){gymSel=c.g;const d=S.draft[c.g],ex=exById(c.ex),n=ex?setsFor(ex,trainMods(c.g)):0,dn=((d&&d.ex[c.ex])||[]).filter(x=>x&&x.done).length;openEx[c.g]=ex&&dn<n?c.ex:null}
   if(view!=="train")go("train");else renderTrain();requestAnimationFrame(()=>keepFocus(false,openEx[c&&c.g]||undefined))}
 T("timer").onclick=e=>{if(e.target.closest("button"))return;timerGo()};
 T("timer").onkeydown=e=>{if((e.key==="Enter"||e.key===" ")&&e.target===T("timer")){e.preventDefault();timerGo()}};
@@ -4392,7 +4416,7 @@ function renderProg(){
   const done=seen.map(exById);
   if(!S.sessions.length){
     app.innerHTML=`<header class="head"><h1>Progressi</h1></header>
-    <div class="empty"><p style="margin:0">Qui vedrai, per ogni esercizio, come sale il massimale stimato seduta dopo seduta, quante serie fai a settimana per ogni muscolo e lo storico delle sedute. Si riempie da solo quando salvi la prima seduta.</p><button class="btn" id="demo">Carica dati di esempio</button><p class="note" style="margin:0">I dati di esempio sono finti e si cancellano da Settimana → Impostazioni → Cancella tutti i dati.</p></div>`;
+    <div class="empty"><p style="margin:0">Qui vedrai, per ogni esercizio, come sale il massimale stimato seduta dopo seduta, quante serie fai a settimana per ogni muscolo e lo storico delle sedute. Si riempie da solo quando salvi la prima seduta.</p><button class="btn" id="demo">Carica dati di esempio</button><p class="note" style="margin:0">I dati di esempio sono finti e spariscono da soli quando salvi la prima seduta vera (o con Togli).</p></div><p class="msg" id="msg" aria-live="polite"></p>`;
     document.getElementById("demo").onclick=()=>{loadDemo();renderProg()};return;
   }
   if(!progEx||!history(progEx).length)progEx=(done.find(e=>e.t==="comp")||done[0]).id;
@@ -4419,7 +4443,7 @@ function renderProg(){
   </section>
   ${bodyCard()}
   <section class="card mus"><h3>Serie a settimana per muscolo</h3><p class="note" style="margin:0">Media delle ultime 2 settimane. Sotto 10 serie la crescita è più lenta, oltre 20 ogni serie in più rende meno. Gambe basse per scelta.</p>${mrows}</section>
-  <section style="display:flex;flex-direction:column;gap:8px"><h2>Storico</h2><div class="hist">${hs.slice(0,histN).map(histItem).join("")}</div>${hs.length>histN?`<button class="btn ghost" id="histMore">Mostra altre ${Math.min(10,hs.length-histN)} sedute <small>(ne restano ${hs.length-histN})</small></button>`:""}</section>`;
+  <section style="display:flex;flex-direction:column;gap:8px"><h2>Storico</h2><p class="msg" id="msg" aria-live="polite"></p><div class="hist">${hs.slice(0,histN).map(histItem).join("")}</div>${hs.length>histN?`<button class="btn ghost" id="histMore">Mostra altre ${Math.min(10,hs.length-histN)} sedute <small>(ne restano ${hs.length-histN})</small></button>`:""}</section>`;
   const hm=document.getElementById("histMore");if(hm)hm.onclick=()=>{histN+=10;renderProg();setTimeout(()=>document.querySelector(".hist details:nth-child("+(histN-9)+")")?.scrollIntoView({block:"center"}),0)};
   document.getElementById("exSel").onchange=e=>{progEx=e.target.value;renderProg()};
   const nd=document.getElementById("noDemo");if(nd)nd.onclick=()=>{clearDemo();save();renderProg()};
@@ -4431,7 +4455,10 @@ function renderProg(){
   ledify();
   lineChart(document.getElementById("lineChart"),pts.map(p=>({x:new Date(p.date),y:p.v,dl:p.dl,label:p.x?(num(p.x.kg)?fk(num(p.x.kg))+" kg × ":"")+p.x.reps+(ex.t==="time"?" s":""):""})),unit);
   document.querySelectorAll("[data-fix]").forEach(b=>b.onclick=()=>fixSheet(S.sessions.find(s=>s.id===b.dataset.fix)));
-  document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Tocca di nuovo per eliminare";return}S.sessions=S.sessions.filter(s=>s.id!==b.dataset.del);save();renderProg()});
+  document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{if(!arm2(b,"Tocca di nuovo per eliminare","Elimina seduta"))return;const it=b.closest("details"),ix=it?[...it.parentElement.children].indexOf(it):-1;
+    snap();S.sessions=S.sessions.filter(s=>s.id!==b.dataset.del);save();renderProg();
+    // "Seduta eliminata. Annulla" al posto della seduta tolta
+    const m=document.getElementById("msg"),h=document.querySelector(".hist");if(m&&h&&ix>=0){const ref=h.children[ix];if(ref)h.insertBefore(m,ref);else h.appendChild(m)}undoable("Seduta eliminata.")});
 }
 function progGroups(seen){
   const used=new Set(),out=[];
