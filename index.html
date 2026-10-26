@@ -2148,7 +2148,9 @@ function altsOf(e){const k=e.lib||e.id;let out=[...(ALTS[k]||[]).map(([key,n,o])
 // Spinte sopra la testa (landmine, lento, shoulder press, arnold): una serie in meno nei giorni col padel, anche quando sono la variante di un esercizio che non lo è
 const OH_RX=/landmine|lento|shoulder press|arnold|military/i;
 function variant(e,a){const v={...e,...a.o,id:e.id+"~"+a.k,n:a.n,note:a.o.note??"",base:e.id,ss:e.ss,custom:a.custom};if(OH_RX.test(a.n||""))v.oh=true;return v}
-function rebuild(){
+// Ogni rebuild (piano salvato o rinominato, import, ripristino) svuota la cache dei nomi di famIds
+let famRev=0;
+function rebuild(){famRev++;
   PLAN={...BUILTIN,...(S.plans||{})};GYM_ORDER=[...new Set([...Object.keys(BUILTIN),...Object.keys(S.plans||{})])];ALL_EX=[];EX={};
   for(const k of GYM_ORDER)for(const e of PLAN[k].ex){const b={...e,day:k};if(!EX[e.id]){ALL_EX.push(b);EX[e.id]=b}for(const a of altsOf(e)){const v=variant(e,a);v.day=k;if(!EX[v.id]){ALL_EX.push(v);EX[v.id]=v}}}
   // Seduta libera: esercizi scelti al volo, fuori dal piano, solo per oggi. Stessi id della scheda, quindi carichi e progressi restano quelli
@@ -2177,8 +2179,17 @@ const PADEL_LBL={none:"Niente",train:"Allenamento",match:"Partita"};
 const iso=d=>{const x=new Date(d);x.setMinutes(x.getMinutes()-x.getTimezoneOffset());return x.toISOString().slice(0,10)};
 const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
 const today=()=>new Date();
+// Giorni di calendario tra due date "AAAA-MM-GG" (b meno a): non sbaglia al cambio d'ora, quando un giorno dura 23 o 25 ore
+const dayDiff=(a,b)=>{const p=s=>{const [y,m,d]=String(s).slice(0,10).split("-").map(Number);return Date.UTC(y,m-1,d)};return Math.round((p(b)-p(a))/864e5)};
 const KEY="allenati-scemo.v1";
-function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.sessions)return s}catch(e){}return {sessions:[],draft:{},week:DEFAULT_WEEK,overrides:{},energy:{},view:"oggi",gym:null}}
+// Dati salvati illeggibili (troncati o non dell'app): il testo grezzo resta in KEY.err, si prova la copia di sicurezza e lo si dice in Oggi
+let loadMsg="",storageOk=true;
+function load(){const ok=s=>s&&typeof s==="object"&&!Array.isArray(s)&&s.sessions;let raw=null;try{raw=localStorage.getItem(KEY)}catch(e){}
+  if(raw!=null){try{const s=JSON.parse(raw);if(ok(s))return s}catch(e){}
+    try{localStorage.setItem(KEY+".err",raw)}catch(e){}
+    try{const b=JSON.parse(localStorage.getItem(KEY+".bak"));if(ok(b)){loadMsg="I dati salvati erano illeggibili: ho rimesso la copia di sicurezza. Controlla le ultime sedute.";return b}}catch(e){}
+    loadMsg="I dati salvati erano illeggibili e non c'era una copia di sicurezza: li ho messi da parte su questo telefono e l'app riparte vuota."}
+  return {sessions:[],draft:{},week:DEFAULT_WEEK,overrides:{},energy:{},view:"oggi",gym:null}}
 let S=load();
 // Completa i campi mancanti: all'avvio, dopo "Cancella tutti i dati" e dopo un backup importato (anche vecchio)
 function normS(){const obj=v=>v&&typeof v==="object"&&!Array.isArray(v),arr=v=>Array.isArray(v)?v:[];
@@ -2189,25 +2200,55 @@ function normS(){const obj=v=>v&&typeof v==="object"&&!Array.isArray(v),arr=v=>A
   for(const key of ["draft","oldDraft"]){S[key]=obj(S[key])?S[key]:{};for(const g in S[key]){const d=S[key][g];if(!obj(d)||!obj(d.ex)){delete S[key][g];continue}for(const id in d.ex)if(!Array.isArray(d.ex[id]))delete d.ex[id];else d.ex[id]=d.ex[id].map(x=>obj(x)?x:{});if(d.ramp!=null){if(!obj(d.ramp))delete d.ramp;else for(const id in d.ramp)if(!Array.isArray(d.ramp[id]))delete d.ramp[id];else d.ramp[id]=d.ramp[id].map(x=>obj(x)?x:{})}if(typeof d.date!=="string")d.date=iso(today());for(const f of ["start","last","idle"])if(d[f]!=null&&!(typeof d[f]==="number"&&isFinite(d[f])))delete d[f];if(d.mods!=null&&!Array.isArray(d.mods))delete d.mods}}
   S.plans=obj(S.plans)?S.plans:{};for(const k in S.plans)if(!obj(S.plans[k])||!Array.isArray(S.plans[k].ex))delete S.plans[k];else S.plans[k].ex=S.plans[k].ex.filter(e=>obj(e)&&e.id&&typeof e.n==="string");
   S.swaps=obj(S.swaps)?S.swaps:{};for(const k in S.swaps)if(!obj(S.swaps[k]))delete S.swaps[k];S.customAlts=obj(S.customAlts)?S.customAlts:{};for(const k in S.customAlts)S.customAlts[k]=arr(S.customAlts[k]).filter(a=>obj(a)&&a.k&&typeof a.n==="string");if(S.skin!=null&&!["vetro","eclisse","carbonio","campo","manga","lavagna"].includes(S.skin))S.skin="vetro";S.pain=obj(S.pain)?S.pain:{};
-  for(const key of ["archive","body","phases","cycles"])S[key]=arr(S[key]).filter(obj);if(S.free&&!(obj(S.free)&&Array.isArray(S.free.ex)))delete S.free;if(S.deload&&!(obj(S.deload)&&S.deload.from&&S.deload.to))delete S.deload;if(S.timer&&!obj(S.timer))delete S.timer;for(const key of ["setup","station","eqmax","eqf","vars"])if(S[key]!=null&&!obj(S[key]))delete S[key];
+  for(const key of ["archive","body","phases","cycles"])S[key]=arr(S[key]).filter(obj);
+  // Piani vecchi: solo versioni con un piano leggibile (nome ed esercizi), altrimenti Impostazioni non si apre
+  S.archive=S.archive.filter(x=>x.key&&x.id&&obj(x.plan)&&typeof x.plan.name==="string"&&Array.isArray(x.plan.ex));S.archive.forEach(x=>{x.plan.ex=x.plan.ex.filter(e=>obj(e)&&typeof e.n==="string")});if(S.free&&!(obj(S.free)&&Array.isArray(S.free.ex)))delete S.free;if(S.deload&&!(obj(S.deload)&&S.deload.from&&S.deload.to))delete S.deload;if(S.timer&&!obj(S.timer))delete S.timer;for(const key of ["setup","station","eqmax","eqf","vars"])if(S[key]!=null&&!obj(S[key]))delete S[key];
   if(S.rkSeen!=null&&(typeof S.rkSeen!=="object"||Array.isArray(S.rkSeen)))delete S.rkSeen;if(S.dlFx!=null&&(typeof S.dlFx!=="object"||!Array.isArray(S.dlFx.ex)))delete S.dlFx;
-  for(const key of ["lastDeload","fullDay","deloadSnooze","bkSnooze","bodySnooze","lastBackup"])if(S[key]!=null&&typeof S[key]!=="string")delete S[key];if(S.view!=null&&!["oggi","train","prog","set","imp","edit"].includes(S.view))S.view="oggi";if(S.vars)for(const k in S.vars)if(![0,1,2].includes(S.vars[k]))delete S.vars[k]}
-let bootMsg="";
+  for(const key of ["lastDeload","fullDay","deloadSnooze","bkSnooze","bodySnooze","lastBackup"])if(S[key]!=null&&typeof S[key]!=="string")delete S[key];if(S.view!=null&&!["oggi","train","prog","set","imp","edit"].includes(S.view))S.view="oggi";if(S.vars)for(const k in S.vars)if(![0,1,2].includes(S.vars[k]))delete S.vars[k];fixDupIds()}
+// Piani duplicati (o con esercizi presi dalla libreria) prima della v56: stessi id di un altro piano, e le sedute della copia cambiavano la proposta dell'originale.
+// Il primo piano che usa un id (la scheda, poi i tuoi nell'ordine) lo tiene; negli altri l'esercizio prende un id nuovo e sedute, bozze, varianti scelte e versioni vecchie lo seguono.
+// Lo storico resta in comune per nome (famIds) e ogni piano torna ad avere il suo range.
+function fixDupIds(){const seen=new Set(),base=id=>String(id).split("~")[0],keys=[...new Set([...Object.keys(BUILTIN),...Object.keys(S.plans)])];
+  for(const k of keys){const P=S.plans[k]||BUILTIN[k],mine=new Set();if(!P||!Array.isArray(P.ex))continue;
+    if(S.plans[k]){const map={},vers=[P,...S.archive.filter(v=>v.key===k).map(v=>v.plan)];
+      for(const V of vers)for(const e of V.ex){if(!e||!e.id)continue;const id=e.id;if(map[id]===undefined)map[id]=seen.has(id)||seen.has(base(id))?k+"_"+Math.random().toString(36).slice(2,7):null}
+      for(const id in map)if(!map[id])delete map[id];
+      if(Object.keys(map).length){const rn=id=>{if(map[id])return map[id];const i=String(id).indexOf("~");return i>0&&map[id.slice(0,i)]?map[id.slice(0,i)]+id.slice(i):id};
+        const rk=o=>{if(!o||typeof o!=="object"||Array.isArray(o))return o;const n={};for(const x in o)n[rn(x)]=o[x];return n};
+        for(const V of vers)for(const e of V.ex)if(e&&map[e.id]){e.lib=e.lib||e.id;e.id=map[e.id]}
+        for(const s of S.sessions)if(s.day===k)for(const f of ["sets","names","eff","stn","pre"])if(s[f])s[f]=rk(s[f]);
+        const fixD=d=>{for(const f in d){const v=d[f];if(typeof v==="string"&&f!=="date"&&f!=="g")d[f]=rn(v);else if(f!=="mods"&&f!=="nextNote")d[f]=rk(v)}if(d.nextNote&&d.nextNote.ex)d.nextNote.ex=rn(d.nextNote.ex)};
+        if(S.draft[k])fixD(S.draft[k]);for(const o in S.oldDraft)if((S.oldDraft[o].g||o.split("@")[0])===k)fixD(S.oldDraft[o]);
+        for(const w in S.swaps)if(w.startsWith(k+"|")){const n=k+"|"+rn(w.slice(k.length+1));if(n!==w){S.swaps[n]=S.swaps[w];delete S.swaps[w]}}
+        if(S.timer&&S.timer.ctx&&S.timer.ctx.g===k&&S.timer.ctx.ex)S.timer.ctx.ex=rn(S.timer.ctx.ex);fixDupIds.n=(fixDupIds.n||0)+1}}
+    for(const e of P.ex)if(e&&e.id)mine.add(e.id);mine.forEach(i=>seen.add(i))}}
+let bootMsg=loadMsg;
 function boot(){normS();for(const P of Object.values(S.plans))for(const e of P.ex||[])if(/^Alzate laterali al cavo/i.test(e.n||"")&&(e.eq||"mac")==="mac"){e.eq="cavl";e.step=2.5}for(const P of Object.values(S.plans))for(const e of P.ex||[])if(e.n==="Curl panca Scott"&&e.eq==="db"){e.n="Curl Scott con manubri";e.note=e.note||"Kg = un manubrio."}
-if(S.deload){const t=new Date();t.setMinutes(t.getMinutes()-t.getTimezoneOffset());if(t.toISOString().slice(0,10)>S.deload.to){S.lastDeload=S.deload.to;delete S.deload}}
-moveOld();rebuild()}
+if(S.deload&&iso(today())>S.deload.to)closeDeload(S.deload.to);
+moveOld();rebuild();if(fixDupIds.n){fixDupIds.n=0;save()}}
 // Se i dati salvati mandano in errore l'avvio: prima si chiudono le sedute non salvate, poi si prova la copia di sicurezza, infine si tengono solo le sedute
 try{boot()}catch(e){const cur=JSON.parse(JSON.stringify(S));try{delete S.free;S.draft={};S.oldDraft={};boot();bootMsg="Una seduta non salvata mandava in errore l'app: l'ho chiusa. Le sedute salvate ci sono tutte."}catch(e2){try{S=JSON.parse(localStorage.getItem(KEY+".bak"));if(!S||!Array.isArray(S.sessions))throw 0;boot();bootMsg="I dati salvati davano errore: ho rimesso la copia di sicurezza. Controlla le ultime sedute."}catch(e3){S={sessions:Array.isArray(cur.sessions)?cur.sessions:[],skin:cur.skin};boot();bootMsg="I dati salvati davano errore: ho tenuto solo le sedute."}}try{localStorage.setItem(KEY+".err",JSON.stringify(cur))}catch(e4){}save()}
 // Chiede al browser di non cancellare i dati dell'app quando il telefono ha poco spazio
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+// Seduta in corso di un piano che si ripristina o si elimina: non si cancella, passa tra le sedute da salvare con la sua data (in Oggi), e il suo recupero si ferma
+function parkDraft(k){const d=S.draft[k];if(!d)return 0;delete S.draft[k];if((tCtx&&tCtx.g===k)||(S.timer&&S.timer.ctx&&S.timer.ctx.g===k))stopTimer();if(!hasDone(d))return 0;
+  const names={};for(const id in d.ex)names[id]=exName(id);let key=k+"@"+d.date;while(S.oldDraft[key])key+="+";S.oldDraft[key]={...d,g:k,names,planName:PLAN[k]?PLAN[k].name:k};return Object.values(d.ex).reduce((a,r)=>a+r.filter(x=>x&&x.done).length,0)}
+const parkMsg=n=>n?` La seduta in corso (${n} serie) è in Oggi: salvala con la sua data o scartala.`:"";
 function archivePlan(key,why){if(!PLAN[key])return;S.archive.unshift({id:"v"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),key,at:new Date().toISOString(),why,plan:JSON.parse(JSON.stringify(PLAN[key]))});S.archive=S.archive.slice(0,60)}
 // Prima di cancellare, importare o scartare: copia dei dati attuali e "Annulla" per 10 secondi nel messaggio della schermata
-const snap=()=>{try{localStorage.setItem(KEY+".bak",JSON.stringify(S))}catch(e){}};
-function undoable(txt){const m=document.getElementById("bmsg")||document.getElementById("omsg")||document.getElementById("msg");if(!m)return;m.className="msg ok";m.innerHTML=`${esc(txt)} <button class="lnk" id="undoD">Annulla</button>`;
+// Se la copia non si scrive (memoria piena) non si offre "Annulla": rimetterebbe una copia vecchia
+let snapOk=true;const snap=()=>{snapOk=setKey(KEY+".bak",JSON.stringify(S))};
+function undoable(txt,at){const m=(at&&document.getElementById(at))||document.getElementById("bmsg")||document.getElementById("omsg")||document.getElementById("msg");if(!m)return;if(!snapOk){m.className="msg err";m.textContent=txt+" Non posso offrire Annulla: memoria piena, la copia di sicurezza non si è salvata.";return}m.className="msg ok";m.innerHTML=`${esc(txt)} <button class="lnk" id="undoD">Annulla</button>`;
   const u=document.getElementById("undoD");const t=setTimeout(()=>{if(u.isConnected)u.remove()},10000);
-  u.onclick=()=>{clearTimeout(t);try{S=JSON.parse(localStorage.getItem(KEY+".bak"));normS();rebuild();save();applySkin();render();const mm=document.getElementById("bmsg")||document.getElementById("omsg")||document.getElementById("msg");if(mm){mm.className="msg ok";mm.textContent="Dati ripristinati."}}catch(e){}}}
-let storageOk=true;
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){storageOk=false}}
+  u.onclick=()=>{clearTimeout(t);try{S=JSON.parse(localStorage.getItem(KEY+".bak"));normS();rebuild();save();applySkin();render();const mm=(at&&document.getElementById(at))||document.getElementById("bmsg")||document.getElementById("omsg")||document.getElementById("msg");if(mm){mm.className="msg ok";mm.textContent="Dati ripristinati."}}catch(e){}}}
+// Scrittura in memoria: se è piena si libera la copia dei dati illeggibili (.err) e si riprova una volta
+function setKey(k,v){try{localStorage.setItem(k,v);return true}catch(e){try{if(localStorage.getItem(KEY+".err")!=null){localStorage.removeItem(KEY+".err");localStorage.setItem(k,v);return true}}catch(e2){}return false}}
+// storageOk torna vero al primo salvataggio riuscito (e l'avviso sparisce); se un salvataggio fallisce l'avviso compare subito
+const STOR_MSG="Non riesco a salvare su questo telefono (memoria piena o navigazione privata): le ultime modifiche non restano. Esporta un backup da Impostazioni.";
+// Avviso fisso in alto, fuori dalle schermate: resta anche quando Allenamento si ridisegna a ogni serie
+function storWarn(on){let m=document.getElementById("storErr");if(!on){if(m)m.remove();return}if(m||!document.body)return;m=document.createElement("p");m.id="storErr";m.className="msg err";m.setAttribute("role","alert");m.textContent=STOR_MSG;
+  m.style.cssText="position:fixed;left:16px;right:16px;top:calc(env(safe-area-inset-top,0px) + 8px);z-index:90;margin:0;padding:10px 12px;border-radius:12px;background:var(--card);border:1px solid currentColor;box-shadow:0 6px 20px rgba(0,0,0,.25)";document.body.appendChild(m)}
+function save(){storageOk=setKey(KEY,JSON.stringify(S));try{storWarn(!storageOk)}catch(e){}}
 
 /* ================= DATES ================= */
 // iso, addDays e today sono in cima a STORAGE: servono già all'avvio (seduta libera aperta)
@@ -2295,7 +2336,7 @@ function setsFor(ex,mods){
 // Due esercizi sono lo stesso se hanno lo stesso nome; ogni giorno tiene però il suo range di ripetizioni.
 const nmKey=n=>String(n||"").toLowerCase().replace(/\s+/g," ").trim();
 let famC={k:"",m:null};
-function famIds(id){const k=S.sessions.length+"|"+ALL_EX.length;
+function famIds(id){const k=famRev+"|"+S.sessions.length+"|"+((S.sessions[S.sessions.length-1]||{}).id||"")+"|"+ALL_EX.length;
   if(famC.k!==k){const m=new Map(),add=i=>{const n=nmKey(exName(i));if(!m.has(n))m.set(n,new Set());m.get(n).add(i)};Object.keys(EX).forEach(add);S.sessions.forEach(x=>x.sets&&Object.keys(x.sets).forEach(add));famC={k,m}}
   const f=famC.m.get(nmKey(exName(id)));return f&&f.has(id)?[id,...[...f].filter(i=>i!==id)]:[id]}
 const okSets=a=>a&&a.some(x=>num(x.reps)!=null);
@@ -2539,7 +2580,7 @@ function tgFor(ex,mods,g){let t=target(ex);
 const PH={massa:{n:"Massa",lo:.25,hi:.5,src:"Iraki 2019",col:""},def:{n:"Definizione",lo:-1,hi:-.5,src:"Helms 2014, Garthe 2011",col:"var(--adapt)"},mant:{n:"Mantenimento",lo:-.25,hi:.25,src:"regola pratica",col:"var(--muted)"}};
 function phaseAt(d){const k=typeof d==="string"?d:iso(d||today());let ph="massa";for(const x of (S.phases||[]).slice().sort((a,b)=>a.d.localeCompare(b.d)))if(x.d<=k)ph=x.ph;return ph}
 // Prime 3 settimane della fase (o dalla prima seduta): il taglio sugli eccentrici prima del padel vale solo qui, poi le gambe sono abituate
-function earlyPhase(d){const st=phaseStart()||(S.sessions.map(x=>iso(x.date)).sort()[0]);return !st||(d-new Date(st+"T00:00:00"))<21*864e5}
+function earlyPhase(d){const st=phaseStart()||(S.sessions.map(x=>iso(x.date)).sort()[0]);return !st||dayDiff(st,iso(d))<21}
 function phaseStart(){const P=(S.phases||[]).slice().sort((a,b)=>a.d.localeCompare(b.d)),cur=phaseAt();let st=null;for(const x of P){if(x.d>iso(today()))break;if(x.ph===cur){if(!st)st=x.d}else st=null}return st}
 function setPhase(ph){S.phases=(S.phases||[]).filter(x=>x.d!==iso(today()));if(phaseAt()!==ph||!S.phases.length)S.phases.push({d:iso(today()),ph});save()}
 function phaseBands(x0,x1){const P=(S.phases||[]).slice().sort((a,b)=>a.d.localeCompare(b.d)),out=[];
@@ -2563,22 +2604,27 @@ function stalled(ex){if(noStall(ex))return false;// Le prime 2 sedute di un eser
   const pk=Math.max(...P.map(kg)),pb=Math.max(...P.map(bm)),pr=Math.max(0,...P.filter(s=>kg(s)===pk).map(s=>rt(s,pk)));
   return !W.some(s=>kg(s)>pk+1e-9||bm(s)>pb+1e-9||(kg(s)===pk&&rt(s,pk)>pr))}
 // Una pausa di 7 o più giorni senza sedute vale come scarico: le settimane si contano da lì
-function restEnd(){const d=[...new Set(S.sessions.map(dayOf))].sort();let e=null;for(let i=1;i<d.length;i++)if((new Date(d[i])-new Date(d[i-1]))/864e5>=8)e=d[i];
-  if(d.length&&(today()-new Date(d[d.length-1]+"T00:00:00"))/864e5>=8)e=iso(today());return e}
+function restEnd(){const d=[...new Set(S.sessions.map(dayOf))].sort();let e=null;for(let i=1;i<d.length;i++)if(dayDiff(d[i-1],d[i])>=8)e=d[i];
+  if(d.length&&dayDiff(d[d.length-1],iso(today()))>=8)e=iso(today());return e}
 function cycleStart(){const a=S.lastDeload||"",b=restEnd()||"",c=a>b?a:b;return c||S.sessions.map(dayOf).sort()[0]}
 const deloadOn=(d=today())=>!!S.deload&&iso(d)>=S.deload.from&&iso(d)<=S.deload.to;
 function deloadAdvice(){
   if(S.deload||!S.sessions.length)return null;if(S.deloadSnooze&&iso(today())<S.deloadSnooze)return null;
   const why=[],cut=iso(addDays(today(),-21));
   const ids=[...new Set(S.sessions.filter(x=>dayOf(x)>=cut).flatMap(x=>Object.keys(x.sets||{})))];
-  const st=new Set(ids.filter(id=>{const ex=exById(id);if(!stalled(ex))return false;try{const t=target(ex);return !t.hold&&t.kind!=="down"}catch(e){return true}}).map(id=>nmKey(exName(id)))).size;  const since=cycleStart();const wk=Math.floor((today()-new Date(since+"T00:00:00"))/(7*864e5));
+  const st=new Set(ids.filter(id=>{const ex=exById(id);if(!stalled(ex))return false;try{const t=target(ex);return !t.hold&&t.kind!=="down"}catch(e){return true}}).map(id=>nmKey(exName(id)))).size;  const since=cycleStart();const wk=Math.floor(dayDiff(since,iso(today()))/7);
   // Per gli stalli lo scarico si propone solo dopo almeno 4 settimane di lavoro (dall'inizio o dall'ultimo scarico)
   if(st>=3&&wk>=4)why.push(`${st} esercizi fermi da 3 sedute`);
   if(wk>=6)why.push(`${wk} settimane di allenamento senza scarico`);
   return why.length?why:null;
 }
-function startDeload(){const from=cycleStart()||iso(today());S.cycles=S.cycles||[];if(!S.cycles.some(c=>c.to===iso(today())))S.cycles.push({from,to:iso(today())});S.deload={from:iso(today()),to:iso(addDays(today(),6))};delete S.deloadSnooze;save()}
-function endDeload(){S.lastDeload=iso(today());delete S.deload;delete S.dlFx;save()}
+function startDeload(){const from=cycleStart()||iso(today());S.cycles=S.cycles||[];const cy=S.cycles.some(c=>c.to===iso(today()))?0:1;if(cy)S.cycles.push({from,to:iso(today())});S.deload={from:iso(today()),to:iso(addDays(today(),6)),cy};delete S.deloadSnooze;save()}
+// Scarico vero solo se è durato almeno 2 giorni e ha almeno una seduta di scarico; altrimenti è annullato: non conta come fatto e il ciclo aggiunto all'avvio si toglie
+function deloadReal(D,end){return !!D&&dayDiff(D.from,end)>=2&&S.sessions.some(x=>x.deload&&iso(x.date)>=D.from&&iso(x.date)<=end)}
+function closeDeload(end){const D=S.deload;if(!D)return false;const real=deloadReal(D,end);if(real)S.lastDeload=end;else if(D.cy!==0)S.cycles=(S.cycles||[]).filter(c=>c.to!==D.from);delete S.deload;delete S.dlFx;return real}
+function endDeload(){const r=closeDeload(iso(today()));save();return r}
+// Testo della conferma di "Termina": dice se lo scarico conterà come fatto
+function endDeloadAsk(){const D=S.deload;if(!D)return "";const n=dayDiff(D.from,iso(today()));return deloadReal(D,iso(today()))?`Conta come scarico fatto (${n} giorni). Tocca di nuovo per terminarlo.`:`${n<2?"Dura da meno di 2 giorni":"Non c'è nessuna seduta di scarico"}: lo annullo e non conta come fatto. Tocca di nuovo per confermare.`}
 function pad(a,n,fill){const r=a.slice(0,n);while(r.length<n)r.push(fill??r[r.length-1]??0);return r}
 
 /* ================= RECORDS ================= */
@@ -2605,7 +2651,7 @@ function draftFor(g){moveOld();S.draft[g]=S.draft[g]||{date:iso(today()),ex:{}};
 function hasDone(d){return Object.values(d.ex||{}).some(a=>Array.isArray(a)&&a.some(x=>x&&x.done))}
 function moveOld(){let lib=false;for(const g in S.draft||{}){const d=S.draft[g];if(d&&d.date!==iso(today())&&hasDone(d)&&Date.now()-(d.last||d.start||Date.parse(d.date+"T12:00:00"))>12*36e5){S.oldDraft=S.oldDraft||{};S.oldDraft[g+"@"+d.date]={...d,g};delete S.draft[g];if(g==="LIB")lib=true}}if(lib&&PLAN&&PLAN.LIB){if(gymSel==="LIB")gymSel=null;rebuild()}}
 const draftOld=g=>{const d=S.draft&&S.draft[g];if(!d||d.date===iso(today())||!hasDone(d))return null;return {d,stale:false}};
-function oldBox(key,d,stale){const g=d.g||key,nm=PLAN[g]?PLAN[g].name:g==="LIB"?"Seduta libera":"Seduta",dt=new Date(d.start||d.date+"T12:00:00"),n=Object.values(d.ex).reduce((a,r)=>a+r.filter(x=>x.done).length,0)+Object.values(d.pre||{}).reduce((a,b)=>a+b,0);
+function oldBox(key,d,stale){const g=d.g||key,nm=d.planName||PLAN[g]?d.planName||PLAN[g].name:g==="LIB"?"Seduta libera":"Seduta",dt=new Date(d.start||d.date+"T12:00:00"),n=Object.values(d.ex).reduce((a,r)=>a+r.filter(x=>x.done).length,0)+Object.values(d.pre||{}).reduce((a,b)=>a+b,0);
   return stale?`<section class="card oldd"><p><b>${esc(nm)} di ${esc(WD_LONG[dt.getDay()])} ${dt.getDate()} non salvata</b> · ${n} serie</p><div class="seg" style="grid-template-columns:1fr 1fr"><button class="btn hot" data-oldsave="${esc(key)}">Salvala con la sua data</button><button class="btn ghost" data-olddrop="${esc(key)}">Scartala</button></div></section>`
   :PLAN[g]?`<section class="card oldd"><p><b>${esc(nm)} in corso</b> · ${n} serie ${d.date===iso(today())?"di oggi":"da "+esc(WD_LONG[dt.getDay()])}</p><div class="seg" style="grid-template-columns:1fr"><button class="btn hot" data-oldgo="${g}">Continua</button></div></section>`:""}
 // Oggi: anche una seduta di oggi lasciata a metà per un'altra (Cambia seduta di oggi) resta raggiungibile con "Continua"
@@ -2617,12 +2663,14 @@ function cell(g,exId,j){const d=draftFor(g);const a=d.ex[exId]=d.ex[exId]||[];wh
 
 /* ================= RENDER ================= */
 const app=document.getElementById("app");
-function render(){
+function render(){shownDay=iso(today());
   const nv=view==="imp"||view==="edit"?"set":view;
   document.querySelectorAll("nav.bar button").forEach(b=>b.setAttribute("aria-current",b.dataset.v===nv?"page":"false"));
   const nd=document.querySelector("nav.bar .ndot");if(nd)nd.style.transform=`translateX(${Math.max(0,["oggi","train","prog","set"].indexOf(nv))*100}%)`;
   if(view==="edit"&&!editPlan)view="set";
-  ({oggi:renderToday,train:renderTrain,prog:renderProg,set:renderWeek,imp:renderSettings,edit:renderEditor})[view]();
+  // Una schermata che va in errore (dati rotti) non deve restare vuota anche alle riaperture: si torna a Oggi e l'errore resta visibile in console
+  try{({oggi:renderToday,train:renderTrain,prog:renderProg,set:renderWeek,imp:renderSettings,edit:renderEditor})[view]()}catch(e){if(render.strict||view==="oggi")throw e;view="oggi";S.view="oggi";save();render();setTimeout(()=>{throw e});return}
+  shownGym=view==="train"?currentGym():null;
   if(tOn)tick();
   wakeSync();
 }
@@ -2633,6 +2681,21 @@ function go(v){const from=view,upd=()=>{view=v;if(v!=="edit"){S.view=v;save()}re
     const t=vtTrack(document.startViewTransition(upd));t.finished.finally(()=>h.classList.remove("vt-sed","vt-back"));return}
   upd();if(from!==v)slideIn((VORD[v]??0)>=(VORD[from]??0)?"in-r":"in-l")}
 document.querySelectorAll("nav.bar button").forEach(b=>b.onclick=()=>go(b.dataset.v));
+// App rimasta aperta da ieri (su iPhone la PWA resta in memoria di notte): se il giorno è cambiato da quando la schermata è stata disegnata
+// si ridisegna sul giorno giusto al ritorno in primo piano, ogni minuto e al primo tocco. In automatico non si ridisegna sopra un foglio aperto, un campo in scrittura o l'editor.
+let shownDay=null,shownGym=null;
+const dayStale=()=>!!shownDay&&shownDay!==iso(today());
+function natGym(){const w=gymSel;gymSel=null;try{return currentGym()}finally{gymSel=w}}
+function freshDay(auto){if(!dayStale())return false;if(auto&&(view==="edit"||document.querySelector(".sheet-wrap")||/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement||{}).tagName||"")))return false;gymSel=null;moveOld();rebuild();render();return true}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")freshDay(true)});
+addEventListener("pageshow",()=>freshDay(true));addEventListener("focus",()=>freshDay(true));
+setInterval(()=>{if(document.visibilityState==="visible")freshDay(true)},60000);
+// Primo tocco su una schermata di ieri: in Oggi si ridisegna su oggi e si ripete il tocco sullo stesso tasto (se c'è ancora); in Allenamento solo se la seduta di oggi è un'altra
+app.addEventListener("click",e=>{if(!dayStale())return;const b=e.target.closest("button");if(!b||!app.contains(b))return;
+  if(view==="oggi"){e.stopPropagation();e.preventDefault();const sel=b.id?"#"+CSS.escape(b.id):b.dataset.dt?`[data-dt="${b.dataset.dt}"]`:null;freshDay();const nb=sel&&app.querySelector(sel);if(nb)nb.click()}
+  else if(view==="train"&&natGym()!==shownGym){e.stopPropagation();e.preventDefault();freshDay()}},true);
+// Un'altra finestra dell'app ha salvato: ci si allinea invece di sovrascrivere le sue serie al prossimo salvataggio
+addEventListener("storage",e=>{if(e.key!==KEY||e.newValue==null)return;try{S=JSON.parse(e.newValue);normS();rebuild();applySkin();if(view!=="edit")render()}catch(x){}});
 
 /* ================= CONTENUTI: errori comuni, riscaldamento, avvicinamento, fastidio, peso e misure ================= */
 const ERRS={
@@ -3227,9 +3290,10 @@ function bkOk(b){if(!b||!b.isConnected)return;const old=b.querySelector(":scope>
   if(old){if(wasAbs)ck.classList.add("abs");old.replaceWith(ck)}else{ck.classList.add("abs");if(getComputedStyle(b).position==="static")b.style.position="relative";b.append(ck)}if(RM())return;const pa=ck.firstElementChild;
   ck.animate([{opacity:0,transform:"scale(.6)"},{opacity:1,transform:"none"}],{duration:200,easing:"cubic-bezier(.23,1,.32,1)"});
   pa.animate([{strokeDashoffset:1},{strokeDashoffset:0}],{duration:320,delay:80,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"})}
-function dlBackup(){try{S.lastBackup=iso(today());save();const b=new Blob([JSON.stringify(S,null,1)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="allenati-scemo-"+iso(today())+".json";document.body.appendChild(a);a.click();a.remove();return true}catch(e){return false}}
+// lastBackup si segna solo dopo che il file è partito (condivisione riuscita o download avviato), mai prima
+function dlBackup(){try{const b=new Blob([JSON.stringify(S,null,1)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="allenati-scemo-"+iso(today())+".json";document.body.appendChild(a);a.click();a.remove();S.lastBackup=iso(today());save();return true}catch(e){return false}}
 function backupDue(){const L=S.sessions||[];if(L.length<3)return null;const k=iso(today());if(S.bkSnooze&&S.bkSnooze>k)return null;
-  const from=S.lastBackup||L.map(x=>x.date.slice(0,10)).sort()[0],days=Math.floor((today()-new Date(from+"T00:00:00"))/864e5);return days>=14?{days,never:!S.lastBackup,n:L.length}:null}
+  const from=S.lastBackup||L.map(dayOf).sort()[0],days=dayDiff(from,k);return days>=14?{days,never:!S.lastBackup,n:L.length}:null}
 // Titolo che si adatta: prima rimpicciolisce fino a stare su una riga (non sotto il 72% della misura dello stile);
 // se il nome è troppo lungo va su 2 righe, rimpicciolendo ancora fino a un minimo
 function fitTitle(el,{min=26,avail}={}){if(!el)return;el.style.fontSize="";const fs0=parseFloat(getComputedStyle(el).fontSize);if(!fs0)return;
@@ -3254,13 +3318,13 @@ function renderToday(){
   const runG=hasGym&&!doneS&&S.draft&&S.draft[a.gym]&&!draftOld(a.gym)?a.gym:null;let runN=0,runT=0;
   if(runG){const L=trainList(runG,trainMods(runG));for(const {ex} of L){const n=setsFor(ex,trainMods(runG));runT+=n;runN+=Math.min(n,doneCount(runG,ex.id))}}
   const doneSt=doneS?sessStats(doneS):null,doneAt=doneS?new Date(doneS.date).toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"}):"";
-  const week=[...Array(7)].map((_,i)=>{const x=addDays(d,i),p=dayPlan(x);return `<button class="wd2 ${i===0?"t":""}" data-wd="${i}" aria-label="${esc(cap(WD_LONG[x.getDay()]))}: cambia il padel"><b>${WD[x.getDay()]}</b><span class="ics">${i===0&&doneS?dayIcons(p).replace(I("gym"),`<b class="dk" aria-label="Fatta">✓</b>`):dayIcons(p)}</span><small>${p.gym in PLAN?esc(PLAN[p.gym].name).replace(/ (\S{1,2})$/,"<br>$1"):p.padel==="match"?"Partita":p.padel==="train"?"Padel":"Riposo"}</small></button>`}).join("");
+  const week=[...Array(7)].map((_,i)=>{const x=addDays(d,i),p=dayPlan(x);return `<button class="wd2 ${i===0?"t":""}" data-wd="${i}" data-dt="${iso(x)}" aria-label="${esc(cap(WD_LONG[x.getDay()]))}: cambia il padel"><b>${WD[x.getDay()]}</b><span class="ics">${i===0&&doneS?dayIcons(p).replace(I("gym"),`<b class="dk" aria-label="Fatta">✓</b>`):dayIcons(p)}</span><small>${p.gym in PLAN?esc(PLAN[p.gym].name).replace(/ (\S{1,2})$/,"<br>$1"):p.padel==="match"?"Partita":p.padel==="train"?"Padel":"Riposo"}</small></button>`}).join("");
   let dl="";
   if(deloadOn())dl=`<div class="banner">${I("bolt")}<div><b>Scarico in corso</b><span>Fino a ${fmtShort(S.deload.to)}: metà serie, stessi carichi, 3-4 in canna.</span></div><button id="endDl">Termina</button></div>`;
   else{const w=deloadAdvice();if(w)dl=`<div class="banner">${I("bolt")}<div><b>Scarico consigliato</b><span>${esc(cap(w.join(" e ")))}.</span></div><button id="startDl">Avvia scarico</button><button id="snoozeDl" class="sec">Non ora</button></div>`}
   const bk=backupDue();if(bk)dl+=`<div class="banner bk">${I("info")}<div><b>Salva un backup</b><span>${bk.never?`${bk.n} sedute salvate solo su questo telefono, mai copiate.`:`Ultimo backup ${bk.days} giorni fa.`} Se cancelli l'app o cambi telefono le perdi.</span></div><button id="bkNow">Salva</button><button id="bkLater" class="sec">Non ora</button></div>`;
   app.innerHTML=`
-  <header class="head"><span class="today-d">${esc(cap(WD_LONG[d.getDay()]))} ${d.getDate()} ${d.toLocaleDateString("it-IT",{month:"long"})}${phaseStart()?` · ${PH[phaseAt()].n} settimana ${Math.floor((d-new Date(phaseStart()+"T00:00:00"))/(7*864e5))+1}`:""}</span></header>
+  <header class="head"><span class="today-d">${esc(cap(WD_LONG[d.getDay()]))} ${d.getDate()} ${d.toLocaleDateString("it-IT",{month:"long"})}${phaseStart()?` · ${PH[phaseAt()].n} settimana ${Math.floor(dayDiff(phaseStart(),k)/7)+1}`:""}</span></header>
   ${oldBoxes(null,a.gym)}<p class="msg" id="omsg" aria-live="polite">${bootMsg?esc(bootMsg):""}</p>
   ${doneS?`<section class="card hero done" aria-live="polite">
     <div class="big">${esc(doneS.planName||big)}</div>
@@ -3286,25 +3350,28 @@ function renderToday(){
   ${dl}
   ${bodyBanner()}
   <section class="card wk" aria-label="Prossimi 7 giorni">${week}</section>`;
+  // I tasti leggono la data al momento della scelta (un foglio aperto prima di mezzanotte non scrive su ieri)
+  shownDay=k;
   const setO=(day,field,v)=>{const kk=iso(day);S.overrides[kk]={...(S.overrides[kk]||{}),[field]:v};save();renderToday()};
   const padOpts=[{v:"none",l:"Niente"},{v:"train",l:"Allenamento"},{v:"match",l:"Partita"}];
-  document.getElementById("cPad").onclick=()=>pickSheet("Padel oggi",padOpts,a.padel,v=>setO(d,"padel",v));
-  document.querySelectorAll("[data-wd]").forEach(b=>b.onclick=()=>{const x=addDays(d,+b.dataset.wd);pickSheet(`Padel ${WD_LONG[x.getDay()]} ${x.getDate()}`,padOpts,dayPlan(x).padel,v=>setO(x,"padel",v))});
-  document.getElementById("cTom").onclick=()=>pickSheet("Padel domani",padOpts,tm.padel,v=>setO(addDays(d,1),"padel",v));
-  document.getElementById("cEn").onclick=()=>pickSheet("Come ti senti",[{v:"low",l:"Stanco",sub:"Stessi carichi, una serie in meno per esercizio"},{v:"ok",l:"Normale"},{v:"high",l:"In forma",sub:"Scheda normale"}],a.energy,v=>{S.energy[k]=v;save();renderToday()});
+  document.getElementById("cPad").onclick=()=>pickSheet("Padel oggi",padOpts,a.padel,v=>setO(today(),"padel",v));
+  document.querySelectorAll("[data-wd]").forEach(b=>b.onclick=()=>{const x=new Date(b.dataset.dt+"T12:00:00");pickSheet(`Padel ${WD_LONG[x.getDay()]} ${x.getDate()}`,padOpts,dayPlan(x).padel,v=>setO(x,"padel",v))});
+  document.getElementById("cTom").onclick=()=>pickSheet("Padel domani",padOpts,tm.padel,v=>setO(addDays(today(),1),"padel",v));
+  document.getElementById("cEn").onclick=()=>pickSheet("Come ti senti",[{v:"low",l:"Stanco",sub:"Stessi carichi, una serie in meno per esercizio"},{v:"ok",l:"Normale"},{v:"high",l:"In forma",sub:"Scheda normale"}],a.energy,v=>{S.energy[iso(today())]=v;save();renderToday()});
   const fg=document.getElementById("freeGo");if(fg)fg.onclick=()=>{if(PLAN.LIB&&S.draft.LIB){gymSel="LIB";go("train")}else freeSheet()};
   const fd=document.getElementById("fullDay");if(fd)fd.onclick=()=>{if(a.full)S.preMatchLite=true;else delete S.preMatchLite;delete S.fullDay;save();renderToday()};
-  const cg=document.getElementById("chGym");if(cg)cg.onclick=()=>pickSheet("Palestra oggi",[{v:"none",l:"Niente palestra"},...GYM_ORDER.filter(x=>x!=="LIB").map(g=>({v:g,l:PLAN[g].name,sub:PLAN[g].sub})),{v:"@free",l:PLAN.LIB&&S.draft.LIB?"Continua la seduta libera":"Seduta libera",sub:"Esercizi scelti al volo, fuori dal piano"}],a.gym,v=>{if(v==="@free"){if(PLAN.LIB&&S.draft.LIB){gymSel="LIB";go("train")}else setTimeout(freeSheet,240);return}setO(d,"gym",v)});
-  const sd=document.getElementById("startDl");if(sd)sd.onclick=()=>{startDeload();renderToday();reviewSheet(S.cycles[S.cycles.length-1])};
+  const cg=document.getElementById("chGym");if(cg)cg.onclick=()=>pickSheet("Palestra oggi",[{v:"none",l:"Niente palestra"},...GYM_ORDER.filter(x=>x!=="LIB").map(g=>({v:g,l:PLAN[g].name,sub:PLAN[g].sub})),{v:"@free",l:PLAN.LIB&&S.draft.LIB?"Continua la seduta libera":"Seduta libera",sub:"Esercizi scelti al volo, fuori dal piano"}],a.gym,v=>{if(v==="@free"){if(PLAN.LIB&&S.draft.LIB){gymSel="LIB";go("train")}else setTimeout(freeSheet,240);return}setO(today(),"gym",v)});
+  const sd=document.getElementById("startDl");if(sd)sd.onclick=()=>{snap();startDeload();renderToday();undoable("Scarico avviato.","omsg");reviewSheet(S.cycles[S.cycles.length-1])};
   const bkN=document.getElementById("bkNow");if(bkN)bkN.onclick=async()=>{await shareBackup();renderToday()};
   const bkL=document.getElementById("bkLater");if(bkL)bkL.onclick=()=>{S.bkSnooze=iso(addDays(today(),7));save();renderToday()};
   const zd=document.getElementById("snoozeDl");if(zd)zd.onclick=()=>{S.deloadSnooze=iso(addDays(today(),7));save();renderToday()};
-  const ed=document.getElementById("endDl");if(ed)ed.onclick=()=>{endDeload();renderToday()};
+  // Termina: prima un tocco che dice se conterà come scarico fatto o se viene annullato, poi la conferma
+  const ed=document.getElementById("endDl");if(ed)ed.onclick=()=>{if(ed.dataset.arm!=="1"){ed.dataset.arm="1";ed.textContent="Conferma";const sp=ed.parentElement.querySelector("span");if(sp)sp.textContent=endDeloadAsk();return}const r=endDeload();renderToday();const om=document.getElementById("omsg");if(om){om.className="msg ok";om.textContent=r?"Scarico terminato.":"Scarico annullato: non conta come fatto."}};
   const bg=document.getElementById("bodyGo");if(bg)bg.onclick=()=>bodySheet(renderToday);
   const bn=document.getElementById("bodyNo");if(bn)bn.onclick=()=>{S.bodySnooze=iso(addDays(today(),2));save();renderToday()};
   const ss2=document.getElementById("seeSum");if(ss2)ss2.onclick=()=>sheetFrom(ss2.closest(".hero"),()=>summarySheet(doneS));
   const sg=document.getElementById("startGym");if(sg)sg.onclick=()=>{gymSel=a.gym;go("train")};oldDraftBind();
-  const sa=document.getElementById("startAlt");if(sa)sa.onclick=()=>{setO(d,"gym",a.gymAlt);gymSel=a.gymAlt;go("train")};
+  const sa=document.getElementById("startAlt");if(sa)sa.onclick=()=>{setO(today(),"gym",a.gymAlt);gymSel=a.gymAlt;go("train")};
   fitTitles();
 }
 
@@ -3646,6 +3713,8 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;
   kgChk="";
   r.done=!r.done;const dd=draftFor(g);if(r.done&&!dd.start)dd.start=Date.now();if(r.done){const nw=Date.now();if(dd.last&&nw-dd.last>45*6e4)dd.idle=(dd.idle||0)+(nw-dd.last-10*6e4);dd.last=nw;dd.mods=[...mods]}
   if(!r.done){delete r.myo;delete r.myoEnd;delete r.pr}
+  // Esercizio non più completo: il voto dell'ultima serie (e i suoi effetti sul recupero) non vale più, si richiede a fine esercizio
+  if(!r.done&&doneCount(g,exId)<setsFor(ex,mods))for(const f of ["eff","effAt","restPlus"])if(dd[f])delete dd[f][exId];
   if(!r.done&&dd.nextNote&&dd.nextNote.ex===exId&&dd.nextNote.j===j){for(const [k,v] of Object.entries(dd.nextNote.old||{})){const c=cell(g,exId,+k);if(!c.done){if(v==null)delete c.kg;else c.kg=v}}delete dd.nextNote}
   save();
   if(r.done){
@@ -3754,17 +3823,18 @@ function finish(g,mods,oldKey){
   const names={};
   const order=(PLAN[g]?PLAN[g].ex:[]).flatMap(e=>[e.id,...altsOf(e).map(a=>e.id+"~"+a.k)]);
   const ids=[...order.filter(id=>d.ex[id]),...Object.keys(d.ex).filter(id=>!order.includes(id))];
-  const eff={};let stn=null;for(const id of ids){const r=(d.ex[id]||[]).filter(x=>x.done).map(x=>({kg:x.kg??"",reps:x.reps??"",...(Array.isArray(x.myo)&&x.myo.length?{myo:x.myo.slice()}:{}),...(x.pr?{pr:1}:{})}));if(r.length){sets[id]=r;names[id]=exName(id);n+=r.length;if(d.eff&&d.eff[id])eff[id]=d.eff[id];const t=stationOf(exById(id));if(t)(stn=stn||{})[id]=t}}
+  const eff={};let stn=null;for(const id of ids){const r=(d.ex[id]||[]).filter(x=>x.done).map(x=>({kg:x.kg??"",reps:x.reps??"",...(Array.isArray(x.myo)&&x.myo.length?{myo:x.myo.slice()}:{}),...(x.pr?{pr:1}:{})}));if(r.length){sets[id]=r;names[id]=(d.names&&d.names[id])||exName(id);n+=r.length;if(d.eff&&d.eff[id])eff[id]=d.eff[id];const t=stationOf(exById(id));if(t)(stn=stn||{})[id]=t}}
   const m=document.getElementById("msg");
   if(!n){m.className="msg err";m.textContent="Spunta almeno una serie con ✓ prima di salvare.";return}
   // Seduta di un altro giorno: data dell'inizio e durata fino all'ultima serie
   const old=oldKey?{d,stale:true}:draftOld(g),when=d.start?new Date(d.start):old?new Date(d.date+"T12:00:00"):new Date();
   const dur=sesMin(d,old&&old.stale);
   clearDemo();
-  S.sessions.push({id:"s"+Date.now(),day:g,planName:PLAN[g]?PLAN[g].name:"Seduta libera",date:when.toISOString(),sets,names,eff,mods:[...mods],deload:mods.has("deload"),dur,prv:1,...(stn?{stn}:{}),...(d.pre&&Object.values(d.pre).some(v=>v>0)?{pre:{...d.pre}}:{})});
+  try{localStorage.removeItem(KEY+".imp")}catch(e){}
+  S.sessions.push({id:"s"+Date.now(),day:g,planName:d.planName||(PLAN[g]?PLAN[g].name:"Seduta libera"),date:when.toISOString(),sets,names,eff,mods:[...mods],deload:mods.has("deload"),dur,prv:1,...(stn?{stn}:{}),...(d.pre&&Object.values(d.pre).some(v=>v>0)?{pre:{...d.pre}}:{})});
   if(oldKey)delete S.oldDraft[oldKey];else{delete S.draft[g];openEx[g]=null;if(g==="LIB"){delete S.free;rebuild();gymSel=null}stopTimer()}save();sheetFrom(document.getElementById("finish"),()=>{renderTrain();
   const mm=document.getElementById("msg");mm.className="msg ok";mm.textContent=`Seduta salvata: ${n} serie. I carichi della prossima volta sono già pronti.`;
-  if(!storageOk){mm.className="msg err";mm.textContent="Non riesco a salvare su questo dispositivo: controlla che il browser non sia in navigazione privata."}
+  if(!storageOk){mm.className="msg err";mm.textContent=STOR_MSG}
   summarySheet(S.sessions[S.sessions.length-1])});
 }
 
@@ -4105,7 +4175,7 @@ function exRank(ids,BW,excl,at){
   const id=ids[0],sd=stdOf(id);if(!sd)return null;
   const ex=exById(id),from=iso(addDays(at||today(),-RWIN)),to=iso(at||today()),mid=rirMid(ex.rir);let best=null,loose=null;
   for(const s of S.sessions)for(const xid of ids){
-    if(s.id===excl||s.deload||!s.sets||!s.sets[xid]||s.date.slice(0,10)<from||s.date.slice(0,10)>to)continue;
+    if(s.id===excl||s.deload||!s.sets||!s.sets[xid]||dayOf(s)<from||dayOf(s)>to)continue;
     const arr=s.sets[xid],ef=(s.eff||{})[xid];
     arr.forEach((x,j)=>{const r=num(x.reps);let kg=num(x.kg);if(r==null||r<1)return;
       if(sd.k==="w")kg=BW+(kg||0);else if(!kg||kg<=0)return;else kg*=eqFOf(exById(xid),stnOfSet(s,xid));
@@ -4610,6 +4680,14 @@ function renderWeek(){
   document.getElementById("toImp").onclick=()=>go("imp");
 }
 
+// Import di un backup: il file sostituisce i dati solo dopo la conferma; i dati di prima restano in KEY.imp e "Annulla l'import" c'è finché non salvi una seduta nuova
+const impUndoOk=()=>{try{return localStorage.getItem(KEY+".imp")!=null}catch(e){return false}};
+function impMsg(t,err){const bm=document.getElementById("bmsg");if(!bm)return;bm.className=err?"msg err":"msg ok";bm.textContent=t}
+function applyImport(j){const prev=S,pre=JSON.stringify(S);if(!setKey(KEY+".imp",pre)){impMsg("Memoria piena: non importo senza poter annullare. Esporta prima un backup dei dati attuali.",true);return}
+  // Prima si prova il backup su tutte le schermate; se qualcosa non va si rimettono i dati di prima e non si salva niente
+  render.strict=true;try{S=j;normS();rebuild();assess(today());for(const v of ["oggi","train","prog","set","imp"]){view=v;render()}}catch(e){S=prev;normS();rebuild();view="imp";render();try{localStorage.removeItem(KEY+".imp")}catch(x){}impMsg("File non valido: scegli un backup esportato da Allenati Scemo.",true);return}finally{render.strict=false}
+  fixDupIds.n=0;stopTimer();save();applySkin();view="imp";render();const n=S.sessions.length;
+  impMsg(`Backup importato: ${n===1?"1 seduta":n+" sedute"}. Puoi annullare l'import finché non salvi una seduta nuova.`)}
 function renderSettings(){
   app.innerHTML=`<header class="head"><button class="back" id="back">‹ Settimana</button><h1>Impostazioni</h1></header>
   <section class="card"><h3>Palestra e padel nello stesso giorno</h3><p class="note" style="margin:0">Cosa fai prima di solito? Con la palestra prima, l'app tiene almeno 1 ripetizione in canna e mette la prevenzione di spalla e polso dopo il padel.</p><div class="seg two" id="segOrd">${[["gym","Palestra prima"],["padel","Padel prima"]].map(([v,l])=>`<button data-v="${v}" aria-pressed="${(S.order||"gym")===v}">${l}</button>`).join("")}</div></section>
@@ -4619,7 +4697,7 @@ function renderSettings(){
   ${S.archive.length?`<section class="card"><h3>Piani vecchi</h3><p class="note" style="margin:0">Le versioni precedenti dei tuoi piani. Ripristinandone una, quella attuale viene salvata qui al suo posto. Lo storico delle sedute resta sempre.</p>
    <div class="plist">${S.archive.map(v=>{const live=!!PLAN[v.key];return `<div class="arch"><div class="pitem"><div><b>${esc(v.plan.name)}</b><small>${v.why==="eliminato"?"eliminato il":"versione del"} ${fmtShort(v.at)} · ${v.plan.ex.length} ${v.plan.ex.length===1?"esercizio":"esercizi"}${live&&PLAN[v.key].name!==v.plan.name?` · ora "${esc(PLAN[v.key].name)}"`:""}</small></div><button class="sbtn" data-vw="${v.id}">Vedi</button><button class="sbtn" data-rs="${v.id}">Ripristina</button><button class="sbtn danger" data-rmv="${v.id}" aria-label="Elimina versione">✕</button></div>
     <ol class="arx" id="ax-${v.id}" hidden>${v.plan.ex.map(e=>`<li>${esc(e.n)} <span>${e.s}×${e.lo}${e.hi!==e.lo?"-"+e.hi:""}${e.t==="time"?" s":""}</span></li>`).join("")}</ol></div>`}).join("")}</div></section>`:""}
-  <section class="card"><h3>Scarico</h3><p class="note" style="margin:0">${deloadOn()?`In corso fino a ${fmtShort(S.deload.to)}.`:"Una settimana con metà serie, stessi carichi e 3-4 ripetizioni in canna. L'app te lo propone quando servirebbe; avvialo tu nella settimana di un torneo."}</p><button class="btn ${deloadOn()?"ghost":""}" id="dlBtn">${deloadOn()?"Termina scarico":"Inizia settimana di scarico"}</button>${(S.cycles||[]).length?`<button class="sbtn" id="rvBtn" style="margin-top:10px">Revisione dell'ultimo ciclo</button>`:""}</section>
+  <section class="card"><h3>Scarico</h3><p class="note" style="margin:0">${deloadOn()?`In corso fino a ${fmtShort(S.deload.to)}.`:"Una settimana con metà serie, stessi carichi e 3-4 ripetizioni in canna. L'app te lo propone quando servirebbe; avvialo tu nella settimana di un torneo."}</p><button class="btn ${deloadOn()?"ghost":""}" id="dlBtn">${deloadOn()?"Termina scarico":"Inizia settimana di scarico"}</button><p class="msg" id="dlmsg" aria-live="polite"></p>${(S.cycles||[]).length?`<button class="sbtn" id="rvBtn" style="margin-top:10px">Revisione dell'ultimo ciclo</button>`:""}</section>
   <section class="card"><h3>Fase</h3><div class="seg" id="segPh" role="group" aria-label="Fase">${Object.entries(PH).map(([k,v])=>`<button data-ph="${k}" aria-pressed="${phaseAt()===k}">${v.n}</button>`).join("")}</div>
    <p class="note" style="margin:10px 0 0">${phaseStart()?`${PH[phaseAt()].n} dal ${fmtShort(phaseStart()+"T12:00:00")}. `:""}${{massa:"Peso +0,25-0,5% a settimana. Esercizio \"Fermo\" se non migliora in 3 sedute.",def:"Peso −0,5-1% a settimana, avviso se cali più dell'1%. L'obiettivo è tenere i carichi: l'avviso scatta solo se il massimale cala oltre il 5% per 2 sedute.",mant:"Peso stabile, ±0,25% a settimana. Progressione come in massa."}[phaseAt()]} Cambia anche la revisione del ciclo e lo sfondo dei grafici. L'app non tocca la dieta.</p></section>
   <section class="card"><h3>Durante l'allenamento</h3>
@@ -4653,10 +4731,13 @@ function renderSettings(){
    </ul></section>
   <section class="card"><h3>Backup</h3><p class="note" style="margin:0">I dati stanno solo su questo telefono. Salva un backup ogni tanto.</p>
    <div class="row"><button class="btn" id="exp">${I("save")}Esporta backup</button><label class="btn" style="flex-direction:column;gap:2px;text-align:center">Importa backup<small style="font-size:12px;font-weight:500;opacity:.75">sostituisce i dati attuali</small><input type="file" id="imp" accept="application/json" hidden></label></div>
-   <button class="btn danger" id="wipe">Cancella tutti i dati</button><p class="msg" id="bmsg" aria-live="polite"></p></section>`;
+   ${impUndoOk()?`<button class="btn ghost" id="impUndo">Annulla l'import del backup</button>`:""}<button class="btn danger" id="wipe">Cancella tutti i dati</button><p class="msg" id="bmsg" aria-live="polite"></p></section>`;
   document.getElementById("back").onclick=()=>go("set");
   document.querySelectorAll("#segOrd button").forEach(b=>b.onclick=()=>{S.order=b.dataset.v;save();renderSettings()});
-  document.getElementById("dlBtn").onclick=()=>{const on=deloadOn();on?endDeload():startDeload();renderSettings();if(!on)reviewSheet(S.cycles[S.cycles.length-1])};
+  document.getElementById("dlBtn").onclick=e=>{const b=e.currentTarget,on=deloadOn();
+    if(on){if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Tocca di nuovo per confermare";const m=document.getElementById("dlmsg");m.className="msg";m.textContent=endDeloadAsk();return}
+      const r=endDeload();renderSettings();const m=document.getElementById("dlmsg");m.className="msg ok";m.textContent=r?"Scarico terminato.":"Scarico annullato: non conta come fatto.";return}
+    snap();startDeload();renderSettings();undoable("Scarico avviato.","dlmsg");reviewSheet(S.cycles[S.cycles.length-1])};
   const rvb=document.getElementById("rvBtn");if(rvb)rvb.onclick=()=>reviewSheet(S.cycles[S.cycles.length-1]);
   document.querySelectorAll("#skins button").forEach(b=>b.onclick=e=>{if(S.skin===b.dataset.s)return;skinVT(e,()=>{S.skin=b.dataset.s;save();applySkin();renderSettings()})});
   document.querySelectorAll("[data-ph]").forEach(b=>b.onclick=()=>{setPhase(b.dataset.ph);renderSettings()});
@@ -4669,18 +4750,24 @@ function renderSettings(){
   document.getElementById("newPlan").onclick=()=>{editPlan={key:null,name:"",sub:"",legs:false,ex:[blankEx()]};go("edit")};
   document.querySelectorAll("[data-ed]").forEach(b=>b.onclick=()=>{const k=b.dataset.ed,P=PLAN[k];editPlan=JSON.parse(JSON.stringify({key:k,name:P.name,sub:P.sub||"",legs:!!P.legs,ex:P.ex}));go("edit")});
   document.querySelectorAll("[data-vw]").forEach(b=>b.onclick=()=>{const l=document.getElementById("ax-"+b.dataset.vw);l.hidden=!l.hidden;b.textContent=l.hidden?"Vedi":"Chiudi"});
-  document.querySelectorAll("[data-rs]").forEach(b=>b.onclick=()=>{const v=S.archive.find(x=>x.id===b.dataset.rs);if(!v)return;S.archive=S.archive.filter(x=>x!==v);if(PLAN[v.key])archivePlan(v.key,"modificato");S.plans[v.key]=JSON.parse(JSON.stringify(v.plan));delete S.draft[v.key];rebuild();save();renderSettings();const m=document.getElementById("wmsg");m.className="msg ok";m.textContent=`Ripristinato "${v.plan.name}".`});
+  document.querySelectorAll("[data-rs]").forEach(b=>b.onclick=()=>{const v=S.archive.find(x=>x.id===b.dataset.rs);if(!v)return;snap();const n=parkDraft(v.key);S.archive=S.archive.filter(x=>x!==v);if(PLAN[v.key])archivePlan(v.key,"modificato");S.plans[v.key]=JSON.parse(JSON.stringify(v.plan));fixDupIds();fixDupIds.n=0;rebuild();save();renderSettings();undoable(`Ripristinato "${v.plan.name}".${parkMsg(n)}`,"wmsg")});
   document.querySelectorAll("[data-rmv]").forEach(b=>b.onclick=()=>{if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Sicuro?";return}S.archive=S.archive.filter(x=>x.id!==b.dataset.rmv);save();renderSettings()});
-  document.querySelectorAll("[data-dup]").forEach(b=>b.onclick=()=>{const P=PLAN[b.dataset.dup];editPlan=JSON.parse(JSON.stringify({key:null,name:P.name+" (copia)",sub:P.sub||"",legs:!!P.legs,ex:P.ex.map(e=>({...e,lib:e.lib||e.id}))}));go("edit")});
-  document.querySelectorAll("[data-delp]").forEach(b=>b.onclick=()=>{if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Sicuro?";return}const k=b.dataset.delp;archivePlan(k,"eliminato");delete S.plans[k];for(const d in S.week)if(S.week[d].gym===k)S.week[d]={...S.week[d],gym:"none"};for(const d in S.overrides)if(S.overrides[d].gym===k)delete S.overrides[d].gym;delete S.draft[k];rebuild();save();renderSettings()});
+  document.querySelectorAll("[data-dup]").forEach(b=>b.onclick=()=>{const P=PLAN[b.dataset.dup];editPlan=JSON.parse(JSON.stringify({key:null,name:P.name+" (copia)",sub:P.sub||"",legs:!!P.legs,ex:P.ex.map(e=>({...e,lib:e.lib||e.id,id:null}))}));go("edit")});
+  document.querySelectorAll("[data-delp]").forEach(b=>b.onclick=()=>{const k=b.dataset.delp;if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent=S.draft[k]&&hasDone(S.draft[k])?"Sicuro? Ha una seduta in corso":"Sicuro?";return}snap();const n=parkDraft(k);archivePlan(k,"eliminato");delete S.plans[k];for(const d in S.week)if(S.week[d].gym===k)S.week[d]={...S.week[d],gym:"none"};for(const d in S.overrides)if(S.overrides[d].gym===k)delete S.overrides[d].gym;rebuild();save();renderSettings();undoable(`Piano eliminato.${parkMsg(n)}`,"wmsg")});
   const bm=document.getElementById("bmsg");
   document.getElementById("exp").onclick=async e=>{const eb=e.currentTarget,x=await shareBackup();if(x==="ok"){bkOk(eb);bm.className="msg ok";bm.textContent="Backup salvato."}else if(x==="no"){bm.className="msg";bm.textContent="Backup non salvato."}else{bm.className="msg err";bm.textContent="Salvataggio non riuscito su questo browser."}};
   // Prima di cancellare o importare: copia dei dati attuali e "Annulla" per 10 secondi
-  document.getElementById("imp").onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{const j=JSON.parse(t);if(!j||!Array.isArray(j.sessions))throw 0;const prev=S;snap();
-    // Prima si prova il backup; se qualcosa non va si rimettono i dati di prima e non si salva niente
-    try{S=j;normS();rebuild();assess(today());for(const v of ["oggi","train","prog","set","imp"]){view=v;render()}}catch(e){S=prev;normS();rebuild();view="imp";render();throw e}
-    stopTimer();save();applySkin();view="imp";render();undoable(`Backup importato: ${S.sessions.length} sedute.`)}).catch(()=>{const bm=document.getElementById("bmsg");if(!bm)return;bm.className="msg err";bm.textContent="File non valido: scegli un backup esportato da Allenati Scemo."})};
-  const w=document.getElementById("wipe");w.onclick=()=>{if(w.dataset.arm!=="1"){w.dataset.arm="1";w.textContent="Tocca di nuovo: cancella tutto";clearTimeout(w.t);w.t=setTimeout(()=>{if(w.isConnected){w.dataset.arm="";w.textContent="Cancella tutti i dati"}},4000);return}snap();stopTimer();S={sessions:[],view:"set",skin:S.skin,vars:S.vars};normS();rebuild();save();renderSettings();undoable("Dati cancellati.")};
+  // Importa: si contano le sedute valide del file su una copia; senza sedute il file si rifiuta, altrimenti si chiede conferma col confronto
+  document.getElementById("imp").onchange=e=>{const inp=e.target,f=inp.files[0];if(!f)return;inp.value="";
+    f.text().then(t=>{const j=JSON.parse(t);if(!j||typeof j!=="object"||!Array.isArray(j.sessions))throw 0;
+      const prev=S;let n=0,last="";try{S=JSON.parse(t);normS();n=S.sessions.length;last=S.sessions.map(dayOf).sort().pop()||""}finally{S=prev;fixDupIds.n=0}
+      if(!n){impMsg("Il file non contiene sedute di Allenati Scemo: non ho cambiato niente.",true);return}
+      const m=S.sessions.length,mLast=S.sessions.map(dayOf).sort().pop()||"",run=Object.values(S.draft||{}).some(d=>d&&hasDone(d))||Object.keys(S.oldDraft||{}).length>0,dm=s=>s.slice(8,10)+"/"+s.slice(5,7);
+      openSheet({html:()=>`<h2>Sostituire i dati?</h2><p class="note" style="margin:0">Il file ha ${n===1?"1 seduta":n+" sedute"} fino al ${dm(last)}, tu ${m?`ne hai ${m} fino al ${dm(mLast)}`:"non ne hai nessuna"}${run?", più una seduta non salvata che si perde":""}: sostituisco?</p><button class="btn hot" id="impGo">Sostituisci con il backup</button>`,
+        bind:(w,draw,close)=>{w.querySelector("#impGo").onclick=()=>{close();applyImport(j)}}})
+    }).catch(()=>impMsg("File non valido: scegli un backup esportato da Allenati Scemo.",true))};
+  const iu=document.getElementById("impUndo");if(iu)iu.onclick=()=>{try{const p=JSON.parse(localStorage.getItem(KEY+".imp"));if(!p||!Array.isArray(p.sessions))throw 0;stopTimer();S=p;normS();rebuild();save();if(!storageOk)return;try{localStorage.removeItem(KEY+".imp")}catch(e){}applySkin();view="imp";render();impMsg("Import annullato: ho rimesso i dati di prima.")}catch(e){impMsg("Non riesco ad annullare l'import.",true)}};
+  const w=document.getElementById("wipe");w.onclick=()=>{if(w.dataset.arm!=="1"){w.dataset.arm="1";w.textContent="Tocca di nuovo: cancella tutto";clearTimeout(w.t);w.t=setTimeout(()=>{if(w.isConnected){w.dataset.arm="";w.textContent="Cancella tutti i dati"}},4000);return}snap();if(!snapOk){const bm=document.getElementById("bmsg");bm.className="msg err";bm.textContent="Memoria piena: non cancello niente senza poter annullare. Esporta prima un backup.";w.dataset.arm="";w.textContent="Cancella tutti i dati";return}stopTimer();S={sessions:[],view:"set",skin:S.skin,vars:S.vars};normS();rebuild();save();renderSettings();undoable("Dati cancellati.")};
 }
 
 
@@ -4755,8 +4842,9 @@ function renderEditor(){
     if(!ex.length){m.textContent="Aggiungi almeno un esercizio con il nome.";return}
     for(const x of ex){if(!(x.s>=1&&x.s<=10)){m.textContent=`${x.n}: le serie vanno da 1 a 10.`;return}if(!(x.lo>=1&&x.hi>=x.lo)){m.textContent=`${x.n}: le ripetizioni minime devono essere almeno 1 e non più delle massime.`;return}}
     const key=E.key||("p"+Date.now().toString(36));
-    const seen=new Set();
-    const out=ex.map((x,i)=>{let id=x.id;if(!id||seen.has(id))id=key+"_"+Math.random().toString(36).slice(2,7);seen.add(id);
+    // Id unici anche rispetto agli altri piani (copie, esercizi presi dalla libreria): con lo stesso id le sedute di un piano cambierebbero la proposta dell'altro
+    const seen=new Set(),taken=new Set();for(const k2 of GYM_ORDER)if(k2!==key&&k2!=="LIB"&&PLAN[k2])for(const e2 of PLAN[k2].ex)taken.add(e2.id);
+    const out=ex.map((x,i)=>{let id=x.id;if(!id||seen.has(id)||taken.has(id)||taken.has(String(id).split("~")[0]))id=key+"_"+Math.random().toString(36).slice(2,7);seen.add(id);
       const o={id,n:x.n.trim(),s:x.s,lo:x.lo,hi:x.hi,rir:(x.rir||"").trim()||"1-2",rest:x.rest||0,t:x.t||"comp",step:x.step||2.5};
       for(const f of ["side","oh","ecc","lower"])if(x[f])o[f]=true;if(x.eq)o.eq=x.eq;if(x.mu)o.mu=x.mu;if(x.ss)o.ss=String(x.ss).trim();if(x.note)o.note=x.note;if(x.lib)o.lib=x.lib;return o});
     if(E.key&&PLAN[key])archivePlan(key,"modificato");
