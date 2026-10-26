@@ -2012,26 +2012,26 @@ html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .rk-h button{white-s
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .rk-next b{font-family:var(--ui);font-weight:800}
 /* ===== VETRO MURANO "MADREPERLA" (2026-10-26): velo iridescente che scorre sulla lastra, canne arcobaleno, perle e bordi cangianti ===== */
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5){--mp-iri:linear-gradient(115deg,rgba(255,110,190,.75),rgba(255,214,110,.65) 22%,rgba(110,255,215,.65) 44%,rgba(150,140,255,.7) 66%,rgba(255,110,190,.75) 88%);
- --mp-rim:linear-gradient(120deg,#8aa0ff,#e49ad0,#f3cf7a,#7fd8cf,#8aa0ff)}
+ --mp-rim:linear-gradient(120deg,#6f86f5,#d470b8,#e0a93a,#3fb3a8,#6f86f5)}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera]{--mp-rim:linear-gradient(120deg,#7d93ff,#d77fc2,#e9bf5e,#5fcfc3,#7d93ff)}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5):not([data-sera]) body{background:linear-gradient(180deg,#f2eef6 0,var(--m-bg) 280px)}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera] body{background:linear-gradient(180deg,color-mix(in srgb,var(--m-bg) 82%,#5a3a7a) 0,var(--m-bg) 300px)}
-/* la lastra: un velo di madreperla che scorre piano */
+/* la lastra: una banda di luce madreperla che attraversa piano il vetro (solo transform, niente ridisegno) */
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero{position:relative;overflow:hidden;isolation:isolate}
-html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;background:var(--mp-iri);background-size:260% 100%;mix-blend-mode:overlay;opacity:.95;animation:mpSheen 14s ease-in-out infinite alternate}
-html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero::before{content:"";display:block!important;position:absolute;left:0;right:0;top:0;height:1.5px;z-index:1;pointer-events:none;background:var(--mp-rim);opacity:.9}
-@keyframes mpSheen{from{background-position:0% 0}to{background-position:100% 0}}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero::after{content:"";position:absolute;top:0;bottom:0;left:-100%;width:300%;z-index:-1;pointer-events:none;
+ background:linear-gradient(115deg,transparent 28%,rgba(255,150,215,.24) 38%,rgba(200,170,255,.24) 46%,rgba(140,205,255,.22) 54%,transparent 64%);
+ will-change:transform;animation:mpBand 14s ease-in-out infinite alternate}
+@keyframes mpBand{from{transform:translateX(-12%)}to{transform:translateX(34%)}}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero::before{content:"";display:block!important;position:absolute;left:0;right:0;top:0;height:1.5px;z-index:1;pointer-events:none;background:var(--mp-rim);opacity:.9;-webkit-mask:none;mask:none;padding:0;border-radius:0}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero :is(.big,.meta,.hn p,.link,.pill){text-shadow:0 1px 2px rgba(0,0,0,.22)}
 /* canne arcobaleno al posto della canna blu */
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) :is(.pbar i,.rk-bar i){background:repeating-linear-gradient(115deg,rgba(255,255,255,.55) 0 2px,transparent 2px 9px),linear-gradient(90deg,#6d7ff2,#b07ae6,#f08cb8,#f3c46b,#5fcfc6)!important}
 /* perla cangiante sulla serie fatta */
-html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) button.tick[aria-pressed="true"]{background:radial-gradient(60% 50% at 35% 25%,rgba(255,255,255,.6),transparent 60%),conic-gradient(from 200deg,#1f9a68,#2aa98a,#3fb9b3,#7fc65a,#1f9a68)!important}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) button.tick[aria-pressed="true"]{background:radial-gradient(60% 50% at 35% 25%,rgba(255,255,255,.6),transparent 60%),conic-gradient(from 200deg,#1f9a68,#2aa98a,#3fb9b3,#2f9f7a,#1f9a68)!important}
 /* bordo di madreperla sulla scheda in corso e sul timer */
-html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .ex.cur:not(.gold){border:1.5px solid transparent;background:linear-gradient(var(--m-card),var(--m-card)) padding-box,var(--mp-rim) border-box}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .ex.cur:not(.gold){border:2px solid transparent;box-shadow:0 8px 20px -12px var(--m-shadow);background:linear-gradient(var(--m-card),var(--m-card)) padding-box,var(--mp-rim) border-box}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) div.timer:not(.over){border:1.5px solid transparent;background:linear-gradient(color-mix(in srgb,var(--m-card) 90%,transparent),color-mix(in srgb,var(--m-card) 90%,transparent)) padding-box,var(--mp-rim) border-box}
-/* bottone principale: la goccia di vetro con un riflesso cangiante che passa */
-html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .btn.hot:not(:disabled):not(.card.hero .btn){position:relative;overflow:hidden;isolation:isolate}
-html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .btn.hot:not(:disabled):not(.card.hero .btn)::after{content:"";display:block!important;position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;background:var(--mp-iri);background-size:300% 100%;mix-blend-mode:overlay;opacity:.7;animation:mpSheen 9s ease-in-out infinite alternate;left:0;width:auto;transform:none}
-@media (prefers-reduced-motion:reduce){html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero::after,html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .btn.hot::after{animation:none}}
+@media (prefers-reduced-motion:reduce){html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero::after{animation:none}}
 </style>
 <!--APP-HEAD-END-->
 </head>
