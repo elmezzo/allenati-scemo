@@ -2218,6 +2218,9 @@ let famRev=0;
 function rebuild(){famRev++;
   PLAN={...BUILTIN,...(S.plans||{})};GYM_ORDER=[...new Set([...Object.keys(BUILTIN),...Object.keys(S.plans||{})])];ALL_EX=[];EX={};
   for(const k of GYM_ORDER)for(const e of PLAN[k].ex){const b={...e,day:k};if(!EX[e.id]){ALL_EX.push(b);EX[e.id]=b}for(const a of altsOf(e)){const v=variant(e,a);v.day=k;if(!EX[v.id]){ALL_EX.push(v);EX[v.id]=v}}}
+  // Esercizi che ci sono solo in Piani vecchi (piano eliminato o esercizio tolto; vale la versione più recente): restano noti col loro range,
+  // così le loro sedute non contano come stesso range di un esercizio di un altro piano. Non entrano in ALL_EX
+  for(const v of S.archive||[])if(v.plan&&Array.isArray(v.plan.ex))for(const e of v.plan.ex)if(e&&e.id&&!EX[e.id])EX[e.id]={...e,day:v.key,gone:true};
   // Seduta libera: esercizi scelti al volo, fuori dal piano, solo per oggi. Stessi id della scheda, quindi carichi e progressi restano quelli
   if(S.free&&(S.free.d===iso(today())||(S.draft&&S.draft.LIB))){const ex=S.free.ex.filter(id=>EX[id]).map(id=>({...EX[id],ss:""}));
     if(ex.length){PLAN.LIB={name:"Libera",title:"Seduta libera",sub:"Fuori dal piano",custom:true,ex};GYM_ORDER.push("LIB")}}
@@ -2273,10 +2276,12 @@ function normS(){const obj=v=>v&&typeof v==="object"&&!Array.isArray(v),arr=v=>A
 // Piani duplicati (o con esercizi presi dalla libreria) prima della v57: stessi id di un altro piano, e le sedute della copia cambiavano la proposta dell'originale.
 // Il primo piano che usa un id (la scheda, poi i tuoi nell'ordine) lo tiene; negli altri l'esercizio prende un id nuovo e sedute, bozze, varianti scelte e versioni vecchie lo seguono.
 // Lo storico resta in comune per nome (famIds) e ogni piano torna ad avere il suo range.
-function fixDupIds(){const seen=new Set(),base=id=>String(id).split("~")[0],keys=[...new Set([...Object.keys(BUILTIN),...Object.keys(S.plans)])];
-  for(const k of keys){const P=S.plans[k]||BUILTIN[k],mine=new Set();if(!P||!Array.isArray(P.ex))continue;
-    if(S.plans[k]){const map={},vers=[P,...S.archive.filter(v=>v.key===k).map(v=>v.plan)];
-      for(const V of vers)for(const e of V.ex){if(!e||!e.id)continue;const id=e.id;if(map[id]===undefined)map[id]=seen.has(id)||seen.has(base(id))?k+"_"+Math.random().toString(36).slice(2,7):null}
+// Gli id in comune tra i piani della scheda (es. Extrarotazione ed Estensione del polso in Gambe e Venerdì) sono voluti: un piano della scheda, anche modificato, tiene i suoi.
+// Anche i piani eliminati che restano solo in Piani vecchi vengono sistemati (le loro sedute non devono contare per l'originale). I fastidi segnati si copiano sull'id nuovo.
+function fixDupIds(){const seen=new Set(),base=id=>String(id).split("~")[0],keys=[...new Set([...Object.keys(BUILTIN),...Object.keys(S.plans),...S.archive.map(v=>v.key)])];
+  for(const k of keys){const P=S.plans[k]||BUILTIN[k]||null,mine=new Set(),own=new Set(BUILTIN[k]?BUILTIN[k].ex.map(e=>e.id):[]);if(P&&!Array.isArray(P.ex))continue;
+    if(S.plans[k]||!P){const map={},vers=[...(P?[P]:[]),...S.archive.filter(v=>v.key===k).map(v=>v.plan)];
+      for(const V of vers)for(const e of V.ex){if(!e||!e.id)continue;const id=e.id;if(map[id]===undefined)map[id]=(seen.has(id)||seen.has(base(id)))&&!own.has(id)&&!own.has(base(id))?k+"_"+Math.random().toString(36).slice(2,7):null}
       for(const id in map)if(!map[id])delete map[id];
       if(Object.keys(map).length){const rn=id=>{if(map[id])return map[id];const i=String(id).indexOf("~");return i>0&&map[id.slice(0,i)]?map[id.slice(0,i)]+id.slice(i):id};
         const rk=o=>{if(!o||typeof o!=="object"||Array.isArray(o))return o;const n={};for(const x in o)n[rn(x)]=o[x];return n};
@@ -2285,8 +2290,10 @@ function fixDupIds(){const seen=new Set(),base=id=>String(id).split("~")[0],keys
         const fixD=d=>{for(const f in d){const v=d[f];if(typeof v==="string"&&f!=="date"&&f!=="g")d[f]=rn(v);else if(f!=="mods"&&f!=="nextNote")d[f]=rk(v)}if(d.nextNote&&d.nextNote.ex)d.nextNote.ex=rn(d.nextNote.ex)};
         if(S.draft[k])fixD(S.draft[k]);for(const o in S.oldDraft)if((S.oldDraft[o].g||o.split("@")[0])===k)fixD(S.oldDraft[o]);
         for(const w in S.swaps)if(w.startsWith(k+"|")){const n=k+"|"+rn(w.slice(k.length+1));if(n!==w){S.swaps[n]=S.swaps[w];delete S.swaps[w]}}
+        // Fastidi: sono per id e non si sa su quale dei due piani erano stati segnati, quindi restano sull'originale e si copiano sulla copia
+        for(const id in map)if(Array.isArray(S.pain[id])&&!S.pain[map[id]])S.pain[map[id]]=S.pain[id].slice();
         if(S.timer&&S.timer.ctx&&S.timer.ctx.g===k&&S.timer.ctx.ex)S.timer.ctx.ex=rn(S.timer.ctx.ex);fixDupIds.n=(fixDupIds.n||0)+1}}
-    for(const e of P.ex)if(e&&e.id)mine.add(e.id);mine.forEach(i=>seen.add(i))}}
+    if(P)for(const e of P.ex)if(e&&e.id)mine.add(e.id);mine.forEach(i=>seen.add(i))}}
 let bootMsg=loadMsg;
 function boot(){normS();for(const P of Object.values(S.plans))for(const e of P.ex||[])if(/^Alzate laterali al cavo/i.test(e.n||"")&&(e.eq||"mac")==="mac"){e.eq="cavl";e.step=2.5}for(const P of Object.values(S.plans))for(const e of P.ex||[])if(e.n==="Curl panca Scott"&&e.eq==="db"){e.n="Curl Scott con manubri";e.note=e.note||"Kg = un manubrio."}
 if(S.deload&&iso(today())>S.deload.to)closeDeload(S.deload.to);
@@ -2308,7 +2315,7 @@ function arm2(b,txt,lbl){const n=performance.now();if(b.dataset.arm!=="1"){b.dat
   if(n-b._at<600)return false;clearTimeout(b._t);b.dataset.arm="";return true}
 function undoable(txt,at){const m=(at&&document.getElementById(at))||document.getElementById("bmsg")||document.getElementById("omsg")||document.getElementById("msg");if(!m)return;if(!snapOk){m.className="msg err";m.textContent=txt+" Non posso offrire Annulla: memoria piena, la copia di sicurezza non si è salvata.";return}m.className="msg ok";m.innerHTML=`${esc(txt)} <button class="lnk" id="undoD">Annulla</button>`;
   const u=document.getElementById("undoD");const t=setTimeout(()=>{if(u.isConnected)u.remove()},10000);
-  u.onclick=()=>{clearTimeout(t);try{S=JSON.parse(localStorage.getItem(KEY+".bak"));normS();rebuild();save();applySkin();render();const mm=(at&&document.getElementById(at))||document.getElementById("bmsg")||document.getElementById("omsg")||document.getElementById("msg");if(mm){mm.className="msg ok";mm.textContent="Dati ripristinati."}}catch(e){}}}
+  u.onclick=()=>{clearTimeout(t);try{S=JSON.parse(localStorage.getItem(KEY+".bak"));normS();rebuild();save();applySkin();render();if(S.timer&&S.timer.end>Date.now()&&!tOn){const x=S.timer;startTimer(x.tot,x.lbl,x.plus,x.end,x.ctx)}const mm=(at&&document.getElementById(at))||document.getElementById("bmsg")||document.getElementById("omsg")||document.getElementById("msg");if(mm){mm.className="msg ok";mm.textContent="Dati ripristinati."}}catch(e){}}}
 // Scrittura in memoria: se è piena si libera la copia dei dati illeggibili (.err) e si riprova una volta
 function setKey(k,v){try{localStorage.setItem(k,v);return true}catch(e){try{if(localStorage.getItem(KEY+".err")!=null){localStorage.removeItem(KEY+".err");localStorage.setItem(k,v);return true}}catch(e2){}return false}}
 // storageOk torna vero al primo salvataggio riuscito (e l'avviso sparisce); se un salvataggio fallisce l'avviso compare subito
@@ -2728,7 +2735,7 @@ function draftFor(g){moveOld();S.draft[g]=S.draft[g]||{date:iso(today()),ex:{}};
 // Seduta di un altro giorno non salvata. Ferma da più di 12 ore è "vecchia": passa in S.oldDraft (si salva con la sua data o si scarta) e la seduta di oggi parte pulita.
 // Prima delle 12 ore è ancora in corso (es. dopo mezzanotte) e resta la seduta aperta.
 function hasDone(d){return Object.values(d.ex||{}).some(a=>Array.isArray(a)&&a.some(x=>x&&x.done))}
-function moveOld(){let lib=false;for(const g in S.draft||{}){const d=S.draft[g];if(d&&d.date!==iso(today())&&hasDone(d)&&Date.now()-(d.last||d.start||Date.parse(d.date+"T12:00:00"))>12*36e5){S.oldDraft=S.oldDraft||{};S.oldDraft[g+"@"+d.date]={...d,g};delete S.draft[g];if(g==="LIB")lib=true}}if(lib&&PLAN&&PLAN.LIB){if(gymSel==="LIB")gymSel=null;rebuild()}}
+function moveOld(){let lib=false;for(const g in S.draft||{}){const d=S.draft[g];if(d&&d.date!==iso(today())&&hasDone(d)&&Date.now()-(d.last||d.start||Date.parse(d.date+"T12:00:00"))>12*36e5){S.oldDraft=S.oldDraft||{};let ok=g+"@"+d.date;while(S.oldDraft[ok])ok+="+";S.oldDraft[ok]={...d,g};delete S.draft[g];if(g==="LIB")lib=true}}if(lib&&PLAN&&PLAN.LIB){if(gymSel==="LIB")gymSel=null;rebuild()}}
 const draftOld=g=>{const d=S.draft&&S.draft[g];if(!d||d.date===iso(today())||!hasDone(d))return null;return {d,stale:false}};
 function oldBox(key,d,stale){const g=d.g||key,nm=d.planName||PLAN[g]?d.planName||PLAN[g].name:g==="LIB"?"Seduta libera":"Seduta",dt=new Date(d.start||d.date+"T12:00:00"),n=Object.values(d.ex).reduce((a,r)=>a+r.filter(x=>x.done).length,0)+Object.values(d.pre||{}).reduce((a,b)=>a+b,0);
   return stale?`<section class="card oldd"><p><b>${esc(nm)} di ${esc(WD_LONG[dt.getDay()])} ${dt.getDate()} non salvata</b> · ${n} serie</p><div class="seg" style="grid-template-columns:1fr 1fr"><button class="btn hot" data-oldsave="${esc(key)}">Salvala con la sua data</button><button class="btn ghost" data-olddrop="${esc(key)}">Scartala</button></div></section>`
@@ -4818,7 +4825,8 @@ function renderWeek(){
 // Import di un backup: il file sostituisce i dati solo dopo la conferma; i dati di prima restano in KEY.imp e "Annulla l'import" c'è finché non salvi una seduta nuova
 const impUndoOk=()=>{try{return localStorage.getItem(KEY+".imp")!=null}catch(e){return false}};
 function impMsg(t,err){const bm=document.getElementById("bmsg");if(!bm)return;bm.className=err?"msg err":"msg ok";bm.textContent=t}
-function applyImport(j){const prev=S,pre=JSON.stringify(S);if(!setKey(KEY+".imp",pre)){impMsg("Memoria piena: non importo senza poter annullare. Esporta prima un backup dei dati attuali.",true);return}
+// Con più import di fila "Annulla l'import" torna ai dati di prima del primo: KEY.imp non si sovrascrive
+function applyImport(j){const prev=S,pre=JSON.stringify(S),had=impUndoOk();if(!had&&!setKey(KEY+".imp",pre)){impMsg("Memoria piena: non importo senza poter annullare. Esporta prima un backup dei dati attuali.",true);return}
   // Prima si prova il backup su tutte le schermate; se qualcosa non va si rimettono i dati di prima e non si salva niente
   render.strict=true;try{S=j;normS();rebuild();assess(today());for(const v of ["oggi","train","prog","set","imp"]){view=v;render()}}catch(e){S=prev;normS();rebuild();view="imp";render();try{localStorage.removeItem(KEY+".imp")}catch(x){}impMsg("File non valido: scegli un backup esportato da Allenati Scemo.",true);return}finally{render.strict=false}
   fixDupIds.n=0;stopTimer();save();applySkin();view="imp";render();const n=S.sessions.length;
@@ -4978,10 +4986,11 @@ function renderEditor(){
     for(const x of ex){if(!(x.s>=1&&x.s<=10)){m.textContent=`${x.n}: le serie vanno da 1 a 10.`;return}if(!(x.lo>=1&&x.hi>=x.lo)){m.textContent=`${x.n}: le ripetizioni minime devono essere almeno 1 e non più delle massime.`;return}}
     const key=E.key||("p"+Date.now().toString(36));
     // Id unici anche rispetto agli altri piani (copie, esercizi presi dalla libreria): con lo stesso id le sedute di un piano cambierebbero la proposta dell'altro
-    const seen=new Set(),taken=new Set();for(const k2 of GYM_ORDER)if(k2!==key&&k2!=="LIB"&&PLAN[k2])for(const e2 of PLAN[k2].ex)taken.add(e2.id);
-    const out=ex.map((x,i)=>{let id=x.id;if(!id||seen.has(id)||taken.has(id)||taken.has(String(id).split("~")[0]))id=key+"_"+Math.random().toString(36).slice(2,7);seen.add(id);
+    // Gli id che il piano aveva già (e quelli della sua versione della scheda) restano: cambiarli toglierebbe varianti, fastidi e serie spuntate
+    const seen=new Set(),taken=new Set(),own=new Set([...(E.key&&PLAN[E.key]?PLAN[E.key].ex.map(e2=>e2.id):[]),...(BUILTIN[key]?BUILTIN[key].ex.map(e2=>e2.id):[])]);for(const k2 of GYM_ORDER)if(k2!==key&&k2!=="LIB"&&PLAN[k2])for(const e2 of PLAN[k2].ex)taken.add(e2.id);
+    const out=ex.map((x,i)=>{let id=x.id,lib0=null;if(!id||seen.has(id)||(!own.has(id)&&(taken.has(id)||taken.has(String(id).split("~")[0])))){if(id)lib0=id;id=key+"_"+Math.random().toString(36).slice(2,7)}seen.add(id);
       const o={id,n:x.n.trim(),s:x.s,lo:x.lo,hi:x.hi,rir:(x.rir||"").trim()||"1-2",rest:x.rest||0,t:x.t||"comp",step:x.step||2.5};
-      for(const f of ["side","oh","ecc","lower"])if(x[f])o[f]=true;if(x.eq)o.eq=x.eq;if(x.mu)o.mu=x.mu;if(x.ss)o.ss=String(x.ss).trim();if(x.note)o.note=x.note;if(x.lib)o.lib=x.lib;return o});
+      for(const f of ["side","oh","ecc","lower"])if(x[f])o[f]=true;if(x.eq)o.eq=x.eq;if(x.mu)o.mu=x.mu;if(x.ss)o.ss=String(x.ss).trim();if(x.note)o.note=x.note;if(x.lib)o.lib=x.lib;else if(lib0)o.lib=String(lib0).split("~")[0];return o});
     if(E.key&&PLAN[key])archivePlan(key,"modificato");
     const B=BUILTIN[key];
     S.plans[key]={name,title:B&&B.name===name?B.title:name,sub:(E.sub||"").trim()||`${out.length} esercizi`,legs:!!E.legs,custom:!B,ex:out};
