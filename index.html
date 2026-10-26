@@ -520,7 +520,7 @@ html[data-skin="carbonio"] :is(.rest,.timer):not(.over) .ra{stroke:var(--acc,#ff
 /* 2 spunta a molla */
 .tick,.xrow .ck{position:relative}
 :is(.tick,.xrow .ck).pop{animation:spring .55s cubic-bezier(.3,1.6,.5,1)}
-:is(.tick,.xrow .ck).pop::after{content:"";position:absolute;inset:-4px;border-radius:inherit;border:2px solid var(--go);animation:ripple .6s ease-out forwards;pointer-events:none}
+:is(.tick,.xrow .ck).pop::after{content:"";position:absolute;inset:-4px;border-radius:inherit;border:2px solid var(--go);animation:ripple .3s var(--ease-out) forwards;pointer-events:none}
 @keyframes spring{0%{transform:scale(.82)}45%{transform:scale(1.14)}100%{transform:scale(1)}}
 @keyframes ripple{from{opacity:.9;transform:scale(.9)}to{opacity:0;transform:scale(1.35)}}
 .pbar i{position:relative;overflow:hidden;transition:width .6s cubic-bezier(.2,.9,.3,1)}
@@ -538,7 +538,9 @@ nav.bar .ndot::before{content:"";width:34px;height:3px;border-radius:0 0 3px 3px
 /* 4 lama di luce sul record */
 .blade{position:absolute;inset:0;border-radius:inherit;overflow:hidden;pointer-events:none;z-index:3}
 .blade::after{content:"";position:absolute;top:-30%;bottom:-30%;width:45%;left:-70%;transform:skewX(-18deg);background:linear-gradient(100deg,transparent,rgba(255,236,180,.75),rgba(255,255,255,.9),rgba(255,200,120,.5),transparent);mix-blend-mode:screen;animation:blade 1.1s cubic-bezier(.3,.6,.2,1) forwards}
-.recgo{animation:goldrim 1.6s ease-out}
+/* Bordo dorato del record: ombra ferma su un livello a parte, si anima solo l'opacità (niente box-shadow ridisegnato a ogni fotogramma) */
+.rim{position:absolute;inset:0;border-radius:inherit;pointer-events:none;box-shadow:0 0 0 1.5px rgba(255,214,140,.9),0 0 30px rgba(255,190,90,.45);opacity:0;animation:rimGlow 1.6s ease-out}
+@keyframes rimGlow{30%{opacity:1}}
 @keyframes blade{to{left:140%}}
 /* Animazioni v49 */
 :root{--pr:var(--hot);--pr-ink:var(--hot-ink);--fil:var(--hot)}
@@ -600,7 +602,7 @@ html[data-skin="lavagna"] .prs{font:800 max(12px,.7059rem)/1 var(--ui);letter-sp
 .gold-end i{position:absolute;top:-20%;bottom:-20%;width:55%;left:-80%;transform:skewX(-18deg);background:linear-gradient(100deg,transparent,rgba(255,226,150,.35),rgba(255,248,220,.75),rgba(255,196,90,.35),transparent);mix-blend-mode:screen;animation:goldsweep 1.15s cubic-bezier(.3,.6,.2,1) forwards}
 @keyframes goldsweep{to{left:140%}}
 @keyframes goldframe{25%{box-shadow:inset 0 0 0 3px rgba(255,214,140,.85),inset 0 0 60px rgba(255,190,90,.35)}100%{box-shadow:inset 0 0 0 2px rgba(255,214,140,0)}}
-@keyframes goldrim{30%{box-shadow:0 0 0 1.5px rgba(255,214,140,.9),0 0 30px rgba(255,190,90,.45)}}
+
 /* 5 Vetro vivo: luce che segue il telefono, bordo che gira sull'esercizio attivo, aurora che si scalda con le serie */
 html[data-skin="vetro"][data-skin] :is(.card,.ex,.status,details.h){background:radial-gradient(280px 200px at var(--mx) var(--my),rgba(255,255,255,.30),rgba(255,255,255,.08) 45%,transparent 72%),radial-gradient(120% 70% at 0% 0%,rgba(255,255,255,.13),transparent 55%),linear-gradient(160deg,rgba(255,255,255,.09),rgba(255,255,255,.03))}
 html[data-skin="vetro"][data-skin] :is(.card,.ex:not(.cur),.status,details.h)::before{background:radial-gradient(240px 170px at var(--mx) var(--my),#fff,rgba(255,255,255,.35) 45%,transparent 80%),linear-gradient(140deg,rgba(255,255,255,.35),rgba(255,255,255,.05) 35%,rgba(255,255,255,.02) 60%,rgba(255,120,200,.4));padding:1.6px}
@@ -1318,7 +1320,7 @@ html[data-skin="carbonio"]:not([data-var="1"]):not([data-var="2"]){--acc:#ffb000
 html[data-skin="campo"]{--acc:#e4ff3a;--acc-rgb:228,255,58}
 html[data-skin="manga"]:not([data-var="1"]):not([data-var="2"]){--acc:#ff2340;--acc-rgb:255,35,64}
 
-/* --p (avanzamento della seduta) cambia sulla radice senza transizione: animarla lì ricalcolava tutta la pagina a ogni spunta.
+/* --p (avanzamento della seduta) sta solo su #aurw e sull'intestazione dell'Allenamento, senza transizione (sulla radice ricalcolava tutta la pagina a ogni spunta).
    L'aurora sfuma da sola (transition sull'opacità), la luna di Eclisse anima una sua copia (--pm) solo sul suo elemento */
 @property --pm{syntax:'<number>';inherits:false;initial-value:0}
 /* Tutti: recupero nel colore dello stile, numeri grandi. Gli avvisi restano azzurri (--info), distinti dai tasti */
@@ -2865,7 +2867,7 @@ function summarySheet(sess){
 const RM=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
 const skinNow=()=>document.documentElement.dataset.skin||"vetro";
 function popEl(el,c,ms){el.classList.remove(c);void el.offsetWidth;el.classList.add(c);setTimeout(()=>el.classList.remove(c),ms||700)}
-function blade(el){if(RM()||!el)return;if(getComputedStyle(el).position==="static")el.style.position="relative";const b=document.createElement("i");b.className="blade";b.setAttribute("aria-hidden","true");el.appendChild(b);popEl(el,"recgo",1600);setTimeout(()=>b.remove(),1300)}
+function blade(el){if(RM()||!el)return;if(getComputedStyle(el).position==="static")el.style.position="relative";const b=document.createElement("i");b.className="blade";b.setAttribute("aria-hidden","true");el.appendChild(b);el.querySelector(":scope>.rim")?.remove();const rm=document.createElement("i");rm.className="rim";rm.setAttribute("aria-hidden","true");el.appendChild(rm);setTimeout(()=>{b.remove();},1300);setTimeout(()=>rm.remove(),1650)}
 // Display a 7 segmenti (stile Carbonio)
 const SEG={a:[4,0,12,3],b:[16.5,3.5,3,13],c:[16.5,19.5,3,13],d:[4,33,12,3],e:[.5,19.5,3,13],f:[.5,3.5,3,13],g:[4,16.5,12,3]};
 const SEGMAP={"+":"g","-":"g","0":"abcdef","1":"bc","2":"abged","3":"abgcd","4":"fgbc","5":"afgcd","6":"afgedc","7":"abc","8":"abcdefg","9":"abcdfg"};
@@ -2879,27 +2881,35 @@ function segSVG(str,fixed){let x=0,p="";for(const ch of str){
 function setNum(el,txt){if(!el)return;if(skinNow()==="carbonio"){if(el.dataset.t===txt&&el.querySelector(".seg7"))return;el.dataset.t=txt;el.innerHTML=`<span class="sr">${esc(txt)}</span>`+txt.replace(/([0-9:,\-]+)|([^0-9:,\-]+)/g,(m,d,o)=>d?`<span class="seg7">${segSVG(d,!!el.closest(".tr,.rr"))}</span>`:`<span class="lu" aria-hidden="true">${esc(o)}</span>`)}else{delete el.dataset.t;el.textContent=txt}}
 function ledify(){if(skinNow()!=="carbonio")return;app.querySelectorAll(".tgt b,.kpi b").forEach(b=>{if(!b.querySelector(".seg7"))setNum(b,b.textContent)})}
 // Il carico della prossima volta sale contando, una volta al giorno per esercizio
-const lastPct={},lastDn={},recShown=new Set();let lastRow={g:null,m:new Map()};
+const lastPct={},lastXd={},lastDn={},recShown=new Set();let lastRow={g:null,m:new Map()};
 // Carichi già fatti scorrere oggi: salvati in S (come la Settimana con S.wkFx), così se iOS ricarica l'app non ripartono tutti
 // Serie spuntata: la riga si abbassa (fatta = più bassa) in 200 ms invece di saltare; vale anche togliendo la spunta. Solo righe già viste nello stesso disegno di prima
 function rowFx(g){const m=new Map(),wm=new Map(),E="cubic-bezier(.23,1,.32,1)";document.querySelectorAll("#exs .set").forEach(r=>{const t=r.querySelector(".tick[data-j],.tick.rt");if(!t)return;const k=(t.dataset.ex||t.dataset.rex)+"|"+(t.dataset.j??"r"+t.dataset.k);m.set(k,{h:r.getBoundingClientRect().height,d:r.classList.contains("done"),r})});
   // Righe A dell'avvicinamento: quanto spazio occupano sopra le serie (iniziate le serie, quelle non spuntate spariscono)
   document.querySelectorAll("#exs article.ex[data-ex]").forEach(card=>{const st=card.querySelector(".sets");if(!st)return;const seg=[...st.querySelectorAll(":scope>.wset,:scope>.wcap")],w1=st.querySelector(":scope>.set:not(.wset):not(.sethd)");
     wm.set(card.dataset.ex,{n:st.querySelectorAll(":scope>.wset").length,h:seg.length&&w1?w1.getBoundingClientRect().top-seg[0].getBoundingClientRect().top:0,html:seg.map(x=>x.outerHTML),pill:!!st.querySelector(".wpill"),d:st.querySelectorAll(":scope>.set.done:not(.wset)").length})});
-  if(lastRow.g===g&&!RM()){m.forEach((v,k)=>{const o=lastRow.m.get(k);if(!o||o.d===v.d||Math.abs(o.h-v.h)<2)return;v.r.querySelectorAll(":scope>.field").forEach(f=>{const h=f.getBoundingClientRect().height;f.animate([{height:(h+o.h-v.h)+"px"},{height:h+"px"}],{duration:200,easing:E})})});
-    wm.forEach((v,id)=>{const o=lastRow.w&&lastRow.w.get(id);if(!o||v.pill||o.pill||v.n>=o.n||v.d<=o.d||o.h-v.h<2)return;const card=document.querySelector(`#exs article.ex[data-ex="${CSS.escape(id)}"]`),st=card&&card.querySelector(".sets"),w1=st&&st.querySelector(":scope>.set:not(.wset):not(.sethd)");if(!w1)return;
-      const gap=parseFloat(getComputedStyle(st).rowGap)||0,w=document.createElement("div");w.className="dlg";w.setAttribute("aria-hidden","true");w.inert=true;
-      w.style.cssText=`display:flex;flex-direction:column;gap:${gap}px;overflow:hidden;height:${o.h-v.h}px;margin-bottom:${-gap}px`;
-      // Tutte le righe A saltate: le stesse righe si sbiadiscono e lo spazio si chiude. Solo alcune: si chiude lo spazio
-      if(!v.n){w.innerHTML=o.html.join("");w.querySelectorAll("input,button").forEach(x=>{x.tabIndex=-1;x.removeAttribute("data-ex");x.removeAttribute("data-rex");x.removeAttribute("data-rf")});w.querySelectorAll(".now").forEach(x=>x.classList.remove("now"))}
-      w1.before(w);[...w.children].forEach(c=>c.animate([{opacity:1},{opacity:0}],{duration:140,easing:E,fill:"forwards"}));
-      w.animate([{height:(o.h-v.h)+"px"},{height:"0px"}],{duration:220,delay:v.n?0:100,easing:E,fill:"forwards"}).finished.then(()=>w.remove(),()=>w.remove())})}
-    // Tolta l'unica serie fatta: le righe A tornano aprendosi invece di comparire di colpo
-  if(lastRow.g===g&&!RM())wm.forEach((v,id)=>{const o=lastRow.w&&lastRow.w.get(id);if(!o||v.pill||o.pill||v.n<=o.n||v.d>=o.d||v.h-o.h<2)return;const card=document.querySelector(`#exs article.ex[data-ex="${CSS.escape(id)}"]`),st=card&&card.querySelector(".sets");if(!st)return;
-      const seg=[...st.querySelectorAll(":scope>.wset,:scope>.wcap")];if(!seg.length)return;const gap=parseFloat(getComputedStyle(st).rowGap)||0,w=document.createElement("div");
-      w.style.cssText=`display:flex;flex-direction:column;gap:${gap}px;overflow:hidden;margin-bottom:${-gap}px`;seg[0].before(w);seg.forEach(x=>w.appendChild(x));
-      const unwrap=()=>{if(!w.isConnected)return;[...w.children].forEach(x=>w.before(x));w.remove()};
-      w.animate([{height:o.h+"px",opacity:o.n?1:0},{height:v.h+"px",opacity:1}],{duration:220,easing:E}).finished.then(unwrap,unwrap)})
+  // FLIP: la riga cambia altezza subito; quello che sta sotto riparte da dove era e scorre al posto nuovo con transform (niente altezze animate a ogni spunta)
+  if(lastRow.g===g&&!RM()){const sh=[];
+    m.forEach((v,k)=>{const o=lastRow.m.get(k);if(!o||o.d===v.d||Math.abs(o.h-v.h)<2)return;sh.push({r:v.r,d:o.h-v.h})});
+    wm.forEach((v,id)=>{const o=lastRow.w&&lastRow.w.get(id);if(!o||v.pill||o.pill)return;const card=document.querySelector(`#exs article.ex[data-ex="${CSS.escape(id)}"]`),st=card&&card.querySelector(".sets"),w1=st&&st.querySelector(":scope>.set:not(.wset):not(.sethd)");if(!w1)return;
+      // Iniziate le serie, le righe A non spuntate spariscono: se erano tutte da fare restano un attimo come ombra che sbiadisce, e lo spazio si chiude
+      if(v.n<o.n&&v.d>o.d&&o.h-v.h>=2){if(!v.n){const y0=w1.getBoundingClientRect().top-v.h,sr=st.getBoundingClientRect(),gap=parseFloat(getComputedStyle(st).rowGap)||0,w=document.createElement("div");w.className="dlg";w.setAttribute("aria-hidden","true");w.inert=true;
+          w.innerHTML=o.html.join("");w.querySelectorAll("input,button").forEach(x=>{x.tabIndex=-1;x.removeAttribute("data-ex");x.removeAttribute("data-rex");x.removeAttribute("data-rf")});w.querySelectorAll(".now").forEach(x=>x.classList.remove("now"));
+          w.style.cssText=`display:flex;flex-direction:column;gap:${gap}px;position:absolute;pointer-events:none;margin:0`;st.before(w);const op=w.offsetParent||document.body,pr=op.getBoundingClientRect();
+          w.style.left=(sr.left-pr.left-op.clientLeft)+"px";w.style.top=(y0-pr.top-op.clientTop)+"px";w.style.width=sr.width+"px";
+          w.animate([{opacity:1},{opacity:0}],{duration:140,easing:E,fill:"forwards"}).finished.then(()=>w.remove(),()=>w.remove())}
+        sh.push({r:null,at:w1,d:o.h-v.h})}
+      // Tolta l'unica serie fatta: le righe A tornano in dissolvenza e le serie sotto scendono al loro posto
+      else if(v.n>o.n&&v.d<o.d&&v.h-o.h>=2){st.querySelectorAll(":scope>.wset,:scope>.wcap").forEach(x=>x.animate([{opacity:o.n?1:0},{opacity:1}],{duration:220,easing:E}));sh.push({r:null,at:w1,d:o.h-v.h})}});
+    if(sh.length){const ts=new Set(),F=Node.DOCUMENT_POSITION_FOLLOWING;
+      // quello che sta dopo ogni riga cambiata, fino in fondo alla pagina (la riga A "at" si sposta anche lei)
+      sh.forEach(c=>{const ref=c.r||c.at;if(!c.r)ts.add(ref);for(let e=ref;e&&e!==app&&e!==document.body;e=e.parentElement)for(let x=e.nextElementSibling;x;x=x.nextElementSibling)ts.add(x)});
+      const Dx=x=>{let k=0;for(const c of sh){const ref=c.r||c.at;if(ref===x){if(!c.r)k+=c.d;continue}if(!ref.contains(x)&&!x.contains(ref)&&(ref.compareDocumentPosition(x)&F))k+=c.d}return k};
+      const vh=innerHeight;ts.forEach(x=>{if(getComputedStyle(x).position==="absolute")return;
+        // si toglie lo spostamento già dato a un contenitore che scorre anche lui
+        let p=x.parentElement;while(p&&!ts.has(p))p=p.parentElement;const d=Dx(x)-(p?Dx(p):0);
+        if(Math.abs(d)<.5)return;const r=x.getBoundingClientRect();if(!r.height||r.bottom+d<-60||r.top+Math.min(0,d)>vh+60)return;
+        x.animate([{transform:`translateY(${d}px)`},{transform:"none"}],{duration:200,easing:E})})}}
   m.forEach(v=>delete v.r);lastRow={g,m,w:wm}}
 // Settimana di scarico: le serie tolte restano un attimo barrate sotto le altre; quando si vedono (sopra la barra in basso) si sbiadiscono una per una e lo spazio si chiude.
 // Conta come vista solo quando parte davvero; se l'esercizio si ridisegna a metà (spunta), lo spazio si chiude invece di saltare
@@ -2952,8 +2962,12 @@ function trainFx(g,pct,mods){
   const dc=app.querySelector(".thead .dnc"),dw=lastDn[g];if(dc){const v=+dc.textContent;if(dw!=null&&v!==dw&&Math.abs(v-dw)<=3&&!RM()){const u=v>dw?1:-1;dc.animate([{transform:`translateY(${u*.45}em)`,opacity:0},{transform:"none",opacity:1}],{duration:180,easing:"cubic-bezier(.23,1,.32,1)"})}lastDn[g]=v}
   rowFx(g);if(mods)dlFx(g,mods);litApply();
   const pb=app.querySelector(".pbar i"),was=lastPct[g];
-  if(pb&&was!=null&&was!==pct&&!RM()){pb.style.transition="none";pb.style.setProperty("--pw",was);void pb.offsetWidth;pb.style.transition="";pb.style.setProperty("--pw",pct);if(pct>was)popEl(pb.parentElement,"shine",1200)}
-  lastPct[g]=pct;document.documentElement.style.setProperty("--p",(pct/100).toFixed(2));
+  // La lama di luce sulla barra passa solo quando finisci un esercizio (decisione 12), non a ogni serie
+  const xd=mods?trainList(g,mods).filter(x=>setsFor(x.ex,mods)>0&&exDone(g,x.ex,mods)).length:null,xw=lastXd[g];if(xd!=null)lastXd[g]=xd;
+  if(pb&&was!=null&&was!==pct&&!RM()){pb.style.transition="none";pb.style.setProperty("--pw",was);void pb.offsetWidth;pb.style.transition="";pb.style.setProperty("--pw",pct);if(pct>was&&xw!=null&&xd>xw)popEl(pb.parentElement,"shine",1200)}
+  lastPct[g]=pct;
+  // --p (aurora di Vetro e Lavagna, luna di Eclisse) solo sui due elementi che lo usano: sulla radice ricalcolava gli stili di tutta la pagina a ogni spunta
+  {const v=(pct/100).toFixed(2),au=document.getElementById("aurw"),th=app.querySelector(".thead");if(au)au.style.setProperty("--p",v);if(th)th.style.setProperty("--p",v)}
   veilFx();
   ledify();
   app.querySelectorAll(".tgt b[data-cu]").forEach(b=>{const [a,z,rest,id]=b.dataset.cu.split("|");const k=g+id+iso(today());if(counted.has(k))return;counted.add(k);rollUp(b,+a,+z,rest)});
@@ -3158,7 +3172,7 @@ function sheetFx(wrap,close){if(!RM()&&!vtSheet){wrap.classList.add("enter");set
   let y0=null,dy=0,pts=[];const sh=()=>wrap.querySelector(".sheet");
   wrap.addEventListener("pointerdown",e=>{if(!e.target.closest(".grab,.sheet h2")||sh().scrollTop>0)return;y0=e.clientY;dy=0;pts=[[e.clientY,performance.now()]];sh().style.transition="none";try{e.target.setPointerCapture(e.pointerId)}catch(_){}});
   wrap.addEventListener("pointermove",e=>{if(y0==null)return;const raw=e.clientY-y0;dy=raw<0?raw*.2:raw;const t=performance.now();pts.push([e.clientY,t]);while(pts.length>2&&t-pts[0][1]>80)pts.shift();sh().style.transform=`translateY(${dy}px)`});
-  const end=()=>{if(y0==null)return;y0=null;const s=sh();s.style.transition="";const a=pts[0],b=pts[pts.length-1],v=b&&a&&b[1]>a[1]?(b[0]-a[0])/(b[1]-a[1]):0;if(dy>90||(v>.5&&dy>10)){close()}else{s.style.transform=""}};
+  const end=()=>{if(y0==null)return;y0=null;const s=sh();s.style.transition="";const a=pts[0],b=pts[pts.length-1],v=b&&a&&b[1]>a[1]?(b[0]-a[0])/(b[1]-a[1]):0;if(dy>90||(v>.11&&dy>10)){close()}else{s.style.transform=""}};
   wrap.addEventListener("pointerup",end);wrap.addEventListener("pointercancel",end)}
 function sheetOut(wrap){if(!wrap.isConnected)return;if(RM()){wrap.style.transition="opacity .15s";wrap.style.opacity="0";wrap.style.pointerEvents="none";setTimeout(()=>wrap.remove(),160);return}const s=wrap.querySelector(".sheet");
   // Se sta ancora salendo, l'entrata (keyframe, non interrompibile) viene fermata dove si trova: la discesa e il fondo partono da lì, senza salti
@@ -3292,7 +3306,9 @@ const noEff=ex=>["perf","time","nordic"].includes(ex.t);
 // Voto dell'ultima serie: sempre modificabile (resta acceso fino alla prossima spunta e nella scheda dell'esercizio finito)
 const EFFS=[["easy","Facile (3+)"],["ok","Giusta"],["hard","Al limite"]],EFFL={easy:"Facile",ok:"Giusta",hard:"Al limite"};
 const effSeg=(id,cur)=>`<div class="seg" role="group" aria-label="Com'era l'ultima serie">${EFFS.map(([v,l])=>`<button data-ex="${id}" data-eff="${v}" aria-pressed="${cur===v}">${l}</button>`).join("")}</div>`;
-function renderTrain(){
+// Spunta di una serie (only): se fuori dalla scheda aperta non cambia niente, si ridisegna solo la scheda e il conteggio in alto, non tutta la pagina (con la CPU lenta il ridisegno intero costava 60-140 ms a spunta)
+let rtKey=null,rtExs=null;
+function renderTrain(only){
   const hadFin=!!document.getElementById("finish");
   const g=currentGym(),P=PLAN[g],mc=modsCtx(g),a=mc.a;
   const isToday=mc.own;const mods=mc.mods;
@@ -3323,11 +3339,12 @@ function renderTrain(){
     nextH.push(`<button class="xrow" data-open="${ex.id}"><span class="ck o">${L.filter((x,k)=>k<=i&&setsFor(x.ex,mods)>0).length}</span><span class="xb"><span class="nmw"><span class="nm">${esc(ex.n)}</span></span><em>${n}×${rng}${tg.kg>0&&!noEff(ex)?" · "+fk(tg.kg)+" kg":""}</em></span></button>`);
   });
   if(curH.length&&askH.length){curH[0]=curH[0].replace("<!--ASK-->",askH.join(""));askH.length=0}
-  html=askH.join("")+curH.join("")+(nextH.some(h=>h.startsWith("<button")||h.startsWith("<div"))?`<p class="grp">Prossimi</p>`+nextH.join(""):"")+(doneH.length?`<p class="grp">Fatti</p>`+doneH.join(""):"");
+  const curReg=curH.join(""),CR="<!--CURREG-->";
+  html=askH.join("")+(curReg?CR:"")+(nextH.some(h=>h.startsWith("<button")||h.startsWith("<div"))?`<p class="grp">Prossimi</p>`+nextH.join(""):"")+(doneH.length?`<p class="grp">Fatti</p>`+doneH.join(""):"");
   const svd=dn?null:S.sessions.filter(x=>x.day===g&&iso(x.date)===iso(today())).slice(-1)[0];
   const savedH=svd?`<section class="card alldone saved"><p><b>${esc(P.name)} salvata</b> alle ${new Date(svd.date).toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"})}.</p><button class="btn" id="seeSv">Vedi il riepilogo</button></section>`:"";
-  app.innerHTML=`
-  <div class="thead"><div class="r"><h1>${esc(P.title)}</h1><span><span class="dnw"><span class="dnc">${dn}</span> / ${tot} serie${dr.start&&mins>0?` · ${mins} min`:""}</span></span></div><div class="pbar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Serie fatte"><i style="--pw:${pct}"></i></div></div>
+  const dnwH=`<span class="dnc">${dn}</span> / ${tot} serie${dr.start&&mins>0?` · ${mins} min`:""}`;
+  const bodyT=`
   <div class="tabs" role="group" aria-label="Scheda">${GYM_ORDER.map(k=>{const wd=Object.entries(S.week).find(([,v])=>v.gym===k);return `<button data-k="${k}" aria-pressed="${k===g}"><small>${wd?WD[wd[0]]:"Extra"}</small><span class="tn">${esc(PLAN[k].name)}</span></button>`}).join("")}</div>
   ${oldBoxes(g)}
   ${modNote}
@@ -3337,6 +3354,14 @@ function renderTrain(){
   <div id="exs" class="exs">${html}</div>
   ${!first&&dn?"":`<button class="btn hot" id="finish">Termina e salva</button>`}<button class="lnk clr" id="clear">Svuota la seduta</button>
   <p class="msg" id="msg" aria-live="polite"></p>`;
+  const key=g+"|"+P.title+"|"+bodyT,ex0=document.getElementById("exs"),curs=only&&view==="train"&&curReg&&key===rtKey&&ex0&&ex0===rtExs?[...ex0.querySelectorAll(":scope>article.ex.cur")]:[],patch=curs.length>0;
+  if(patch){const th=app.querySelector(".thead"),dw=th&&th.querySelector(".dnw"),pb=th&&th.querySelector(".pbar");if(dw)dw.innerHTML=dnwH;if(pb)pb.setAttribute("aria-valuenow",pct);
+    curs[0].insertAdjacentHTML("beforebegin",curReg);curs.forEach(x=>x.remove());
+    // come dopo un ridisegno intero: Termina e Svuota tornano normali
+    for(const [id,l] of [["finish","Termina e salva"],["clear","Svuota la seduta"]]){const b=document.getElementById(id);if(b&&b.dataset.arm==="1"){clearTimeout(b._t);b.dataset.arm="";b.textContent=l}}}
+  else{app.innerHTML=`
+  <div class="thead" style="--p:${(pct/100).toFixed(2)}"><div class="r"><h1>${esc(P.title)}</h1><span><span class="dnw">${dnwH}</span></span></div><div class="pbar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Serie fatte"><i style="--pw:${pct}"></i></div></div>`+bodyT.split(CR).join(curReg);rtExs=document.getElementById("exs")}
+  rtKey=key;
   document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{goldFlush();gymSel=b.dataset.k;S.gym=gymSel;save();renderTrain()});
   document.querySelectorAll("#exs input[data-f]").forEach(i=>i.oninput=()=>{const v=i.dataset.f==="kg"?i.value.replace(/[^\d.,]/g,"").replace(/([.,].*?)[.,]/g,"$1").slice(0,6):i.value.replace(/\D/g,"").slice(0,3);if(v!==i.value)i.value=v;cell(g,i.dataset.ex,+i.dataset.j)[i.dataset.f]=v.trim();save()});
   document.querySelectorAll("#exs .tick:not(.mt):not(.rt)").forEach(b=>b.onclick=()=>toggleSet(g,b.dataset.ex,+b.dataset.j,mods));
@@ -3371,7 +3396,7 @@ function renderTrain(){
   document.querySelectorAll("#exs [data-effskip]").forEach(b=>b.onclick=()=>{const d=draftFor(g);d.effSkip=d.effSkip||{};d.effSkip[b.dataset.effskip]=1;save();renderTrain()});
   const rp=document.querySelector("#restIn [data-tp]");if(rp)rp.onclick=()=>{if(!tFresh())addRest()};
   const rs=document.querySelector("#restIn [data-ts]");if(rs)rs.onclick=()=>{if(!tFresh())closeRest()};
-  const tb=document.querySelector('.tabs button[aria-pressed="true"]');if(tb)tb.scrollIntoView({block:"nearest",inline:"center"});
+  const tb=!patch&&document.querySelector('.tabs button[aria-pressed="true"]');if(tb)tb.scrollIntoView({block:"nearest",inline:"center"});
   const fb=document.getElementById("finish");fb.onclick=()=>{const miss=tot-dn;
     if(miss>0&&!arm2(fb,`Mancano ${miss} serie · tocca ancora`,"Termina e salva"))return;
     finish(g,mods,null,miss)};
@@ -3380,7 +3405,7 @@ function renderTrain(){
   // Il riflesso del bottone passa una volta sola: dopo ogni spunta la scheda si ridisegna e non deve ripartire
   if(hadFin){const fb=document.getElementById("finish");if(fb)fb.classList.add("noshine")}
   const c=document.getElementById("clear");c.onclick=()=>{if(!arm2(c,"Tocca di nuovo per svuotare","Svuota la seduta"))return;snap();delete S.draft[g];openEx[g]=null;stopTimer();save();renderTrain();undoable("Seduta svuotata.")};
-  fitTitles();
+  if(!patch)fitTitles();
   trainFx(g,pct,mods);
   if(tOn)tick();
   wakeSync();
@@ -3587,13 +3612,13 @@ function rampTick(g,exId,k){const tk="r|"+exId+"|"+k,tn=performance.now(),dt=tn-
     // il timer in basso (appena partito) si decide a piega finita: durante la transizione le righe con nome gli passerebbero sopra
     const tm=T("timer");if(tm.hidden||tm.classList.contains("enter")){tm.hidden=true;tm.classList.remove("enter");tHold=true}
     const t=vtRun("vt-wf",()=>{renderTrain();keepFocus(false,exId);nameEx(true,skip);nm(true)});t.finished.finally(()=>{nm(false);nameEx(false);tHold=false;if(tOn)syncTimer(0)})}
-  else{renderTrain();keepFocus(false,exId)}
+  else{renderTrain(exId);keepFocus(false,exId)}
   if(tOn)setTimeout(tick,510);
   const nb=document.querySelector(`#exs .tick.rt[data-rex="${exId}"][data-k="${k}"]`);if(r.done&&nb&&!RM()){nb.classList.remove("pop");void nb.offsetWidth;nb.classList.add("pop")}}
 function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;
   // Doppio tocco: dopo la spunta la pagina scorre e un'altra spunta (o un tasto del recupero) può finire sotto il dito
   // Se la pagina è scivolata sotto il dito: una spunta già fatta (anche la stessa) non si toglie per 1,1 s; una serie ancora da fare si segna dopo 0,5 s. Senza scorrimento: stessa spunta entro 0,4 s è un doppio tocco
-  const tk=exId+"|"+j,tn=performance.now(),dt=tn-lastTk.t,mv=Math.abs(scrollY-lastTk.y)>4,wasDone=!!((draftFor(g).ex[exId]||[])[j]||{}).done;if(lastTk.k===tk&&(dt<400||(mv&&dt<1100)))return;if(lastTk.k!==tk&&mv&&(wasDone?dt<1100:dt<500)){const rw=document.querySelector(`.tick[data-ex="${exId}"][data-j="${j}"]`);if(rw&&!RM())rw.animate([{transform:"translateX(0)"},{transform:"translateX(-4px)"},{transform:"translateX(4px)"},{transform:"translateX(0)"}],{duration:220});return}lastTk={t:tn,k:tk,y:scrollY};
+  const tk=exId+"|"+j,tn=performance.now(),dt=tn-lastTk.t,mv=Math.abs(scrollY-lastTk.y)>4,wasDone=!!((draftFor(g).ex[exId]||[])[j]||{}).done;if(lastTk.k===tk&&(dt<400||(mv&&dt<1100)))return;if(lastTk.k!==tk&&mv&&(wasDone?dt<1100:dt<500)){const rw=document.querySelector(`.tick[data-ex="${exId}"][data-j="${j}"]`);if(rw){if(RM())rw.animate([{opacity:1},{opacity:.5},{opacity:1}],{duration:160,easing:"ease"});else rw.animate([{transform:"translateX(0)"},{transform:"translateX(-4px)"},{transform:"translateX(4px)"},{transform:"translateX(0)"}],{duration:220,easing:"cubic-bezier(.23,1,.32,1)"})}return}lastTk={t:tn,k:tk,y:scrollY};
   audioUnlock();
   const ex=PLAN[g].ex.map(e=>effEx(g,e)).find(e=>e.id===exId)||exById(exId),r=cell(g,exId,j);
   const row=document.querySelector(`.tick[data-ex="${exId}"][data-j="${j}"]`).closest(".set");
@@ -3624,7 +3649,7 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;
     // Serie myo-rep: dopo l'attivazione si resta sull'esercizio per le mini-serie, con 15 s di pausa
     if(j===n-1&&ex.t==="iso"&&myoOn(g,ex,mods,tgFor(ex,mods,g))){r.myo=[];openEx[g]=exId;save();
       const want=num(tgFor(ex,mods,g).reps[j]??ex.hi),got=num(r.reps);if(want!=null&&got!=null&&got<want)celebrate("fail");else buzz(40);
-      startTimer(MYO.rest,ex.n+" · mini-serie",0,null,{g,ex:exId});renderTrain();keepFocus(false,exId);myoShow();tickFx(g,exId,j,false,false);return}
+      startTimer(MYO.rest,ex.n+" · mini-serie",0,null,{g,ex:exId});renderTrain(exId);keepFocus(false,exId);myoShow();tickFx(g,exId,j,false,false);return}
     if(doneN>=N){dd.lastDone=exId;openEx[g]=null;save()}
     const allEx=PLAN[g].ex.map(e=>effEx(g,e)).filter(e=>setsFor(e,mods)>0);
     // Superserie: dopo ogni serie passa da solo all'altro esercizio della coppia che ha ancora serie da fare
@@ -3656,7 +3681,7 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;
     if(rec&&document.querySelector(`#exs article.ex[data-ex="${exId}"] .prog.fermo`))brkNow.add(exId);
   }
   if(wowNow){goldCard(g,exId);tickFx(g,exId,j,rec,wowNow);return}
-  renderTrain();
+  renderTrain(exId);
   const jump=r.done&&ssGo[g]&&ssGo[g]!==exId?ssGo[g]:null;
   keepFocus(!!jump||!document.querySelector(`#exs .tick[data-ex="${exId}"][data-j="${j}"]`),jump);
   // Dopo lo scorrimento si decide se serve il timer in basso (prima lampeggiava per un attimo)
@@ -3666,7 +3691,7 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;
 function myoTick(g,exId,j,mods){const r=cell(g,exId,j),inp=document.querySelector(`#exs [data-myo="${exId}"]`),v=Math.max(0,Math.round(num(inp&&inp.value)||0));
   r.myo=r.myo||[];r.myo.push(v);save();buzz(30);
   if(v<MYO.stop||r.myo.length>=MYO.max)return myoFinish(g,exId,j,mods);
-  startTimer(MYO.rest,PLAN[g]?(exById(exId).n+" · mini-serie "+(r.myo.length+1)):"Mini-serie",0,null,{g,ex:exId});renderTrain();keepFocus(false,exId);myoShow()}
+  startTimer(MYO.rest,PLAN[g]?(exById(exId).n+" · mini-serie "+(r.myo.length+1)):"Mini-serie",0,null,{g,ex:exId});renderTrain(exId);keepFocus(false,exId);myoShow()}
 const myoShow=()=>{const m=document.querySelector("#exs .myo");if(m)setTimeout(()=>m.scrollIntoView({block:"center",behavior:RM()?"auto":"smooth"}),60)};
 function myoFinish(g,exId,j,mods){const r=cell(g,exId,j),dd=draftFor(g),ex=PLAN[g].ex.map(e=>effEx(g,e)).find(e=>e.id===exId)||exById(exId);
   r.myo=r.myo||[];r.myoEnd=true;dd.lastDone=exId;openEx[g]=null;save();stopTimer();
@@ -3745,9 +3770,10 @@ function finish(g,mods,oldKey,miss){
   const mm=document.getElementById("msg");mm.className="msg ok";mm.textContent=`Seduta salvata: ${n} serie. I carichi della prossima volta sono già pronti.`;
   if(!storageOk){mm.className="msg err";mm.textContent="Non riesco a salvare su questo dispositivo: controlla che il browser non sia in navigazione privata."}
   const ss=S.sessions[S.sessions.length-1];
-  if(bk&&storageOk){mm.innerHTML=`${esc(mm.textContent)} <button class="lnk" id="reopen">Riapri</button>`;const rb=document.getElementById("reopen");
+  // "Riapri" nella scheda "… salvata alle" in alto (il messaggio in fondo alla pagina a 320 px non si vede)
+  if(bk&&storageOk){const sc=app.querySelector(".card.saved");if(sc)sc.insertAdjacentHTML("beforeend",`<button class="lnk" id="reopen">Riapri la seduta (salvata con ${miss} serie mancanti)</button>`);else mm.insertAdjacentHTML("beforeend",` <button class="lnk" id="reopen">Riapri</button>`);const rb=document.getElementById("reopen");
     // i 10 secondi partono quando il messaggio si vede (chiuso il riepilogo)
-    const wait=()=>{if(!rb.isConnected)return;if(document.querySelector(".sheet-wrap")){setTimeout(wait,300);return}setTimeout(()=>{if(rb.isConnected)rb.remove()},10000)};wait();
+    const wait=()=>{if(!rb.isConnected)return;if(document.querySelector(".sheet-wrap")){setTimeout(wait,300);return}setTimeout(()=>{if(rb.isConnected)rb.remove()},10000)};setTimeout(wait,0);
     rb.onclick=()=>{S.sessions=S.sessions.filter(x=>x.id!==ss.id);S.sessions.unshift(...bk.ds);S.body=[...bk.db,...(S.body||[])];S.draft[g]=bk.d;if(g==="LIB"&&bk.free){S.free=bk.free;rebuild();gymSel="LIB"}save();renderTrain();
       const m2=document.getElementById("msg");if(m2){m2.className="msg ok";m2.textContent=`Seduta riaperta: mancano ${miss} serie.`}}}
   summarySheet(ss)});
@@ -3887,8 +3913,8 @@ function tick(){if(!tOn)return;const left=Math.round((tEnd-Date.now())/1000);
   if(left>10)tWarn=false;
   ballFx(left);
   if(left<=0&&!T("timer").classList.contains("over")){const live=left>-3;litNext(live);T("timer").classList.add("over");T("tlbl").textContent="Recupero finito";try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}if(live)beep()}
-  if(left<=0&&inl&&!inl.classList.contains("over")){inl.classList.add("over");inl.querySelector(".tl").textContent="Recupero finito"}
-  if(left>0&&inl&&inl.classList.contains("over")){inl.classList.remove("over");inl.querySelector(".tl").textContent="Recupero"}}
+  if(left<=0&&inl&&!inl.classList.contains("over")){inl.style.minHeight=inl.offsetHeight+"px";inl.classList.add("over");inl.querySelector(".tl").textContent="Recupero finito"}
+  if(left>0&&inl&&inl.classList.contains("over")){inl.style.minHeight="";inl.classList.remove("over");inl.querySelector(".tl").textContent="Recupero"}}
 // Anello: angolo che resta A (0-360) = due mezzi anelli + il puntino della fine, ruotati con WAAPI su transform per tutto il tempo che manca
 function ringSync(){const k=tEnd+"|"+tTot;
   document.querySelectorAll("#timer .tr,#restIn .rr").forEach(c=>{
@@ -3962,13 +3988,19 @@ function stopTimer(){clearInterval(tInt);tOn=false;
   document.querySelectorAll("#timer .tr,#restIn .rr").forEach(c=>{c._rk=null;clearTimeout(c._rz);c.querySelectorAll(".rh>b").forEach(e=>e.getAnimations().forEach(a=>a.cancel()))});document.querySelectorAll(".tball").forEach(b=>b.remove());if(S.timer){delete S.timer;save()}T("timer").hidden=true;const inl=document.getElementById("restIn");if(inl)inl.remove()}
 // Chiudi sul recupero: il timer in basso scende e sparisce, il recupero nella scheda si richiude (200 ms), poi si ferma davvero
 let tClosing=false;
-function closeRest(){if(tClosing)return;const tm=T("timer"),inl=document.getElementById("restIn");if(RM()||(tm.hidden&&!inl)){stopTimer();return}
-  tClosing=true;clearInterval(tInt);const E="cubic-bezier(.23,1,.32,1)",an=[],te=tEnd;
-  if(!tm.hidden){tm.inert=true;an.push(tm.animate([{transform:"none",opacity:1},{transform:"translateY(calc(100% + 16px))",opacity:0}],{duration:200,easing:E,fill:"forwards"}))}
-  if(inl){const cs=getComputedStyle(inl),pc=getComputedStyle(inl.parentElement),gp=/flex|grid/.test(pc.display)&&inl.previousElementSibling?parseFloat(pc.rowGap)||0:0,h=inl.offsetHeight;inl.style.overflow="hidden";inl.style.boxSizing="border-box";inl.inert=true;
-    // si chiude tutto lo spazio: altezza, margini e lo spazio fra gli elementi della scheda (il bordo resta e lo compensa il margine)
-    an.push(inl.animate([{height:h+"px",opacity:1,marginTop:cs.marginTop,marginBottom:cs.marginBottom,paddingTop:cs.paddingTop,paddingBottom:cs.paddingBottom},{height:"0px",opacity:0,marginTop:(-gp-(parseFloat(cs.borderTopWidth)||0)-(parseFloat(cs.borderBottomWidth)||0))+"px",marginBottom:"0px",paddingTop:"0px",paddingBottom:"0px"}],{duration:200,easing:E,fill:"forwards"}))}
-  Promise.all(an.map(a=>a.finished.catch(()=>{}))).then(()=>{tClosing=false;tm.inert=false;if(tOn&&tEnd===te)stopTimer();else if(tOn){clearInterval(tInt);tInt=setInterval(tick,250);tick()}an.forEach(a=>a.cancel())})}
+// Elementi dopo el (fratelli suoi e dei suoi contenitori, fino alla pagina): dopo mut() ripartono dal posto di prima e scorrono al nuovo con transform (FLIP), niente altezze animate. Solo quelli vicini allo schermo
+function flipAfter(el,mut,ms){const ts=[];for(let e=el;e&&e!==app&&e!==document.body;e=e.parentElement)for(let x=e.nextElementSibling;x;x=x.nextElementSibling)ts.push(x);
+  const vh=innerHeight,b=ts.map(x=>{const r=x.getBoundingClientRect();return r.height&&r.bottom>-60&&r.top<vh+60?r.top:null});mut();
+  ts.forEach((x,i)=>{if(b[i]==null)return;const d=b[i]-x.getBoundingClientRect().top;if(Math.abs(d)>.5)x.animate([{transform:`translateY(${d}px)`},{transform:"none"}],{duration:ms,easing:"cubic-bezier(.23,1,.32,1)"})})}
+function closeRest(){if(tClosing)return;const tm=T("timer"),inl=document.getElementById("restIn");if(tm.hidden&&!inl){stopTimer();return}
+  // Riduci movimento: solo dissolvenza di 150 ms, poi lo spazio si chiude a blocco già invisibile
+  const rm=RM(),D=rm?150:200;tClosing=true;clearInterval(tInt);const E="cubic-bezier(.23,1,.32,1)",an=[],te=tEnd;let st0=null;
+  if(!tm.hidden){tm.inert=true;an.push(tm.animate(rm?[{opacity:1},{opacity:0}]:[{transform:"none",opacity:1},{transform:"translateY(calc(100% + 16px))",opacity:0}],{duration:D,easing:E,fill:"forwards"}))}
+  if(inl){inl.inert=true;st0=inl.style.cssText;
+    // il recupero esce dal flusso restando dov'è e sfuma; quello che sta sotto sale con transform
+    if(!rm)flipAfter(inl,()=>{const l=inl.offsetLeft,t=inl.offsetTop,w=inl.offsetWidth;inl.style.position="absolute";inl.style.left=l+"px";inl.style.top=t+"px";inl.style.width=w+"px";inl.style.margin="0";inl.style.boxSizing="border-box";inl.style.pointerEvents="none"},D);
+    an.push(inl.animate([{opacity:1},{opacity:0}],{duration:D,easing:rm?"ease":E,fill:"forwards"}))}
+  Promise.all(an.map(a=>a.finished.catch(()=>{}))).then(()=>{tClosing=false;tm.inert=false;if(tOn&&tEnd===te)stopTimer();else{if(inl&&inl.isConnected){inl.style.cssText=st0;inl.inert=false}if(tOn){clearInterval(tInt);tInt=setInterval(tick,250);tick()}}an.forEach(a=>a.cancel())})}
 // +15 s: l'anello si riallunga in 0,32 s invece di saltare e il tempo scorre fino al valore nuovo
 let tGrow=null,tTw=null;
 // angolo dell'anello che si vede adesso (a metà di un +15 s non è quello calcolato): dal puntino della fine, con il giro intero risolto vicino al valore giusto
