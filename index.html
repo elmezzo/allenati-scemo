@@ -1920,7 +1920,7 @@ html[data-skin="lavagna"] .wpill{border-radius:4px}
 @keyframes wPill{from{opacity:0;transform:scale(.94)}}
 html.vt-wf::view-transition-old(root){animation:vtOut .14s var(--ease-out) both}
 html.vt-wf::view-transition-new(root){animation:vtIn .14s var(--ease-out) both}
-/* ===== SESTO GIRO, GRAFICA (v56) ===== */
+/* ===== SESTO GIRO, GRAFICA (v57) ===== */
 /* GRF-1: se la parola più lunga del nome non sta accanto a "⇄ Cambia", il tasto scende sotto il nome (a destra). Una parola più larga di tutta la scheda va a capo sillabata */
 .exhead{flex-wrap:wrap;container-type:inline-size}
 :root:not(#g1):not(#g2) .exhead .swap{margin-left:auto}
@@ -2270,7 +2270,7 @@ function normS(){const obj=v=>v&&typeof v==="object"&&!Array.isArray(v),arr=v=>A
   S.archive=S.archive.filter(x=>x.key&&x.id&&obj(x.plan)&&typeof x.plan.name==="string"&&Array.isArray(x.plan.ex));S.archive.forEach(x=>{x.plan.ex=x.plan.ex.filter(e=>obj(e)&&typeof e.n==="string")});if(S.free&&!(obj(S.free)&&Array.isArray(S.free.ex)))delete S.free;if(S.deload&&!(obj(S.deload)&&S.deload.from&&S.deload.to))delete S.deload;if(S.timer&&!obj(S.timer))delete S.timer;for(const key of ["setup","station","eqmax","eqf","vars"])if(S[key]!=null&&!obj(S[key]))delete S[key];
   if(S.rkSeen!=null&&(typeof S.rkSeen!=="object"||Array.isArray(S.rkSeen)))delete S.rkSeen;if(S.dlFx!=null&&(typeof S.dlFx!=="object"||!Array.isArray(S.dlFx.ex)))delete S.dlFx;
   for(const key of ["lastDeload","fullDay","deloadSnooze","bkSnooze","bodySnooze","lastBackup"])if(S[key]!=null&&typeof S[key]!=="string")delete S[key];if(S.view!=null&&!["oggi","train","prog","set","imp","edit"].includes(S.view))S.view="oggi";if(S.vars)for(const k in S.vars)if(![0,1,2].includes(S.vars[k]))delete S.vars[k];fixDupIds()}
-// Piani duplicati (o con esercizi presi dalla libreria) prima della v56: stessi id di un altro piano, e le sedute della copia cambiavano la proposta dell'originale.
+// Piani duplicati (o con esercizi presi dalla libreria) prima della v57: stessi id di un altro piano, e le sedute della copia cambiavano la proposta dell'originale.
 // Il primo piano che usa un id (la scheda, poi i tuoi nell'ordine) lo tiene; negli altri l'esercizio prende un id nuovo e sedute, bozze, varianti scelte e versioni vecchie lo seguono.
 // Lo storico resta in comune per nome (famIds) e ogni piano torna ad avere il suo range.
 function fixDupIds(){const seen=new Set(),base=id=>String(id).split("~")[0],keys=[...new Set([...Object.keys(BUILTIN),...Object.keys(S.plans)])];

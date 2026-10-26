@@ -1,6 +1,10 @@
-const CACHE="allenati-scemo-v56";
-const CORE=["./","index.html","manifest.webmanifest","icons/icon-192.png","icons/icon-512.png","icons/apple-touch-icon.png"];
-self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()))});
+const CACHE="allenati-scemo-v57";
+const CORE=["./","index.html","manifest.webmanifest","icons/icon-192.png","icons/icon-512.png","icons/apple-touch-icon.png","icons/icon-maskable-512.png"];
+const isFont=u=>/(^|\.)fonts\.(googleapis|gstatic)\.com$/.test(new URL(u).hostname);
+// I font (foglio di Google Fonts e file woff2) non sono in CORE: si copiano dalle cache vecchie prima che activate le cancelli,
+// così la prima apertura offline dopo un aggiornamento ha ancora i font. Se la copia non riesce l'installazione va avanti lo stesso
+async function keepFonts(c){for(const k of await caches.keys()){if(k===CACHE)continue;const o=await caches.open(k);for(const r of await o.keys())if(isFont(r.url)&&!(await c.match(r))){const hit=await o.match(r);if(hit)await c.put(r,hit)}}}
+self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE).then(()=>keepFonts(c).catch(()=>{}))).then(()=>self.skipWaiting()))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener("fetch",e=>{
   const req=e.request;if(req.method!=="GET")return;
