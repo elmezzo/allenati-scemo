@@ -2450,18 +2450,25 @@ function target(ex,noMyo){
     const sh=h.filter(x=>!x.from||sameRng(EX[x.from],ex));
     if(sh.length){h=sh;last=sh[0]}
     else{const ls=workSets(last.sets[ex.id],ex.lo).filter(x=>num(x.reps)!=null&&num(x.kg)>0);
-    if(ls.length){const st=stepOf(ex),lk=Math.max(...ls.map(x=>num(x.kg))),best=Math.max(...ls.map(x=>e1rm(num(x.kg),num(x.reps))));
-      // Carico arrotondato al gradino più vicino; se lì non arriveresti quasi al minimo del range (contando le ripetizioni in canna) un gradino sotto
-      // Gradino grosso (es. cavo singolo da 2,5 su 5 kg): un gradino sotto vorrebbe dire dimezzare, si resta al carico dell'altro giorno
-      let k=Math.max(st,Math.round(best/(1+ex.lo/30)/st)*st);if(k>st&&st/(k-st)<=0.15&&(best/k-1)*30-rirMid(ex.rir)<ex.lo-2)k-=st;if(ex.lo>fx.lo)k=st/lk>0.15?lk:Math.min(k,lk);
-      // Pausa di 4+ settimane: -10%, arrotondato al gradino
-      const pz=gapDays(ex)>=28;if(pz)k=Math.max(st,roundStep(k*0.9,st));
+    if(ls.length){const st=stepOf(ex),lk=Math.max(...ls.map(x=>num(x.kg))),fr=rirMid(fx.rir),rq=rirMid(ex.rir),
+      // Massimale con le ripetizioni che restavano in canna nell'altro giorno; ripetizioni stimate a un carico con quelle in canna di qui
+      best=Math.max(...ls.map(x=>e1rm(num(x.kg),num(x.reps)+fr))),ea=k=>Math.floor((best/k-1)*30-rq),dR=Math.min(...ls.map(x=>num(x.reps)));
+      // Carico da cui arrivi al minimo del range; mai più dell'altro giorno se qui il range è più alto
+      let k=Math.max(st,roundStep(best/(1+(ex.lo+rq)/30),st));if(ex.lo>fx.lo&&k>lk)k=lk;
+      // Lì non arrivi al minimo: un gradino sotto (fino al carico dell'altro giorno sempre; sotto, solo se il gradino è piccolo o se non sfori il range)
+      while(ea(k)<ex.lo&&k-st>=st-1e-9){const nk=k-st;if(k>lk+1e-9||st/nk<=0.15+1e-9||ea(nk)<=ex.hi)k=nk;else break}
+      // Pausa di 4+ settimane: -10% arrotondato al gradino; col gradino troppo grosso carico uguale e 3 ripetizioni in meno
+      const pz=gapDays(ex)>=28;let pk=false,pr=0;if(pz){const nk=roundStep(k*0.9,st);if(nk<k-1e-9&&nk>=st-1e-9&&(k-nk)/k<=0.15+1e-9){k=nk;pk=true}else pr=3}
       // Mai oltre il pacco della macchina (es. butterfly 55 su un pacco da 50): pacco e ripetizioni che il massimale permette
       const cp=eqMax(ex),dn=PLAN[last.day]?PLAN[last.day].name:"un altro giorno";let rp=ex.lo,ct="";
-      if(cp&&k>cp+1e-6){k=cp;rp=Math.max(ex.lo,Math.min(ex.hi+(ex.t==="comp"?5:10),Math.floor((best/cp-1)*30-rirMid(ex.rir))));ct=` Il pacco arriva a ${fk(cp)} kg: ${fk(cp)} × ${rp}.`}
-      // Al carico scelto il massimale non arriva al minimo del range (es. 10 kg × 13 in Upper A, qui 15-20): le ripetizioni che arrivi a fare, poi si sale una alla volta
-      else{const ea=Math.floor((best/k-1)*30-rirMid(ex.rir));if(ea<ex.lo){rp=Math.max(1,ea);ct=` A ${fk(k)} kg arrivi a circa ${rp}: da lì una ripetizione in più alla volta fino a ${ex.lo}.`}}
-      return {kg:k,reps:Array(ex.s).fill(rp),top:rp>ex.hi?rp:undefined,kind:pz?"down":"flat",badge:pz?"Pausa":"",xr:true,msg:`Ultima volta in ${dn} (${fk(lk)} kg, range ${fx.lo}-${fx.hi}): qui il range è ${rr}, carico ricalcolato${pz?" e 10% in meno dopo la pausa":""}.${ct}`}}}}
+      if(cp&&k>cp+1e-6){k=cp;rp=Math.max(ex.lo,Math.min(ex.hi+(ex.t==="comp"?5:10),ea(cp)));ct=` Il pacco arriva a ${fk(cp)} kg: ${fk(cp)} × ${rp}.`}
+      // Al carico dell'altro giorno: mai meno ripetizioni di quelle fatte lì (dentro il range)
+      else if(ea(k)>=ex.lo){if(Math.abs(k-lk)<1e-9)rp=Math.min(ex.hi,Math.max(ex.lo,dR))}
+      // Non arrivi al minimo e scendere sarebbe un salto troppo grosso (es. 10 kg × 13 in Upper A, qui 15-20): le ripetizioni che arrivi a fare, poi una alla volta
+      else{rp=Math.max(1,ea(k),Math.abs(k-lk)<1e-9?Math.min(dR,ex.hi):0);if(rp<ex.lo)ct=` A ${fk(k)} kg arrivi a circa ${rp}: da lì una ripetizione in più alla volta fino a ${ex.lo}.`;else rp=Math.min(rp,ex.hi)}
+      if(pr){const r0=rp;rp=Math.max(Math.min(rp,ex.lo),rp-pr);pr=r0-rp}
+      const pT=pk?" e 10% in meno dopo la pausa":pr?`; dopo la pausa ${pr===1?"una ripetizione":pr+" ripetizioni"} in meno (il gradino è troppo grosso per scendere del 10%)`:"";
+      return {kg:k,reps:Array(ex.s).fill(rp),top:rp>ex.hi?rp:undefined,kind:pk||pr?"down":"flat",badge:pk||pr?"Pausa":"",xr:true,msg:`Ultima volta in ${dn} (${fk(lk)} kg, range ${fx.lo}-${fx.hi}): qui il range è ${rr}, carico ricalcolato${pT}.${ct}`}}}}
   // Voto dell'ultima serie della seduta scelta (con lo storico in comune il voto è salvato sotto l'esercizio da cui viene la serie)
   const eff=(last.eff||{})[last.from||ex.id]??(last.eff||{})[ex.id];
   // Serie salvate senza kg (prima seduta, carico scritto solo sulla prima): valgono quelli della serie prima
@@ -2490,12 +2497,16 @@ function target(ex,noMyo){
   const rAt=(r,nk)=>Math.floor((e1rm(kg,r+rirMid(ex.rir))/nk-1)*30-rirMid(ex.rir));
   // Pausa lunga (14+ giorni senza fare questo esercizio): la prima volta ripeti l'ultima seduta, stessi kg e ripetizioni; da 28 giorni 10% in meno sui kg (arrotondato al gradino)
   const gap=gapDays(ex);
-  if(gap>=14&&reps.length){const rp=pad(reps,ex.s);let nk=kg;
-    // -10% arrotondato al gradino: se il gradino è troppo grosso per farlo (es. Pallof 15 kg col gradino da 5) il carico resta
-    if(gap>=28&&kg>0){nk=ex.t==="bw"?Math.max(0,roundStep(kg-(bwNow()+kg)*0.1,st)):roundStep(kg*0.9,st);if(ex.t!=="bw"&&(nk>=kg||nk<st-1e-9||(kg-nk)/kg>0.15+1e-9))nk=kg;if(cap&&nk>cap)nk=cap}
-    const dn=nk!=null&&kg!=null&&nk<kg-1e-9,tm=ex.t==="time",el=ex.t==="nordic"||kg==null&&ex.t!=="bw"&&!tm&&eqOf(ex)==="altro"?"stesso elastico, ":"",
-      kT=ex.t==="bw"&&!(nk>0)?"a corpo libero, senza zavorra":`${fk(nk)} kg`;
-    return {kg:nk,reps:rp,top:Math.max(ex.hi,...rp),kind:dn?"down":"flat",badge:dn?`-${fk(kg-nk)} kg`:"Pausa",hold:true,pause:true,msg:dn?`Ultima volta ${gap} giorni fa: ${kT} (10% in meno${ex.t==="bw"?" contando il tuo peso":""}) e le ripetizioni di allora. Dalla volta dopo si riprende a salire.`:`Ultima volta ${gap} giorni fa: ripeti l'ultima seduta, ${el}${kg>0?`${fk(kg)} kg e `:""}${tm?"stessi secondi":"stesse ripetizioni"}. Dalla volta dopo si riprende a salire.`}}
+  if(gap>=14&&reps.length){let rp=pad(reps,ex.s),nk=kg,rc=0,rcU=true;
+    // Giorni dalla seduta che si ripete (stesso range): è quella che il testo nomina
+    const gL=Math.round((new Date(iso(today())+"T00:00:00")-new Date(dayOf(last)+"T00:00:00"))/864e5),bw=ex.t==="bw"||eqOf(ex)==="zav";
+    // -10% arrotondato al gradino. Se il gradino è troppo grosso per farlo (es. curl al cavo 30 kg col gradino da 5) o sei a corpo libero:
+    // carico uguale e 3 ripetizioni in meno (circa il 10%), mai sotto il minimo del range
+    if(gap>=28&&(kg>0||bw)){if(kg>0){nk=bw?Math.max(0,roundStep(kg-(bwNow()+kg)*0.1,st)):roundStep(kg*0.9,st);if(!bw&&(nk>=kg||nk<st-1e-9||(kg-nk)/kg>0.15+1e-9))nk=kg;if(cap&&nk>cap)nk=cap}
+      if(!(nk<kg-1e-9)){const r2=rp.map(r=>Math.max(Math.min(r,ex.lo),r-3)),df=rp.map((r,i)=>r-r2[i]);rc=Math.max(0,...df);rcU=df.every(v=>v===rc);rp=r2}}
+    const dn=nk!=null&&kg!=null&&nk<kg-1e-9,tm=ex.t==="time",el=kg==null&&!bw&&!tm&&(ex.t==="nordic"?eqOf(ex)!=="zav":eqOf(ex)==="altro")?"stesso elastico, ":"",
+      kT=bw&&!(nk>0)?"a corpo libero, senza zavorra":`${fk(nk)} kg`,pc=dn?Math.round((kg-nk)/(bw?bwNow()+kg:kg)*100):0,u=tm?"secondi":"ripetizioni";
+    return {kg:nk,reps:rp,top:Math.max(ex.hi,...rp),kind:dn||rc?"down":"flat",badge:dn?`-${fk(kg-nk)} kg`:rc?`-${rc} rip`:"Pausa",hold:true,pause:true,msg:dn?`Ultima volta ${gL} giorni fa: ${kT} (${bw?`${pc}% in meno contando il tuo peso`:"10% in meno"}) e le ${u} di allora. Dalla volta dopo si riprende a salire.`:rc?`Ultima volta ${gL} giorni fa: ${kg>0?`${fk(kg)} kg come allora (il gradino è troppo grosso per scendere del 10%)`:"a corpo libero come allora"}, ${rcU?"":"fino a "}${rc===1?"una ripetizione":`${rc} ripetizioni`} in meno per serie. Dalla volta dopo si riprende a salire.`:`Ultima volta ${gL} giorni fa: ripeti l'ultima seduta, ${el}${kg>0?`${fk(kg)} kg e `:""}stess${tm?"i":"e"} ${u}. Dalla volta dopo si riprende a salire.`}}
   if(powEx(ex)){const fix=Array(ex.s).fill(ex.lo),lp=ex.side?" per lato":"",allOk=full&&hReps.every(r=>r>=ex.lo);
     if(kg==null)return {kg:null,reps:fix,top:ex.lo,kind:"flat",badge:"=",hold:true,msg:allOk&&eff!=="hard"?`Tutte veloci: ${eqOf(ex)==="altro"?"elastico più duro":"aumenta il carico"}, sempre ${ex.lo}${lp}.`:`Stesse ${ex.lo} ripetizioni${lp}: ogni ripetizione esplosiva.`};
     let nk=kg+st;if(cap&&nk>cap)nk=cap;
@@ -2640,10 +2651,10 @@ function tgFor(ex,mods,g){let t=target(ex);
       if(up)return {...t,myo:false,kg,reps:rp,kind:"flat",badge:"=",msg:`Seduta alleggerita: ${kg>0?`${fk(kg)} kg, `:""}${ex.t==="time"?"stessi secondi":"stesse ripetizioni"} dell'ultima volta. Si sale la prossima volta.`}}}
   if(!mods.has("deload")||ex.t==="perf")return t;
   // Scarico: Nordic e tenute restano come l'ultima volta (niente +1); per i carichi vale l'ultima seduta nello stesso range, mai un carico più alto
-  if(ex.t==="time"||ex.t==="nordic"){const l=history(ex.id)[0],r=l?l.sets[ex.id].map(x=>num(x.reps)).filter(v=>v!=null):[],r0=r.length?Math.min(...r):ex.lo;return {...t,top:ex.hi,reps:Array(ex.s).fill(r0),kind:"flat",badge:"Scarico",msg:ex.t==="time"?`Scarico: ${r0} s come l'ultima volta, metà serie.`:`Scarico: stesso elastico e ${r0} ripetizioni come l'ultima volta, metà serie.`}}
+  if(ex.t==="time"||ex.t==="nordic"){const l=history(ex.id)[0],r=l?l.sets[ex.id].map(x=>num(x.reps)).filter(v=>v!=null):[],r0=r.length?Math.min(...r):ex.lo;return {...t,top:ex.hi,reps:Array(ex.s).fill(r0),kind:"flat",badge:"Scarico",msg:ex.t==="time"?`Scarico: ${r0} s come l'ultima volta, metà serie.`:`Scarico: ${eqOf(ex)==="zav"?"":"stesso elastico e "}${r0} ripetizioni come l'ultima volta, metà serie.`}}
   // Carico dell'ultima seduta vera nello stesso range, al massimo il pacco. Se la proposta è un calo (due sedute sotto il minimo, pausa lunga) vale il carico già abbassato:
   // quello di prima non lo reggi con 3-4 in canna. Il pacco abbassato invece non conta (lì il carico c'era)
-  const k0=lastKg(ex,true),cp=eqMax(ex),kd=t.kind==="down"&&t.kg!=null&&k0!=null&&t.kg<k0&&!(cp&&k0>cp)?t.kg:k0,k=kd!=null?(cp&&kd>cp?cp:kd):t.kg;return {...t,myo:false,top:ex.hi,kg:k,reps:Array(ex.s).fill(ex.lo),kind:"flat",badge:"Scarico",msg:`${k0!=null&&k===k0?"Stesso carico dell'ultima volta":kd!=null&&kd<k0?`${fk(k)} kg, il carico abbassato`:k0!=null?`${fk(k)} kg, il massimo del pacco`:"Carico leggero"}, ${ex.lo} ripetizioni, 3-4 in canna.`}}
+  const k0=lastKg(ex,true),cp=eqMax(ex),kd=t.kind==="down"&&t.kg!=null&&k0!=null&&t.kg<k0&&!(cp&&k0>cp)?t.kg:k0,k=kd!=null?(cp&&kd>cp?cp:kd):t.kg;return {...t,myo:false,top:ex.hi,kg:k,reps:Array(ex.s).fill(ex.lo),kind:"flat",badge:"Scarico",msg:`${k0!=null&&k===k0?"Stesso carico dell'ultima volta":kd!=null&&kd<k0?`${ex.t==="bw"&&!(k>0)?"A corpo libero":`${fk(k)} kg`}, il carico abbassato`:k0!=null?`${fk(k)} kg, il massimo del pacco`:"Carico leggero"}, ${ex.lo} ripetizioni, 3-4 in canna.`}}
 /* Fase: massa (predefinita), definizione, mantenimento. Cambia fascia di peso, avviso "Fermo" e analisi */
 const PH={massa:{n:"Massa",lo:.25,hi:.5,src:"Iraki 2019",col:""},def:{n:"Definizione",lo:-1,hi:-.5,src:"Helms 2014, Garthe 2011",col:"var(--adapt)"},mant:{n:"Mantenimento",lo:-.25,hi:.25,src:"regola pratica",col:"var(--muted)"}};
 function phaseAt(d){const k=typeof d==="string"?d:iso(d||today());let ph="massa";for(const x of (S.phases||[]).slice().sort((a,b)=>a.d.localeCompare(b.d)))if(x.d<=k)ph=x.ph;return ph}
@@ -4605,7 +4616,7 @@ function reviewHTML(R){
   // Giorni del ciclo in cui l'isolamento poteva davvero arrivare a 0-1 in canna (niente padel dopo, partita domani o Stanco): il consiglio segue quelli
   const z0=[...new Set(S.sessions.filter(x=>!x.deload&&R.c&&dayOf(x)>=R.c.from&&dayOf(x)<=(R.c.to||"9999")&&PLAN[x.day]&&PLAN[x.day].ex.some(e=>e.t==="iso"&&/^0/.test(e.rir||""))&&!(x.mods||[]).some(m=>["prePadel","rir","light","prevOnly"].includes(m))).map(x=>PLAN[x.day].name))];
   const effS=(ti+tc)?`<div class="rv-s"><h3>Quanto vicino al cedimento</h3><div class="rv-l rv-w">${ef(R.eff.comp,"Multiarticolari")}${ef(R.eff.iso,"Isolamento")}</div>
-    <p>${ti&&R.eff.iso.easy/ti>=.4?`Sull'isolamento molte ultime serie Facili: ${z0.length?`nella ${z0.join(" e nella ")} puoi arrivare a 0-1 ripetizioni in canna, negli altri giorni (padel dopo, partita vicina, Upper C) resta a quelle previste.`:"arriva alle ripetizioni in canna previste per quel giorno: con la tua settimana è almeno 1 (padel dopo o partita vicina), 1-2 nella Upper C."} I dati sono misti, ma vicino al cedimento la crescita tende a essere un po' maggiore. `:""}${tc&&R.eff.comp.hard/tc>=.5?"Sui multiarticolari più di metà delle ultime serie Al limite: la forza non cresce di più e la fatica pesa sul padel, resta a 1-2 in canna. ":""}${!(ti&&R.eff.iso.easy/ti>=.4)&&!(tc&&R.eff.comp.hard/tc>=.5)?"Distribuzione in linea con la scheda.":""}</p>
+    <p>${ti&&R.eff.iso.easy/ti>=.4?`Sull'isolamento molte ultime serie Facili: ${z0.length?`nella ${z0.join(" e nella ")} puoi arrivare a 0-1 ripetizioni in canna, negli altri giorni (padel dopo, partita vicina, Upper C) resta a quelle previste.`:"arriva alle ripetizioni in canna previste per quel giorno. Con la tua settimana è almeno 1 (padel dopo o partita vicina), 1-2 nella Upper C."} I dati sono misti, ma vicino al cedimento la crescita tende a essere un po' maggiore. `:""}${tc&&R.eff.comp.hard/tc>=.5?"Sui multiarticolari più di metà delle ultime serie Al limite: la forza non cresce di più e la fatica pesa sul padel, resta a 1-2 in canna. ":""}${!(ti&&R.eff.iso.easy/ti>=.4)&&!(tc&&R.eff.comp.hard/tc>=.5)?"Distribuzione in linea con la scheda.":""}</p>
     <p class="rv-n">Voto dell'ultima serie di ogni esercizio.</p>${rvTag("Dati misti",["robinson","refalo"])}</div>`:"";
   const bwS=`<div class="rv-s"><h3>Peso corporeo</h3>${R.bw?`<p>Da ${fk(R.bw.a)} a ${fk(R.bw.b)} kg: <b>${R.bw.pct>0?"+":R.bw.pct<0?"−":""}${fk(Math.abs(Math.round(R.bw.pct*100)/100))}% a settimana</b>. ${bandTxt(R.ph,R.bw.pct)}</p>`:`<p>Meno di due pesate nel ciclo: segna il peso una volta a settimana.</p>`}${R.ph==="massa"?rvTag("Studio",["iraki"]):R.ph==="def"?rvTag("Studio",["helms","garthe"]):rvTag("Regola pratica")}</div>`;
   const balS=R.bal.length?`<div class="rv-s"><h3>Muscolo indietro</h3>${R.bal.map(b=>b.kind==="vol"?`<p>${b.pull<b.push?"Dorso":"Petto"} indietro sulle serie: petto ${fr1(b.push)}, dorso ${fr1(b.pull)} nelle ultime 2 settimane.</p>`:`<p><b>${b.lo.n}</b> ${fr1(b.d)} ranghi sotto ${b.hi.n.toLowerCase()}.</p>`).join("")}${rvTag("Regola pratica")}</div>`:"";
@@ -4849,7 +4860,7 @@ function renderSettings(){
     <li>Venerdì prima di due partite (sabato e domenica), anche con padel o partita il venerdì: di base seduta completa senza serie a cedimento (almeno 1 in canna). Con un tocco su Oggi passi alla versione ridotta (solo braccia, Copenhagen, core, cuffia e polso), che resta finché non torni alla completa.</li>
     <li>Padel e palestra nello stesso giorno: una serie in meno sulle spinte sopra la testa. Giorno di partita o Stanco: una serie in meno su tutto, stessi carichi e stesse ripetizioni dell'ultima volta in quel range (le alzate al cavo del lunedì e del venerdì vanno ognuna per conto suo). Se quel giorno vai peggio della seduta normale prima, la volta dopo si riparte dalla seduta normale.</li>
     <li>Scarico quando serve, non a calendario: l'app lo propone dopo 6 settimane senza scarico (la scheda dice ogni 5-6: puoi avviarlo prima a mano) o con 3+ esercizi fermi, ma non prima di 4 settimane di lavoro. Le prime 2 sedute di un esercizio (in quel range) servono a trovare il carico e non contano per lo stallo. Serie dimezzate, stessi carichi dell'ultima seduta vera (o quello già abbassato, se l'app ti aveva chiesto di scendere), 3-4 in canna. Le sedute di scarico non contano per la progressione. Una pausa di 7 o più giorni senza sedute vale come scarico.</li>
-    <li>Pausa lunga su un esercizio: dopo 14 o più giorni senza farlo, la prima volta ripeti l'ultima seduta (stessi kg e ripetizioni); dopo 28 o più giorni, 10% in meno sui kg, arrotondato al gradino. Dalla volta dopo si riprende a salire.</li>
+    <li>Pausa lunga su un esercizio: dopo 14 o più giorni senza farlo, la prima volta ripeti l'ultima seduta (stessi kg e ripetizioni); dopo 28 o più giorni, 10% in meno sui kg, arrotondato al gradino (con la zavorra conta anche il tuo peso). Se il gradino è troppo grosso per scendere del 10% (es. 30 kg al cavo col gradino da 5) o sei a corpo libero, carico uguale e 3 ripetizioni in meno, mai sotto il minimo del range. Dalla volta dopo si riprende a salire.</li>
     <li>Serie di avvicinamento «A» sul primo esercizio di petto, sul primo di dorso e sul primo multiarticolare: carichi a circa 50, 70 e 85% di quello di lavoro, 60 s di pausa.</li>
     <li>Timbro PR: quando una serie supera il massimale stimato migliore di almeno il 2% e in più usa un carico mai usato prima o batte il massimale della proposta di oggi, anche con più ripetizioni a un carico più basso (seguire la progressione da sola non basta). Niente timbro su Pallof, woodchop, salti, tenute e Nordic. Per trazioni e dip il massimale conta il tuo peso più la zavorra.</li>
    </ul></section>
