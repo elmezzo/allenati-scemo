@@ -1943,18 +1943,17 @@ html[data-skin="manga"][data-var="1"] :where(.c-gym){color:#4a8cff}
 :root:not(#g1):not(#g2) .set .field .pm:last-child::after{inset:0 -1px 0 -6px}
 :root:not(#g1):not(#g2) .set .field+.field{margin-left:8px}
 @media (max-width:360px){
- :root:not(#g1):not(#g2) .set .field .pm:first-child::after{inset:0 -2px 0 -1px}
- :root:not(#g1):not(#g2) .set .field .pm:last-child::after{inset:0 -1px 0 -2px}
+ :root:not(#g1):not(#g2) .set .field .pm:is(:first-child,:last-child)::after{inset:0 -1px}
  /* USA-7: il carico a 5 caratteri, quando lo scrivi, torna a 16 px (niente zoom di Safari) e i −/+ di quel campo si tolgono */
  :root:not(#g1):not(#g2) .set .field input.lg:focus{font-size:16px;letter-spacing:-.02em}
  :root:not(#g1):not(#g2) .set .field:has(input.lg:focus) .pm{display:none}
 }
 /* USA-6: più spazio tra ✓ e "Basta" del myo e tra "Chiudi" e "+15 s" */
 :root:not(#g1):not(#g2) .myo .mc .lnk{margin-left:10px}
-:root:not(#g1):not(#g2) :is(.timer,.rest) .tb{gap:16px}
+:root:not(#g1):not(#g2) :is(.timer,.rest) .tb{gap:12px}
 /* USA-10: timer in basso stretto (sotto 360 px o testo grande): senza il nome dell'esercizio; tasti alti 44 px */
 #timer{container-type:inline-size}
-@container (max-width:19.75em){#tlbl .tn{display:none}}
+@container (max-width:19.7rem){#tlbl .tn{display:none}}
 :root:not(#g1):not(#g2) .timer .tb button{min-height:44px}
 /* ===== VETRO "MURANO" (2026-10-21): vetro lattimo, inchiostro blu notte, lastra di vetro colorato; di sera la stessa fornace al buio ===== */
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4){color-scheme:light;
@@ -3882,7 +3881,7 @@ document.addEventListener("visibilitychange",()=>{if(H&&document.visibilityState
 
 let tCtx=null;
 // Etichetta del timer: il nome dell'esercizio (.tn) sparisce quando il timer è stretto (sotto 360 px o testo grande)
-function tlblHTML(l,p){return "Recupero<span class=\"tn\"> · "+esc(l)+"</span>"+(p?" · +"+p+"\u00a0s":"")}
+function tlblHTML(l,p){return "Recupero<span class=\"tn\">\u00a0· "+esc(l)+"</span>"+(p?"\u00a0· +"+p+"\u00a0s":"")}
 function startTimer(sec,label,plus,end,ctx){litOff();tPlus=plus||0;tLbl=label;tCtx=ctx||null;tEnd=end||Date.now()+sec*1000;tTot=sec;S.timer={end:tEnd,tot:sec,lbl:label,plus:tPlus,ctx:tCtx};save();tWarn=sec<=10;tOn=true;T("tlbl").innerHTML=tlblHTML(label,tPlus);T("timer").classList.remove("over");document.querySelectorAll(".tball").forEach(b=>b.remove());clearInterval(tInt);tick();tInt=setInterval(tick,250)}
 // secondi mostrati adesso (durante lo scorrimento del +15 s: il valore a metà strada, non quello d'arrivo)
 function tVal(){const left=Math.round((tEnd-Date.now())/1000);if(!tTw)return left;const k=(performance.now()-tTw.t)/380;if(k>=1){tTw=null;return left}return Math.round(tTw.a+(left-tTw.a)*(1-Math.pow(1-k,3)))}
