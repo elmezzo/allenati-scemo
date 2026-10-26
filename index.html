@@ -1952,9 +1952,10 @@ html[data-skin="manga"][data-var="1"] :where(.c-gym){color:#4a8cff}
 :root:not(#g1):not(#g2) .myo .mc .lnk{margin-left:10px}
 :root:not(#g1):not(#g2) :is(.timer,.rest) .tb{gap:12px}
 /* GRF-7: "Upper A" resta unito; se il nome non sta accanto a Modifica/Duplica, i tasti scendono sotto (a destra) invece di coprirlo */
-:root:not(#g1):not(#g2) .pitem{flex-wrap:wrap}
+:root:not(#g1):not(#g2) .pitem{flex-wrap:wrap;container-type:inline-size}
 :root:not(#g1):not(#g2) .pitem>div{flex:1 1 0;min-width:min-content}
 :root:not(#g1):not(#g2) .pitem>div+button{margin-left:auto}
+@container (max-width:15.5em){:root:not(#g1):not(#g2) .pitem>div{flex-basis:100%}}
 /* USA-10: timer in basso stretto (sotto 360 px o testo grande): senza il nome dell'esercizio; tasti alti 44 px */
 #timer{container-type:inline-size}
 @container (max-width:19.7rem){#tlbl .tn{display:none}}
