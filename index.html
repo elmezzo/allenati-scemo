@@ -2382,9 +2382,11 @@ function target(ex,noMyo){
   // Pausa lunga (14+ giorni senza fare questo esercizio): la prima volta ripeti l'ultima seduta, stessi kg e ripetizioni; da 28 giorni 10% in meno sui kg (arrotondato al gradino)
   const gap=gapDays(ex);
   if(gap>=14&&reps.length){const rp=pad(reps,ex.s);let nk=kg;
-    if(gap>=28&&kg>0){nk=ex.t==="bw"?Math.max(0,roundStep(kg-(bwNow()+kg)*0.1,st)):Math.max(st,roundStep(kg*0.9,st));if(nk>=kg)nk=ex.t==="bw"?Math.max(0,kg-st):kg-st>=st-1e-9?kg-st:kg;if(cap&&nk>cap)nk=cap}
-    const dn=nk!=null&&kg!=null&&nk<kg-1e-9,u=ex.t==="time"?"secondi":"ripetizioni",el=kg==null&&ex.t!=="bw"?(ex.t==="nordic"||eqOf(ex)==="altro"?"stesso elastico, ":""):"";
-    return {kg:nk,reps:rp,top:Math.max(ex.hi,...rp),kind:dn?"down":"flat",badge:dn?`-${fk(kg-nk)} kg`:"Pausa",hold:true,pause:true,msg:dn?`Ultima volta ${gap} giorni fa: ${fk(nk)} kg (10% in meno) e le ${u} di allora. Dalla volta dopo si riprende a salire.`:`Ultima volta ${gap} giorni fa: ripeti l'ultima seduta, ${el}${kg>0?`${fk(kg)} kg e `:""}stesse ${u}. Dalla volta dopo si riprende a salire.`}}
+    // -10% arrotondato al gradino: se il gradino è troppo grosso per farlo (es. Pallof 15 kg col gradino da 5) il carico resta
+    if(gap>=28&&kg>0){nk=ex.t==="bw"?Math.max(0,roundStep(kg-(bwNow()+kg)*0.1,st)):roundStep(kg*0.9,st);if(ex.t!=="bw"&&(nk>=kg||nk<st-1e-9||(kg-nk)/kg>0.15+1e-9))nk=kg;if(cap&&nk>cap)nk=cap}
+    const dn=nk!=null&&kg!=null&&nk<kg-1e-9,tm=ex.t==="time",el=ex.t==="nordic"||kg==null&&ex.t!=="bw"&&!tm&&eqOf(ex)==="altro"?"stesso elastico, ":"",
+      kT=ex.t==="bw"&&!(nk>0)?"a corpo libero, senza zavorra":`${fk(nk)} kg`;
+    return {kg:nk,reps:rp,top:Math.max(ex.hi,...rp),kind:dn?"down":"flat",badge:dn?`-${fk(kg-nk)} kg`:"Pausa",hold:true,pause:true,msg:dn?`Ultima volta ${gap} giorni fa: ${kT} (10% in meno${ex.t==="bw"?" contando il tuo peso":""}) e le ripetizioni di allora. Dalla volta dopo si riprende a salire.`:`Ultima volta ${gap} giorni fa: ripeti l'ultima seduta, ${el}${kg>0?`${fk(kg)} kg e `:""}${tm?"stessi secondi":"stesse ripetizioni"}. Dalla volta dopo si riprende a salire.`}}
   if(powEx(ex)){const fix=Array(ex.s).fill(ex.lo),lp=ex.side?" per lato":"",allOk=full&&hReps.every(r=>r>=ex.lo);
     if(kg==null)return {kg:null,reps:fix,top:ex.lo,kind:"flat",badge:"=",hold:true,msg:allOk&&eff!=="hard"?`Tutte veloci: ${eqOf(ex)==="altro"?"elastico più duro":"aumenta il carico"}, sempre ${ex.lo}${lp}.`:`Stesse ${ex.lo} ripetizioni${lp}: ogni ripetizione esplosiva.`};
     let nk=kg+st;if(cap&&nk>cap)nk=cap;
