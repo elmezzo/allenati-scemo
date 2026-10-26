@@ -2019,7 +2019,7 @@ html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera] 
 /* la lastra: una banda di luce madreperla che attraversa piano il vetro (solo transform, niente ridisegno) */
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero{position:relative;overflow:hidden;isolation:isolate}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero::after{content:"";position:absolute;top:0;bottom:0;left:-100%;width:300%;z-index:-1;pointer-events:none;
- background:linear-gradient(115deg,transparent 28%,rgba(255,150,215,.24) 38%,rgba(200,170,255,.24) 46%,rgba(140,205,255,.22) 54%,transparent 64%);
+ background:linear-gradient(115deg,transparent 28%,rgba(255,150,215,.17) 38%,rgba(200,170,255,.17) 46%,rgba(140,205,255,.15) 54%,transparent 64%);
  will-change:transform;animation:mpBand 14s ease-in-out infinite alternate}
 @keyframes mpBand{from{transform:translateX(-12%)}to{transform:translateX(34%)}}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero::before{content:"";display:block!important;position:absolute;left:0;right:0;top:0;height:1.5px;z-index:1;pointer-events:none;background:var(--mp-rim);opacity:.9;-webkit-mask:none;mask:none;padding:0;border-radius:0}
@@ -2033,6 +2033,13 @@ html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .ex.cur:not
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) div.timer:not(.over){border:1.5px solid transparent;background:linear-gradient(color-mix(in srgb,var(--m-card) 90%,transparent),color-mix(in srgb,var(--m-card) 90%,transparent)) padding-box,var(--mp-rim) border-box}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-var="2"] .card.hero::after{opacity:.55}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .ex.cur.gold{border-width:2px}
+/* leggibilità sulla lastra: testo bianco pieno, riflesso in alto più tenue, pillola scura, Acquamare e Rubino sera più profondi */
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero{background:radial-gradient(120% 70% at 18% 0%,rgba(255,255,255,.1),transparent 55%),linear-gradient(160deg,var(--m-s1),var(--m-s2) 55%,var(--m-s3))}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero :is(p,.meta,.meta span,.meta b,.hn,small){color:#fff}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero .pill{background:rgba(0,0,0,.2)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-var="2"]{--m-s1:#0f7d87;--m-s2:#0a6670}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera][data-var="2"]{--m-s1:#0e717b;--m-s2:#0b646d}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera][data-var="1"]{--m-s1:#bd2f4a}
 @media (prefers-reduced-motion:reduce){html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero::after{animation:none}}
 
 </style>
