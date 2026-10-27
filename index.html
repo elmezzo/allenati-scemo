@@ -433,6 +433,7 @@ html[data-skin="manga"] .sbar{background:rgba(15,14,18,.92)}
 .rest.over .rr .tv{font-size:34px}
 .rest.over .rr>svg{opacity:0}
 .rest.over .tl{font-size:max(17px,1rem)}
+.rest.over.fit .tl{font-size:inherit}
 .rest button{border:1.5px solid currentColor;background:transparent;color:inherit;border-radius:10px;padding:8px 10px;font-weight:800;font-size:max(12px,0.7059rem);min-height:40px}
 details.more summary{cursor:pointer;font-size:max(14px,0.8235rem);color:var(--muted);font-weight:700;list-style:none;min-height:36px;display:flex;align-items:center;gap:6px}
 details.more summary::-webkit-details-marker{display:none}
@@ -2331,7 +2332,10 @@ let snapOk=true;const snap=()=>{snapOk=setKey(KEY+".bak",JSON.stringify(S))};
 // Conferma con due tocchi (Termina con serie mancanti, Svuota, Elimina seduta): il secondo vale solo se arriva dopo 0,6 s, così un doppio tocco involontario non conferma; dopo 4 s il tasto torna normale
 function arm2(b,txt,lbl){const n=performance.now();if(b.dataset.arm!=="1"){b.dataset.arm="1";b._at=n;b.textContent=txt;clearTimeout(b._t);b._t=setTimeout(()=>{if(b.dataset.arm==="1"){b.dataset.arm="";b.textContent=lbl}},4000);return false}
   if(n-b._at<600)return false;clearTimeout(b._t);b.dataset.arm="";return true}
-function undoable(txt,at){const m=(at&&document.getElementById(at))||document.getElementById("bmsg")||document.getElementById("omsg")||document.getElementById("msg");if(!m)return;if(!snapOk){m.className="msg err";m.textContent=txt+" Non posso offrire Annulla: memoria piena, la copia di sicurezza non si è salvata.";return}m.className="msg ok";m.innerHTML=`${esc(txt)} <button class="lnk" id="undoD">Annulla</button>`;
+// Il messaggio con "Annulla" deve vedersi: se è sotto la barra in basso o sotto l'intestazione fissa la pagina scorre quanto basta
+function msgShow(m){const r=m.getBoundingClientRect(),nb=document.querySelector("nav.bar"),th=view==="train"&&document.querySelector(".thead"),lo=(nb?nb.getBoundingClientRect().top:innerHeight)-16,hi=(th?th.getBoundingClientRect().bottom:0)+16;
+  const dy=r.bottom>lo?r.bottom-lo:r.top<hi?r.top-hi:0;if(Math.abs(dy)>2)window.scrollBy({top:dy,behavior:RM()?"auto":"smooth"})}
+function undoable(txt,at){const m=(at&&document.getElementById(at))||document.getElementById("bmsg")||document.getElementById("omsg")||document.getElementById("msg");if(!m)return;if(!snapOk){m.className="msg err";m.textContent=txt+" Non posso offrire Annulla: memoria piena, la copia di sicurezza non si è salvata.";return}m.className="msg ok";m.innerHTML=`${esc(txt)} <button class="lnk" id="undoD">Annulla</button>`;msgShow(m);
   const u=document.getElementById("undoD");const t=setTimeout(()=>{if(u.isConnected)u.remove()},10000);
   u.onclick=()=>{clearTimeout(t);try{S=JSON.parse(localStorage.getItem(KEY+".bak"));normS();rebuild();save();applySkin();render();if(S.timer&&S.timer.end>Date.now()&&!tOn){const x=S.timer;startTimer(x.tot,x.lbl,x.plus,x.end,x.ctx)}const mm=(at&&document.getElementById(at))||document.getElementById("bmsg")||document.getElementById("omsg")||document.getElementById("msg");if(mm){mm.className="msg ok";mm.textContent="Dati ripristinati."}}catch(e){}}}
 // Scrittura in memoria: se è piena si libera la copia dei dati illeggibili (.err) e si riprova una volta
@@ -3593,11 +3597,13 @@ function renderTrain(only){
     // Cambiato idea su "Al limite": tolti i 30 s di recupero in più
     if(was==="hard"&&(d.restPlus||{})[ex.id]===1){delete d.restPlus[ex.id];if(tOn&&tEnd>Date.now()&&tCtx&&tCtx.ex===ex.id){tEnd-=30000;tTot-=30;tPlus=Math.max(0,tPlus-30);if(S.timer){S.timer.end=tEnd;S.timer.tot=tTot;S.timer.plus=tPlus}T("tlbl").innerHTML=tlblHTML(tLbl,tPlus)}}
     if(b.dataset.eff==="hard"&&(ex.t==="comp"||ex.t==="bw")&&S.adrest!==false&&tOn&&tEnd>Date.now()&&tCtx&&tCtx.ex===ex.id&&!(d.restPlus||{})[ex.id]){d.restPlus=d.restPlus||{};d.restPlus[ex.id]=1;tEnd+=30000;tTot+=30;tPlus+=30;if(S.timer){S.timer.end=tEnd;S.timer.tot=tTot;S.timer.plus=tPlus}save();T("tlbl").innerHTML=tlblHTML(tLbl,tPlus)}
-    save();renderTrain()});
-  document.querySelectorAll("#exs [data-effskip]").forEach(b=>b.onclick=()=>{const d=draftFor(g);d.effSkip=d.effSkip||{};d.effSkip[b.dataset.effskip]=1;save();renderTrain()});
+    save();renderTrain();keepFocus(true)});
+  // Dopo il voto (o ✕) la serie da fare dell'esercizio dopo resta sopra il timer, anche col testo grande
+  document.querySelectorAll("#exs [data-effskip]").forEach(b=>b.onclick=()=>{const d=draftFor(g);d.effSkip=d.effSkip||{};d.effSkip[b.dataset.effskip]=1;save();renderTrain();keepFocus(true)});
   const rp=document.querySelector("#restIn [data-tp]");if(rp)rp.onclick=()=>{if(!tFresh())addRest()};
   const rs=document.querySelector("#restIn [data-ts]");if(rs)rs.onclick=()=>{if(!tFresh())closeRest()};
-  const tb=!patch&&document.querySelector('.tabs button[aria-pressed="true"]');if(tb)tb.scrollIntoView({block:"nearest",inline:"center"});
+  // La scheda del giorno scelto va al centro della fila solo in orizzontale: scrollIntoView spostava anche la pagina (in cima, a ogni ridisegno intero)
+  const tb=!patch&&document.querySelector('.tabs button[aria-pressed="true"]');if(tb){const tr=tb.parentElement.getBoundingClientRect(),r=tb.getBoundingClientRect();tb.parentElement.scrollLeft+=r.left+r.width/2-(tr.left+tr.width/2)}
   const fb=document.getElementById("finish");fb.onclick=()=>{const miss=tot-dn;
     if(miss>0&&!arm2(fb,`Mancano ${miss} serie · tocca ancora`,"Termina e salva"))return;
     finish(g,mods,null,miss)};
@@ -3786,7 +3792,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
 }
 let kgChk="",lastTk={t:0,k:"",y:0};
 // Dopo una spunta la pagina scorre: per 1,1 s un secondo tocco non apre quello che è arrivato sotto il dito (es. "⇄ Cambia")
-document.addEventListener("click",e=>{if(view!=="train"||performance.now()-lastTk.t>=1100||Math.abs(scrollY-lastTk.y)<=4)return;const b=e.target.closest("button,a,summary,input");if(!b||b.closest("#timer"))return;if(b.matches(".tick")&&b.dataset.ex+"|"+b.dataset.j===lastTk.k)return;if(b.matches(".tick"))return;e.preventDefault();e.stopPropagation()},true);
+document.addEventListener("click",e=>{if(view!=="train"||performance.now()-lastTk.t>=1100||Math.abs(scrollY-lastTk.y)<=4)return;const b=e.target.closest("button,a,summary,input");if(!b||b.closest("#timer,nav.bar,.pgr,.xrow"))return;if(b.matches(".tick")&&b.dataset.ex+"|"+b.dataset.j===lastTk.k)return;if(b.matches(".tick"))return;e.preventDefault();e.stopPropagation()},true);
 // Spunta di una serie di avvicinamento: vibrazione leggera e 60 s di pausa, niente record, oro o PIPPA
 const wOpen=new Set();
 function rampTick(g,exId,k){const tk="r|"+exId+"|"+k,tn=performance.now(),dt=tn-lastTk.t,mv=Math.abs(scrollY-lastTk.y)>4;if(lastTk.k===tk&&(dt<400||(mv&&dt<1100)))return;if(lastTk.k!==tk&&mv&&dt<500)return;lastTk={t:tn,k:tk,y:scrollY};
@@ -3933,8 +3939,9 @@ function ssSheet(g,ex,mods){
     else{const key="o"+Date.now().toString(36);dr.ss[ex.id]=key;dr.ss[k]=key}
     save();openEx[g]=ex.id;renderTrain();keepFocus(true,ex.id)})}
 function keepFocus(changed,exId){
-  const c=(exId&&document.querySelector(`#exs .ex.cur[data-ex="${exId}"]`))||document.querySelector("#exs .ex.cur");if(!c)return;
-  const f=document.querySelector("#exs").firstElementChild,tgt=f&&f.classList.contains("ask")&&!exId?f:c;
+  // Seduta finita (nessuna scheda aperta): sale "Tutte le serie fatte" con Termina e salva, prima finiva sotto l'intestazione
+  const c=(exId&&document.querySelector(`#exs .ex.cur[data-ex="${exId}"]`))||document.querySelector("#exs .ex.cur")||document.querySelector(".card.alldone");if(!c)return;
+  const f=document.querySelector("#exs").firstElementChild,tgt=f&&f.classList.contains("ask")&&!exId&&c.matches(".ex")?f:c;
   const th=document.querySelector(".thead"),off=(th?(parseFloat(getComputedStyle(th).top)||0)+th.offsetHeight:0)+16;
   let dy=tgt.getBoundingClientRect().top-off;
   // La scheda si ferma con il bordo alto sotto l'intestazione (nome e "1 di 4" visibili). Si scorre oltre solo quanto serve perché la serie da fare
@@ -4121,8 +4128,10 @@ function tick(){if(!tOn)return;const left=Math.round((tEnd-Date.now())/1000);
   if(left>10)tWarn=false;
   ballFx(left);
   if(left<=0&&!T("timer").classList.contains("over")){const live=left>-3;litNext(live);T("timer").classList.add("over");T("tlbl").textContent="Recupero finito";try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}if(live)beep()}
-  if(left<=0&&inl&&!inl.classList.contains("over")){inl.style.minHeight=inl.offsetHeight+"px";inl.classList.add("over");inl.querySelector(".tl").textContent="Recupero finito"}
-  if(left>0&&inl&&inl.classList.contains("over")){inl.style.minHeight="";inl.classList.remove("over");inl.querySelector(".tl").textContent="Recupero"}}
+  // "Recupero finito": il blocco resta alto uguale. Se con la scritta più grande Chiudi e +15 s andrebbero a capo, la scritta resta della misura di prima (su due righe)
+  if(left<=0&&inl&&!inl.classList.contains("over")){const tb=inl.querySelector(".tb"),rr=inl.querySelector(".rr"),one=()=>!tb||!rr||tb.getBoundingClientRect().top<rr.getBoundingClientRect().bottom-4,was=one();
+    inl.style.minHeight=inl.offsetHeight+"px";inl.classList.add("over");inl.querySelector(".tl").textContent="Recupero finito";if(was&&!one())inl.classList.add("fit")}
+  if(left>0&&inl&&inl.classList.contains("over")){inl.style.minHeight="";inl.classList.remove("over","fit");inl.querySelector(".tl").textContent="Recupero"}}
 // Anello: angolo che resta A (0-360) = due mezzi anelli + il puntino della fine, ruotati con WAAPI su transform per tutto il tempo che manca
 function ringSync(){const k=tEnd+"|"+tTot;
   document.querySelectorAll("#timer .tr,#restIn .rr").forEach(c=>{
@@ -4914,7 +4923,7 @@ function renderSettings(){
   document.querySelectorAll("[data-rs]").forEach(b=>b.onclick=()=>{const v=S.archive.find(x=>x.id===b.dataset.rs);if(!v)return;snap();const n=parkDraft(v.key);S.archive=S.archive.filter(x=>x!==v);if(PLAN[v.key])archivePlan(v.key,"modificato");S.plans[v.key]=JSON.parse(JSON.stringify(v.plan));fixDupIds();fixDupIds.n=0;rebuild();save();renderSettings();undoable(`Ripristinato "${v.plan.name}".${parkMsg(n)}`,"wmsg")});
   document.querySelectorAll("[data-rmv]").forEach(b=>b.onclick=()=>{if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Sicuro?";return}S.archive=S.archive.filter(x=>x.id!==b.dataset.rmv);save();renderSettings()});
   document.querySelectorAll("[data-dup]").forEach(b=>b.onclick=()=>{const P=PLAN[b.dataset.dup];editPlan=JSON.parse(JSON.stringify({key:null,name:P.name+" (copia)",sub:P.sub||"",legs:!!P.legs,ex:P.ex.map(e=>({...e,lib:e.lib||e.id,id:null}))}));go("edit")});
-  document.querySelectorAll("[data-delp]").forEach(b=>b.onclick=()=>{const k=b.dataset.delp;if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent=S.draft[k]&&hasDone(S.draft[k])?"Sicuro? Ha una seduta in corso":"Sicuro?";return}snap();const n=parkDraft(k);archivePlan(k,"eliminato");delete S.plans[k];for(const d in S.week)if(S.week[d].gym===k)S.week[d]={...S.week[d],gym:"none"};for(const d in S.overrides)if(S.overrides[d].gym===k)delete S.overrides[d].gym;rebuild();save();renderSettings();undoable(`Piano eliminato.${parkMsg(n)}`,"wmsg")});
+  document.querySelectorAll("[data-delp]").forEach(b=>b.onclick=()=>{const k=b.dataset.delp;if(!arm2(b,S.draft[k]&&hasDone(S.draft[k])?"Sicuro? Ha una seduta in corso":"Sicuro?","Elimina"))return;snap();const n=parkDraft(k);archivePlan(k,"eliminato");delete S.plans[k];for(const d in S.week)if(S.week[d].gym===k)S.week[d]={...S.week[d],gym:"none"};for(const d in S.overrides)if(S.overrides[d].gym===k)delete S.overrides[d].gym;rebuild();save();renderSettings();undoable(`Piano eliminato.${parkMsg(n)}`,"wmsg")});
   const bm=document.getElementById("bmsg");
   document.getElementById("exp").onclick=async e=>{const eb=e.currentTarget,x=await shareBackup();if(x==="ok"){bkOk(eb);bm.className="msg ok";bm.textContent="Backup salvato."}else if(x==="no"){bm.className="msg";bm.textContent="Backup non salvato."}else{bm.className="msg err";bm.textContent="Salvataggio non riuscito su questo browser."}};
   // Prima di cancellare o importare: copia dei dati attuali e "Annulla" per 10 secondi
