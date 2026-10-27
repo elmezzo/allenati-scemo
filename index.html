@@ -2043,7 +2043,12 @@ html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera][
 /* contrasti residui: barra in basso di giorno, "(invece di N)" sulla scheda in corso velata, numero del recupero dentro l'anello */
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5):not([data-sera]) nav.bar button[aria-current="false"]{color:#46536c}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .ex.cur .spec span.ad{color:color-mix(in srgb,var(--info) 68%,var(--m-ink))}
-html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .rest .rr .tv{font-size:24px;letter-spacing:0}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .rest .rr .tv{font-size:21px;letter-spacing:0}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera] .ex.cur .spec span.ad{color:color-mix(in srgb,var(--info) 40%,var(--m-ink))}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera] .ex.cur .prog{color:var(--m-ink)}
+/* velo della scheda in corso: stesso colore, ma più profondo di sera e un po' più tenue di giorno, così il testo resta leggibile anche a scheda quasi piena */
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5):not([data-sera]) .ex.cur>.fp{background:radial-gradient(130% 100% at 25% 15%,color-mix(in srgb,var(--fc,var(--go)) 44%,transparent),color-mix(in srgb,var(--fc,var(--go)) 26%,transparent) 70%)}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera] .ex.cur>.fp{background:radial-gradient(130% 100% at 25% 15%,color-mix(in srgb,color-mix(in srgb,var(--fc,var(--go)) 42%,var(--m-card)) 80%,transparent),color-mix(in srgb,color-mix(in srgb,var(--fc,var(--go)) 42%,var(--m-card)) 55%,transparent) 70%)}
 @media (prefers-reduced-motion:reduce){html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero::after{animation:none}}
 
 </style>
