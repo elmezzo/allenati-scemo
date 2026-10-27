@@ -1958,9 +1958,11 @@ html[data-skin="manga"][data-var="1"] :where(.c-gym){color:#4a8cff}
 :root:not(#g1):not(#g2) .pitem>div{flex:1 1 0;min-width:min-content}
 :root:not(#g1):not(#g2) .pitem>div+button{margin-left:auto}
 @container (max-width:15.5em){:root:not(#g1):not(#g2) .pitem>div{flex-basis:100%}}
-/* USA-10: timer in basso stretto (sotto 360 px o testo grande): senza il nome dell'esercizio; tasti alti 44 px */
+/* USA-10: timer in basso stretto (schermo sotto 360 px o testo grande): senza il nome dell'esercizio; tasti alti 44 px */
 #timer{container-type:inline-size}
-@container (max-width:19.7rem){#tlbl .tn{display:none}}
+@media (max-width:359.98px){#tlbl .tn{display:none}}
+/* testo grande: il contenuto del timer è sotto 17 rem (a 360 px con testo normale è ~18 rem, a 430 con testo grande ~16,3) */
+@container (max-width:17rem){#tlbl .tn{display:none}}
 :root:not(#g1):not(#g2) .timer .tb button{min-height:44px}
 /* ===== VETRO "MURANO" (2026-10-21): vetro lattimo, inchiostro blu notte, lastra di vetro colorato; di sera la stessa fornace al buio ===== */
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4){color-scheme:light;
