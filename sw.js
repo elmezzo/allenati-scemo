@@ -1,4 +1,4 @@
-const CACHE="allenati-scemo-v57";
+const CACHE="allenati-scemo-v58";
 const CORE=["./","index.html","manifest.webmanifest","icons/icon-192.png","icons/icon-512.png","icons/apple-touch-icon.png","icons/icon-maskable-512.png"];
 const isFont=u=>/(^|\.)fonts\.(googleapis|gstatic)\.com$/.test(new URL(u).hostname);
 // I font (foglio di Google Fonts e file woff2) non sono in CORE: si copiano dalle cache vecchie prima che activate le cancelli,
