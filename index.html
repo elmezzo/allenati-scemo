@@ -2421,7 +2421,7 @@ function assess(d){
   return r;
 }
 // Serie in più aggiunte durante la seduta (+ Aggiungi una serie): stanno nella bozza (dr.xs) e arrivano qui attaccate ai mods della seduta
-const xsOf=(mods,id)=>(mods&&mods.xs&&mods.xs[id])|0;
+const xsOf=(mods,id)=>mods&&mods.xs&&!mods.has("deload")?mods.xs[id]|0:0;
 // Fai la seduta normale / Rimetti la seduta adattata (solo quel giorno); si tengono le ultime 2 settimane
 function toggleNorm(day){S.normal=S.normal||{};if(S.normal[day])delete S.normal[day];else S.normal[day]=1;const lim=iso(addDays(today(),-14));for(const k in S.normal)if(k<lim)delete S.normal[k];save()}
 function setsFor(ex,mods){const b=setsBase(ex,mods);return b>0?b+xsOf(mods,ex.id):0}
@@ -3494,14 +3494,14 @@ function renderToday(){
   shownDay=k;
   // Padel o energia cambiati: la "seduta normale" scelta oggi decade e l'app riadatta col contesto nuovo
   const normOff=()=>{if(S.normal)delete S.normal[iso(today())]};
-  const setO=(day,field,v)=>{const kk=iso(day);S.overrides[kk]={...(S.overrides[kk]||{}),[field]:v};normOff();save();renderToday()};
+  const setO=(day,field,v)=>{const kk=iso(day),dd=dayDiff(iso(today()),kk);if(dd>=0&&dd<=2&&dayPlan(day)[field]!==v)normOff();S.overrides[kk]={...(S.overrides[kk]||{}),[field]:v};save();renderToday()};
   const padOpts=[{v:"none",l:"Niente"},{v:"train",l:"Allenamento"},{v:"match",l:"Partita"}];
   document.getElementById("cPad").onclick=()=>pickSheet("Padel oggi",padOpts,a.padel,v=>setO(today(),"padel",v));
   document.querySelectorAll("[data-wd]").forEach(b=>b.onclick=()=>{const x=new Date(b.dataset.dt+"T12:00:00");pickSheet(`Padel ${WD_LONG[x.getDay()]} ${x.getDate()}`,padOpts,dayPlan(x).padel,v=>setO(x,"padel",v))});
   document.getElementById("cTom").onclick=()=>pickSheet("Padel domani",padOpts,tm.padel,v=>setO(addDays(today(),1),"padel",v));
   document.getElementById("cEn").onclick=()=>pickSheet("Come ti senti",[{v:"low",l:"Stanco",sub:"Stessi carichi, una serie in meno per esercizio"},{v:"ok",l:"Normale"},{v:"high",l:"In forma",sub:"Scheda normale"}],a.energy,v=>{if(a.energy!==v)normOff();S.energy[iso(today())]=v;save();renderToday()});
   const fg=document.getElementById("freeGo");if(fg)fg.onclick=()=>{if(PLAN.LIB&&S.draft.LIB){gymSel="LIB";go("train")}else freeSheet()};
-  const nd=document.getElementById("normDay");if(nd)nd.onclick=()=>{toggleNorm(a.day);renderToday();const b=document.getElementById("normDay");if(b)b.focus({preventScroll:true})};
+  const nd=document.getElementById("normDay");if(nd)nd.onclick=()=>{if(a.day!==iso(today())){renderToday();return}toggleNorm(a.day);renderToday();const b=document.getElementById("normDay");if(b)b.focus({preventScroll:true})};
   const fd=document.getElementById("fullDay");if(fd)fd.onclick=()=>{if(a.full)S.preMatchLite=true;else delete S.preMatchLite;delete S.fullDay;save();renderToday()};
   const cg=document.getElementById("chGym");if(cg)cg.onclick=()=>pickSheet("Palestra oggi",[{v:"none",l:"Niente palestra"},...GYM_ORDER.filter(x=>x!=="LIB").map(g=>({v:g,l:PLAN[g].name,sub:PLAN[g].sub})),{v:"@free",l:PLAN.LIB&&S.draft.LIB?"Continua la seduta libera":"Seduta libera",sub:"Esercizi scelti al volo, fuori dal piano"}],a.gym,v=>{if(v==="@free"){if(PLAN.LIB&&S.draft.LIB){gymSel="LIB";go("train")}else setTimeout(freeSheet,240);return}setO(today(),"gym",v)});
   const sd=document.getElementById("startDl");if(sd)sd.onclick=()=>{snap();startDeload();renderToday();undoable("Scarico avviato.","omsg");reviewSheet(S.cycles[S.cycles.length-1])};
@@ -3541,7 +3541,8 @@ function renderTrain(only){
   const g=currentGym(),P=PLAN[g],mc=modsCtx(g),a=mc.a;
   const isToday=mc.own;const mods=mc.mods;
   const dr=draftFor(g),L=trainList(g,mods);
-  let tot=0,dn=0;for(const {ex} of L){const n=setsFor(ex,mods);tot+=n;dn+=Math.min(n,doneCount(g,ex.id))}
+  // mP = serie della scheda ancora da fare: una serie in più lasciata lì non è una serie mancante
+  let tot=0,dn=0,mP=0;for(const {ex} of L){const n=setsFor(ex,mods),dc=doneCount(g,ex.id);tot+=n;dn+=Math.min(n,dc);mP+=Math.max(0,n-xsOf(mods,ex.id)-dc)}
   const pct=tot?Math.round(dn/tot*100):0,od=draftOld(g),mins=dr.start&&!(od&&od.stale)?sesMin(dr):0;
   if(openEx[g]&&!L.some(x=>x.ex.id===openEx[g]))openEx[g]=null;
   const first=L.find(x=>!exDone(g,x.ex,mods));
@@ -3561,7 +3562,7 @@ function renderTrain(only){
       const ef=(dr.eff||{})[ex.id],skip=(dr.effSkip||{})[ex.id],eAt=(dr.effAt||{})[ex.id];
       html=`<button class="xrow done" data-open="${ex.id}"><span class="ck">✓</span><span class="xb"><span class="nmw"><span class="nm">${esc(ex.n)}</span></span><em>${dc}/${n}${ef&&!noEff(ex)?" · "+EFFL[ef]:""}</em></span></button>`;doneH.push(html);
       // Dopo il voto la domanda resta (con la scelta segnata) finché non spunti un'altra serie: un tocco sbagliato si corregge subito
-      if((!ef||(eAt&&!(dr.last>eAt)))&&!skip&&!noEff(ex)&&!mods.has("deload")&&dr.lastDone===ex.id)askH.push(`<div class="ask"><div class="t"><span>${esc(ex.n)}: ${ef?"ultima serie":"com'era l'ultima serie?"}</span><button data-effskip="${ex.id}" aria-label="${ef?"Chiudi":"Salta la domanda"}">✕</button></div>${effSeg(ex.id,ef)}</div>`);
+      if((!ef||(eAt&&!(dr.last>eAt)))&&!skip&&!noEff(ex)&&!mods.has("deload")&&dr.lastDone===ex.id)askH.push(`<div class="ask"><div class="t"><span>${esc(ex.n)}: ${xsOf(mods,ex.id)?(ef?"ultima serie della scheda":"com'era l'ultima serie della scheda?"):ef?"ultima serie":"com'era l'ultima serie?"}</span><button data-effskip="${ex.id}" aria-label="${ef?"Chiudi":"Salta la domanda"}">✕</button></div>${effSeg(ex.id,ef)}</div>`);
       return;
     }
     const tg=tgFor(ex,mods,g),rng=(ex.lo===ex.hi?ex.lo:ex.lo+"-"+ex.hi)+(ex.t==="time"?" s":"");
@@ -3631,7 +3632,7 @@ function renderTrain(only){
   const rs=document.querySelector("#restIn [data-ts]");if(rs)rs.onclick=()=>{if(!tFresh())closeRest()};
   // La scheda del giorno scelto va al centro della fila solo in orizzontale: scrollIntoView spostava anche la pagina (in cima, a ogni ridisegno intero)
   const tb=!patch&&document.querySelector('.tabs button[aria-pressed="true"]');if(tb){const tr=tb.parentElement.getBoundingClientRect(),r=tb.getBoundingClientRect();tb.parentElement.scrollLeft+=r.left+r.width/2-(tr.left+tr.width/2)}
-  const fb=document.getElementById("finish");fb.onclick=()=>{const miss=tot-dn;
+  const fb=document.getElementById("finish");fb.onclick=()=>{const miss=mP;
     if(miss>0&&!arm2(fb,`Mancano ${miss} serie · tocca ancora`,"Termina e salva"))return;
     finish(g,mods,null,miss)};
   const sv=document.getElementById("seeSv");if(sv)sv.onclick=()=>sheetFrom(sv.closest(".card"),()=>summarySheet(svd));
@@ -3813,7 +3814,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
     ${stallTxt}
         <div class="sets">${wpH}<div class="set sethd" aria-hidden="true"><span></span><span>${hasKg?"kg":""}</span><span>${unit}</span><span></span></div>${sets}${xsH}</div>
     ${rest}<!--ASK-->
-    ${n>0&&fN>=n&&exDone(g,ex,mods)&&!noEff(ex)&&!mods.has("deload")?`<div class="ask effc"><div class="t"><span>Com'era l'ultima serie?</span></div>${effSeg(ex.id,(dr.eff||{})[ex.id])}</div>`:""}
+    ${n>0&&(xN?fN>=n-xN:fN>=n&&exDone(g,ex,mods))&&!noEff(ex)&&!mods.has("deload")?`<div class="ask effc"><div class="t"><span>Com'era l'ultima serie${xN?" della scheda":""}?</span></div>${effSeg(ex.id,(dr.eff||{})[ex.id])}</div>`:""}
     ${painWarn(ex,base)}
     <details class="more" data-more="${ex.id}" ${moreOpen.has(ex.id)?"open":""}><summary>${I("info")} Altro<span>${errOf(ex)?"errori, ":""}fastidio, superserie, ultima volta</span></summary><div>${ex.note?`<p class="note">${esc(ex.note)}</p>`:""}${errOf(ex)?`<div class="errs"><b>Errori da evitare</b><ul>${errOf(ex).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}<p class="last">${lastTxt}</p>
     ${hasKg&&!(setupOf(ex)||eqLbl(ex))?setupHTML(ex):""}
@@ -3892,14 +3893,14 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;
   r.done=!r.done;const dd=draftFor(g);if(r.done&&!dd.start)dd.start=Date.now();if(r.done){const nw=Date.now();if(dd.last&&nw-dd.last>45*6e4)dd.idle=(dd.idle||0)+(nw-dd.last-10*6e4);dd.last=nw;dd.mods=[...mods]}
   if(!r.done){delete r.myo;delete r.myoEnd;delete r.pr}
   // Esercizio non più completo: il voto dell'ultima serie (e i suoi effetti sul recupero) non vale più, si richiede a fine esercizio
-  if(!r.done&&doneCount(g,exId)<setsFor(ex,mods))for(const f of ["eff","effAt","restPlus"])if(dd[f])delete dd[f][exId];
+  if(!r.done&&doneCount(g,exId)<setsFor(ex,mods)-xsOf(mods,exId))for(const f of ["eff","effAt","restPlus"])if(dd[f])delete dd[f][exId];
   if(!r.done&&dd.nextNote&&dd.nextNote.ex===exId&&dd.nextNote.j===j){for(const [k,v] of Object.entries(dd.nextNote.old||{})){const c=cell(g,exId,+k);if(!c.done){if(v==null)delete c.kg;else c.kg=v}}delete dd.nextNote}
   save();
   if(r.done){
     // n = righe di questo esercizio (senza le serie tenute dopo un "Cambia"), N = serie previste in tutto
     const N=setsFor(ex,mods),n=Math.max(0,N-((dd.pre||{})[exId]||0)),doneN=doneCount(g,exId);
     // Serie myo-rep: dopo l'attivazione si resta sull'esercizio per le mini-serie, con 15 s di pausa
-    if(j===n-1&&ex.t==="iso"&&myoOn(g,ex,mods,tgFor(ex,mods,g))){r.myo=[];openEx[g]=exId;save();
+    if(j===n-1-xsOf(mods,exId)&&ex.t==="iso"&&myoOn(g,ex,mods,tgFor(ex,mods,g))){r.myo=[];openEx[g]=exId;save();
       const want=num(tgFor(ex,mods,g).reps[j]??ex.hi),got=num(r.reps);if(want!=null&&got!=null&&got<want)celebrate("fail");else buzz(40);
       startTimer(MYO.rest,ex.n+" · mini-serie",0,null,{g,ex:exId});renderTrain(exId);keepFocus(false,exId);myoShow();tickFx(g,exId,j,false,false);return}
     if(doneN>=N){dd.lastDone=exId;openEx[g]=null;save()}
@@ -4063,6 +4064,8 @@ function openSwap(g,baseId){
   const doPick=(k,keep)=>{const key=g+"|"+baseId,old=effEx(g,base).id,d=draftFor(g);
     if(!k)delete S.swaps[key];else S.swaps[key]=swapScope==="always"?{k,always:true}:{k,date:iso(today())};
     const nw=effEx(g,base).id;d.pre=d.pre||{};fam(d).forEach(id=>delete d.pre[id]);
+    // le serie in più seguono l'esercizio nella variante (e al ritorno)
+    if(nw!==old&&d.xs){const xk=fam(d).reduce((a,id)=>a+(d.xs[id]|0),0);fam(d).forEach(id=>delete d.xs[id]);if(xk)d.xs[nw]=xk}
     if(nw!==old&&keep){const od=famDone(d,nw);if(od)d.pre[nw]=od}
     // "Le rifaccio tutte": le serie di prima non contano più e non vengono salvate
     if(nw!==old&&keep===false)fam(d).forEach(id=>{if(d.ex[id])d.ex[id]=d.ex[id].filter(x=>!x.done)});
