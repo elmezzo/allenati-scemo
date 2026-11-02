@@ -2152,7 +2152,7 @@ const BUILTIN={
  A:{name:"Upper A",title:"Upper A",sub:"Petto e schiena, carichi pesanti",ex:[
   {id:"a1",mu:"Petto",n:"Chest press alla macchina",s:4,lo:6,hi:8,rir:"1-2",rest:150,t:"comp",step:5,note:"Convergente o a leve separate, presa neutra se c'è.",eq:"mac"},
   {id:"a2",mu:"Dorso",n:"Trazioni presa neutra",s:4,lo:6,hi:8,rir:"1-2",rest:150,t:"bw",step:2,note:"Kg = zavorra (0 = corpo libero).",eq:"zav"},
-  {id:"a3",mu:"Petto",n:"Panca inclinata 30° al Smith",s:3,lo:8,hi:10,rir:"1-2",rest:120,t:"comp",step:2.5,note:"Fermati a 3-4 cm dal petto.",eq:"bar"},
+  {id:"a3",mu:"Petto",n:"Panca inclinata 30° al Smith",s:3,lo:8,hi:10,rir:"1-2",rest:120,t:"comp",step:2.5,note:"Kg = dischi (barra esclusa). Fermati a 3-4 cm dal petto.",eq:"bar"},
   {id:"a4",mu:"Dorso",n:"Rematore petto in appoggio",s:3,lo:8,hi:10,rir:"1-2",rest:120,t:"comp",step:5,eq:"mac",strap:true},
   {id:"a5",mu:"Deltoidi",n:"Alzate laterali al cavo",s:3,lo:12,hi:15,rir:"0-1",rest:75,t:"iso",step:2.5,eq:"cavl"},
   {id:"a6",mu:"Bicipiti",n:"Curl panca inclinata",s:3,lo:8,hi:12,rir:"0-1",rest:0,t:"iso",step:2,ss:"6",eq:"db"},
@@ -2191,7 +2191,7 @@ const BUILTIN={
 };
 // Varianti simili per quando la macchina è occupata: [chiave, nome, campi che cambiano]
 const ALTS={
- a1:[["smith","Panca piana al Smith",{note:"Fermati a 3-4 cm dal petto, gomiti a 45°.",step:2.5,eq:"bar"}],["cavi","Chest press ai cavi in piedi",{step:5,eq:"mac"}],["pushup","Piegamenti zavorrati",{t:"bw",note:"Kg = zavorra sulla schiena.",step:2,eq:"zav"}],["hammer","Chest press altra macchina (Hammer)",{step:5,eq:"mac"}],["manubri","Panca piana con manubri",{step:2,note:"Kg = un manubrio. Gomiti a 45°, fermati prima che la spalla tiri.",eq:"db"}]],
+ a1:[["smith","Panca piana al Smith",{note:"Kg = dischi (barra esclusa). Fermati a 3-4 cm dal petto, gomiti a 45°.",step:2.5,eq:"bar"}],["cavi","Chest press ai cavi in piedi",{step:5,eq:"mac"}],["pushup","Piegamenti zavorrati",{t:"bw",note:"Kg = zavorra sulla schiena.",step:2,eq:"zav"}],["hammer","Chest press altra macchina (Hammer)",{step:5,eq:"mac"}],["manubri","Panca piana con manubri",{step:2,note:"Kg = un manubrio. Gomiti a 45°, fermati prima che la spalla tiri.",eq:"db"}]],
  a2:[["lat","Lat machine presa neutra",{t:"comp",step:5,eq:"mac"}],["latmono","Lat machine a un braccio",{t:"comp",side:true,step:5,eq:"mac"}],["latstretta","Pulldown presa stretta",{t:"comp",step:5,eq:"mac"}]],
  a3:[["cpinc","Chest press inclinata alla macchina",{step:5,eq:"mac"}],["croci","Croci ai cavi dal basso",{t:"iso",lo:10,hi:15,step:5,eq:"mac"}],["landmine","Landmine press",{side:true,oh:true,note:"Kg = dischi sul bilanciere.",step:2.5,eq:"bar"}],["manubri","Panca inclinata con manubri",{step:2,note:"Kg = un manubrio. Gomiti a 45°, fermati prima che la spalla tiri.",eq:"db"}]],
  a4:[["tbar","Rematore T-bar con appoggio",{step:2.5,eq:"bar"}],["pulley","Pulley basso",{step:5,eq:"mac"}],["manubrio","Rematore manubrio su panca",{side:true,step:2,note:"Kg = un manubrio.",eq:"db"}],["incman","Rematore manubri petto su panca inclinata",{step:2,note:"Kg = un manubrio.",eq:"db"}]],
@@ -2201,15 +2201,15 @@ const ALTS={
  a8:[["elastico","Extrarotazione con elastico",{eq:"altro",note:"Kg = lascia vuoto se usi l'elastico."}],["manubrio","Extrarotazione da sdraiato con manubrio",{step:2,eq:"db"}]],
  g1:[["ostacolo","Salti laterali sopra un ostacolo",{}],["bound","Lateral bound con arrivo bloccato",{}]],
  g2:[["sjump","Squat jump",{}],["lungo","Salto in lungo da fermo",{}]],
- g3:[["hack","Hack squat",{step:2.5,eq:"bar"}],["pressa","Pressa 45°",{step:5,eq:"mac"}],["smith","Squat al Smith",{step:2.5,eq:"bar"}],["goblet","Goblet squat",{step:2,note:"Kg = un manubrio.",eq:"db"}]],
+ g3:[["hack","Hack squat",{step:2.5,eq:"bar"}],["pressa","Pressa 45°",{step:5,eq:"mac"}],["smith","Squat al Smith",{step:2.5,note:"Kg = dischi (barra esclusa).",eq:"bar"}],["goblet","Goblet squat",{step:2,note:"Kg = un manubrio.",eq:"db"}]],
  g4:[["rdlman","Stacco rumeno con manubri",{step:2,note:"Kg = un manubrio.",eq:"db"}],["goodm","Good morning",{step:2.5,eq:"bar"}],["pullthr","Pull-through al cavo",{t:"iso",step:5,eq:"mac"}]],
- g5:[["affondi","Affondi camminati",{eq:"db"}],["stepup","Step-up su panca",{eq:"db"}],["smith","Split squat al Smith",{step:2.5,note:"",eq:"bar"}],["affman","Affondi indietro con manubri",{step:2,note:"Kg = un manubrio.",eq:"db"}]],
+ g5:[["affondi","Affondi camminati",{note:"Kg = un manubrio.",eq:"db"}],["stepup","Step-up su panca",{note:"Kg = un manubrio.",eq:"db"}],["smith","Split squat al Smith",{step:2.5,note:"Kg = dischi (barra esclusa).",eq:"bar"}],["affman","Affondi indietro con manubri",{step:2,note:"Kg = un manubrio.",eq:"db"}]],
  g6:[["legcurl","Leg curl seduto, discesa in 4 s",{t:"iso",lo:8,hi:10,step:5,note:"Eccentrico lento.",eq:"mac"}],["ghr","Glute-ham raise",{step:2,eq:"zav"}]],
  g7:[["adduttori","Adduttori alla macchina",{t:"iso",lo:12,hi:15,step:5,side:false,eq:"mac"}],["copbreve","Copenhagen a leva corta (ginocchio)",{}]],
- g8:[["pressa","Calf alla pressa",{step:5,eq:"mac"}],["smith","Calf al Smith",{step:2.5,eq:"bar"}],["mono","Calf a una gamba con manubrio",{side:true,step:2,eq:"db"}]],
+ g8:[["pressa","Calf alla pressa",{step:5,eq:"mac"}],["smith","Calf al Smith",{step:2.5,note:"Kg = dischi (barra esclusa).",eq:"bar"}],["mono","Calf a una gamba con manubrio",{side:true,step:2,eq:"db"}]],
  g9:[["palla","Lancio rotazionale palla medica",{t:"perf"}],["elastico","Woodchop con elastico",{eq:"altro"}],["manubrio","Woodchop con manubrio",{step:2,note:"Kg = un manubrio.",eq:"db"}]],
- b10:[["macchina","Shoulder press alla macchina",{side:false,step:5,note:"Presa neutra se c'è.",eq:"mac"}],["manubri","Lento manubri seduto",{side:false,lo:6,hi:10,step:2,note:"Kg = un manubrio. Presa neutra.",eq:"db"}],["smith","Lento al Smith",{side:false,step:2.5,eq:"bar"}],["arnold","Arnold press",{side:false,step:2,note:"Kg = un manubrio. Da evitare se la spalla tira.",eq:"db"}]],
- b1:[["macchina","Shoulder press alla macchina",{step:5,eq:"mac"}],["landmine","Landmine press",{side:true,step:2.5,eq:"bar"}],["smith","Lento al Smith",{step:2.5,eq:"bar"}],["arnold","Arnold press",{step:2,note:"Kg = un manubrio.",eq:"db"}]],
+ b10:[["macchina","Shoulder press alla macchina",{side:false,step:5,note:"Presa neutra se c'è.",eq:"mac"}],["manubri","Lento manubri seduto",{side:false,lo:6,hi:10,step:2,note:"Kg = un manubrio. Presa neutra.",eq:"db"}],["smith","Lento al Smith",{side:false,step:2.5,note:"Kg = dischi (barra esclusa).",eq:"bar"}],["arnold","Arnold press",{side:false,step:2,note:"Kg = un manubrio. Da evitare se la spalla tira.",eq:"db"}]],
+ b1:[["macchina","Shoulder press alla macchina",{step:5,eq:"mac"}],["landmine","Landmine press",{side:true,step:2.5,eq:"bar"}],["smith","Lento al Smith",{step:2.5,note:"Kg = dischi (barra esclusa).",eq:"bar"}],["arnold","Arnold press",{step:2,note:"Kg = un manubrio.",eq:"db"}]],
  b2:[["trazioni","Trazioni presa neutra",{t:"bw",note:"Kg = zavorra.",step:2,eq:"zav"}],["mono","Pulldown a un braccio al cavo",{side:true,step:5,eq:"mac"}],["larga","Lat machine presa larga",{step:5,eq:"mac"}],["pullover","Pullover con manubrio",{t:"iso",lo:10,hi:12,step:2,note:"Un manubrio tenuto con due mani.",eq:"db"}]],
  b3:[["butterfly","Butterfly alla macchina",{step:5,eq:"mac"}],["cpinc","Chest press inclinata alla macchina",{t:"comp",lo:8,hi:12,step:5,eq:"mac"}],["crociman","Croci su panca inclinata con manubri",{step:2,note:"Kg = un manubrio. Gomiti a 45°, fermati prima che la spalla tiri.",eq:"db"}],["incman","Panca inclinata con manubri",{t:"comp",lo:8,hi:12,step:2,note:"Kg = un manubrio. Gomiti a 45°, fermati prima che la spalla tiri.",eq:"db"}]],
  b4:[["unbraccio","Pulley a un braccio",{side:true,step:2.5,eq:"cavl",note:"Busto fermo: tira col gomito, senza ruotare."}],["macchina","Rematore alla macchina",{step:5,eq:"mac"}],["manubrio","Rematore manubrio su panca",{side:true,step:2,eq:"db"}],["tbar","Rematore T-bar",{step:2.5,eq:"bar"}]],
@@ -2320,6 +2320,8 @@ function fixDupIds(){const seen=new Set(),base=id=>String(id).split("~")[0],keys
 let bootMsg=loadMsg;
 function boot(){normS();for(const P of Object.values(S.plans))for(const e of P.ex||[])if(/^Alzate laterali al cavo/i.test(e.n||"")&&(e.eq||"mac")==="mac"){e.eq="cavl";e.step=2.5}for(const P of Object.values(S.plans))for(const e of P.ex||[])if(e.n==="Curl panca Scott"&&e.eq==="db"){e.n="Curl Scott con manubri";e.note=e.note||"Kg = un manubrio."}
 if(S.deload&&iso(today())>S.deload.to)closeDeload(S.deload.to);
+// Esercizi allo Smith nei piani salvati (scheda modificata o creata da te): nota sui kg se non ce n'è già una
+for(const P of Object.values(S.plans))for(const e of P.ex||[])if(/\bal Smith\b/i.test(e.n||"")&&!/kg\s*=/i.test(e.note||""))e.note="Kg = dischi (barra esclusa)."+(e.note?" "+e.note:"");
 moveOld();rebuild();if(fixDupIds.n){fixDupIds.n=0;save()}}
 // Se i dati salvati mandano in errore l'avvio: prima si chiudono le sedute non salvate, poi si prova la copia di sicurezza, infine si tengono solo le sedute
 try{boot()}catch(e){const cur=JSON.parse(JSON.stringify(S));try{delete S.free;S.draft={};S.oldDraft={};boot();bootMsg="Una seduta non salvata mandava in errore l'app: l'ho chiusa. Le sedute salvate ci sono tutte."}catch(e2){try{S=JSON.parse(localStorage.getItem(KEY+".bak"));if(!S||!Array.isArray(S.sessions))throw 0;boot();bootMsg="I dati salvati davano errore: ho rimesso la copia di sicurezza. Controlla le ultime sedute."}catch(e3){S={sessions:Array.isArray(cur.sessions)?cur.sessions:[],skin:cur.skin};boot();bootMsg="I dati salvati davano errore: ho tenuto solo le sedute."}}try{localStorage.setItem(KEY+".err",JSON.stringify(cur))}catch(e4){}save()}
@@ -2484,10 +2486,10 @@ function baseHist(ex){let h=history(ex.id).filter(x=>!x.deload);const sh=h.filte
 function target(ex,noMyo){
   let h=baseHist(ex),last=h[0];
   const rr=(ex.lo===ex.hi?ex.lo:ex.lo+"-"+ex.hi),lr=/\d/.test(ex.rir||"")?" lasciando "+ex.rir+" in canna":"";
-  const base={kg:null,reps:Array(ex.s).fill(ex.lo),badge:"",kind:"flat",msg:ex.t==="time"?`Prima volta: tieni ${ex.lo} s${ex.side?" per lato":""}, senza arrivare allo sfinimento.`:ex.t==="nordic"?`Prima volta: scegli l'elastico con cui fai ${rr} ripetizioni frenando fino in fondo.`:ex.t==="bw"?`Prima volta: a corpo libero, ${rr} ripetizioni${lr}. Se ne fai di più, aggiungi zavorra.`:`Prima volta: scegli un carico con cui arrivi a ${rr} ripetizioni${lr}.`};
+  const base={kg:null,reps:Array(ex.s).fill(ex.lo),badge:"",kind:"flat",msg:ex.t==="time"?`Prima volta: tieni ${ex.lo} s${ex.side?" per lato":""}, senza arrivare allo sfinimento.`:ex.t==="nordic"&&eqOf(ex)!=="zav"?`Prima volta: scegli l'elastico con cui fai ${rr} ripetizioni frenando fino in fondo.`:ex.t==="bw"||ex.t==="nordic"?`Prima volta: a corpo libero, ${rr} ripetizioni${lr}. Se ne fai di più, aggiungi zavorra.`:`Prima volta: scegli un carico con cui arrivi a ${rr} ripetizioni${lr}.`};
   // Esplosivi a ripetizioni fisse (woodchop): conta la velocità, mai ripetizioni in più o discesa lenta
   if(powEx(ex)&&!last)return {...base,msg:`Prima volta: un carico che sposti veloce per ${ex.lo} ripetizioni${ex.side?" per lato":""}, lontano dal cedimento. Esplosivo in uscita.`};
-  if(ex.t==="perf"){const th=/lancio|palla/i.test(ex.n);return {...base,msg:last?(th?"Stesse ripetizioni. Se ogni lancio è stato esplosivo fino all'ultimo, usa una palla più pesante.":(/box/i.test(ex.n)?"Stesse ripetizioni. Se gli atterraggi sono stati puliti, alza il box.":"Stesse ripetizioni. Se gli atterraggi sono stati puliti, allunga il salto o atterra più fermo.")):(th?"Ripetizioni fisse: conta la velocità di ogni lancio.":"Ripetizioni fisse: conta la qualità di ogni salto.")}}
+  if(ex.t==="perf"){const th=/lancio|palla/i.test(ex.n);return {...base,msg:last?(th?"Stesse ripetizioni. Se ogni lancio è stato esplosivo fino all'ultimo, usa una palla più pesante.":(/box/i.test(ex.n)?"Stesse ripetizioni. Se gli atterraggi sono stati puliti, alza il box.":/ostacolo/i.test(ex.n)?"Stesse ripetizioni. Se gli atterraggi sono stati puliti, alza l'ostacolo.":/squat jump/i.test(ex.n)?"Stesse ripetizioni. Se gli atterraggi sono stati puliti, salta più in alto.":"Stesse ripetizioni. Se gli atterraggi sono stati puliti, allunga il salto o atterra più fermo.")):(th?"Ripetizioni fisse: conta la velocità di ogni lancio.":"Ripetizioni fisse: conta la qualità di ogni salto.")}}
   if(!last)return base;
   // Ultima volta fatto in un altro giorno con un altro range (es. 12-15 in Upper A, 15-20 in Upper C): carico ricalcolato dal massimale stimato
   const fx=last.from&&EX[last.from];
@@ -2617,6 +2619,12 @@ function target(ex,noMyo){
     const ex5=nr.every((v,i)=>v===reps[i]+5),one=nr.every(v=>v===nr[0]);
     return {kg:null,reps:pad(nr,ex.s),kind:"up",badge:ex5?"+5 s":"Più tempo",msg:ex5?"Aggiungi 5 secondi per serie.":one?`Porta tutte le serie a ${nr[0]} s.`:`Porta le serie a ${nr.join(", ")} s: fino a 5 secondi in più, almeno ${ex.lo}.`};
   }
+  // Nordic con zavorra (glute-ham raise): stessa regola, ma si sale coi kg di zavorra invece che con l'elastico; tolto prima delle partite come il Nordic (noEcc)
+  if(ex.t==="nordic"&&eqOf(ex)==="zav"){const k0=kg>0?kg:0,lo=reps.filter(r=>r<ex.lo).length;
+    if(allTop)return {kg:k0+st,reps:Array(ex.s).fill(ex.lo),kind:"up",badge:`+${fk(st)} kg`,msg:`Chiuse tutte a ${ex.hi}: aggiungi ${fk(st)} kg di zavorra${k0>0?` (${fk(k0+st)} kg)`:""} e riparti da ${ex.lo}.`};
+    if(lo>=2)return {kg:k0>0?Math.max(0,k0-st):null,reps:Array(ex.s).fill(ex.lo),kind:k0>0?"down":"flat",badge:k0>0?`-${fk(Math.min(st,k0))} kg`:"Più aiuto",msg:`${lo} serie sotto le ${ex.lo}: ${k0>0?`togli ${fk(Math.min(st,k0))} kg di zavorra`:"aiutati con le mani per risalire"} e riparti da ${ex.lo}, frenando fino in fondo.`};
+    return {kg:kg!=null?kg:null,reps:pad(reps.map(r=>Math.min(ex.hi,Math.max(ex.lo,r+1))),ex.s),kind:"up",badge:"+1 rip",msg:reps.some(r=>r<ex.lo)?`Stesso carico: porta a ${ex.lo} la serie rimasta sotto, una ripetizione in più sulle altre.`:"Una ripetizione in più per serie, stesso carico."};
+  }
   if(ex.t==="nordic"){
     if(allTop)return {kg:null,reps:Array(ex.s).fill(ex.lo),kind:"up",badge:"Meno aiuto",msg:`Chiuse tutte a ${ex.hi}: usa un elastico più leggero e riparti da ${ex.lo}.`};
     if(reps.filter(r=>r<ex.lo).length>=2)return {kg:null,reps:Array(ex.s).fill(ex.lo),kind:"flat",badge:"Più aiuto",msg:`${reps.filter(r=>r<ex.lo).length} serie sotto le ${ex.lo}: usa un elastico più forte e riparti da ${ex.lo}, frenando fino in fondo.`};
@@ -2699,7 +2707,7 @@ function tgFor0(ex,mods,g){let t=target(ex);
       if(up)return {...t,myo:false,kg,reps:rp,kind:"flat",badge:"=",msg:`Seduta alleggerita: ${kg>0?`${fk(kg)} kg, `:""}${ex.t==="time"?"stessi secondi":"stesse ripetizioni"} dell'ultima volta. Si sale la prossima volta.`}}}
   if(!mods.has("deload")||ex.t==="perf")return t;
   // Scarico: Nordic e tenute restano come l'ultima volta (niente +1); per i carichi vale l'ultima seduta nello stesso range, mai un carico più alto
-  if(ex.t==="time"||ex.t==="nordic"){const l=history(ex.id)[0],r=l?l.sets[ex.id].map(x=>num(x.reps)).filter(v=>v!=null):[],r0=r.length?Math.min(...r):ex.lo;return {...t,top:ex.hi,reps:Array(ex.s).fill(r0),kind:"flat",badge:"Scarico",msg:ex.t==="time"?`Scarico: ${r0} s come l'ultima volta, metà serie.`:`Scarico: ${eqOf(ex)==="zav"?"":"stesso elastico e "}${r0} ripetizioni come l'ultima volta, metà serie.`}}
+  if(ex.t==="time"||ex.t==="nordic"){const l=history(ex.id)[0],r=l?l.sets[ex.id].map(x=>num(x.reps)).filter(v=>v!=null):[],r0=r.length?Math.min(...r):ex.lo;return {...t,...(ex.t==="nordic"&&eqOf(ex)==="zav"?{kg:lastKg(ex,true)}:{}),top:ex.hi,reps:Array(ex.s).fill(r0),kind:"flat",badge:"Scarico",msg:ex.t==="time"?`Scarico: ${r0} s come l'ultima volta, metà serie.`:`Scarico: ${eqOf(ex)==="zav"?"":"stesso elastico e "}${r0} ripetizioni come l'ultima volta, metà serie.`}}
   // Carico dell'ultima seduta vera nello stesso range, al massimo il pacco. Se la proposta è un calo (due sedute sotto il minimo, pausa lunga) vale il carico già abbassato:
   // quello di prima non lo reggi con 3-4 in canna. Il pacco abbassato invece non conta (lì il carico c'era)
   const k0=lastKg(ex,true),cp=eqMax(ex),kd=t.kind==="down"&&t.kg!=null&&k0!=null&&t.kg<k0&&!(cp&&k0>cp)?t.kg:k0,k=kd!=null?(cp&&kd>cp?cp:kd):t.kg;return {...t,myo:false,top:ex.hi,kg:k,reps:Array(ex.s).fill(ex.lo),kind:"flat",badge:"Scarico",msg:`${k0!=null&&k===k0?"Stesso carico dell'ultima volta":kd!=null&&kd<k0?`${ex.t==="bw"&&!(k>0)?"A corpo libero":`${fk(k)} kg`}, il carico abbassato`:k0!=null?`${fk(k)} kg, il massimo del pacco`:"Carico leggero"}, ${ex.lo} ripetizioni, 3-4 in canna.`}}
@@ -2995,7 +3003,8 @@ function painHTML(ex,base){const on=(S.pain[ex.id]||[]).includes(iso(today()));
 function togglePain(id){const k=iso(today()),a=S.pain[id]=(S.pain[id]||[]).filter(d=>d>=iso(addDays(today(),-90)));const i=a.indexOf(k);if(i>=0)a.splice(i,1);else a.push(k);if(!a.length)delete S.pain[id];save()}
 // Peso e misure
 const bodyLast=()=>S.body.slice().sort((a,b)=>b.d.localeCompare(a.d))[0]||null;
-const daysAgo=d=>Math.round((today()-new Date(d+"T00:00:00"))/864e5);
+// Giorni di calendario in ora locale (non ore/24): pesata lunedì, domenica a qualsiasi ora sono 6 giorni
+const daysAgo=d=>dayDiff(d,iso(today()));
 function bodySheet(after){const L=bodyLast(),k=iso(today()),cur=S.body.find(x=>x.d===k)||{};
   openSheet({html:()=>`<h2>Peso e misure</h2><p class="note" style="margin:0">Pesati una volta a settimana, la mattina appena sveglio. Le misure bastano una volta al mese.</p>
     <div class="g3 bodyf"><label>Peso (kg)<input id="bKg" inputmode="decimal" value="${esc(cur.kg!=null?fk(cur.kg):"")}" placeholder="${L&&L.kg!=null?fk(L.kg):"70"}"></label><label>Braccio (cm)<input id="bArm" inputmode="decimal" value="${esc(cur.arm!=null?fk(cur.arm):"")}" placeholder="contratto"></label><label>Petto (cm)<input id="bChest" inputmode="decimal" value="${esc(cur.chest!=null?fk(cur.chest):"")}"></label><label>Vita (cm)<input id="bWaist" inputmode="decimal" value="${esc(cur.waist!=null?fk(cur.waist):"")}" placeholder="all'ombelico"></label></div>
@@ -3336,7 +3345,7 @@ const HOW={
  "estensioni al cavo sopra la testa":["Di spalle al cavo, corda tenuta dietro la testa, un piede avanti, busto inclinato, gomiti in alto.", "Distendi le braccia in avanti sopra la testa tenendo i gomiti fermi; torna lento fino a sentire l'allungamento."],
  "kickback con manubri":["Busto inclinato in avanti quasi orizzontale, un manubrio per mano, gomiti alti attaccati ai fianchi.", "Distendi le braccia indietro fino a tese senza muovere i gomiti; torna lento a 90°."],
  "estensione del polso con elastico":["Seduto, avambraccio appoggiato sulla coscia con il palmo in basso, elastico sotto il piede e in mano.", "Porta il dorso della mano verso l'alto muovendo solo il polso; scendi lento."],
- "flexbar (tyler twist)":["Flexbar verticale davanti a te: mano del braccio della racchetta in basso con il polso piegato all'indietro, l'altra in alto.", "Ruota la mano in alto per torcere la barra, poi distendi le braccia in avanti e lascia tornare la torsione in 4 s con la mano dolente."],
+ "flexbar (tyler twist)":["Flexbar verticale davanti a te: mano della racchetta in basso con il polso piegato all'indietro, l'altra in alto.", "Ruota la mano in alto per torcere la barra, poi distendi le braccia in avanti e lascia tornare la torsione in 4 s con la mano della racchetta."],
  "croci ai cavi":["In piedi al centro tra due cavi alti, un piede avanti, braccia aperte con i gomiti appena piegati.", "Chiudi le braccia ad arco davanti al petto senza cambiare la piega dei gomiti; riapri lento."],
  "chest press leggera alla macchina":["Seduto con la schiena contro lo schienale, sedile regolato con le maniglie all'altezza del petto.", "Spingi in avanti fino a braccia quasi tese, poi torna in 2-3 s finché le mani arrivano vicino al petto."],
  "croci con manubri su panca piana":["Sdraiato sulla panca piana, manubri sopra il petto con i palmi uno verso l'altro, gomiti appena piegati.", "Apri le braccia ad arco fermandoti prima che la spalla tiri; richiudi sopra il petto."],
@@ -3346,7 +3355,7 @@ const HOW={
  "reverse fly con manubri":["Petto appoggiato su una panca inclinata a 30-45°, un manubrio per mano, braccia verso il pavimento.", "Apri le braccia di lato fino all'altezza delle spalle, gomiti appena piegati; scendi lento."],
  "kickback al cavo":["Busto inclinato in avanti davanti al cavo basso, maniglia in una mano, gomito alto attaccato al fianco.", "Distendi il braccio indietro fino a teso senza muovere il gomito; torna lento a 90°."],
  "pallof press con elastico":["In piedi di fianco all'ancoraggio dell'elastico, all'altezza del petto, mani al petto, piedi alla larghezza delle spalle.", "Spingi le mani in avanti fino a braccia tese senza farti ruotare il busto; tieni 2 s e torna."],
- "dead bug con cavo":["Sdraiato sulla schiena davanti al cavo, corda tenuta a braccia tese sopra il petto, anche e ginocchia a 90°.", "Distendi una gamba verso il pavimento tenendo la zona lombare a terra e le braccia ferme; torna e cambia gamba."]
+ "dead bug con cavo":["Sdraiato sulla schiena con la testa verso il cavo basso, corda tenuta a braccia tese sopra il petto, anche e ginocchia a 90°.", "Distendi una gamba verso il pavimento tenendo la zona lombare a terra e le braccia ferme; torna e cambia gamba."]
 };
 const howOf=ex=>HOW[(ex.n||"").toLowerCase().trim()]||null;
 const errOf=ex=>(typeof ERRS!=="undefined"&&ERRS[(ex.n||"").toLowerCase().trim()])||null;
@@ -3736,7 +3745,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   const pre=(dr.pre||{})[ex.id]||0,n=Math.max(0,setsFor(ex,mods)-pre),xN=n>0?xsOf(mods,ex.id):0,tg=tgFor(ex,mods,g),last=history(ex.id)[0];
   const rows=dr.ex[ex.id]||[];
   const unit=ex.t==="time"?"s":"rip";
-  const hasKg=!["perf","nordic","time"].includes(ex.t);
+  const hasKg=!["perf","nordic","time"].includes(ex.t)||ex.t==="nordic"&&eqOf(ex)==="zav";
   const lastTxt=last?`Ultima volta (${fmtShort(last.date)}${last.day&&last.day!==g&&PLAN[last.day]?", "+esc(PLAN[last.day].name):""}${last.stnFrom?", "+STN[last.stnFrom].n.toLowerCase():""}): <b>${(last.raw||last.sets[ex.id]).filter(x=>num(x.reps)!=null).map(x=>(num(x.kg)?fk(num(x.kg))+"×":"")+x.reps+myoTxt(x)).join(" · ")}</b>${last.xrows&&last.xrows.length?` + ${last.xrows.length} in più: <b>${last.xrows.map(x=>(num(x.kg)?fk(num(x.kg))+"×":"")+x.reps).join(" · ")}</b>`:""}`:"Mai fatto finora.";
   const rng=(ex.lo===ex.hi?ex.lo:ex.lo+"-"+ex.hi)+(ex.t==="time"?" s":"")+(ex.side?" per lato":"");
   const r0=tg.reps[0]??ex.lo,rMin=Math.min(...tg.reps.slice(0,setsFor(ex,mods)).map(Number).filter(v=>!isNaN(v)),r0),rMax=Math.max(...tg.reps.slice(0,setsFor(ex,mods)).map(Number).filter(v=>!isNaN(v)),r0),rT=rMin===rMax?String(r0):rMin+"-"+rMax;
@@ -3878,7 +3887,7 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;
   if(!r.done){const k=num(r.kg),pk=num(tgFor(ex,mods,g).kg),ref=pk||Math.max(0,...(history(exId)[0]?.sets[exId]||[]).map(x=>num(x.kg)||0))||0,key=exId+"|"+j+"|"+r.kg;
     const warn=m=>{document.querySelector(".kgchk")?.remove();row.insertAdjacentHTML("afterend",`<p class="kgchk" role="alert">${m}</p>`);buzz(20)};
     // Campo kg vuoto (prima volta o variante nuova): senza carico la volta dopo l'app non saprebbe cosa proporre. Non vale a corpo libero né con l'elastico (kg lasciati vuoti)
-    if(!String(r.kg||"").trim()&&ex.t!=="bw"&&eqOf(ex)!=="altro"&&row.querySelector('input[data-f="kg"]')){kgChk="";warn("Scrivi il carico, poi ✓.");return}
+    if(!String(r.kg||"").trim()&&ex.t!=="bw"&&!["altro","zav"].includes(eqOf(ex))&&row.querySelector('input[data-f="kg"]')){kgChk="";warn("Scrivi il carico, poi ✓.");return}
     // Kg scritti male (es. "1,2,5"): la serie non si segna finché non è un numero
     if(String(r.kg||"").trim()&&k==null){kgChk="";warn("Kg non validi: scrivi un numero, per esempio 52,5.");return}
     const rp=num(r.reps),key2=key+"|"+r.reps;
@@ -4083,7 +4092,9 @@ function openSwap(g,baseId){
   const pick=k=>{const old=effEx(g,base).id,d=draftFor(g),od=famDone(d);
     const nwId=k&&EX[base.id+"~"+k]?base.id+"~"+k:base.id;if(!od||nwId===old){doPick(k);return}
     const q=wrap.querySelector(".swq")||wrap.querySelector(".opts").insertAdjacentElement("beforebegin",document.createElement("div"));q.className="swq";
-    q.innerHTML=`<p><b>Hai già fatto ${od} serie di ${esc(effEx(g,base).n)}${fam(d).filter(id=>(d.ex[id]||[]).some(x=>x.done)).length>1?" e varianti":""}.</b> Le conti e fai solo le restanti con l'esercizio nuovo?</p><div class="seg" style="grid-template-columns:1fr 1fr"><button class="btn hot" data-keep="1">Tienile</button><button class="btn ghost" data-keep="0">Le rifaccio tutte</button></div>`;
+    // Nella frase gli esercizi con cui le serie sono state fatte davvero (dopo "Tienile" e un altro Cambia possono essere di varianti diverse)
+    const dn=fam(d).map(id=>[id,(d.ex[id]||[]).filter(x=>x.done).length]).filter(x=>x[1]),sN=([id,n],w)=>`${n}${w?" serie":""} di ${esc(exName(id))}`;
+    q.innerHTML=`<p><b>Hai già fatto ${dn.length>1?`${od} serie: ${dn.slice(0,-1).map(x=>sN(x)).join(", ")} e ${sN(dn[dn.length-1])}`:sN(dn[0],1)}.</b> Le conti e fai solo le restanti con l'esercizio nuovo?</p><div class="seg" style="grid-template-columns:1fr 1fr"><button class="btn hot" data-keep="1">Tienile</button><button class="btn ghost" data-keep="0">Le rifaccio tutte</button></div>`;
     q.querySelectorAll("[data-keep]").forEach(b=>b.onclick=()=>doPick(k,b.dataset.keep==="1"));q.scrollIntoView({block:"nearest"})};
   wrap.querySelectorAll(".opt").forEach(b=>b.onclick=()=>pick(b.dataset.k));
   wrap.querySelector("#swAdd").onclick=()=>{const n=wrap.querySelector("#swNew").value.trim();if(!n)return;const lib=base.lib||base.id;const k="u"+Date.now().toString(36);(S.customAlts[lib]=S.customAlts[lib]||[]).push({k,n});rebuild();pick(k)};
