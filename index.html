@@ -2426,9 +2426,9 @@ function assess(d){
       say("stop",`Partita domani: niente gambe oggi. ${alt?`Spostale a ${WD_LONG[alt.getDay()]} ${alt.getDate()}.`:""}`);
       if(PLAN.C){r.notes.push("Oggi puoi fare l'Upper C o riposare.");r.gymAlt="C"}
     }else if(t2.padel==="match"){
-      say("adapt","Partita dopodomani: gambe sì, ma senza Nordic e con una serie in meno sugli esercizi eccentrici pesanti (es. stacco rumeno).");r.mods.add("noEcc");
+      say("adapt",dlo?"Partita dopodomani: gambe sì, ma senza Nordic.":"Partita dopodomani: gambe sì, ma senza Nordic e con una serie in meno sugli esercizi eccentrici pesanti (es. stacco rumeno).");r.mods.add("noEcc");
     }else if(t1.padel==="train"&&earlyPhase(d)){
-      say("adapt","Domani padel, e sei nelle prime 3 settimane: una serie in meno sugli esercizi eccentrici pesanti (stacco rumeno, Nordic) per arrivare in campo meno indolenzito.");r.mods.add("noEccLight");
+      say("adapt",dlo?"Domani padel, e sei nelle prime 3 settimane: lo scarico è già leggero, oggi non cambia altro.":"Domani padel, e sei nelle prime 3 settimane: una serie in meno sugli esercizi eccentrici pesanti (stacco rumeno, Nordic) per arrivare in campo meno indolenzito.");r.mods.add("noEccLight");
     }else if(t1.padel==="train"){
       say("go","Domani padel: seduta completa.");
     }else say("go","Giornata libera da padel e nessuna partita nelle prossime 48 h: seduta completa.");
@@ -2444,7 +2444,7 @@ function assess(d){
     // La versione ridotta (braccia, Copenhagen, core, cuffia e polso) è a un tocco e resta scelta finché non la cambi (S.preMatchLite)
     if(t1.padel==="match"&&t2.padel==="match"){r.notes=r.notes.filter(n=>!/seduta completa/.test(n));r.pm=true;
       if(S.preMatchLite===true){say("adapt",`Partite domani e dopodomani: oggi solo braccia, Copenhagen, core, cuffia e polso. Petto, dorso e spalle li salti, così arrivi alle partite con le spalle fresche. Versione ridotta scelta da te: resta così finché non torni alla seduta completa.`);r.mods.add("prevOnly")}
-      else{say("adapt",`Partite domani e dopodomani: ${p.padel==="match"||energy==="low"?"":"seduta completa, ma "}niente serie a cedimento, almeno 1 ripetizione in canna su tutto.`);r.mods.add("rir");r.full=true}}
+      else{say("adapt",`Partite domani e dopodomani: ${p.padel==="match"||energy==="low"||dlo?"":"seduta completa, ma "}niente serie a cedimento, almeno 1 ripetizione in canna su tutto.`);r.mods.add("rir");r.full=true}}
     else if(t1.padel==="match"){r.notes=r.notes.filter(n=>!/seduta completa/.test(n));say("adapt","Partita domani: niente serie a cedimento, almeno 1 ripetizione in canna su tutto.");r.mods.add("rir")}
   }else{
     if(p.padel==="match")r.notes.push("Giorno di partita. Carboidrati 2-3 h prima, acqua con sali durante, proteine + carboidrati entro 2 h dopo.");
@@ -2452,9 +2452,9 @@ function assess(d){
     else r.notes.push("Riposo. Dormi, mangia, e se vuoi 10 minuti di mobilità per anche e spalle.");
   }
   if(energy==="low"&&p.gym in PLAN&&!(PLAN[p.gym].legs&&r.level==="stop")){say("adapt",dlo?"Stanco: lo scarico è già leggero, oggi non cambia altro.":r.mods.has("light")?"Stanco: la serie in meno c'è già, stessi carichi dell'ultima volta.":"Stanco: stessi carichi, una serie in meno per esercizio.");r.mods.add("light")}
-  if(dlo){say("adapt",`Settimana di scarico fino a ${fmtShort(S.deload.to)}: metà serie, stessi carichi, 3-4 ripetizioni in canna.`);r.mods.add("deload")}
+  if(dlo){r.notes=r.notes.filter(n=>!/: seduta completa\.$/.test(n));say("adapt",`Settimana di scarico fino a ${fmtShort(S.deload.to)}: metà serie, stessi carichi, 3-4 ripetizioni in canna.`);r.mods.add("deload")}
   // Seduta normale scelta da te (S.normal[giorno]): via gli adattamenti del giorno (padel, partita, Stanco, eccentrici). Restano lo scarico (ha il suo Termina),
-  // la scelta completa/ridotta prima di due partite (mai cedimento né myo-rep lì) e il padel dopo la palestra (fasce, cuffia e polso dopo il padel: sono fatti, non adattamenti)
+  // la scelta completa/ridotta prima di due partite (mai cedimento né myo-rep lì) e il padel dopo la palestra (fasce, cuffia e polso dopo il padel, niente myo-rep: myoOn guarda pAfter)
   r.day=iso(d);const keep=m=>m==="deload"||m==="pAfter"||r.pm&&(m==="rir"||m==="prevOnly"),own=[...r.mods].filter(m=>!keep(m)).sort();r.nk=p.gym+"|"+own.join(",");
   // Il tasto c'è solo se toglierli cambia davvero qualcosa rispetto alla scheda: serie, ripetizioni in canna, myo-rep o ordine (es. sotto lo scarico padel e Stanco non cambiano niente)
   if(own.length&&r.level==="adapt"&&p.gym in PLAN){const g=p.gym,m0=r.mods,m1=new Set([...m0].filter(keep)),ids=m=>trainList(g,m).map(x=>x.ex.id).join();
@@ -2464,7 +2464,7 @@ function assess(d){
   if(sv&&r.canNorm&&(sv===1||sv===r.nk)){r.norm=own;r.mods=new Set([...r.mods].filter(keep));r.level=[...r.mods].some(m=>m!=="pAfter")?"adapt":"go";
     const dl=r.mods.has("deload");
     r.notes=[dl||r.pm?`Adattamenti del giorno tolti da te: ${dl&&r.pm?"restano lo scarico e quello per le partite":dl?"resta solo lo scarico":"resta solo quello per le partite"}.`:"Adattamenti tolti da te: oggi serie e ripetizioni in canna come da scheda.",
-      ...r.notes.filter(n=>/^(Settimana di scarico|Partite domani e dopodomani)/.test(n)).map(n=>r.mods.has("rir")?n.replace(/^Partite domani e dopodomani: niente/,"Partite domani e dopodomani: seduta completa, ma niente"):n)]}
+      ...r.notes.filter(n=>/^(Settimana di scarico|Partite domani e dopodomani)/.test(n)).map(n=>r.mods.has("rir")&&!dl?n.replace(/^Partite domani e dopodomani: niente/,"Partite domani e dopodomani: seduta completa, ma niente"):n)]}
   else if(sv)r.normLost=true;
   r.title={go:"Via libera",adapt:"Seduta adattata",stop:"Cambia programma"}[r.level];
   if(r.norm&&r.level==="go")r.title="Seduta normale";
@@ -2480,7 +2480,7 @@ function xsMig(d,g,mods){if(!d||d.xs==null)return;const xs=d.xs;delete d.xs;if(t
   for(const id in xs){const k=Math.min(XS_MAX,Math.floor(+xs[id])||0),ex=(PLAN[g]?PLAN[g].ex.map(e=>effEx(g,e)).find(e=>e.id===id):null)||exById(id);if(!(k>0)||!ex)continue;
     const a=d.ex[id]=d.ex[id]||[],b=Math.max(0,setsBase(ex,mods)-((d.pre||{})[id]||0));while(a.length<b+k)a.push({});for(let j=b;j<b+k;j++)a[j].xs=1}}
 // Fai la seduta normale / Rimetti la seduta adattata (solo quel giorno); si tengono le ultime 2 settimane
-function toggleNorm(a){S.normal=S.normal||{};if(a.norm)delete S.normal[a.day];else S.normal[a.day]=a.nk;const lim=iso(addDays(today(),-14));for(const k in S.normal)if(k<lim)delete S.normal[k];save()}
+function toggleNorm(a){nLost=null;S.normal=S.normal||{};if(a.norm)delete S.normal[a.day];else S.normal[a.day]=a.nk;const lim=iso(addDays(today(),-14));for(const k in S.normal)if(k<lim)delete S.normal[k];save()}
 // Seduta normale scelta e poi adattamenti del giorno cambiati: la scelta decade (true = va detto). Le scelte salvate come 1 (v58) prendono l'impronta di oggi
 function normSync(a){const n=S.normal||{};if(a.normLost&&n[a.day]){delete n[a.day];save();return true}if(a.norm&&n[a.day]===1){n[a.day]=a.nk;save()}return false}
 const normLostMsg=a=>`Padel, energia o seduta cambiati: ${a.level==="adapt"?"la seduta di oggi è di nuovo adattata":a.level==="go"&&a.gym in PLAN?"oggi la seduta è già quella della scheda":"la seduta normale scelta prima non vale più"}.`;
@@ -2526,7 +2526,7 @@ const roundStep=(x,st)=>Math.round(x/st)*st;
    Mai in scarico, prima del padel, con energia bassa o in superserie. Le mini-serie non contano per massimale e ranghi. */
 const MYO={mini:5,max:5,rest:15,stop:3};
 const myoEx=ex=>ex.t==="iso"&&!/face pull/i.test(ex.n||"")&&!["Gambe","Core"].includes(ex.mu||(EX[String(ex.id).split("~")[0]]||{}).mu)&&(isCable(ex)||eqOf(ex)==="mac");
-const myoOn=(g,ex,mods,tg)=>!!(tg&&tg.myo)&&!["deload","prePadel","rir","light","prevOnly"].some(m=>mods.has(m))&&!(g&&ssOf(g,ex));
+const myoOn=(g,ex,mods,tg)=>!!(tg&&tg.myo)&&!["deload","prePadel","pAfter","rir","light","prevOnly"].some(m=>mods.has(m))&&!(g&&ssOf(g,ex));
 const myoTxt=x=>Array.isArray(x.myo)&&x.myo.length?"+"+x.myo.join("+"):"";
 const powEx=ex=>!!ex&&(ex.pow||/^woodchop/i.test(ex.n||""))&&ex.t!=="perf";
 // Prevenzione del core a ripetizioni fisse (Pallof)
@@ -2869,7 +2869,7 @@ function render(){shownDay=iso(today());
   wakeSync();
 }
 let trainArrive=false;
-function go(v){goldFlush();const from=view,upd=()=>{view=v;if(v!=="edit"){S.view=v;save()}render();window.scrollTo(0,0);if(trainArrive){trainArrive=false;if(v==="train")nowReveal(false)}};
+function go(v){goldFlush();if(v!=="train")nLost=null;const from=view,upd=()=>{view=v;if(v!=="edit"){S.view=v;save()}render();window.scrollTo(0,0);if(trainArrive){trainArrive=false;if(v==="train")nowReveal(false)}};
   // Oggi <-> Allenamento: la scheda della seduta si trasforma nell'intestazione (e ritorno)
   const pair=(from==="oggi"&&v==="train")||(from==="train"&&v==="oggi");
   if(pair&&document.startViewTransition&&!RM()){const h=document.documentElement;h.classList.add("vt-sed");h.classList.toggle("vt-back",v==="oggi");
@@ -3535,7 +3535,7 @@ function renderToday(){
   // Seduta di oggi già salvata (l'ultima di oggi) o iniziata e non ancora salvata
   const doneS=S.sessions.filter(x=>iso(x.date)===k).sort((x,y)=>(x.day==="LIB")-(y.day==="LIB")||y.date.localeCompare(x.date))[0]||null;
   const runG=hasGym&&!doneS&&S.draft&&S.draft[a.gym]&&!draftOld(a.gym)?a.gym:null;let runN=0,runT=0;
-  if(runG){const L=trainList(runG,trainMods(runG));for(const {ex} of L){const n=setsFor(ex,trainMods(runG));runT+=n;runN+=Math.min(n,doneCount(runG,ex.id))}}
+  if(runG){const L=trainList(runG,trainMods(runG));for(const {ex} of L){const n=setsShown(runG,ex,trainMods(runG));runT+=n;runN+=Math.min(n,doneCount(runG,ex.id))}}
   const doneSt=doneS?sessStats(doneS):null,doneAt=doneS?new Date(doneS.date).toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"}):"";
   const week=[...Array(7)].map((_,i)=>{const x=addDays(d,i),p=dayPlan(x);return `<button class="wd2 ${i===0?"t":""}" data-wd="${i}" data-dt="${iso(x)}" aria-label="${esc(cap(WD_LONG[x.getDay()]))}: cambia il padel"><b>${WD[x.getDay()]}</b><span class="ics">${i===0&&doneS?dayIcons(p).replace(I("gym"),`<b class="dk" aria-label="Fatta">✓</b>`):dayIcons(p)}</span><small>${p.gym in PLAN?esc(PLAN[p.gym].name).replace(/ (\S{1,2})$/,"<br>$1"):p.padel==="match"?"Partita":p.padel==="train"?"Padel":"Riposo"}</small></button>`}).join("");
   let dl="";
@@ -3598,7 +3598,7 @@ function renderToday(){
   fitTitles();
 }
 
-let openEx={},mnOpen=false;
+let openEx={},mnOpen=false,nLost=null;
 // Adattamenti di una seduta: quelli del giorno in cui è iniziata (dopo mezzanotte non cambia forma). Se oggi il piano è un altro
 // (es. "Cambia seduta di oggi" a metà) restano quelli con cui l'hai iniziata
 function modsCtx(g){const dr=(S.draft||{})[g],busy=!!dr&&hasDone(dr),d=busy&&dr.date&&dr.date!==iso(today())?new Date(dr.date+"T12:00:00"):today(),a=assess(d),own=a.gym===g;
@@ -3610,7 +3610,7 @@ const padAfter=mods=>mods.has("pAfter")||mods.has("prePadel");
 function trainList(g,mods){const L=PLAN[g].ex.map(e=>({ex:effEx(g,e),base:e}));if(!padAfter(mods))return L;return [...L.filter(x=>x.ex.t!=="prev"),...L.filter(x=>x.ex.t==="prev")]}
 // pre: serie già fatte con l'esercizio di prima, tenute dopo un "Cambia" a metà
 const doneCount=(g,id)=>(draftFor(g).ex[id]||[]).filter(x=>x.done).length+((draftFor(g).pre||{})[id]||0);
-function exDone(g,ex,mods){const n=setsFor(ex,mods);if(n===0)return true;if(doneCount(g,ex.id)<n)return false;
+function exDone(g,ex,mods){const n=setsShown(g,ex,mods);if(n===0)return true;if(doneCount(g,ex.id)<n)return false;
   const r=(draftFor(g).ex[ex.id]||[])[rowPlan(g,ex,mods).mj];return !(r&&r.done&&Array.isArray(r.myo)&&!r.myoEnd)}
 // Righe di un esercizio nell'ordine in cui si vedono: prima le serie della scheda (righe senza segno, più quelle ancora da creare), poi le serie in più (xs:1), fatte e da fare.
 // j = posto nella bozza, t = posto nella proposta (tg.reps: le serie in più dopo l'ultima della scheda), mj = ultima serie della scheda (myo-rep), sd = serie della scheda fatte, xp = serie in più ancora da fare
@@ -3618,6 +3618,8 @@ function rowPlan(g,ex,mods){const dr=draftFor(g),rows=dr.ex[ex.id]||[],b=setsBas
   rows.forEach((r,j)=>{if(r&&r.xs){if(r.done)xd.push(j);else if(b>0&&!mods.has("deload"))xp.push(j)}else if(sch.length<nb||r&&r.done)sch.push(j)});
   for(let j=rows.length;sch.length<nb;j++)sch.push(j);
   return {ord:[...sch.map((j,i)=>({j,x:0,t:i})),...[...xd,...xp].map((j,i)=>({j,x:1,t:nb+i}))],nb,mj:nb>0?sch[nb-1]:-1,xp,sd:sch.filter(j=>rows[j]&&rows[j].done).length}}
+// Serie che si vedono (conteggi in alto, "fatte / totali", intestazione della scheda): mai meno delle righe, anche se dopo averle fatte le serie della scheda calano (es. 4+1 in seduta normale, poi Stanco)
+const setsShown=(g,ex,mods)=>{const n=setsFor(ex,mods);return n>0?Math.max(n,rowPlan(g,ex,mods).ord.length+((draftFor(g).pre||{})[ex.id]||0)):0};
 // "+ Aggiungi una serie": non sui salti (volume fisso), sulla myo-rep (è già il lavoro in più), nello scarico né oltre 10 serie in più
 const xsCan=(g,ex,mods,tg)=>setsFor(ex,mods)-((draftFor(g).pre||{})[ex.id]||0)>0&&!powEx(ex)&&ex.t!=="perf"&&!mods.has("deload")&&xsOf(mods,ex.id)<XS_MAX&&!(!["nordic","time"].includes(ex.t)&&myoOn(g,ex,mods,tg||tgFor(ex,mods,g)));
 const tIx=(g,ex,mods,j)=>{const o=rowPlan(g,ex,mods).ord.find(x=>x.j===j);return o?o.t:j};
@@ -3633,19 +3635,24 @@ function renderTrain(only){
   const isToday=mc.own;const mods=mc.mods;
   const dr=draftFor(g),L=trainList(g,mods);
   // mP = serie della scheda ancora da fare: una serie in più lasciata lì non è una serie mancante
-  let tot=0,dn=0,mP=0;for(const {ex} of L){const n=setsFor(ex,mods),dc=doneCount(g,ex.id);tot+=n;dn+=Math.min(n,dc);const rp=rowPlan(g,ex,mods);mP+=Math.max(0,rp.nb-rp.sd)}
+  let tot=0,dn=0,mP=0;for(const {ex} of L){const n=setsShown(g,ex,mods),dc=doneCount(g,ex.id);tot+=n;dn+=Math.min(n,dc);const rp=rowPlan(g,ex,mods);mP+=Math.max(0,rp.nb-rp.sd)}
   const pct=tot?Math.round(dn/tot*100):0,od=draftOld(g),mins=dr.start&&!(od&&od.stale)?sesMin(dr):0;
   if(openEx[g]&&!L.some(x=>x.ex.id===openEx[g]))openEx[g]=null;
   const first=L.find(x=>!exDone(g,x.ex,mods));
   const curId=(goldHold&&goldHold.g===g?goldHold.ex:null)||openEx[g]||first?.ex.id;const curIt=L.find(x=>x.ex.id===curId);
   const open=new Set(curId?[curId]:[]);
   if(curIt&&ssOf(g,curIt.ex))L.forEach(x=>{if(ssOf(g,x.ex)===ssOf(g,curIt.ex)&&!exDone(g,x.ex,mods))open.add(x.ex.id)});
-  const mList=[...mods].filter(m=>MODTXT[m]).map(m=>MODTXT[m]);
+  // Solo ciò che cambia davvero: nello scarico (metà serie, 3-4 in canna) restano solo "niente Nordic" e la versione ridotta; fuori dallo scarico noEcc toglie anche la serie sugli eccentrici
+  const mList=[...new Set([...mods].flatMap(m=>m==="noEcc"&&!mods.has("deload")?[m,"noEccLight"]:[m]))].filter(m=>MODTXT[m]&&(!mods.has("deload")||m==="noEcc"||m==="prevOnly")).map(m=>MODTXT[m]);
+  // Seduta normale decaduta (es. Settimana cambiata a seduta iniziata): l'avviso sta in alto, sopra le schede dei giorni (sopra il recupero anche a 320 px col testo grande), non in fondo alla pagina.
+  // Resta anche se il recupero o l'oro ridisegnano la pagina; sparisce alla prossima spunta, con «Fai la seduta normale» o uscendo da Allenamento
+  const lostNow=isToday&&normSync(a);if(lostNow)nLost={g,day:a.day,txt:normLostMsg(a)+(a.canNorm?" Se vuoi, rimetti la seduta normale da «perché».":"")};
+  const lostH=isToday&&nLost&&nLost.g===g&&nLost.day===a.day?`<p class="msg nlost" id="nmsg" role="status">${esc(nLost.txt)}</p>`:"";
   const nBtn=isToday&&a.canNorm?`<button class="lnk" id="normT">${a.norm?"Rimetti la seduta adattata":"Fai la seduta normale"}</button>`:"";
   const modNote=isToday&&(a.level!=="go"||a.norm)?`<details class="mn"${mnOpen?" open":""}><summary>${esc(a.title)}<span>${a.norm?"cambia":"perché"}</span></summary><p>${esc(a.notes.join(" "))}</p>${nBtn}</details>`:!isToday&&mList.length?`<details class="mn"><summary>Seduta adattata<span>perché</span></summary><p>${esc(cap("tiene gli adattamenti del giorno in cui l'hai iniziata: "+mList.join(", ")+"."))}</p></details>`:"";
   let html="",shownPost=false,restShown=false;const askH=[],curH=[],nextH=[],doneH=[];
   L.forEach(({ex,base},i)=>{
-    const n=setsFor(ex,mods),dc=doneCount(g,ex.id);
+    const n=setsShown(g,ex,mods),dc=doneCount(g,ex.id);
     if(open.has(ex.id)){curH.push(exCard(g,ex,mods,dr,base,!restShown));restShown=true;return}
     if(padAfter(mods)&&ex.t==="prev"&&!shownPost&&dc<n&&n>0){nextH.push(`<p class="grp">Dopo il padel</p>`);shownPost=true}
     if(n===0){nextH.push(`<div class="xrow off"><span class="ck o">–</span><span class="xb"><span class="nm">${esc(ex.n)}</span><em>salta oggi</em></span></div>`);return}
@@ -3665,7 +3672,7 @@ function renderTrain(only){
   const svd=dn?null:S.sessions.filter(x=>x.day===g&&iso(x.date)===iso(today())).slice(-1)[0];
   const savedH=svd?`<section class="card alldone saved"><p><b>${esc(P.name)} salvata</b> alle ${new Date(svd.date).toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"})}.</p><button class="btn" id="seeSv">Vedi il riepilogo</button></section>`:"";
   const dnwH=`<span class="dnc">${dn}</span> / <span class="dnt">${tot}</span> serie${dr.start&&mins>0?` · ${mins} min`:""}`;
-  const bodyT=`
+  const bodyT=`${lostH}
   <div class="tabs" role="group" aria-label="Scheda">${GYM_ORDER.map(k=>{const wd=Object.entries(S.week).find(([,v])=>v.gym===k);return `<button data-k="${k}" aria-pressed="${k===g}"><small>${wd?WD[wd[0]]:"Extra"}</small><span class="tn">${esc(PLAN[k].name)}</span></button>`}).join("")}</div>
   ${oldBoxes(g)}
   ${modNote}
@@ -3719,7 +3726,7 @@ function renderTrain(only){
   // Dopo il voto (o ✕) la serie da fare dell'esercizio dopo resta sopra il timer, anche col testo grande
   document.querySelectorAll("#exs [data-effskip]").forEach(b=>b.onclick=()=>{const d=draftFor(g);d.effSkip=d.effSkip||{};d.effSkip[b.dataset.effskip]=1;save();renderTrain();keepFocus(true)});
   const nt=document.getElementById("normT");if(nt)nt.onclick=()=>normSwap(g,a);
-  if(isToday&&normSync(a)){const m=document.getElementById("msg");if(m){m.className="msg";m.textContent=normLostMsg(a)}}
+  if(lostNow){const m=document.getElementById("nmsg");if(m)msgShow(m)}
   const rp=document.querySelector("#restIn [data-tp]");if(rp)rp.onclick=()=>{if(!tFresh())addRest()};
   const rs=document.querySelector("#restIn [data-ts]");if(rs)rs.onclick=()=>{if(!tFresh())closeRest()};
   // La scheda del giorno scelto va al centro della fila solo in orizzontale: scrollIntoView spostava anche la pagina (in cima, a ogni ridisegno intero)
@@ -3825,7 +3832,7 @@ function swipeBind(g,L,curId,mods){
 // "l'8%", "l'11%", "il 10%"
 const pct=p=>(/^(8|11|1|8\d|8\d\d)$/.test(String(p))?"l'":"il ")+p+"%";
 function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
-  const pre=(dr.pre||{})[ex.id]||0,n=Math.max(0,setsFor(ex,mods)-pre),xN=n>0?xsOf(mods,ex.id):0,tg=tgFor(ex,mods,g),last=history(ex.id)[0];
+  const pre=(dr.pre||{})[ex.id]||0,n=Math.max(0,setsShown(g,ex,mods)-pre),xN=n>0?(dr.ex[ex.id]||[]).filter(x=>x&&x.xs&&(x.done||!mods.has("deload"))).length:0,tg=tgFor(ex,mods,g),last=history(ex.id)[0];
   const rows=dr.ex[ex.id]||[];
   const unit=ex.t==="time"?"s":"rip";
   const hasKg=!["perf","nordic","time"].includes(ex.t)||ex.t==="nordic"&&eqOf(ex)==="zav";
@@ -3975,8 +3982,10 @@ function addXs(g,id,d){const tn=performance.now(),kk=g+"|"+id;
   // Aggiunta dalla domanda sul voto (sopra l'esercizio dopo): la scheda torna in primo piano con la serie nuova sopra il timer
   else if(!fin&&d>0)keepFocus(true,id);
   const D=!fin&&card&&T0!=null&&y!=null?T0-card.getBoundingClientRect().top:0,mv=Math.abs(D)>1&&!RM()&&!!card.animate;
-  // FLIP: la scheda parte da dov'era e scorre al suo posto; il tasto e quello che sta sotto restano fermi
-  if(mv){const o={duration:200,easing:E};card.animate([{transform:`translateY(${D}px)`},{transform:"none"}],o);card.querySelectorAll(":scope>.sets>.xsr,:scope>.sets~*").forEach(e=>e.animate([{transform:`translateY(${-D}px)`},{transform:"none"}],o))}
+  // FLIP: la scheda parte da dov'era e scorre al suo posto; il tasto e quello che sta sotto restano fermi.
+  // Il bordo basso della scheda è già al suo posto: la parte spostata in giù si taglia (stessa curva), così non copre "Prossimi" quando il recupero non c'è.
+  // Sotto resta libero lo spazio fino all'elemento dopo (l'ombra di Manga non sparisce)
+  if(mv){const o={duration:200,easing:E},nx=card.nextElementSibling,gp=nx?Math.max(0,Math.min(48,nx.getBoundingClientRect().top-card.getBoundingClientRect().bottom)):48,cp=b=>`inset(-48px -48px ${b-gp}px -48px)`;card.animate([{transform:`translateY(${D}px)`,clipPath:cp(D)},{transform:"none",clipPath:cp(0)}],o);card.querySelectorAll(":scope>.sets>.xsr,:scope>.sets~*").forEach(e=>e.animate([{transform:`translateY(${-D}px)`},{transform:"none"}],o))}
   if(nj>=0&&card){const t=card.querySelector(`.tick[data-j="${nj}"]`),nr=t&&t.closest(".set");if(nr&&nr.animate)nr.animate([{opacity:0},{opacity:1}],{duration:200,easing:E})}
   // La serie tolta: copia ferma nel punto in cui era, sbiadisce più in fretta di come entra una riga
   if(gone&&card&&(!fin||Math.abs(scrollY-sy0)<2)){const st=card.querySelector(".sets"),w=gone.el;if(st){w.classList.remove("now","lit","litin");w.setAttribute("aria-hidden","true");w.inert=true;w.querySelectorAll("[data-ex],[data-j],[data-f],[data-pm]").forEach(x=>{for(const a of ["data-ex","data-j","data-f","data-pm"])x.removeAttribute(a);x.tabIndex=-1});
@@ -3987,7 +3996,7 @@ function addXs(g,id,d){const tn=performance.now(),kk=g+"|"+id;
 function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;
   // Doppio tocco: dopo la spunta la pagina scorre e un'altra spunta (o un tasto del recupero) può finire sotto il dito
   // Se la pagina è scivolata sotto il dito: una spunta già fatta (anche la stessa) non si toglie per 1,1 s; una serie ancora da fare si segna dopo 0,5 s. Senza scorrimento: stessa spunta entro 0,4 s è un doppio tocco
-  const tk=exId+"|"+j,tn=performance.now(),dt=tn-lastTk.t,mv=Math.abs(scrollY-lastTk.y)>4,wasDone=!!((draftFor(g).ex[exId]||[])[j]||{}).done;if(lastTk.k===tk&&(dt<400||(mv&&dt<1100)))return;if(lastTk.k!==tk&&mv&&(wasDone?dt<1100:dt<500)){const rw=document.querySelector(`.tick[data-ex="${exId}"][data-j="${j}"]`);if(rw){if(RM())rw.animate([{opacity:1},{opacity:.5},{opacity:1}],{duration:160,easing:"ease"});else rw.animate([{transform:"translateX(0)"},{transform:"translateX(-4px)"},{transform:"translateX(4px)"},{transform:"translateX(0)"}],{duration:220,easing:"cubic-bezier(.23,1,.32,1)"})}return}lastTk={t:tn,k:tk,y:scrollY};
+  const tk=exId+"|"+j,tn=performance.now(),dt=tn-lastTk.t,mv=Math.abs(scrollY-lastTk.y)>4,wasDone=!!((draftFor(g).ex[exId]||[])[j]||{}).done;if(lastTk.k===tk&&(dt<400||(mv&&dt<1100)))return;if(lastTk.k!==tk&&mv&&(wasDone?dt<1100:dt<500)){const rw=document.querySelector(`.tick[data-ex="${exId}"][data-j="${j}"]`);if(rw){if(RM())rw.animate([{opacity:1},{opacity:.5},{opacity:1}],{duration:160,easing:"ease"});else rw.animate([{transform:"translateX(0)"},{transform:"translateX(-4px)"},{transform:"translateX(4px)"},{transform:"translateX(0)"}],{duration:220,easing:"cubic-bezier(.23,1,.32,1)"})}return}lastTk={t:tn,k:tk,y:scrollY};nLost=null;
   // Spunta tolta durante la passata dorata di questo esercizio: la passata si chiude subito e la scheda resta quella (niente rientro né salto)
   if(goldCard.p&&goldCard.p.g===g&&goldCard.p.exId===exId){goldFlush();openEx[g]=exId}
   audioUnlock();
@@ -4018,7 +4027,7 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;
   save();
   if(r.done){
     // N = serie previste in tutto; rpl = righe nell'ordine in cui si vedono (ti = ripetizioni proposte per questa riga, nxs = righe dopo)
-    const N=setsFor(ex,mods),doneN=doneCount(g,exId),rpl=rowPlan(g,ex,mods),pi=rpl.ord.findIndex(o=>o.j===j),ti=pi>=0?rpl.ord[pi].t:j,nxs=rpl.ord.slice(pi+1).map(o=>o.j);
+    const N=setsShown(g,ex,mods),doneN=doneCount(g,exId),rpl=rowPlan(g,ex,mods),pi=rpl.ord.findIndex(o=>o.j===j),ti=pi>=0?rpl.ord[pi].t:j,nxs=rpl.ord.slice(pi+1).map(o=>o.j);
     // Serie myo-rep: dopo l'attivazione si resta sull'esercizio per le mini-serie, con 15 s di pausa
     if(j===rpl.mj&&ex.t==="iso"&&myoOn(g,ex,mods,tgFor(ex,mods,g))){r.myo=[];openEx[g]=exId;save();
       const want=num(tgFor(ex,mods,g).reps[ti]??ex.hi),got=num(r.reps);if(want!=null&&got!=null&&got<want)celebrate("fail");else buzz(40);
@@ -4029,11 +4038,11 @@ function toggleSet(g,exId,j,mods){let rec=false,wowNow=false;
     // il recupero parte solo a giro finito; tra un esercizio e l'altro della coppia si passa subito
     ssGo[g]=null;let restS=ex.rest||0;const sk=ssOf(g,ex);
     if(sk){const dn=e=>doneCount(g,e.id),grp=allEx.filter(e=>ssOf(g,e)===sk),i=grp.findIndex(e=>e.id===exId);
-      const nx=[...grp.slice(i+1),...grp.slice(0,i+1)].find(e=>dn(e)<setsFor(e,mods));ssGo[g]=nx?nx.id:null;
+      const nx=[...grp.slice(i+1),...grp.slice(0,i+1)].find(e=>dn(e)<setsShown(g,e,mods));ssGo[g]=nx?nx.id:null;
       // Recupero a giro finito (tutti gli esercizi della coppia allo stesso numero di serie) o se rifai lo stesso esercizio di fila; a metà giro si passa subito
-      if(grp.length>1){const cnt=grp.map(e=>Math.min(dn(e),setsFor(e,mods))),even=cnt.every(c=>c===cnt[0]),again=dd.ssLast===exId&&dn(ex)>1;restS=even||again||!nx||nx.id===exId?Math.max(...grp.map(e=>e.rest||0)):0}
+      if(grp.length>1){const cnt=grp.map(e=>Math.min(dn(e),setsShown(g,e,mods))),even=cnt.every(c=>c===cnt[0]),again=dd.ssLast===exId&&dn(ex)>1;restS=even||again||!nx||nx.id===exId?Math.max(...grp.map(e=>e.rest||0)):0}
       dd.ssLast=exId}
-    const sessionDone=allEx.every(e=>doneCount(g,e.id)>=setsFor(e,mods));
+    const sessionDone=allEx.every(e=>doneCount(g,e.id)>=setsShown(g,e,mods));
     const want=num(tgFor(ex,mods,g).reps[ti]??ex.lo),got=num(r.reps);
     const fail=ex.t!=="perf"&&want!=null&&got!=null&&got<want;
     if(fail)celebrate("fail");else if(doneN>=N)goldEnd(true);else buzz(40)
@@ -4095,7 +4104,7 @@ function goldCard(g,exId,after){goldFlush();goldHold={g,ex:exId};openEx[g]=exId;
 const ssOf=(g,ex)=>{const o=(S.draft&&S.draft[g]&&S.draft[g].ss)||{};return ex.id in o?o[ex.id]:(ex.ss||"")};
 function ssSheet(g,ex,mods){
   const dr=draftFor(g),cur=ssOf(g,ex),dn=e=>doneCount(g,e.id);
-  const L=PLAN[g].ex.map(e=>effEx(g,e)).filter(e=>e.id!==ex.id&&setsFor(e,mods)>0&&dn(e)<setsFor(e,mods));
+  const L=PLAN[g].ex.map(e=>effEx(g,e)).filter(e=>e.id!==ex.id&&setsFor(e,mods)>0&&dn(e)<setsShown(g,e,mods));
   const opts=L.map(e=>({v:e.id,l:e.n,sub:ssOf(g,e)&&ssOf(g,e)===cur?"In superserie adesso":muLbl(e.mu||"")}));
   if(cur)opts.push({v:"",l:"Togli la superserie",sub:"Solo per oggi"});
   pickSheet("Superserie con…",opts,"",k=>{dr.ss=dr.ss||{};
@@ -4401,7 +4410,7 @@ function addRest(){litOff();const l0=Math.max(0,tVal()),A0=Math.min(360,ringShow
   if(!RM()){const t=performance.now();tGrow={a:A0,t};tTw={a:l0,t};const f=()=>{if(!tTw||!tOn)return;tTxt();requestAnimationFrame(f)};requestAnimationFrame(f)}if(S.timer){S.timer.end=tEnd;S.timer.tot=tTot;save()}T("timer").classList.remove("over");tick()}
 T("tplus").onclick=()=>{if(!tFresh())addRest()};T("tstop").onclick=()=>{if(!tFresh())closeRest()};
 // Tocco sul timer (fuori dai bottoni): torna all'allenamento, sull'esercizio del recupero o sul successivo se l'hai finito
-function timerGo(){goldFlush();const c=tCtx;if(c&&PLAN[c.g]){gymSel=c.g;const d=S.draft[c.g],ex=exById(c.ex),n=ex?setsFor(ex,trainMods(c.g)):0,dn=((d&&d.ex[c.ex])||[]).filter(x=>x&&x.done).length;openEx[c.g]=ex&&dn<n?c.ex:null}
+function timerGo(){goldFlush();const c=tCtx;if(c&&PLAN[c.g]){gymSel=c.g;const d=S.draft[c.g],ex=exById(c.ex),n=ex?setsShown(c.g,ex,trainMods(c.g)):0,dn=((d&&d.ex[c.ex])||[]).filter(x=>x&&x.done).length;openEx[c.g]=ex&&dn<n?c.ex:null}
   if(view!=="train")go("train");else renderTrain();requestAnimationFrame(()=>keepFocus(false,openEx[c&&c.g]||undefined))}
 T("timer").onclick=e=>{if(e.target.closest("button"))return;timerGo()};
 T("timer").onkeydown=e=>{if((e.key==="Enter"||e.key===" ")&&e.target===T("timer")){e.preventDefault();timerGo()}};
@@ -5075,7 +5084,7 @@ function renderSettings(){
     <li>Una serie molto sotto il range (3 o più ripetizioni sotto il minimo): le serie dopo, in quella seduta, scendono del 10%. La volta dopo si riparte dal carico con cui hai fatto la maggior parte delle serie, con le ripetizioni fatte lì.</li>
     <li>Venerdì prima di due partite (sabato e domenica), anche con padel o partita il venerdì: di base seduta completa senza serie a cedimento (almeno 1 in canna). Con un tocco su Oggi passi alla versione ridotta (solo braccia, Copenhagen, core, cuffia e polso), che resta finché non torni alla completa.</li>
     <li>Padel e palestra nello stesso giorno: una serie in meno sulle spinte sopra la testa. Giorno di partita o Stanco: una serie in meno su tutto, stessi carichi e stesse ripetizioni dell'ultima volta in quel range (le alzate al cavo del lunedì e del venerdì vanno ognuna per conto suo). Se quel giorno vai peggio dell'ultima seduta piena, la volta dopo si riparte da quella.</li>
-    <li>«Fai la seduta normale» (su Oggi o nel «perché» di Allenamento), solo per quel giorno: serie e ripetizioni in canna della scheda, senza gli adattamenti per padel, partita, Stanco ed eccentrici. Restano lo scarico, la scelta completa o ridotta prima di due partite, le fasce da polso e cuffia e polso dopo il padel. C'è solo se cambia davvero qualcosa. Se poi cambiano padel di oggi, domani o dopodomani, energia o seduta, decade e l'app lo dice. Fatta da Stanco o in un giorno di partita, per la progressione conta come seduta alleggerita.</li>
+    <li>«Fai la seduta normale» (su Oggi o nel «perché» di Allenamento), solo per quel giorno: serie e ripetizioni in canna della scheda, senza gli adattamenti per padel, partita, Stanco ed eccentrici. Restano lo scarico, la scelta completa o ridotta prima di due partite e, con il padel dopo la palestra, le fasce da polso, cuffia e polso dopo il padel e niente myo-rep a cedimento. C'è solo se cambia davvero qualcosa. Vale finché non cambia qualcosa che adatta la seduta di oggi (la seduta, il padel di oggi o il suo ordine, una partita domani o dopodomani, Stanco): allora decade e l'app lo dice. «In forma» o un padel che non tocca la seduta di oggi non la cambiano. Fatta da Stanco o in un giorno di partita, per la progressione conta come seduta alleggerita.</li>
     <li>«+ Aggiungi una serie»: le serie in più contano per record e volume, non per la progressione né per lo stallo. Non c'è su salti, myo-rep e scarico.</li>
     <li>Scarico quando serve, non a calendario: l'app lo propone dopo 6 settimane senza scarico (la scheda dice ogni 5-6: puoi avviarlo prima a mano) o con 3+ esercizi fermi, ma non prima di 4 settimane di lavoro. Le prime 2 sedute di un esercizio (in quel range) servono a trovare il carico e non contano per lo stallo. Serie dimezzate, stessi carichi dell'ultima seduta vera (o quello già abbassato, se l'app ti aveva chiesto di scendere), 3-4 in canna. Le sedute di scarico non contano per la progressione. Una pausa di 7 o più giorni senza sedute vale come scarico.</li>
     <li>Pausa lunga su un esercizio: dopo 14 o più giorni senza farlo, la prima volta ripeti l'ultima seduta (stessi kg e ripetizioni); dopo 28 o più giorni, 10% in meno sui kg, arrotondato al gradino (con la zavorra conta anche il tuo peso). Se il gradino è troppo grosso per scendere del 10% (es. 30 kg al cavo col gradino da 5) o sei a corpo libero, carico uguale e 3 ripetizioni in meno, mai sotto il minimo del range. Dalla volta dopo si riprende a salire.</li>
