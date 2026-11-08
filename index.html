@@ -1019,6 +1019,7 @@ details.wu[open] ol{margin-top:12px}
 .lnk.clr{align-self:center;margin-top:10px}
 .ex .lnk.setup0{margin-block:-6px}
 .ex .lnk.pgo{margin-block:-4px -2px}
+.tgt b .pgn{display:inline-block}
 /* Bottoni a misura di dito (44 pt) */
 :root:not(#z) .pm{width:32px;height:44px;position:relative}
 :root:not(#z) .pm::after{content:"";position:absolute;inset:0 -4px}
@@ -3737,8 +3738,9 @@ function renderTrain(only){
   document.querySelectorAll("#exs [data-open]").forEach(b=>b.onclick=()=>openExVT(g,b.dataset.open));
   document.querySelectorAll("#exs [data-xadd]").forEach(b=>b.onclick=()=>addXs(g,b.dataset.xadd,1));
   // Progredisci comunque / Rimetti la ripresa dopo la pausa: il tasto resta dov'era sullo schermo e tiene il fuoco
-  document.querySelectorAll("#exs [data-pgo]").forEach(b=>b.onclick=()=>{const id=b.dataset.pgo,y=b.getBoundingClientRect().top,ex=PLAN[g].ex.map(e=>effEx(g,e)).find(e=>e.id===id)||exById(id);
-    togglePauseGo(ex);buzz(8);renderTrain();const nb=document.querySelector(`#exs [data-pgo="${id}"]`);if(nb){window.scrollBy(0,nb.getBoundingClientRect().top-y);nb.focus({preventScroll:true})}});
+  document.querySelectorAll("#exs [data-pgo]").forEach(b=>b.onclick=()=>{const id=b.dataset.pgo,y=b.getBoundingClientRect().top,ex=PLAN[g].ex.map(e=>effEx(g,e)).find(e=>e.id===id)||exById(id),ot=pgoTxt(b.closest("article"));
+    togglePauseGo(ex);buzz(8);renderTrain();const nb=document.querySelector(`#exs [data-pgo="${id}"]`);if(nb){window.scrollBy(0,nb.getBoundingClientRect().top-y);nb.focus({preventScroll:true})}
+    pgoFx(document.querySelector(`#exs article.ex.cur[data-ex="${CSS.escape(id)}"]`),ot,nb,y)});
   document.querySelectorAll("#exs [data-xdel]").forEach(b=>b.onclick=()=>addXs(g,b.dataset.xdel,-1));
   document.querySelectorAll("#exs [data-eff]").forEach(b=>b.onclick=()=>{const d=draftFor(g);d.eff=d.eff||{};const was=d.eff[b.dataset.ex];if(was===b.dataset.eff)return;d.eff[b.dataset.ex]=b.dataset.eff;d.effAt=d.effAt||{};d.effAt[b.dataset.ex]=Date.now();buzz(8);
     const ex=PLAN[g].ex.map(e=>effEx(g,e)).find(e=>e.id===b.dataset.ex)||exById(b.dataset.ex);
@@ -4140,6 +4142,27 @@ function ssSheet(g,ex,mods){
     if(!k){PLAN[g].ex.map(e=>effEx(g,e)).forEach(e=>{if(ssOf(g,e)===cur)dr.ss[e.id]=""})}
     else{const key="o"+Date.now().toString(36);dr.ss[ex.id]=key;dr.ss[k]=key}
     save();openEx[g]=ex.id;renderTrain();keepFocus(true,ex.id)})}
+// ANM-2 (v61) "Progredisci comunque" / "Rimetti la ripresa": la proposta cambia in modo leggibile e il tasto non salta.
+// Testi di prima (numero grande, badge, messaggio); in Carbonio il numero sta in data-t (le cifre sono LED)
+function pgoTxt(c){const q=s=>c&&c.querySelector(s),b=q(".tgt b"),sm=q(".tgt small"),p=q(":scope>.prog");return {b:b?b.dataset.t||b.textContent:"",s:sm?sm.textContent:"",p:p?p.textContent:""}}
+function pgoFx(card,ot,nb,y){if(!card||!card.animate)return;const rm=RM(),E="cubic-bezier(.23,1,.32,1)",fade=e=>e.animate([{opacity:0},{opacity:1}],{duration:150,easing:E});
+  // kg e ripetizioni cambiati: la cifra nuova entra dal basso se sale, dall'alto se scende (come le serie fatte in alto: .45em, 180 ms); con Riduci movimento solo dissolvenza
+  const b=card.querySelector(".tgt b"),re=/[0-9:,\-]+/g;
+  if(b){const nt=b.dataset.t||b.textContent;if(nt!==ot.b){const a=ot.b.match(re)||[],z=nt.match(re)||[],nv=x=>parseFloat(x.replace(",","."));let els=null;
+    if(a.length===z.length&&ot.b.replace(re,"#")===nt.replace(re,"#")){const ch=z.map((x,i)=>x!==a[i]);
+      if(b.querySelector(".seg7")){const sg=[...b.querySelectorAll(".seg7")];if(sg.length===z.length)els=sg.map((e,i)=>ch[i]&&[e,i]).filter(Boolean)}
+      else if([...b.children].every(e=>e.classList.contains("dc"))){const pt=nt.split(re);b.innerHTML=pt.map((x,i)=>esc(x)+(i<z.length?(ch[i]?`<span class="pgn">${dcw(esc(z[i]))}</span>`:dcw(esc(z[i]))):"")).join("");const ci=ch.map((c,i)=>c?i:-1).filter(i=>i>=0);els=[...b.querySelectorAll(".pgn")].map((e,k)=>[e,ci[k]])}
+      if(els)els.forEach(([e,i])=>{const u=nv(z[i])<nv(a[i])?-1:1;e.animate(rm?[{opacity:0},{opacity:1}]:[{transform:`translateY(${u*.45}em)`,opacity:0},{transform:"none",opacity:1}],{duration:180,easing:E})})}
+    if(!els)fade(b)}}
+  const sm=card.querySelector(".tgt small");if(sm&&sm.textContent!==ot.s)fade(sm);
+  const pr=card.querySelector(":scope>.prog");if(pr&&pr.textContent!==ot.p)fade(pr);
+  // Il tasto: se scrollBy non ha potuto compensare (inizio pagina, o fondo), tutto quello che sta sotto il messaggio parte da dov'era e scorre al suo posto in 200 ms.
+  // Il bordo basso della scheda è già al suo posto: la parte spostata in giù si taglia lì, come in addXs (resta libero lo spazio fino all'elemento dopo, per l'ombra)
+  if(rm||!nb||!pr)return;const D=y-nb.getBoundingClientRect().top;if(Math.abs(D)<=1)return;
+  const o={duration:200,easing:E},els=[];for(let e=pr.nextElementSibling;e;e=e.nextElementSibling)els.push(e);
+  for(let e=card;e&&e!==app&&e!==document.body;e=e.parentElement)for(let x=e.nextElementSibling;x;x=x.nextElementSibling)if(getComputedStyle(x).position!=="fixed")els.push(x);
+  els.forEach(e=>e.animate([{transform:`translateY(${D}px)`},{transform:"none"}],o));
+  if(D>0){const nx=card.nextElementSibling,gp=nx?Math.max(0,Math.min(48,nx.getBoundingClientRect().top-card.getBoundingClientRect().bottom)):48,cp=`inset(-48px -48px ${-gp}px -48px)`;card.animate([{clipPath:cp},{clipPath:cp}],o)}}
 function keepFocus(changed,exId){
   // Seduta finita (nessuna scheda aperta): sale "Tutte le serie fatte" con Termina e salva, prima finiva sotto l'intestazione
   const c=(exId&&document.querySelector(`#exs .ex.cur[data-ex="${exId}"]`))||document.querySelector("#exs .ex.cur")||document.querySelector(".card.alldone");if(!c)return;
