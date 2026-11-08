@@ -1018,6 +1018,7 @@ details.wu[open] ol{margin-top:12px}
 .lnk{border:0;background:none;color:var(--muted);font-weight:700;font-size:max(14px,0.8235rem);min-height:44px;padding:0 2px;text-decoration:underline;text-underline-offset:3px;align-self:flex-start;text-align:left}
 .lnk.clr{align-self:center;margin-top:10px}
 .ex .lnk.setup0{margin-block:-6px}
+.ex .lnk.pgo{margin-block:-4px -2px}
 /* Bottoni a misura di dito (44 pt) */
 :root:not(#z) .pm{width:32px;height:44px;position:relative}
 :root:not(#z) .pm::after{content:"";position:absolute;inset:0 -4px}
@@ -2331,7 +2332,7 @@ function normS(){const obj=v=>v&&typeof v==="object"&&!Array.isArray(v),arr=v=>A
   S.sessions=arr(S.sessions).filter(x=>obj(x)&&typeof x.date==="string"&&!isNaN(new Date(x.date)));S.sessions.forEach(x=>{if(!obj(x.sets))x.sets={};for(const k in x.sets)if(!Array.isArray(x.sets[k]))delete x.sets[k];else x.sets[k]=x.sets[k].filter(obj);if(!obj(x.names))x.names={};if(!Array.isArray(x.mods))x.mods=[]});S.sessions=S.sessions.filter(x=>Object.keys(x.sets).length);
   // Ogni campo col suo tipo: un backup modificato a mano o rotto non deve bloccare le schermate
   const wk=obj(S.week)?S.week:{};S.week={};for(let i=0;i<7;i++){const w=obj(wk[i])?wk[i]:DEFAULT_WEEK[i];S.week[i]={padel:typeof w.padel==="string"?w.padel:"none",gym:typeof w.gym==="string"?w.gym:"none"}}
-  S.overrides=obj(S.overrides)?S.overrides:{};for(const k in S.overrides)if(!obj(S.overrides[k]))delete S.overrides[k];S.energy=obj(S.energy)?S.energy:{};S.normal=obj(S.normal)?S.normal:{};
+  S.overrides=obj(S.overrides)?S.overrides:{};for(const k in S.overrides)if(!obj(S.overrides[k]))delete S.overrides[k];S.energy=obj(S.energy)?S.energy:{};S.normal=obj(S.normal)?S.normal:{};S.pauseGo=obj(S.pauseGo)?S.pauseGo:{};
   for(const key of ["draft","oldDraft"]){S[key]=obj(S[key])?S[key]:{};for(const g in S[key]){const d=S[key][g];if(!obj(d)||!obj(d.ex)){delete S[key][g];continue}for(const id in d.ex)if(!Array.isArray(d.ex[id]))delete d.ex[id];else{let xn=0;d.ex[id]=d.ex[id].map(x=>obj(x)?x:{}).filter(x=>{if(x.xs==null)return true;if(x.xs!==1&&x.xs!==true){delete x.xs;return true}x.xs=1;return !!x.done||++xn<=XS_MAX})}if(d.ramp!=null){if(!obj(d.ramp))delete d.ramp;else for(const id in d.ramp)if(!Array.isArray(d.ramp[id]))delete d.ramp[id];else d.ramp[id]=d.ramp[id].map(x=>obj(x)?x:{})}if(typeof d.date!=="string")d.date=iso(today());for(const f of ["start","last","idle"])if(d[f]!=null&&!(typeof d[f]==="number"&&isFinite(d[f])))delete d[f];if(d.mods!=null&&!Array.isArray(d.mods))delete d.mods;if(d.xs!=null){if(!obj(d.xs))delete d.xs;else for(const id in d.xs){const v=Math.floor(+d.xs[id]);if(v>0)d.xs[id]=Math.min(XS_MAX,v);else delete d.xs[id]}}}}
   S.plans=obj(S.plans)?S.plans:{};for(const k in S.plans)if(!obj(S.plans[k])||!Array.isArray(S.plans[k].ex))delete S.plans[k];else S.plans[k].ex=S.plans[k].ex.filter(e=>obj(e)&&e.id&&typeof e.n==="string");
   S.swaps=obj(S.swaps)?S.swaps:{};for(const k in S.swaps)if(!obj(S.swaps[k]))delete S.swaps[k];S.customAlts=obj(S.customAlts)?S.customAlts:{};for(const k in S.customAlts)S.customAlts[k]=arr(S.customAlts[k]).filter(a=>obj(a)&&a.k&&typeof a.n==="string");if(S.skin!=null&&!["vetro","eclisse","carbonio","campo","manga","lavagna"].includes(S.skin))S.skin="vetro";S.pain=obj(S.pain)?S.pain:{};
@@ -2569,7 +2570,7 @@ function target(ex,noMyo){
       // Lì non arrivi al minimo: un gradino sotto (fino al carico dell'altro giorno sempre; sotto, solo se il gradino è piccolo o se non sfori il range)
       while(ea(k)<ex.lo&&k-st>=st-1e-9){const nk=k-st;if(k>lk+1e-9||st/nk<=0.15+1e-9||ea(nk)<=ex.hi)k=nk;else break}
       // Pausa di 4+ settimane: -10% arrotondato al gradino; col gradino troppo grosso carico uguale e 3 ripetizioni in meno
-      const pz=gapDays(ex)>=28;let pk=false,pr=0;if(pz){const nk=roundStep(k*0.9,st);if(nk<k-1e-9&&nk>=st-1e-9&&(k-nk)/k<=0.15+1e-9){k=nk;pk=true}else pr=3}
+      const pz=gapDays(ex)>=28&&!pauseGo(ex);let pk=false,pr=0;if(pz){const nk=roundStep(k*0.9,st);if(nk<k-1e-9&&nk>=st-1e-9&&(k-nk)/k<=0.15+1e-9){k=nk;pk=true}else pr=3}
       // Mai oltre il pacco della macchina (es. butterfly 55 su un pacco da 50): pacco e ripetizioni che il massimale permette
       const cp=eqMax(ex),dn=PLAN[last.day]?PLAN[last.day].name:"un altro giorno";let rp=ex.lo,ct="";
       if(cp&&k>cp+1e-6){k=cp;rp=Math.max(ex.lo,Math.min(ex.hi+(ex.t==="comp"?5:10),ea(cp)));ct=` Il pacco arriva a ${fk(cp)} kg: ${fk(cp)} × ${rp}.`}
@@ -2579,7 +2580,7 @@ function target(ex,noMyo){
       else{rp=Math.max(1,ea(k),Math.abs(k-lk)<1e-9?Math.min(dR,ex.hi):0);if(rp<ex.lo)ct=` A ${fk(k)} kg arrivi a circa ${rp}: da lì una ripetizione in più alla volta fino a ${ex.lo}.`;else rp=Math.min(rp,ex.hi)}
       if(pr){const r0=rp;rp=Math.max(Math.min(rp,ex.lo),rp-pr);pr=r0-rp}
       const pT=pk?" e 10% in meno dopo la pausa":pr?`; dopo la pausa ${pr===1?"una ripetizione":pr+" ripetizioni"} in meno (il gradino è troppo grosso per scendere del 10%)`:"";
-      return {kg:k,reps:Array(ex.s).fill(rp),top:rp>ex.hi?rp:undefined,kind:pk||pr?"down":"flat",badge:pk||pr?"Pausa":"",xr:true,msg:`Ultima volta in ${dn} (${fk(lk)} kg, range ${fx.lo}-${fx.hi}): qui il range è ${rr}, carico ricalcolato${pT}.${ct}`}}}}
+      return {kg:k,reps:Array(ex.s).fill(rp),top:rp>ex.hi?rp:undefined,kind:pk||pr?"down":"flat",badge:pk||pr?"Pausa":"",xr:true,pause:!!(pk||pr),msg:`Ultima volta in ${dn} (${fk(lk)} kg, range ${fx.lo}-${fx.hi}): qui il range è ${rr}, carico ricalcolato${pT}.${ct}`}}}}
   // Voto dell'ultima serie della seduta scelta (con lo storico in comune il voto è salvato sotto l'esercizio da cui viene la serie)
   const eff=(last.eff||{})[last.from||ex.id]??(last.eff||{})[ex.id];
   // Serie salvate senza kg (prima seduta, carico scritto solo sulla prima): valgono quelli della serie prima
@@ -2607,8 +2608,9 @@ function target(ex,noMyo){
   // Ripetizioni (su tutte le serie) da cui il carico nuovo diventa raggiungibile; null = mai, nemmeno al mantenimento
   const rAt=(r,nk)=>Math.floor((e1rm(kg,r+rirMid(ex.rir))/nk-1)*30-rirMid(ex.rir));
   // Pausa lunga (14+ giorni senza fare questo esercizio): la prima volta ripeti l'ultima seduta, stessi kg e ripetizioni; da 28 giorni 10% in meno sui kg (arrotondato al gradino)
+  // Con "Progredisci comunque" (pauseGo) si salta: progressione normale dall'ultima seduta
   const gap=gapDays(ex);
-  if(gap>=14&&reps.length){let rp=pad(reps,ex.s),nk=kg,rc=0,rcU=true;
+  if(gap>=14&&reps.length&&!pauseGo(ex)){let rp=pad(reps,ex.s),nk=kg,rc=0,rcU=true;
     // Giorni dalla seduta che si ripete (stesso range): è quella che il testo nomina
     const gL=Math.round((new Date(iso(today())+"T00:00:00")-new Date(dayOf(last)+"T00:00:00"))/864e5),bw=ex.t==="bw"||eqOf(ex)==="zav";
     // -10% arrotondato al gradino. Se il gradino è troppo grosso per farlo (es. curl al cavo 30 kg col gradino da 5) o sei a corpo libero:
@@ -2749,12 +2751,19 @@ function smallAlt(ex){const b=EX[String(ex.id).split("~")[0]]||ex,cur=ex.k||Stri
   if(!best&&cur&&b.id!==ex.id){const k=lastKg(b);if(k>0&&stepOf(b)/k<=0.2)best={k:"",n:b.n,r:stepOf(b)/k}}
   return best}
 // Giorni dall'ultima volta che hai fatto l'esercizio (in qualsiasi giorno, scarico compreso)
+// "Progredisci comunque" dopo una pausa lunga: la scelta vale per l'ultima seduta salvata di quell'esercizio (S.pauseGo[id] = il suo giorno).
+// Salvata la seduta nuova il giorno cambia e la scelta decade da sola, anche passando la mezzanotte con la seduta aperta
+function pgKey(ex){const l=history(ex.id)[0];return l?dayOf(l):null}
+// pgOff: nello scarico e nei giorni alleggeriti la scelta non vale (lì il tasto non c'è). pgForce: per confrontare la proposta con e senza la scelta
+let pgOff=false,pgForce=null;
+function pauseGo(ex){if(pgOff)return false;if(pgForce!=null)return pgForce;const k=pgKey(ex);return !!k&&(S.pauseGo||{})[ex.id]===k}
+function togglePauseGo(ex){S.pauseGo=S.pauseGo||{};if(pauseGo(ex))delete S.pauseGo[ex.id];else S.pauseGo[ex.id]=pgKey(ex);for(const id in S.pauseGo)if(pgKey(exById(id))!==S.pauseGo[id])delete S.pauseGo[id];save()}
 function gapDays(ex){const l=history(ex.id)[0];return l?Math.round((new Date(iso(today())+"T00:00:00")-new Date(dayOf(l)+"T00:00:00"))/864e5):0}
 function lastKg(ex,same){const l=history(ex.id).filter(x=>!x.deload&&(!same||!x.from||sameRng(EX[x.from],ex)))[0];if(!l)return null;return workKg(l.sets[ex.id],ex.lo)}
 // Ripetizioni in canna del giorno (stesse regole del chip sotto l'esercizio): padel dopo = almeno 1 sull'isolamento, partita domani = +1 dove la scheda dice 0, scarico 3-4
 function rirFor(ex,mods){let r=mods.has("deload")?"3-4":mods.has("prePadel")&&/^0/.test(ex.rir||"")?"1":ex.rir;if(mods.has("rir")&&!mods.has("deload")&&/^0/.test(String(r)))r=String(r).replace(/\d+/g,d=>+d+1);return r}
 // Serie in più: stesse ripetizioni proposte per l'ultima serie della scheda (non il minimo del range)
-function tgFor(ex,mods,g){const t=tgFor0(ex,mods,g),n=setsFor(ex,mods),r=t&&t.reps;if(!Array.isArray(r)||!r.length||r.length>=n)return t;return {...t,reps:[...r,...Array(n-r.length).fill(r[r.length-1])]}}
+function tgFor(ex,mods,g){const o=pgOff;pgOff=o||mods.has("light")||mods.has("deload");let t0;try{t0=tgFor0(ex,mods,g)}finally{pgOff=o}const t=t0,n=setsFor(ex,mods),r=t&&t.reps;if(!Array.isArray(r)||!r.length||r.length>=n)return t;return {...t,reps:[...r,...Array(n-r.length).fill(r[r.length-1])]}}
 function tgFor0(ex,mods,g){let t=target(ex);
   // Prima volta: nel messaggio le ripetizioni in canna di oggi, non quelle della scheda
   {const rf=rirFor(ex,mods);if(rf!==ex.rir&&/^Prima volta/.test(t.msg||""))t={...t,msg:t.msg.replace(` lasciando ${ex.rir} in canna`,` lasciando ${rf} in canna`)}}
@@ -3720,6 +3729,9 @@ function renderTrain(only){
   document.querySelectorAll("#exs [data-painswap]").forEach(b=>b.onclick=()=>openSwap(g,b.dataset.painswap));
   document.querySelectorAll("#exs [data-open]").forEach(b=>b.onclick=()=>openExVT(g,b.dataset.open));
   document.querySelectorAll("#exs [data-xadd]").forEach(b=>b.onclick=()=>addXs(g,b.dataset.xadd,1));
+  // Progredisci comunque / Rimetti la ripresa dopo la pausa: il tasto resta dov'era sullo schermo e tiene il fuoco
+  document.querySelectorAll("#exs [data-pgo]").forEach(b=>b.onclick=()=>{const id=b.dataset.pgo,y=b.getBoundingClientRect().top,ex=PLAN[g].ex.map(e=>effEx(g,e)).find(e=>e.id===id)||exById(id);
+    togglePauseGo(ex);buzz(8);renderTrain();const nb=document.querySelector(`#exs [data-pgo="${id}"]`);if(nb){window.scrollBy(0,nb.getBoundingClientRect().top-y);nb.focus({preventScroll:true})}});
   document.querySelectorAll("#exs [data-xdel]").forEach(b=>b.onclick=()=>addXs(g,b.dataset.xdel,-1));
   document.querySelectorAll("#exs [data-eff]").forEach(b=>b.onclick=()=>{const d=draftFor(g);d.eff=d.eff||{};const was=d.eff[b.dataset.ex];if(was===b.dataset.eff)return;d.eff[b.dataset.ex]=b.dataset.eff;d.effAt=d.effAt||{};d.effAt[b.dataset.ex]=Date.now();buzz(8);
     const ex=PLAN[g].ex.map(e=>effEx(g,e)).find(e=>e.id===b.dataset.ex)||exById(b.dataset.ex);
@@ -3905,6 +3917,11 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   if(padAfter(mods)&&ex.strap)chips.push(`<span class="chip adapt">Fasce da polso: risparmi la presa per il padel</span>`);
   if(tg.top&&tg.top>ex.hi&&!mods.has("deload")&&tg.reps.every(r=>r>=ex.lo)&&!["time","nordic","perf"].includes(ex.t)){const mx=eqMax(ex);chips.push(`<span class="chip hot">Range esteso fino a ${tg.top}: ${mx&&(tg.kg||0)>=mx?`${fk(mx)} kg è il massimo del pacco`:`il prossimo gradino è ${pct(Math.round(stepOf(ex)/Math.max(1,tg.kg||lastKg(ex)||1)*100))}`}</span>`)}
   const stallTxt=!mods.has("deload")&&!tg.hold&&tg.kind!=="down"&&!(tg.kind==="up"&&tg.kg>0&&tg.kg>(lastKg(ex)||0))&&!((draftFor(g).ex[ex.id]||[]).some(x=>x.done&&x.pr)&&!brkNow.has(ex.id))&&stalled(ex)?(phaseAt()==="def"?`<p class="prog down"><span>In calo</span><span>Massimale sotto del 5% nelle ultime 2 sedute. In definizione basta tenere i carichi: se continua togli una serie o fai lo scarico.</span></p>`:`<p class="prog down fermo"><span>Fermo</span><span>Nessun miglioramento nelle ultime 3 sedute: prova una variante con ⇄ Cambia o togli una serie per due settimane.</span></p>`):"";
+  // Pausa lunga: "Progredisci comunque" finché non hai fatto serie dell'esercizio. Mai nello scarico né nei giorni alleggeriti (lì i carichi restano fermi comunque)
+  const pgOn=!nn&&!rows.some(r=>r.done)&&!mods.has("deload")&&!mods.has("light"),pgSel=pgOn&&pauseGo(ex)&&gapDays(ex)>=14;
+  // Solo se la scelta cambia davvero kg o ripetizioni (es. non quando anche la progressione normale terrebbe tutto uguale)
+  let pgDiff=false;if(pgOn&&(tg.pause||pgSel)){pgForce=!pgSel;try{const t2=tgFor(ex,mods,g);pgDiff=t2.kg!==tg.kg||(t2.reps||[]).join()!==(tg.reps||[]).join()}catch(e){}finally{pgForce=null}}
+  const pgH=pgDiff?`<button class="lnk pgo" data-pgo="${ex.id}">${pgSel?"Rimetti la ripresa dopo la pausa":"Progredisci comunque"}</button>`:"";
   const over=tOn&&tEnd<=Date.now();
   const rest=withRest&&tOn?`<div class="rest ${over?"over":""}" id="restIn" role="timer"><span class="rr"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rk" cx="32" cy="32" r="28"/><circle class="ra rc" cx="32" cy="32" r="28" pathLength="100"/></svg><i class="rg" aria-hidden="true"><i class="rh r1" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><i class="rh r2" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><i class="rh rd" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra rc" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i></i><b class="tv"></b></span><span class="tl" aria-live="assertive">${over?"Recupero finito":"Recupero"+(tPlus?"\u00a0· +"+tPlus+"\u00a0s":"")}</span><span class="tb"><button data-ts>Chiudi</button><button data-tp>+15 s</button></span></div>`:"";
   // Scheda che si colora: a ogni serie un velo su tutta la scheda si intensifica piano; a esercizio finito passa l'oro in diagonale
@@ -3913,6 +3930,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
     <div class="exhead"><h3>${esc(ex.n)}${(howOf(ex)||errOf(ex)||ex.note)?(IMGEX[ex.id]=ex,`<button class="qm" data-img="${ex.id}" aria-label="Come si fa: ${esc(ex.n)}">?</button>`):""}</h3><button class="swap" data-base="${base.id}" aria-label="Sostituisci ${esc(ex.n)}">⇄ Cambia</button></div>
     <div class="tgt"><b${cu&&!nn?` data-cu="${lk}|${tg.kg}|${esc(" kg × "+r0)}|${ex.id}"`:""}>${dcw(nn&&nn.kg!=null&&hasKg?`${fk(nn.kg)} kg × ${rT}`:big)}</b>${tg.badge?`<small class="${tg.kind}">${esc(tg.badge)}</small>`:""}</div>
     ${nn?`<p class="prog down"><span>${esc(nn.txt)}</span></p>`:`<p class="prog ${tg.kind}"><span>${esc(tg.msg)}</span></p>`}
+    ${pgH}
     <p class="spec">${spec.join("<i> · </i>")}</p>
     ${chips.length&&!fN?`<div class="chips">${chips.join("")}</div>`:""}
     ${hasKg&&(setupOf(ex)||eqLbl(ex))?setupHTML(ex):""}
@@ -5092,7 +5110,7 @@ function renderSettings(){
     <li>«Fai la seduta normale» (su Oggi o nel «perché» di Allenamento), solo per quel giorno: serie e ripetizioni in canna della scheda, senza gli adattamenti per padel, partita, Stanco ed eccentrici. Restano lo scarico, la scelta completa o ridotta prima di due partite e, con il padel dopo la palestra, le fasce da polso, cuffia e polso dopo il padel e niente myo-rep a cedimento. C'è solo se cambia davvero qualcosa. Vale finché non cambia qualcosa che adatta la seduta di oggi (la seduta, il padel di oggi o il suo ordine, una partita domani o dopodomani, Stanco): allora decade e l'app lo dice. «In forma» o un padel che non tocca la seduta di oggi non la cambiano. Fatta da Stanco o in un giorno di partita, per la progressione conta come seduta alleggerita.</li>
     <li>«+ Aggiungi una serie»: le serie in più contano per record e volume, non per la progressione né per lo stallo. Non c'è su salti, myo-rep e scarico.</li>
     <li>Scarico quando serve, non a calendario: l'app lo propone dopo 6 settimane senza scarico (la scheda dice ogni 5-6: puoi avviarlo prima a mano) o con 3+ esercizi fermi, ma non prima di 4 settimane di lavoro. Le prime 2 sedute di un esercizio (in quel range) servono a trovare il carico e non contano per lo stallo. Serie dimezzate, stessi carichi dell'ultima seduta vera (o quello già abbassato, se l'app ti aveva chiesto di scendere), 3-4 in canna. Le sedute di scarico non contano per la progressione. Una pausa di 7 o più giorni senza sedute vale come scarico.</li>
-    <li>Pausa lunga su un esercizio: dopo 14 o più giorni senza farlo, la prima volta ripeti l'ultima seduta (stessi kg e ripetizioni); dopo 28 o più giorni, 10% in meno sui kg, arrotondato al gradino (con la zavorra conta anche il tuo peso). Se il gradino è troppo grosso per scendere del 10% (es. 30 kg al cavo col gradino da 5) o sei a corpo libero, carico uguale e 3 ripetizioni in meno, mai sotto il minimo del range. Dalla volta dopo si riprende a salire.</li>
+    <li>Pausa lunga su un esercizio: dopo 14 o più giorni senza farlo, la prima volta ripeti l'ultima seduta (stessi kg e ripetizioni); dopo 28 o più giorni, 10% in meno sui kg, arrotondato al gradino (con la zavorra conta anche il tuo peso). Se il gradino è troppo grosso per scendere del 10% (es. 30 kg al cavo col gradino da 5) o sei a corpo libero, carico uguale e 3 ripetizioni in meno, mai sotto il minimo del range. Dalla volta dopo si riprende a salire. Se ti senti bene, tocca «Progredisci comunque» sotto la proposta: l'app propone la progressione normale dall'ultima volta, come se la pausa non ci fosse stata. Vale finché non salvi una seduta con quell'esercizio; «Rimetti la ripresa dopo la pausa» torna indietro. Il tasto c'è solo se cambia kg o ripetizioni e sparisce alla prima serie fatta; nei giorni di scarico o alleggeriti non c'è e la scelta non conta.</li>
     <li>Serie di avvicinamento «A» sul primo esercizio di petto, sul primo di dorso e sul primo multiarticolare: carichi a circa 50, 70 e 85% di quello di lavoro, 60 s di pausa.</li>
     <li>Timbro PR: quando una serie supera il massimale stimato migliore di almeno il 2% e in più usa un carico mai usato prima o batte il massimale della proposta di oggi, anche con più ripetizioni a un carico più basso (seguire la progressione da sola non basta). Niente timbro su Pallof, woodchop, salti, tenute e Nordic. Per trazioni e dip il massimale conta il tuo peso più la zavorra.</li>
    </ul></section>
