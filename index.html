@@ -73,6 +73,8 @@ h3{font-size:22px;line-height:1.05}
 .sets{display:flex;flex-direction:column;gap:6px}
 .set{display:grid;grid-template-columns:22px 1fr 1fr 46px;gap:7px;align-items:center}
 .set .i{text-align:center;font:400 max(20px,1.1765rem)/1 var(--display);color:var(--dim)}
+/* segni larghi (M, 10): se sbordano dalla colonna, sbordano a metà per lato (a sinistra c'è il margine della scheda), non tutti verso il campo kg */
+:root:not(#z):not(#y):not(#x) .set .i.wi{display:flex;justify-content:center;white-space:nowrap}
 .field{display:flex;align-items:center;gap:4px;background:var(--field);border:1px solid var(--line);border-radius:10px;padding-inline:10px;min-width:0}
 .field input{width:100%;min-width:0;background:transparent;border:0;padding:11px 0;font-weight:700;font-size:max(17px,1rem);font-variant-numeric:tabular-nums}
 .field input:focus{outline:none}
@@ -232,6 +234,8 @@ html[data-skin][data-skin] .btn.hot::after{content:"";position:absolute;top:-20%
 @media (prefers-reduced-motion:no-preference){html[data-skin][data-skin] .btn.hot:not(.noshine)::after{animation:shine 2.2s ease-in-out .3s 1 both}}
 @keyframes shine{0%,62%{transform:translateX(0) skewX(-20deg)}100%{transform:translateX(475%) skewX(-20deg)}}
 .skins{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+/* campione di Murano: la lastra cobalto con la banda madreperla e il bordo cangiante (il bordo è lo sfondo border-box) */
+.skins button[data-s="vetro"] i{border:2px solid transparent}
 .skins button{border:1px solid var(--line);border-radius:10px;padding:8px 2px 7px;background:var(--card-2);font-size:max(12px,0.7059rem);font-weight:700;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:5px}
 .skins i{width:26px;height:26px;border-radius:50%;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 2px 6px rgba(0,0,0,.4)}
 .skins button[aria-pressed="true"]{border-color:var(--hot);color:var(--fg)}
@@ -1318,8 +1322,9 @@ html[data-skin="campo"]:not(#z) #court{opacity:.14}
   .tick.pop::before,.tick.pop::after,.ex.cur.sw-n,.ex.cur.sw-p,.rk-pr .rbd.n{animation:none!important}
   .sheet{transition:none}
 }
-.rule{display:inline-flex;align-items:center;gap:4px}
-.rule .ic{width:14px;height:14px;flex:none}
+.rule{display:inline-flex;align-items:flex-start;gap:4px;line-height:1.35}
+/* icona allineata alla prima riga (centrata sulla riga, non sul blocco): sulle regole su due righe resta accanto all'inizio della frase */
+.rule .ic{width:14px;height:14px;flex:none;margin-top:max(0px,calc(.675em - 7px))}
 :root:not(#z) .thead{background:color-mix(in srgb,var(--bg) 97%,transparent)}
 .field input{text-align:center}
 :root:not(#z) .banner button.sec{color:var(--muted);font-weight:600}
@@ -1960,7 +1965,7 @@ html.vt-wf::view-transition-new(root){animation:vtIn .14s var(--ease-out) both}
 :root:not(#g1):not(#g2) .exhead .swap{margin-left:auto}
 :root:not(#g1):not(#g2) .exhead h3{flex:1 1 0;min-width:min-content;overflow-wrap:break-word}
 @supports (flex-basis:min-content){:root:not(#g1):not(#g2) .exhead h3{flex-basis:min-content;min-width:0}}
-@container (max-width:12.5em){.exhead h3{hyphens:auto;-webkit-hyphens:auto}}
+@container (max-width:12.5em){.exhead h3{hyphens:auto;-webkit-hyphens:auto;hyphenate-limit-chars:10 5 4;-webkit-hyphenate-limit-before:5;-webkit-hyphenate-limit-after:4}}
 /* GRF-2: il numero delle tessere si rimpicciolisce solo quando non ci sta (--n = caratteri, --tkc = larghezza media di una cifra del font) */
 .tile{container-type:inline-size}
 html[data-skin="vetro"]{--tkc:.58}html[data-skin="carbonio"],html[data-skin="campo"]{--tkc:.37}html[data-skin="eclisse"]{--tkc:.6}html[data-skin="lavagna"]{--tkc:.54}
@@ -2090,34 +2095,46 @@ html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .rk-h button{white-s
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4) .rk-next b{font-family:var(--ui);font-weight:800}
 /* ===== VETRO MURANO "MADREPERLA" (2026-10-26): velo iridescente che scorre sulla lastra, canne arcobaleno, perle e bordi cangianti ===== */
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5){
- --mp-rim:linear-gradient(120deg,#6f86f5,#d470b8,#e0a93a,#3fb3a8,#6f86f5)}
-html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera]{--mp-rim:linear-gradient(120deg,#7d93ff,#d77fc2,#e9bf5e,#5fcfc3,#7d93ff)}
+ --mp-rim:linear-gradient(120deg,var(--m-cane),var(--m-cane) 14%,#d470b8 38%,#e0a93a 58%,#3fb3a8 78%,var(--m-cane))}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera]{--mp-rim:linear-gradient(120deg,var(--m-cane),var(--m-cane) 14%,#d77fc2 38%,#e9bf5e 58%,#5fcfc3 78%,var(--m-cane))}
+/* v61: il bordo madreperla parte e finisce nel colore della variante (blu, rubino, acquamare), così la variante si vede anche in Allenamento */
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5):not([data-sera]) body{background:linear-gradient(180deg,#f2eef6 0,var(--m-bg) 280px)}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera] body{background:linear-gradient(180deg,color-mix(in srgb,var(--m-bg) 82%,#5a3a7a) 0,var(--m-bg) 300px)}
 /* la lastra: una banda di luce madreperla che attraversa piano il vetro (solo transform, niente ridisegno) */
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero{position:relative;overflow:hidden;isolation:isolate}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero::after{content:"";position:absolute;top:0;bottom:0;left:-100%;width:300%;z-index:-1;pointer-events:none;
- background:linear-gradient(115deg,transparent 28%,rgba(255,150,215,.17) 38%,rgba(200,170,255,.17) 46%,rgba(140,205,255,.15) 54%,transparent 64%);
+ background:linear-gradient(115deg,transparent 28%,rgba(224,64,154,.25) 38%,rgba(138,90,224,.25) 46%,rgba(47,143,224,.23) 54%,transparent 64%);
  will-change:transform;animation:mpBand 14s ease-in-out infinite alternate}
+/* v61: la banda cambia tinta più che luce (rosa, lilla, azzurro di media luminosità): si vede di più (≥30/255) e il testo bianco resta ≥4,5:1 anche al passaggio */
 @keyframes mpBand{from{transform:translateX(-12%)}to{transform:translateX(34%)}}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero::before{content:"";display:block!important;position:absolute;left:0;right:0;top:0;height:1.5px;z-index:1;pointer-events:none;background:var(--mp-rim);opacity:.9;-webkit-mask:none;mask:none;padding:0;border-radius:0}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero :is(.big,.meta,.hn p,.link,.pill){text-shadow:0 1px 2px rgba(0,0,0,.22)}
 /* canne arcobaleno al posto della canna blu */
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) :is(.pbar i,.rk-bar i){background:repeating-linear-gradient(115deg,rgba(255,255,255,.55) 0 2px,transparent 2px 9px),linear-gradient(90deg,#6d7ff2,#b07ae6,#f08cb8,#f3c46b,#5fcfc6)!important}
-/* perla cangiante sulla serie fatta */
-html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) button.tick[aria-pressed="true"]{background:radial-gradient(60% 50% at 35% 25%,rgba(255,255,255,.6),transparent 60%),conic-gradient(from 200deg,#1f9a68,#2aa98a,#3fb9b3,#2f9f7a,#1f9a68)!important}
+/* perla cangiante sulla serie fatta: verde (fatto) che vira in verde acqua, blu e lilla come la madreperla; toni scuri abbastanza per la ✓ bianca (≥3:1)
+   e riflesso spostato in alto a sinistra, lontano dalla ✓ */
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) button.tick[aria-pressed="true"]{background:radial-gradient(42% 34% at 24% 18%,rgba(255,255,255,.5),transparent 70%),conic-gradient(from 200deg,#167f55,#147a72 22%,#2a6f9c 40%,#5f58b4 52%,#1d7a8a 68%,#16805a 86%,#167f55)!important}
 /* bordo di madreperla sulla scheda in corso e sul timer */
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .ex.cur:not(.gold){border:2px solid transparent;box-shadow:0 8px 20px -12px var(--m-shadow);background:linear-gradient(var(--m-card),var(--m-card)) padding-box,var(--mp-rim) border-box}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) div.timer:not(.over){border:1.5px solid transparent;background:linear-gradient(color-mix(in srgb,var(--m-card) 90%,transparent),color-mix(in srgb,var(--m-card) 90%,transparent)) padding-box,var(--mp-rim) border-box}
-html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-var="2"] .card.hero::after{opacity:.55}
+/* v61: Acquamare con la banda alla stessa forza delle altre varianti (prima a .55, quasi ferma) */
+/* la stessa banda madreperla, molto più tenue, sulla scheda dell'esercizio in corso (solo transform; ferma con Riduci movimento) */
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .ex.cur{overflow:hidden}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .ex.cur::after{content:"";display:block;position:absolute;top:0;bottom:0;left:-100%;width:300%;z-index:-1;pointer-events:none;border:0;
+ background:linear-gradient(115deg,transparent 30%,rgba(224,64,154,.07) 39%,rgba(138,90,224,.07) 46%,rgba(47,143,224,.065) 53%,transparent 62%);
+ will-change:transform;animation:mpBand 18s ease-in-out infinite alternate}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera] .ex.cur::after{background:linear-gradient(115deg,transparent 30%,rgba(255,150,215,.08) 39%,rgba(200,170,255,.08) 46%,rgba(140,205,255,.07) 53%,transparent 62%)}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .ex.cur.gold{border-width:2px}
 /* leggibilità sulla lastra: testo bianco pieno, riflesso in alto più tenue, pillola scura, Acquamare e Rubino sera più profondi */
-html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero{background:radial-gradient(120% 70% at 18% 0%,rgba(255,255,255,.1),transparent 55%),linear-gradient(160deg,var(--m-s1),var(--m-s2) 55%,var(--m-s3))}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero{background:radial-gradient(120% 70% at 18% 0%,rgba(255,255,255,.04),transparent 55%),linear-gradient(160deg,var(--m-s1),var(--m-s2) 55%,var(--m-s3))}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero :is(p,.meta,.meta span,.meta b,.hn,small){color:#fff}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero .pill{background:rgba(0,0,0,.2)}
-html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-var="2"]{--m-s1:#0f7d87;--m-s2:#0a6670}
-html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera][data-var="2"]{--m-s1:#0e717b;--m-s2:#0b646d}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-var="2"]{--m-s1:#0d6d75;--m-s2:#09616a}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera][data-var="2"]{--m-s1:#0d6c76;--m-s2:#0b646d}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera][data-var="1"]{--m-s1:#bd2f4a}
+/* v61: con la banda alla stessa forza ovunque, la parte alta della lastra (dove stanno "8 esercizi · circa 55 min") un filo più profonda in Rubino giorno e Cobalto sera */
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5):not([data-sera])[data-var="1"]{--m-s1:#c02f48}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera]:not([data-var="1"]):not([data-var="2"]){--m-s1:#3458ca}
 /* contrasti residui: barra in basso di giorno, "(invece di N)" sulla scheda in corso velata, numero del recupero dentro l'anello */
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5):not([data-sera]) nav.bar button[aria-current="false"]{color:#46536c}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .ex.cur .spec span.ad{color:color-mix(in srgb,var(--info) 68%,var(--m-ink))}
@@ -2127,7 +2144,7 @@ html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera] 
 /* velo della scheda in corso: stesso colore, ma più profondo di sera e un po' più tenue di giorno, così il testo resta leggibile anche a scheda quasi piena */
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5):not([data-sera]) .ex.cur>.fp{background:radial-gradient(130% 100% at 25% 15%,color-mix(in srgb,var(--fc,var(--go)) 44%,transparent),color-mix(in srgb,var(--fc,var(--go)) 26%,transparent) 70%)}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera] .ex.cur>.fp{background:radial-gradient(130% 100% at 25% 15%,color-mix(in srgb,color-mix(in srgb,var(--fc,var(--go)) 42%,var(--m-card)) 80%,transparent),color-mix(in srgb,color-mix(in srgb,var(--fc,var(--go)) 42%,var(--m-card)) 55%,transparent) 70%)}
-@media (prefers-reduced-motion:reduce){html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero::after{animation:none}}
+@media (prefers-reduced-motion:reduce){html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) :is(.card.hero,.ex.cur)::after{animation:none}}
 
 /* Serie in più: tasti testuali sotto le righe, a sinistra (lontani dalle ✓). "Togli" sotto "+ Aggiungi", almeno 44 px */
 .xsr{display:flex;flex-direction:column;align-items:flex-start;margin-top:2px}
@@ -3182,6 +3199,10 @@ function segSVG(str,fixed){let x=0,p="";for(const ch of str){
 function setNum(el,txt){if(!el)return;if(skinNow()==="carbonio"){if(el.dataset.t===txt&&el.querySelector(".seg7"))return;el.dataset.t=txt;el.innerHTML=`<span class="sr">${esc(txt)}</span>`+txt.replace(/([0-9:,\-]+)|([^0-9:,\-]+)/g,(m,d,o)=>d?`<span class="seg7">${segSVG(d,!!el.closest(".tr,.rr"))}</span>`:`<span class="lu" aria-hidden="true">${esc(o)}</span>`)}else{delete el.dataset.t;if(el.matches(".tgt b"))el.innerHTML=dcw(esc(txt));else el.textContent=txt}}
 // Virgola decimale del numero grande ("22,5") in uno span: in Murano la virgola Bodoni si incollava al 5
 function dcw(t){return String(t).replace(/(\d),(?=\d)/g,'$1<span class="dc">,</span>')}
+// "M" della myo-rep e "10" nella colonna stretta delle serie: con i caratteri larghi (Syne, Manga) e il testo grande finivano sotto il campo kg.
+// Solo sui segni larghi (classe wi, righe rare) si misura e, se serve, si riduce il carattere quanto basta per stare a 2 px dal campo
+function fitMarks(){app.querySelectorAll(".set .i.wi").forEach(i=>{i.style.fontSize="";const nx=i.nextElementSibling,ib=i.getBoundingClientRect();if(!nx||!ib.width)return;const rg=document.createRange();rg.selectNodeContents(i);const w=rg.getBoundingClientRect().width,room=2*(nx.getBoundingClientRect().left-2-(ib.left+ib.width/2));if(w>room&&room>0)i.style.fontSize=(parseFloat(getComputedStyle(i).fontSize)*room/w).toFixed(2)+"px"})}
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(typeof app!=="undefined"&&app)fitMarks()})
 function ledify(){if(skinNow()!=="carbonio")return;app.querySelectorAll(".tgt b,.kpi b").forEach(b=>{if(!b.querySelector(".seg7"))setNum(b,b.textContent)})}
 // Il carico della prossima volta sale contando, una volta al giorno per esercizio
 const lastPct={},lastXd={},lastDn={},recShown=new Set();let lastRow={g:null,m:new Map()};
@@ -3272,7 +3293,7 @@ function trainFx(g,pct,mods){
   // --p (aurora di Vetro e Lavagna, luna di Eclisse) solo sui due elementi che lo usano: sulla radice ricalcolava gli stili di tutta la pagina a ogni spunta
   {const v=(pct/100).toFixed(2),au=document.getElementById("aurw"),th=app.querySelector(".thead");if(au)au.style.setProperty("--p",v);if(th)th.style.setProperty("--p",v)}
   veilFx();
-  ledify();
+  ledify();fitMarks();
   app.querySelectorAll(".tgt b[data-cu]").forEach(b=>{const [a,z,rest,id]=b.dataset.cu.split("|");const k=g+id+iso(today());if(counted.has(k))return;counted.add(k);rollUp(b,+a,+z,rest)});
 }
 function isRecord(g,ex,exId,j,r){if(noEff(ex)||powEx(ex)||fixRep(ex)||!history(exId).length)return false;const v=metricOf(ex,r);if(!(v>0))return false;
@@ -3888,12 +3909,12 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
     const isM=myoA&&j===rpl.mj;
     // Serie fatta sotto le ripetizioni previste: numero e puntino gialli (la spunta resta quella normale)
     const low=r.done&&ex.t!=="perf"&&num(r.reps)!=null&&num(r.reps)<(+(r.tg??tg.reps[t]??ex.lo)||ex.lo);
-    sets+=`<div class="set ${r.done?"done":""} ${now?"now":""} ${isM?"myom":""} ${isX?"xsm":""} ${low?"low":""}"><span class="i"${isM?' title="Serie myo-rep"':isX?' title="Serie in più"':""}>${isM?"M":isX?"+":t+1}</span>
+    sets+=`<div class="set ${r.done?"done":""} ${now?"now":""} ${isM?"myom":""} ${isX?"xsm":""} ${low?"low":""}"><span class="i${isM||(!isX&&t>=9)?" wi":""}"${isM?' title="Serie myo-rep"':isX?' title="Serie in più"':""}>${isM?"M":isX?"+":t+1}</span>
       ${hasKg?`<${fw} class="field ${r.done?"":"pmf"}">${pm("kg",-1)}<input inputmode="decimal" value="${esc(kgV)}" placeholder="kg" data-ex="${ex.id}" data-j="${j}" data-f="kg" aria-label="Kg serie ${sn}"><span>kg</span>${pm("kg",1)}${r.done&&r.pr?`<i class="prs" aria-hidden="true">PR</i>`:""}</${fw}>`:(ex.t==="time"&&!r.done?`<button class="hold" data-ex="${ex.id}" data-j="${j}" aria-label="Avvia il cronometro della tenuta, serie ${sn}">${I("play")}Via</button>`:`<span class="bw">${ex.t==="nordic"?"elastico":ex.t==="time"?"tenuta":"salto"}</span>`)}
       <${fw} class="field ${r.done?"":"pmf"}">${pm("reps",-1)}<input inputmode="numeric" value="${esc(rpV)}" data-ex="${ex.id}" data-j="${j}" data-f="reps" aria-label="${unit} serie ${sn}"><span>${unit}</span>${pm("reps",1)}</${fw}>
       <button class="tick" data-ex="${ex.id}" data-j="${j}" aria-pressed="${!!r.done}" aria-label="Serie ${sn} fatta">✓</button></div>`;
     if(isM&&r.done){const mm=r.myo||[],open=!r.myoEnd&&mm.length<MYO.max;
-      sets+=`<div class="myo"><span class="ml">Mini-serie<small>${MYO.mini} rip · ${MYO.rest} s di pausa · ti fermi quando ne fai meno di ${MYO.stop}</small></span>
+      sets+=`<div class="myo"><span class="ml">Mini-serie<small>${MYO.mini} rip · ${MYO.rest} s di pausa · ti fermi quando ne fai meno&nbsp;di&nbsp;${MYO.stop}</small></span>
         <div class="mc">${mm.map((v,k)=>`<span class="mv" aria-label="Mini-serie ${k+1}: ${v} ripetizioni">${v}</span>`).join("")}
         ${open?`<label class="field mi"><input inputmode="numeric" value="${MYO.mini}" data-myo="${ex.id}" aria-label="Ripetizioni mini-serie ${mm.length+1}"></label><button class="tick mt" data-myot="${ex.id}" data-j="${j}" aria-label="Mini-serie ${mm.length+1} fatta">✓</button><button class="lnk" data-myoend="${ex.id}" data-j="${j}">Basta</button>`:`<span class="mdone">${mm.reduce((a,b)=>a+b,0)} rip in ${mm.length} mini-serie</span>`}</div></div>`}
   }
@@ -4319,7 +4340,15 @@ function startTimer(sec,label,plus,end,ctx){litOff();tPlus=plus||0;tLbl=label;tC
 function tVal(){const left=Math.round((tEnd-Date.now())/1000);if(!tTw)return left;const k=(performance.now()-tTw.t)/380;if(k>=1){tTw=null;return left}return Math.round(tTw.a+(left-tTw.a)*(1-Math.pow(1-k,3)))}
 function tTxt(){const v=tVal();
   const a=Math.abs(v),txt=(v<0?"+":"")+Math.floor(a/60)+":"+String(a%60).padStart(2,"0");
-  setNum(T("tval"),txt);const inl=document.getElementById("restIn");if(inl)setNum(inl.querySelector(".tv"),txt)}
+  setNum(T("tval"),txt);ringFit(T("tval"),txt);const inl=document.getElementById("restIn");if(inl){const tv=inl.querySelector(".tv");setNum(tv,txt);ringFit(tv,txt)}}
+// Cifre dentro l'anello: la dimensione dipende dall'anello, non solo dal testo. Se "1:58", "9:59" o "+0:01" sono più larghi del foro
+// (50/64 del diametro, tratto escluso) si riducono quanto basta, in ogni stile e con il testo grande. Si misura solo quando cambiano
+// il numero di caratteri, lo stile o la grandezza del testo (non a ogni secondo); a recupero finito l'anello sparisce e torna la misura piena
+function ringFit(el,txt){if(!el)return;const r=el.closest(".tr,.rr");if(!r)return;if(r.closest(".rest.over")){if(el.dataset.fk){el.style.fontSize="";delete el.dataset.fk}return}
+  const k=txt.length+"|"+skinNow()+"|"+getComputedStyle(document.documentElement).fontSize;if(el.dataset.fk===k)return;
+  el.style.fontSize="";const W=r.offsetWidth,R=r.getBoundingClientRect().width;if(!W||!R)return;const rg=document.createRange();rg.selectNodeContents(el);const w=rg.getBoundingClientRect().width,max=R*(50/64-3/W);
+  if(w>max)el.style.fontSize=(parseFloat(getComputedStyle(el).fontSize)*max/w).toFixed(2)+"px";el.dataset.fk=k}
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{document.querySelectorAll(".tr .t,.rr .tv").forEach(e=>delete e.dataset.fk);if(tOn)tTxt()})
 function tick(){if(!tOn)return;const left=Math.round((tEnd-Date.now())/1000);
   tTxt();const inl=document.getElementById("restIn");
   ringSync();
@@ -4335,7 +4364,8 @@ function tick(){if(!tOn)return;const left=Math.round((tEnd-Date.now())/1000);
   // "Recupero finito": il blocco resta alto uguale. Se con la scritta più grande Chiudi e +15 s andrebbero a capo, la scritta resta della misura di prima (su due righe)
   if(left<=0&&inl&&!inl.classList.contains("over")){const tb=inl.querySelector(".tb"),rr=inl.querySelector(".rr"),one=()=>!tb||!rr||tb.getBoundingClientRect().top<rr.getBoundingClientRect().bottom-4,was=one();
     inl.style.minHeight=inl.offsetHeight+"px";inl.classList.add("over");inl.querySelector(".tl").textContent="Recupero finito";if(was&&!one())inl.classList.add("fit")}
-  if(left>0&&inl&&inl.classList.contains("over")){inl.style.minHeight="";inl.classList.remove("over","fit");inl.querySelector(".tl").textContent="Recupero"}}
+  if(left>0&&inl&&inl.classList.contains("over")){inl.style.minHeight="";inl.classList.remove("over","fit");inl.querySelector(".tl").textContent="Recupero"}
+  if(inl){const tv=inl.querySelector(".tv");ringFit(tv,tv.dataset.t||tv.textContent)}}
 // Anello: angolo che resta A (0-360) = due mezzi anelli + il puntino della fine, ruotati con WAAPI su transform per tutto il tempo che manca
 function ringSync(){const k=tEnd+"|"+tTot;
   document.querySelectorAll("#timer .tr,#restIn .rr").forEach(c=>{
@@ -4397,7 +4427,7 @@ let tShown=0,tH=88,tLock=0;const tFresh=()=>performance.now()-lastTk.t<700||perf
 let tHold=false;
 function syncTimer(dy){if(!tOn)return;if(tHold){T("timer").hidden=true;return}const tm=T("timer"),inl=document.getElementById("restIn"),hide=!!inl&&restSeen(inl,dy||0);
   if(tm.hidden&&!hide){tShown=performance.now();tm.classList.remove("enter");void tm.offsetWidth;tm.classList.add("enter");clearTimeout(tm.et);tm.et=setTimeout(()=>tm.classList.remove("enter"),200)}
-  tm.hidden=hide;if(!hide)tH=tm.offsetHeight||tH;if(inl)inl.classList.toggle("dup",!hide);ringSync()}
+  tm.hidden=hide;if(!hide){tH=tm.offsetHeight||tH;const tv=T("tval");ringFit(tv,tv.dataset.t||tv.textContent)}if(inl)inl.classList.toggle("dup",!hide);ringSync()}
 let scrQ=0;addEventListener("scroll",()=>{if(scrQ||!tOn)return;scrQ=requestAnimationFrame(()=>{scrQ=0;if(performance.now()>tLock)syncTimer(0)})},{passive:true});
 // Campo kg con un carico lungo (122,5): classe per il carattere un po' più piccolo sugli schermi stretti
 // cifre più piccole: "lg" da 5 caratteri (122,5); "md", appena più piccole, per 4 caratteri (22,5) quando nel campo non ci stanno (320 px, font dello stile)
@@ -5002,7 +5032,7 @@ function barChart(el,data){
 }
 
 /* ================= WEEK / SETTINGS ================= */
-const SKINS=[["vetro","Vetro","linear-gradient(135deg,#edf1f5 50%,#1e3fae 50%)"],["carbonio","Carbonio","repeating-linear-gradient(45deg,#2a2f36 0 3px,#14171b 3px 6px),#ffb000"],["campo","Campo","linear-gradient(135deg,#12306a 50%,#e4ff3a 50%)"],["manga","Manga","radial-gradient(circle,rgba(255,255,255,.35) 1.1px,transparent 1.5px) 0 0/6px 6px,linear-gradient(135deg,#1a191e 58%,#ff2340 58%)"],["lavagna","Lavagna","linear-gradient(135deg,#1d2521 55%,#ffd84d 55%)"],["eclisse","Eclisse","radial-gradient(circle at 50% 50%,#040406 0 34%,#fffaf2 36%,#ff5277 48%,#040406 66%)"]];
+const SKINS=[["vetro","Murano","linear-gradient(115deg,transparent 30%,rgba(224,64,154,.5) 44%,rgba(138,90,224,.5) 52%,rgba(47,143,224,.45) 60%,transparent 74%) padding-box,linear-gradient(160deg,#3158d4,#1a37a0 55%,#122a7e) padding-box,linear-gradient(120deg,#5d7cf0,#d470b8 38%,#e0a93a 58%,#3fb3a8 78%,#5d7cf0) border-box"],["carbonio","Carbonio","repeating-linear-gradient(45deg,#2a2f36 0 3px,#14171b 3px 6px),#ffb000"],["campo","Campo","linear-gradient(135deg,#12306a 50%,#e4ff3a 50%)"],["manga","Manga","radial-gradient(circle,rgba(255,255,255,.35) 1.1px,transparent 1.5px) 0 0/6px 6px,linear-gradient(135deg,#1a191e 58%,#ff2340 58%)"],["lavagna","Lavagna","linear-gradient(135deg,#1d2521 55%,#ffd84d 55%)"],["eclisse","Eclisse","radial-gradient(circle at 50% 50%,#040406 0 34%,#fffaf2 36%,#ff5277 48%,#040406 66%)"]];
 const SKVARS={vetro:[["Cobalto","linear-gradient(135deg,#edf1f5 45%,#1e3fae 55%)"],["Rubino","linear-gradient(135deg,#edf1f5 45%,#a3162f 55%)"],["Acquamare","linear-gradient(135deg,#edf1f5 45%,#0a6670 55%)"]],
  lavagna:[["Giallo","linear-gradient(135deg,#1d2521 55%,#ffd84d 55%)"],["Azzurro","linear-gradient(135deg,#1d2521 55%,#7fd0ff 55%)"],["Rosa","linear-gradient(135deg,#1d2521 55%,#ff94bd 55%)"]],
  eclisse:[["Rosa","radial-gradient(circle,#040406 0 34%,#fffaf2 36%,#ff5277 50%,#040406 68%)"],["Oro","radial-gradient(circle,#050403 0 34%,#fff1d2 36%,#ffb347 50%,#050403 68%)"],["Plasma","radial-gradient(circle,#02040a 0 34%,#e2f4ff 36%,#8f7bff 50%,#02040a 68%)"]],
