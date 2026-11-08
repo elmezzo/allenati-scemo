@@ -1900,10 +1900,50 @@ html:not(#z):not(#y):not(#x) .sheet .fxgo,html:not(#z):not(#y):not(#x) .sheet .f
 html[data-skin="vetro"]:not(#z):not(#y):not(#x) .sheet .fxgo,html[data-skin="vetro"]:not(#z):not(#y):not(#x) .sheet .fxgo:disabled{box-shadow:0 -12px 24px rgba(0,0,0,.45),0 40px 0 30px rgb(22,23,34)}
 html[data-skin="lavagna"]:not(#z):not(#y):not(#x) .sheet .fxgo,html[data-skin="lavagna"]:not(#z):not(#y):not(#x) .sheet .fxgo:disabled{box-shadow:0 -12px 24px rgba(0,0,0,.45),0 40px 0 30px #202925}
 html[data-skin="manga"]:not(#z):not(#y):not(#x) .sheet .fxgo,html[data-skin="manga"]:not(#z):not(#y):not(#x) .sheet .fxgo:disabled{box-shadow:0 40px 0 30px #0f0e12,0 -6px 0 6px #0f0e12}
-/* Oro: i testi piccoli hanno un fondo scuro sotto, sul giallo chiaro di Carbonio e Campo non bastava il colore */
-:root:not(#z):not(#y):not(#x) .ex.cur.gold .pgr>span{background:rgba(0,0,0,.34);color:var(--fg);padding:2px 8px;border-radius:999px}
-:root:not(#z):not(#y):not(#x) .ex.cur.gold .qm{background:rgba(0,0,0,.42);color:#fff;border-color:rgba(255,255,255,.5)}
-:root:not(#z):not(#y):not(#x) .ex.cur.gold .lu{color:var(--fg);text-shadow:0 1px 2px rgba(0,0,0,.55)}
+/* ===== v61 oro e velo (GOLD-1, COL-2, STL-6) =====
+   Velo Tramonto mescolato al colore della scheda in tutti gli stili (come Murano sera): lo stile resta riconoscibile a fine esercizio.
+   Scheda dorata: oro pieno e coprente con scritte scure (inchiostro) negli stili scuri e in Murano sera, come Murano giorno.
+   Le "isole" con fondo proprio (campi, spunte, recupero, scelte) tengono i colori dello stile: i valori vengono presi da #exs, prima dell'inchiostro. */
+#exs{--gx-fg:var(--fg);--gx-mut:var(--muted);--gx-dim:var(--dim);--gx-info:var(--info);--gx-go:var(--go);--gx-adapt:var(--adapt);--gx-mink:var(--m-ink);--gx-mmut:var(--m-mut);--gx-mdim:var(--m-dim);--gx-chalk:var(--chalk);--gx-chalkrgb:var(--chalk-rgb)}
+html:not([data-skin="vetro"]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur>.fp{background:radial-gradient(130% 100% at 25% 15%,color-mix(in srgb,color-mix(in srgb,var(--fc,var(--go)) 42%,var(--card)) 80%,transparent),color-mix(in srgb,color-mix(in srgb,var(--fc,var(--go)) 42%,var(--card)) 55%,transparent) 70%)}
+html:not([data-skin="vetro"]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur>.fq{background:radial-gradient(130% 100% at 25% 15%,color-mix(in srgb,color-mix(in srgb,var(--fc0,var(--go)) 42%,var(--card)) 80%,transparent),color-mix(in srgb,color-mix(in srgb,var(--fc0,var(--go)) 42%,var(--card)) 55%,transparent) 70%)}
+:is(html:not([data-skin="vetro"]),html[data-skin="vetro"][data-sera]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur>.fg{background:linear-gradient(135deg,#ffe193,#f5c65e 50%,#e6ab45)}
+/* COL-5: link, "Salva", "Avvia scarico" e adattamenti (--info) seguono la variante: accento schiarito col testo, invece dell'azzurro fisso. Lavagna e Murano lo fanno già */
+html:is([data-skin="carbonio"],[data-skin="manga"],[data-skin="eclisse"],[data-skin="campo"]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5){--info:color-mix(in srgb,var(--acc) 58%,var(--fg))}
+/* COL-6: la scheda in corso prende una luce dall'alto nel colore della variante (stessa superficie dello stile, uno strato in più), così Ambra/Rosso/Ciano, Rosa/Oro/Plasma, ecc. si riconoscono anche in Allenamento */
+html[data-skin="carbonio"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur{background:linear-gradient(180deg,rgba(var(--acc-rgb),.2),rgba(var(--acc-rgb),.05) 200px,rgba(var(--acc-rgb),.045)),linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,0) 28%),repeating-linear-gradient(90deg,rgba(255,255,255,.022) 0 1px,transparent 1px 3px),linear-gradient(180deg,#232930,#14181d)}
+html[data-skin="manga"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur{background:linear-gradient(180deg,rgba(var(--acc-rgb),.2),rgba(var(--acc-rgb),.05) 200px,rgba(var(--acc-rgb),.05)),#1a191e}
+html[data-skin="eclisse"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur{background:linear-gradient(180deg,rgba(var(--acc-rgb),.2),rgba(var(--acc-rgb),.06) 200px,rgba(var(--acc-rgb),.05)),var(--cardbg)}
+html[data-skin="lavagna"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur{background:linear-gradient(180deg,rgba(var(--acc-rgb),.2),rgba(var(--acc-rgb),.06) 200px,rgba(var(--acc-rgb),.05)),var(--cardbg)}
+/* Lavagna: il nome dell'esercizio in corso scritto col gesso colorato della variante */
+html[data-skin="lavagna"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur:not(.gold) h3{color:var(--acc)}
+/* COL-7: nel riepilogo il rango di partenza resta più piccolo del nuovo (la gerarchia la fa la misura), ma non più spento a metà */
+:root:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .rk-pr .rbd.o{opacity:.9}
+html[data-skin="vetro"]:not([data-sera]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .rk-pr .rbd.o{opacity:1}
+:root:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .rk-pr .f{color:var(--muted)}
+/* Murano sera Acquamare: il velo pieno (acqua chiara) schiariva la pillola "A Avvicinamento" a 4,4:1; un po' meno colore nel velo. Murano giorno: la ✓ verde della pillola sul velo rosa sotto 3:1, più inchiostro */
+html[data-skin="vetro"][data-sera][data-var="2"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur>.fp{background:radial-gradient(130% 100% at 25% 15%,color-mix(in srgb,color-mix(in srgb,var(--fc,var(--go)) 32%,var(--m-card)) 80%,transparent),color-mix(in srgb,color-mix(in srgb,var(--fc,var(--go)) 32%,var(--m-card)) 55%,transparent) 70%)}
+html[data-skin="vetro"]:not([data-sera]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur.tint .wpill .wck{color:color-mix(in srgb,var(--go) 70%,var(--m-ink))}
+/* Murano giorno: l'oro resta crema sul vetro lattimo ma più carico, così si stacca anche dal velo rosa di Rubino e acqua di Acquamare */
+html[data-skin="vetro"]:not([data-sera]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur>.fg{background:linear-gradient(135deg,rgba(255,220,130,.62),rgba(236,172,52,.5) 55%,rgba(206,140,32,.56))}
+:is(html:not([data-skin="vetro"]),html[data-skin="vetro"][data-sera]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur.gold{--gold-ink:#2a1a04;--gold-ink2:#47300a;
+ --fg:var(--gold-ink);--muted:var(--gold-ink2);--dim:var(--gold-ink2);--m-ink:var(--gold-ink);--m-mut:var(--gold-ink2);--m-dim:var(--gold-ink2);--info:#1b3170;--go:#1b5228;--adapt:#6e3304;color:var(--fg)}
+:is(html:not([data-skin="vetro"]),html[data-skin="vetro"][data-sera]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur.gold :is(.field,.tick,.rest,.seg,.timer){--fg:var(--gx-fg);--muted:var(--gx-mut);--dim:var(--gx-dim);--info:var(--gx-info);--go:var(--gx-go);--adapt:var(--gx-adapt);--m-ink:var(--gx-mink);--m-mut:var(--gx-mmut);--m-dim:var(--gx-mdim)}
+:is(html:not([data-skin="vetro"]),html[data-skin="vetro"][data-sera]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur.gold :is(.pgr,.pgr *,.swap,.sethd,.set .i,.tgt b,.tgt b *,.spec,.spec *,.prog,.setup,.lu,h3){text-shadow:none}
+/* pillole "1 di 8" e "?" sull'oro: bronzo chiaro con l'inchiostro dello stile, non più capsule nere */
+:root:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur.gold .pgr>span{background:color-mix(in srgb,#7a5414 16%,transparent);color:var(--fg);padding:2px 8px;border-radius:999px;text-shadow:none}
+:root:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur.gold .qm{background:color-mix(in srgb,#7a5414 16%,transparent);color:var(--fg);border-color:color-mix(in srgb,#7a5414 50%,transparent);text-shadow:none}
+:root:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur.gold .lu{color:var(--fg)}
+:root:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur.gold .spec span.ad{color:var(--info);background:color-mix(in srgb,#7a5414 14%,transparent)}
+html[data-skin="vetro"]:not([data-sera]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur.gold .spec span.ad{background:none}
+/* isole proprie di alcuni stili: Manga ha la domanda su fondo scuro, Eclisse il recupero quasi trasparente (prende il fondo della scheda) */
+html[data-skin="manga"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur.gold .ask{--fg:var(--gx-fg);--muted:var(--gx-mut);--dim:var(--gx-dim);color:var(--fg)}
+html[data-skin="eclisse"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur.gold .rest:not(.over){background:linear-gradient(180deg,rgba(var(--cor-rgb),.08),rgba(var(--cor-rgb),.03)),var(--cardbg)}
+/* Lavagna: campi, scelte e spunte sono gesso senza fondo, quindi sull'oro diventano inchiostro anche loro */
+html[data-skin="lavagna"][data-skin][data-skin]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur.gold{--chalk:var(--gold-ink);--chalk-rgb:42,26,4}
+html[data-skin="lavagna"][data-skin][data-skin]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur.gold :is(.field,.tick,.seg){--fg:var(--gold-ink);--muted:var(--gold-ink2);--dim:var(--gold-ink2)}
+html[data-skin="lavagna"][data-skin][data-skin]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur.gold :is(.rest,.timer){--chalk:var(--gx-chalk);--chalk-rgb:var(--gx-chalkrgb)}
+html[data-skin="lavagna"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur.gold button.tick[aria-pressed="true"]{color:var(--gold-ink)!important;border-color:var(--gold-ink)}
 /* Progressi: il ? accanto al titolo va a capo invece di uscire dalla scheda */
 :root:not(#z):not(#y) .rk-h{flex-wrap:wrap;row-gap:6px}
 :root:not(#z):not(#y) .rk-h h3{min-width:0;overflow-wrap:break-word}
