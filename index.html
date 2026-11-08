@@ -1743,9 +1743,15 @@ html.vt-back::view-transition-group(sed),html.vt-back::view-transition-group(sed
 /* ===== AVATAR: SAGOMA CHE CRESCE (2026-10-13) ===== */
 .rk-fig .mz path{transform-box:fill-box;transform-origin:center;transform:scale(var(--s,1))}
 @media (prefers-reduced-motion:no-preference){
-  .rk-fig .rk-br{transform-box:view-box;transform-origin:100px 150px;animation:rkBreath 4.6s ease-in-out infinite}
-  .rk-fig .rk-mz .mz.lag{animation:rkLag 1.4s ease-in-out infinite}
+  /* ANM-1 (v61): il respiro sta sul contenitore HTML della sagoma, non su un <g> dentro l'SVG, così va sul compositor (niente Layout/Paint a ogni fotogramma).
+     50% 39.474% = il punto 100,150 del viewBox 38 0 124 380, come prima */
+  .rk-fig .rk-brw{transform-origin:50% 39.474%;animation:rkBreath 4.6s ease-in-out infinite;will-change:transform}
+  .rk-fig .rk-lagl{animation:rkLag 1.4s ease-in-out infinite;will-change:opacity}
 }
+/* muscolo indietro: si vede solo nel livello sopra (.rk-lagl), che lampeggia con l'opacità; nella sagoma resta trasparente ma cliccabile */
+.rk-fig .rk-brw{display:block;position:relative}
+.rk-fig svg.rk-lagl{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.rk-fig svg:not(.rk-lagl) .rk-mz .mz.lag{opacity:0}
 @keyframes rkBreath{50%{transform:scale(1.012,1.018)}}
 @keyframes rkLag{50%{opacity:.35}}
 /* ===== ALTRE TRANSIZIONI (2026-10-13) ===== */
@@ -4626,7 +4632,7 @@ const R_BACK={
 };
 let rView="front",rSel=null;
 function rFigure(A,V,o){
-  const P=rView==="front"?R_FRONT:R_BACK;let defs="",g="";
+  const P=rView==="front"?R_FRONT:R_BACK;let defs="",g="",lg="";
   const LAG=new Set(V||!A.BW?[]:balanceAt().filter(b=>b.kind==="rank").map(b=>b.lo.k));
   if(!V)for(const [k] of RMU){const m=A.mus[k];if(m.none)continue;const [,a,b]=RANKS[m.r];defs+=`<linearGradient id="rmg-${k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient>`}
   for(const k in P){
@@ -4636,9 +4642,9 @@ function rFigure(A,V,o){
     const paths=P[k].map(d=>`<path d="${d}"/>`).join("");
     // avatar: ogni muscolo è più grande quanto più alto è il suo rango (da 0,86 a 1,10); lampeggia se è indietro
     const sc=m&&!m.none&&m.r!=null?(.86+.03*m.r).toFixed(3):m?".86":"",lag=!V&&LAG.has(k);
-    g+=`<g ${m?`class="mz${k===rSel?" sel":""}${lag?" lag":""}" data-rm="${k}" style="--s:${sc}"`:""} fill="${fill}"${op}>${paths}<g transform="matrix(-1 0 0 1 200 0)">${paths}</g></g>`}
-  return `<svg viewBox="38 0 124 380" aria-label="${o&&o.lbl||`Sagoma con i muscoli colorati per ${V?"serie della settimana":"rango"}`}"><defs>${defs}<filter id="rkglow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3"/></filter></defs>
-<g class="rk-br"><ellipse cx="100" cy="28" rx="15" ry="19" fill="var(--rk-n)"/><g class="rk-gl" filter="url(#rkglow)" aria-hidden="true">${g}</g><g class="rk-mz">${g}</g></g></svg>`}
+    const gk=`<g ${m?`class="mz${k===rSel?" sel":""}${lag?" lag":""}" data-rm="${k}" style="--s:${sc}"`:""} fill="${fill}"${op}>${paths}<g transform="matrix(-1 0 0 1 200 0)">${paths}</g></g>`;g+=gk;if(lag)lg+=gk}
+  return `<span class="rk-brw"><svg viewBox="38 0 124 380" aria-label="${o&&o.lbl||`Sagoma con i muscoli colorati per ${V?"serie della settimana":"rango"}`}"><defs>${defs}<filter id="rkglow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3"/></filter></defs>
+<g class="rk-br"><ellipse cx="100" cy="28" rx="15" ry="19" fill="var(--rk-n)"/><g class="rk-gl" filter="url(#rkglow)" aria-hidden="true">${g}</g><g class="rk-mz">${g}</g></g></svg>${lg?`<svg class="rk-lagl" viewBox="38 0 124 380" aria-hidden="true"><g class="rk-mz">${lg}</g></svg>`:""}</span>`}
 // serie negli ultimi 7 giorni per ognuno dei 9 muscoli: 1 per il muscolo principale, 0,5 per i secondari
 const VOLMU={"Petto":"petto","Dorso":"dorso","Deltoidi":"spalle","Bicipiti":"bicipiti","Tricipiti":"tricipiti"},VOLNAME={"nordic curl":["femorali"],"face pull":["spalle"]};
 const VOLPUSH=/^(chest press|panca|landmine|lento|shoulder press|arnold|piegamenti)/,VOLPULL=/^(trazioni|lat machine|pulldown|rematore|pulley)/;
