@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#edf1f5">
 <script>/* stile giusto prima del primo disegno, niente lampo scuro all'avvio */
-try{var _s=JSON.parse(localStorage.getItem("allenati-scemo.v1")||"{}"),_h=document.documentElement,_k=_s.skin||"vetro",_m=_s.sera||"auto",_o=new Date().getHours();_h.dataset.skin=_k;_h.dataset.var=String((_s.vars||{})[_k]||0);if(_k==="vetro"&&(_m==="sera"||(_m==="auto"&&(_o>=19||_o<7))))_h.dataset.sera="";var _t=document.querySelector('meta[name="theme-color"]');if(_t)_t.content=_k!=="vetro"?"#10151d":_h.hasAttribute("data-sera")?"#0f1932":"#edf1f5"}catch(e){}</script>
+try{var _s=JSON.parse(localStorage.getItem("allenati-scemo.v1")||"{}"),_h=document.documentElement,_k=_s.skin||"vetro",_m=_s.sera||"auto",_o=new Date().getHours();_h.dataset.skin=_k;_h.dataset.var=String((_s.vars||{})[_k]||0);var _n=_m==="sera"||(_m==="auto"&&(_o>=19||_o<7));if(_k==="vetro"&&_n)_h.dataset.sera="";if(_k==="campo"&&!_n)_h.dataset.giorno="";var _t=document.querySelector('meta[name="theme-color"]');if(_t)_t.content=_k==="campo"&&!_n?"#e6eef9":_k!=="vetro"?"#10151d":_h.hasAttribute("data-sera")?"#0f1932":"#edf1f5"}catch(e){}</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -2227,6 +2227,162 @@ html[data-skin="lavagna"][data-var="2"]:not(#g1):not(#g2):not(#g3):not(#g4):not(
    (.tint) la M resta come prima (--muted, regola delle serie velate) */
 html:is([data-skin="carbonio"],[data-skin="manga"]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5):not(#g6) .ex.cur:not(.gold) .chip.hot{background:var(--card)!important;color:color-mix(in srgb,var(--hot) 80%,#fff)!important}
 html[data-skin="manga"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5):not(#g6) .ex.cur:not(.gold):not(.tint) .set.myom .i{color:color-mix(in srgb,var(--hot) 80%,#fff)}
+
+/* ===== FIRMA DEGLI STILI (v63, 2026-11-09): sagoma, Andamento, riepilogo, avvisi, icone e passaggi tra le schermate col materiale di ogni stile ===== */
+/* 1 Sagoma: la trama sta su un livello a parte (.rk-tx), sopra i muscoli colorati; i colori del rango non cambiano */
+.rk-fig .rk-tx{display:none;pointer-events:none;stroke:none}
+.rk-fig .rk-tx .lag{opacity:0}
+html[data-skin="manga"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-fig .rk-tx{display:inline;fill:url(#rk-ht)}
+html[data-skin="manga"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-fig .rk-tx .mz{mask:url(#rk-htm)}
+html[data-skin="manga"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-fig .rk-mz .mz.rk-r{fill:var(--rf)}
+html[data-skin="carbonio"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-fig .rk-tx{display:inline;fill:url(#rk-sl)}
+html[data-skin="carbonio"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-fig .rk-gl{opacity:.8}
+/* Eclisse: muscoli neri come la luna, bordo e alone nel colore del rango come la corona */
+html[data-skin="eclisse"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-fig .rk-mz .mz.rk-r{fill:#060608;stroke-width:1.5}
+html[data-skin="eclisse"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-fig .rk-gl{opacity:1}
+html[data-skin="eclisse"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-fig .rk-gl .mz.rk-r{stroke-width:4.5}
+html[data-skin="eclisse"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-fig .mz.rk-r[data-rm="petto"]:not(.sel){stroke:url(#rmg-petto)}
+html[data-skin="eclisse"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-fig .mz.rk-r[data-rm="dorso"]:not(.sel){stroke:url(#rmg-dorso)}
+html[data-skin="eclisse"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-fig .mz.rk-r[data-rm="spalle"]:not(.sel){stroke:url(#rmg-spalle)}
+html[data-skin="eclisse"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-fig .mz.rk-r[data-rm="bicipiti"]:not(.sel){stroke:url(#rmg-bicipiti)}
+html[data-skin="eclisse"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-fig .mz.rk-r[data-rm="tricipiti"]:not(.sel){stroke:url(#rmg-tricipiti)}
+html[data-skin="eclisse"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-fig .mz.rk-r[data-rm="quadricipiti"]:not(.sel){stroke:url(#rmg-quadricipiti)}
+html[data-skin="eclisse"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-fig .mz.rk-r[data-rm="femorali"]:not(.sel){stroke:url(#rmg-femorali)}
+html[data-skin="eclisse"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-fig .mz.rk-r[data-rm="glutei"]:not(.sel){stroke:url(#rmg-glutei)}
+html[data-skin="eclisse"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-fig .mz.rk-r[data-rm="polpacci"]:not(.sel){stroke:url(#rmg-polpacci)}
+
+/* 5 Andamento: la linea nel materiale dello stile */
+.rk-hist .and-a{fill:none;stroke:none}
+html[data-skin="carbonio"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-hist svg{background:linear-gradient(rgba(var(--acc-rgb,255,176,0),.09) 1px,transparent 1px) 0 0/100% 12px,linear-gradient(90deg,rgba(var(--acc-rgb,255,176,0),.09) 1px,transparent 1px) 0 0/12px 100%,#07090b;border-radius:8px;box-shadow:inset 0 0 0 1px #2a3038}
+html[data-skin="carbonio"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-hist .and-l{stroke:var(--acc);filter:url(#and-glow)}
+html[data-skin="carbonio"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-hist .and-p{fill:var(--acc);filter:url(#and-glow)}
+html[data-skin="lavagna"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-hist .and-l{stroke:rgba(var(--chalk-rgb),.96);stroke-width:3.6;filter:url(#chalkb)}
+html[data-skin="lavagna"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-hist .and-p{fill:rgba(var(--chalk-rgb),.96);filter:url(#chalkb)}
+html[data-skin="lavagna"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-hist .and-dot{fill:var(--acc)}
+html[data-skin="manga"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-hist .and-a{fill:url(#and-hatch)}
+html[data-skin="manga"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-hist .and-l{stroke:var(--fg);stroke-width:3.4;stroke-linejoin:miter;stroke-linecap:square}
+html[data-skin="manga"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-hist .and-p{fill:var(--fg);stroke:var(--card);stroke-width:1.5}
+html[data-skin="manga"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-hist .and-dot{fill:var(--acc)}
+html[data-skin="eclisse"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-hist .and-a{fill:url(#and-fade)}
+html[data-skin="eclisse"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-hist .and-l{stroke:#fffaf2;stroke-width:2;filter:url(#and-glow)}
+html[data-skin="eclisse"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-hist .and-p{fill:#fffaf2;filter:url(#and-glow)}
+html[data-skin="eclisse"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-hist .and-dot{fill:var(--acc)}
+html[data-skin="vetro"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-hist .and-l{stroke:url(#and-cane);stroke-width:4}
+html[data-skin="vetro"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-hist .and-p{stroke:var(--card);stroke-width:1.2}
+html[data-skin="campo"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-hist .and-l{stroke:var(--fg);stroke-width:2}
+html[data-skin="campo"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-hist .and-p{fill:#e4ff3a;stroke:#10140a;stroke-width:1}
+
+/* 6 Riepilogo di fine seduta: l'oggetto del mondo di ogni stile */
+/* Carbonio: scontrino stampato, con il bordo strappato */
+html[data-skin="carbonio"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh) :is(.sumr,.sumc){--fg:#1b1c1e;--muted:#4f5257;--dim:#5f6267;--go:#0b6b2e;--stop:#a3122a;background:#efece4;color:#1b1c1e;border:0;border-radius:3px 3px 0 0;box-shadow:none;padding:14px 14px 20px;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;-webkit-mask:linear-gradient(#000 0 0) top/100% calc(100% - 7px) no-repeat,conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) bottom/12px 7px repeat-x;mask:linear-gradient(#000 0 0) top/100% calc(100% - 7px) no-repeat,conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) bottom/12px 7px repeat-x}
+html[data-skin="carbonio"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh) :is(.sumr,.sumc) :is(b,span,em,li,div){color:inherit;font-family:inherit}
+html[data-skin="carbonio"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh) :is(.sumr,.sumc)>b{display:block;text-transform:uppercase;letter-spacing:.08em;border-bottom:1.5px dashed #9c978b;padding-bottom:6px}
+html[data-skin="carbonio"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh) :is(.sumr li,.sumc>div){border-bottom:1px dashed #c3beb1}
+html[data-skin="carbonio"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh) :is(.sumr li,.sumc>div):last-child{border-bottom:0}
+html[data-skin="carbonio"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh) .sumc em.up{color:#0b6b2e}
+html[data-skin="carbonio"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh) .sumc em.dn{color:#a3122a}
+html[data-skin="carbonio"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh) :is(.sumr,.sumc) :is(.blade,.rim){display:none}
+/* Campo: tabellone di fine partita */
+html[data-skin="campo"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh) .tiles{gap:0;background:#04102a;border:2px solid #2b4f8f;border-radius:6px;padding:4px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.5)}
+html[data-skin="campo"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh) .tiles .tile{background:transparent;border:0;border-radius:0;box-shadow:none}
+html[data-skin="campo"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh) .tiles .tile+.tile{border-left:1px solid #2b4f8f}
+html[data-skin="campo"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh) .tiles .tile b{color:#e4ff3a;text-shadow:0 0 8px rgba(228,255,58,.45)}
+html[data-skin="campo"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh) .tiles .tile span{color:#c4d3ef}
+/* Lavagna: la lavagna del coach, con la cornice di legno */
+html[data-skin="lavagna"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh){box-shadow:inset 0 9px 0 #5b412a,inset 0 11px 0 #3a291b}
+html[data-skin="lavagna"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh) .grab{margin-top:12px}
+html[data-skin="lavagna"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh) .sumh{position:relative;width:fit-content;padding-bottom:6px}
+html[data-skin="lavagna"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh) .sumh::after{content:"";position:absolute;left:0;right:-6px;bottom:0;height:3px;background:var(--acc);border-radius:2px;filter:url(#chalkb)}
+/* Manga: l'ultima tavola del capitolo, a vignette */
+html[data-skin="manga"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh) .tiles .tile{border:2.5px solid #ece6d6;border-radius:2px;box-shadow:4px 4px 0 var(--acc,#ff2340)}
+html[data-skin="manga"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh) .sumh{background:repeating-linear-gradient(100deg,transparent 0 9px,rgba(236,230,214,.08) 9px 10px);padding:6px 8px;margin-inline:-8px;border-bottom:2.5px solid #ece6d6}
+html[data-skin="manga"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh) .sumr{background:radial-gradient(circle,rgba(236,230,214,.1) 1px,transparent 1.4px) 0 0/6px 6px,var(--card);border:2.5px solid #ece6d6;border-radius:2px}
+/* Murano: i numeri incisi su una lastra di vetro colorato */
+html[data-skin="vetro"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh) .tiles{gap:0;border-radius:16px;overflow:hidden;background:linear-gradient(160deg,var(--m-s1,#3158d4),var(--m-s2,#1a37a0));box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 10px 24px -14px rgba(0,0,0,.5)}
+html[data-skin="vetro"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh) .tiles .tile{background:transparent;border:0;border-radius:0;box-shadow:none}
+html[data-skin="vetro"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh) .tiles .tile+.tile{border-left:1px solid rgba(255,255,255,.2)}
+html[data-skin="vetro"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh) .tiles .tile b{color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.25)}
+html[data-skin="vetro"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh) .tiles .tile span{color:rgba(255,255,255,.86)}
+/* Eclisse: la corona sopra i numeri */
+html[data-skin="eclisse"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .sheet:has(.sumh) .tiles .tile{box-shadow:inset 0 1.5px 0 rgba(var(--acc2-rgb,155,107,255),.75),0 -6px 16px -10px rgba(var(--acc2-rgb,155,107,255),.8)}
+
+/* 7 Avvisi di Oggi */
+/* Lavagna: foglietto appuntato con la puntina */
+html[data-skin="lavagna"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .banner{--muted:#4a4231;--info:#1d4f8f;background:#efe7cf;color:#2a2416;border-radius:2px;transform:rotate(-.5deg);box-shadow:0 6px 12px -6px rgba(0,0,0,.6);margin-top:4px}
+html[data-skin="lavagna"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .banner:nth-of-type(2n){transform:rotate(.45deg)}
+html[data-skin="lavagna"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .banner::after{display:none!important}
+html[data-skin="lavagna"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .banner::before{content:"";display:block!important;position:absolute;top:-5px;left:50%;width:11px;height:11px;margin-left:-5.5px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff8c7a,#c8321e 60%,#7a1a0d);box-shadow:0 2px 2px rgba(0,0,0,.45);pointer-events:none}
+html[data-skin="lavagna"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .banner :is(b,button,.ic){filter:none}
+/* Carbonio: targhetta di metallo con quattro viti */
+html[data-skin="carbonio"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .banner{background:radial-gradient(circle at 7px 7px,#8b939c 0 1.6px,#2a2f35 2px,transparent 2.6px),radial-gradient(circle at calc(100% - 7px) 7px,#8b939c 0 1.6px,#2a2f35 2px,transparent 2.6px),radial-gradient(circle at 7px calc(100% - 7px),#8b939c 0 1.6px,#2a2f35 2px,transparent 2.6px),radial-gradient(circle at calc(100% - 7px) calc(100% - 7px),#8b939c 0 1.6px,#2a2f35 2px,transparent 2.6px),repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px),linear-gradient(180deg,#22272d,#181b20);border:1px solid #3a424c;border-radius:6px;box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 2px 0 rgba(0,0,0,.4)}
+html[data-skin="carbonio"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .banner b{text-transform:uppercase;letter-spacing:.06em}
+/* Campo: cartellone a bordo campo */
+html[data-skin="campo"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .banner{background:repeating-linear-gradient(135deg,transparent 0 14px,rgba(255,255,255,.03) 14px 28px),color-mix(in srgb,var(--info) 12%,var(--card));border:1.5px solid color-mix(in srgb,var(--info) 55%,transparent);border-radius:4px}
+html[data-skin="campo"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .banner b{text-transform:uppercase;letter-spacing:.05em}
+/* Eclisse: un filo di corona sul bordo alto */
+html[data-skin="eclisse"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .banner{box-shadow:inset 0 1.5px 0 rgba(var(--acc2-rgb,155,107,255),.7),0 -8px 18px -14px rgba(var(--acc2-rgb,155,107,255),.9)}
+
+/* 8 Icone della barra in basso: a pixel LED in Carbonio, a tratto grosso in Manga, a mano col gesso in Lavagna */
+nav.bar svg .icp{display:none;fill:currentColor;stroke:none}
+html[data-skin="carbonio"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) nav.bar svg .ic0{display:none}
+html[data-skin="carbonio"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) nav.bar svg .icp{display:inline}
+html[data-skin="manga"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) nav.bar svg{stroke-width:2.7;stroke-linecap:square;stroke-linejoin:miter}
+html[data-skin="lavagna"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) nav.bar svg .ic0{filter:url(#wob)}
+html[data-skin="lavagna"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) nav.bar svg{stroke-width:2.2}
+
+/* 4 Passaggi tra le schermate della barra in basso, uno per stile (sotto i 300 ms; con Riduci movimento resta la dissolvenza breve) */
+@media (prefers-reduced-motion:no-preference){
+  html[data-skin="manga"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .app.in-r{animation:fxMangaR .24s var(--ease-out)}
+  html[data-skin="manga"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .app.in-l{animation:fxMangaL .24s var(--ease-out)}
+  html[data-skin="lavagna"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .app.in-r{animation:fxGessoR .26s var(--ease-out)}
+  html[data-skin="lavagna"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .app.in-l{animation:fxGessoL .26s var(--ease-out)}
+  html[data-skin="carbonio"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) :is(.app.in-r,.app.in-l){animation:fxLed .22s steps(6,end)}
+  html[data-skin="eclisse"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) :is(.app.in-r,.app.in-l){animation:fxLuna .28s var(--ease-out)}
+  html[data-skin="vetro"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) :is(.app.in-r,.app.in-l){animation:fxVetro .22s var(--ease-out)}
+  html[data-skin="campo"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .app.in-r{animation:fxCampoR .22s var(--ease-out)}
+  html[data-skin="campo"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .app.in-l{animation:fxCampoL .22s var(--ease-out)}
+}
+@keyframes fxMangaR{from{clip-path:polygon(100% 0,140% 0,100% 100%,100% 100%)}to{clip-path:polygon(-40% 0,140% 0,140% 100%,0 100%)}}
+@keyframes fxMangaL{from{clip-path:polygon(0 0,0 0,-40% 100%,0 100%)}to{clip-path:polygon(0 0,140% 0,100% 100%,-40% 100%)}}
+@keyframes fxGessoR{from{clip-path:inset(0 100% 0 0);opacity:.6}to{clip-path:inset(0 0 0 0);opacity:1}}
+@keyframes fxGessoL{from{clip-path:inset(0 0 0 100%);opacity:.6}to{clip-path:inset(0 0 0 0);opacity:1}}
+@keyframes fxLed{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes fxLuna{from{clip-path:circle(0 at 50% 100%)}to{clip-path:circle(150% at 50% 100%)}}
+@keyframes fxVetro{from{opacity:.3;filter:blur(6px)}to{opacity:1;filter:blur(0)}}
+@keyframes fxCampoR{from{opacity:.2;transform:translateX(24px)}to{opacity:1;transform:none}}
+@keyframes fxCampoL{from{opacity:.2;transform:translateX(-24px)}to{opacity:1;transform:none}}
+
+/* ===== 3 CAMPO GIORNO E SERA (v63, 2026-11-09): di giorno campo all'aperto, chiaro; dalle 19 alle 7 (o con "Sera") la partita in notturna con i riflettori. Stesso interruttore "Giorno e sera" di Murano. data-giorno solo su Campo ===== */
+/* Sera: due coni di luce dei riflettori sulla scheda di Oggi */
+html[data-skin="campo"]:not([data-giorno]):not(#c1):not(#c2):not(#c3):not(#c4):not(#c5):not(#c6):not(#c7):not(#c8) .hero{background:radial-gradient(55% 95% at 2% -12%,rgba(255,251,226,.26),rgba(255,251,226,.07) 55%,transparent 72%),radial-gradient(55% 95% at 98% -12%,rgba(255,251,226,.26),rgba(255,251,226,.07) 55%,transparent 72%),var(--cardbg)}
+/* Giorno: colori */
+html[data-skin="campo"][data-giorno]:not(#c1):not(#c2):not(#c3):not(#c4):not(#c5):not(#c6):not(#c7):not(#c8){color-scheme:light;--bg:#e6eef9;--card:#fbfdff;--card-2:#eef3fb;--field:#f2f6fc;--line:#c3d2ea;--fg:#0b1d45;--muted:#42557a;--dim:#55688c;
+  --acc:#4a6800;--acc-rgb:74,104,0;--hot:#4a6800;--hot-ink:#ffffff;--grad:linear-gradient(160deg,#f2ff7a,#e4ff3a 45%,#c6ea12);--glow:rgba(74,104,0,.25);--hl:rgba(30,80,200,.12);
+  --go:#12803f;--stop:#c0263d;--adapt:#8a5d00;--info:#1d4fbf;--pad:#0a6f96;--match:#7a3fc4;
+  --cardbg:linear-gradient(170deg,#ffffff,#f1f6fd);--tilebg:#f3f7fd;--navbg:rgba(246,249,255,.95);--title:linear-gradient(#0b1d45,#0b1d45);
+  --bgimg:radial-gradient(520px 360px at 85% -40px,rgba(255,236,150,.55),transparent 70%),radial-gradient(600px 420px at 50% 0%,rgba(80,150,255,.22),transparent 65%),#e6eef9;
+  --rk-n:rgba(11,29,69,.08);--rk-c:rgba(11,29,69,.12);--rk-0:rgba(11,29,69,.05)}
+html[data-skin="campo"][data-giorno][data-var="1"]:not(#c1):not(#c2):not(#c3):not(#c4):not(#c5):not(#c6):not(#c7):not(#c8){--bg:#f5e9e0;--card:#fffaf6;--card-2:#f8ece3;--field:#fbf3ee;--line:#e3c6b3;--fg:#3a1708;--muted:#6d4332;--dim:#7f5848;--hl:rgba(200,90,40,.12);
+  --cardbg:linear-gradient(170deg,#fffaf6,#f7e9de);--tilebg:#fbf1ea;--navbg:rgba(253,246,241,.95);--title:linear-gradient(#3a1708,#3a1708);--info:#1d4fbf;
+  --bgimg:radial-gradient(520px 360px at 85% -40px,rgba(255,226,140,.55),transparent 70%),radial-gradient(600px 420px at 50% 0%,rgba(220,110,60,.2),transparent 65%),#f5e9e0;
+  --rk-n:rgba(58,23,8,.08);--rk-c:rgba(58,23,8,.12);--rk-0:rgba(58,23,8,.05)}
+html[data-skin="campo"][data-giorno][data-var="2"]:not(#c1):not(#c2):not(#c3):not(#c4):not(#c5):not(#c6):not(#c7):not(#c8){--bg:#e7f3ea;--card:#fafffb;--card-2:#ebf6ee;--field:#f2faf4;--line:#bfdcc8;--fg:#0b2a16;--muted:#3c624b;--dim:#4f735d;--hl:rgba(30,140,70,.12);
+  --cardbg:linear-gradient(170deg,#fbfffc,#ecf7ef);--tilebg:#f1f9f3;--navbg:rgba(245,252,247,.95);--title:linear-gradient(#0b2a16,#0b2a16);--info:#1d5fa8;
+  --bgimg:radial-gradient(520px 360px at 85% -40px,rgba(255,236,150,.55),transparent 70%),radial-gradient(600px 420px at 50% 0%,rgba(70,170,100,.2),transparent 65%),#e7f3ea;
+  --rk-n:rgba(11,42,22,.08);--rk-c:rgba(11,42,22,.12);--rk-0:rgba(11,42,22,.05)}
+/* Giorno: il campo disegnato sul fondo e quello nella scheda di Oggi a righe scure, la rete resta del colore della pallina */
+html[data-skin="campo"][data-giorno]:not(#c1):not(#c2):not(#c3):not(#c4):not(#c5):not(#c6):not(#c7):not(#c8) #court .ln{stroke:var(--fg)}
+html[data-skin="campo"][data-giorno]:not(#c1):not(#c2):not(#c3):not(#c4):not(#c5):not(#c6):not(#c7):not(#c8) #court .net{stroke:#9fbf00}
+html[data-skin="campo"][data-giorno]:not(#c1):not(#c2):not(#c3):not(#c4):not(#c5):not(#c6):not(#c7):not(#c8) #court{opacity:.16}
+html[data-skin="campo"][data-giorno]:not(#c1):not(#c2):not(#c3):not(#c4):not(#c5):not(#c6):not(#c7):not(#c8) .hero::after{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 88 48' fill='none' stroke='%230b1d45' stroke-linecap='round'%3E%3Crect x='2' y='2' width='84' height='44' rx='1.5' stroke-width='1.6' stroke-opacity='.55'/%3E%3Cpath d='M15 2v44M73 2v44M15 24h58' stroke-width='1.2' stroke-opacity='.4'/%3E%3Cpath d='M44 -1v50' stroke-width='2.4' stroke-opacity='.8'/%3E%3C/svg%3E") center/contain no-repeat}
+html[data-skin="campo"][data-giorno]:not(#c1):not(#c2):not(#c3):not(#c4):not(#c5):not(#c6):not(#c7):not(#c8) .hero::before{box-shadow:0 0 0 1px rgba(11,29,69,.35),0 1px 3px rgba(11,29,69,.3);background:#e4ff3a}
+html[data-skin="campo"][data-giorno]:not(#c1):not(#c2):not(#c3):not(#c4):not(#c5):not(#c6):not(#c7):not(#c8) :is(.card,.ex,.status,details.h,.banner,details.mn>summary){border-color:var(--line)}
+html[data-skin="campo"][data-giorno]:not(#c1):not(#c2):not(#c3):not(#c4):not(#c5):not(#c6):not(#c7):not(#c8) :is(.card,.ex,.status,details.h){box-shadow:0 1px 0 rgba(255,255,255,.8) inset,0 8px 20px -14px rgba(11,29,69,.35)}
+/* tasto principale: la pallina, lime pieno con l'inchiostro scuro */
+html[data-skin="campo"][data-giorno]:not(#c1):not(#c2):not(#c3):not(#c4):not(#c5):not(#c6):not(#c7):not(#c8) :is(.btn.hot,.wu .wub .btn:not(.ghost)){background:linear-gradient(160deg,#f2ff7a,#e4ff3a 45%,#c6ea12);color:#10140a;border-color:rgba(74,104,0,.35)}
+html[data-skin="campo"][data-giorno]:not(#c1):not(#c2):not(#c3):not(#c4):not(#c5):not(#c6):not(#c7):not(#c8) .banner{background:repeating-linear-gradient(135deg,transparent 0 14px,rgba(11,29,69,.025) 14px 28px),color-mix(in srgb,var(--info) 7%,var(--card))}
+html[data-skin="campo"][data-giorno]:not(#c1):not(#c2):not(#c3):not(#c4):not(#c5):not(#c6):not(#c7):not(#c8) .sbar{background:color-mix(in srgb,var(--bg) 96%,transparent)}
+html[data-skin="campo"][data-giorno]:not(#c1):not(#c2):not(#c3):not(#c4):not(#c5):not(#c6):not(#c7):not(#c8) .rk-hist .and-l{stroke:var(--fg)}
 </style>
 <!--APP-HEAD-END-->
 </head>
@@ -2251,7 +2407,7 @@ html[data-skin="manga"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5):not(#g6) .e
 <div id="aurw" aria-hidden="true"></div>
 <svg id="court" viewBox="0 0 120 220" aria-hidden="true"><path class="ln" pathLength="1" d="M10 10 H110 V210 H10 Z"/><path class="ln net" pathLength="1" d="M4 110 H116"/><path class="ln" pathLength="1" d="M10 40.5 H110"/><path class="ln" pathLength="1" d="M10 179.5 H110"/><path class="ln" pathLength="1" d="M60 40.5 V179.5"/></svg>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <defs><linearGradient id="rgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff9a5a"/><stop offset=".7" style="stop-color:var(--acc,#ff4f9a)"/><stop offset="1" stop-color="#c34dff"/></linearGradient><filter id="chalk" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="2" seed="4" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="3.5" xChannelSelector="R" yChannelSelector="G" result="d"/><feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="1" seed="9" result="g"/><feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2.6 0 0 0 1.9" result="m"/><feComposite in="d" in2="m" operator="in"/></filter><filter id="chalkb" x="-3%" y="-8%" width="106%" height="116%"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="2" seed="11" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="4" xChannelSelector="R" yChannelSelector="G" result="d"/><feTurbulence type="fractalNoise" baseFrequency="1.3" numOctaves="1" seed="5" result="g"/><feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -1.4 0 0 0 1.75" result="m"/><feComposite in="d" in2="m" operator="in"/></filter></defs>
+  <defs><linearGradient id="rgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff9a5a"/><stop offset=".7" style="stop-color:var(--acc,#ff4f9a)"/><stop offset="1" stop-color="#c34dff"/></linearGradient><filter id="chalk" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="2" seed="4" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="3.5" xChannelSelector="R" yChannelSelector="G" result="d"/><feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="1" seed="9" result="g"/><feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2.6 0 0 0 1.9" result="m"/><feComposite in="d" in2="m" operator="in"/></filter><filter id="chalkb" x="-3%" y="-8%" width="106%" height="116%"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="2" seed="11" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="4" xChannelSelector="R" yChannelSelector="G" result="d"/><feTurbulence type="fractalNoise" baseFrequency="1.3" numOctaves="1" seed="5" result="g"/><feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -1.4 0 0 0 1.75" result="m"/><feComposite in="d" in2="m" operator="in"/></filter><pattern id="rk-ht" patternUnits="userSpaceOnUse" width="4.2" height="4.2" patternTransform="rotate(45)"><circle cx="2.1" cy="2.1" r="1.25" fill="#0d0c10"/></pattern><linearGradient id="rk-htg" x1="0" y1="0" x2="0" y2="1"><stop offset=".25" stop-color="#000"/><stop offset=".9" stop-color="#fff"/></linearGradient><mask id="rk-htm" maskContentUnits="objectBoundingBox"><rect width="1" height="1" fill="url(#rk-htg)"/></mask><pattern id="rk-sl" patternUnits="userSpaceOnUse" width="4" height="3.2"><rect y="2.1" width="4" height="1.1" fill="#07080a" opacity=".85"/><rect x="3.2" width=".8" height="3.2" fill="#07080a" opacity=".55"/></pattern><filter id="and-glow" x="-10%" y="-40%" width="120%" height="180%"><feGaussianBlur in="SourceGraphic" stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><pattern id="and-hatch" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(-35)"><rect width="1.3" height="5" style="fill:var(--fg)" opacity=".4"/></pattern><linearGradient id="and-cane" gradientUnits="userSpaceOnUse" x1="68" y1="0" x2="294" y2="0"><stop offset="0" stop-color="#5d7cf0"/><stop offset=".38" stop-color="#d470b8"/><stop offset=".62" stop-color="#e0a93a"/><stop offset="1" stop-color="#3fb3a8"/></linearGradient><linearGradient id="and-fade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--acc)" stop-opacity=".34"/><stop offset="1" style="stop-color:var(--acc)" stop-opacity="0"/></linearGradient><filter id="wob" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".22" numOctaves="1" seed="7" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="1.6" xChannelSelector="R" yChannelSelector="G"/></filter></defs>
   <symbol id="i-rac" viewBox="0 0 24 24"><circle cx="9.5" cy="9.5" r="6.8"/><path d="m14.3 14.3 1.9 1.9"/><path d="m15.4 18.2 2.8-2.8 3.9 3.9-2.8 2.8z"/><circle cx="7.4" cy="8" r=".75"/><circle cx="11.6" cy="8" r=".75"/><circle cx="9.5" cy="11.4" r=".75"/></symbol>
   <symbol id="i-cup" viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 0 1-10 0V4zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4M12 13v4M8 21h8M10 17h4v4h-4z"/></symbol>
   <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></symbol>
@@ -2267,10 +2423,10 @@ html[data-skin="manga"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5):not(#g6) .e
 </svg>
 
 <nav class="bar" aria-label="Sezioni"><div class="in"><i class="ndot" aria-hidden="true"></i>
-  <button data-v="oggi"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Oggi</button>
-  <button data-v="train"><svg viewBox="0 0 24 24"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></svg>Allenamento</button>
-  <button data-v="prog"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></svg>Progressi</button>
-  <button data-v="set"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Settimana</button>
+  <button data-v="oggi"><svg viewBox="0 0 24 24"><g class="ic0"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></g><path class="icp" d="M10.2 2.2h1.6v1.6h-1.6zM12.2 2.2h1.6v1.6h-1.6zM2.2 4.2h1.6v1.6h-1.6zM20.2 4.2h1.6v1.6h-1.6zM8.2 6.2h1.6v1.6h-1.6zM10.2 6.2h1.6v1.6h-1.6zM12.2 6.2h1.6v1.6h-1.6zM14.2 6.2h1.6v1.6h-1.6zM6.2 8.2h1.6v1.6h-1.6zM16.2 8.2h1.6v1.6h-1.6zM0.2 10.2h1.6v1.6h-1.6zM2.2 10.2h1.6v1.6h-1.6zM6.2 10.2h1.6v1.6h-1.6zM16.2 10.2h1.6v1.6h-1.6zM20.2 10.2h1.6v1.6h-1.6zM22.2 10.2h1.6v1.6h-1.6zM0.2 12.2h1.6v1.6h-1.6zM2.2 12.2h1.6v1.6h-1.6zM6.2 12.2h1.6v1.6h-1.6zM16.2 12.2h1.6v1.6h-1.6zM20.2 12.2h1.6v1.6h-1.6zM22.2 12.2h1.6v1.6h-1.6zM6.2 14.2h1.6v1.6h-1.6zM16.2 14.2h1.6v1.6h-1.6zM8.2 16.2h1.6v1.6h-1.6zM10.2 16.2h1.6v1.6h-1.6zM12.2 16.2h1.6v1.6h-1.6zM14.2 16.2h1.6v1.6h-1.6zM2.2 18.2h1.6v1.6h-1.6zM20.2 18.2h1.6v1.6h-1.6zM10.2 20.2h1.6v1.6h-1.6zM12.2 20.2h1.6v1.6h-1.6z"/></svg>Oggi</button>
+  <button data-v="train"><svg viewBox="0 0 24 24"><g class="ic0"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></g><path class="icp" d="M4.2 4.2h1.6v1.6h-1.6zM6.2 4.2h1.6v1.6h-1.6zM16.2 4.2h1.6v1.6h-1.6zM18.2 4.2h1.6v1.6h-1.6zM4.2 6.2h1.6v1.6h-1.6zM6.2 6.2h1.6v1.6h-1.6zM16.2 6.2h1.6v1.6h-1.6zM18.2 6.2h1.6v1.6h-1.6zM0.2 8.2h1.6v1.6h-1.6zM2.2 8.2h1.6v1.6h-1.6zM4.2 8.2h1.6v1.6h-1.6zM6.2 8.2h1.6v1.6h-1.6zM16.2 8.2h1.6v1.6h-1.6zM18.2 8.2h1.6v1.6h-1.6zM20.2 8.2h1.6v1.6h-1.6zM22.2 8.2h1.6v1.6h-1.6zM0.2 10.2h1.6v1.6h-1.6zM2.2 10.2h1.6v1.6h-1.6zM4.2 10.2h1.6v1.6h-1.6zM6.2 10.2h1.6v1.6h-1.6zM8.2 10.2h1.6v1.6h-1.6zM10.2 10.2h1.6v1.6h-1.6zM12.2 10.2h1.6v1.6h-1.6zM14.2 10.2h1.6v1.6h-1.6zM16.2 10.2h1.6v1.6h-1.6zM18.2 10.2h1.6v1.6h-1.6zM20.2 10.2h1.6v1.6h-1.6zM22.2 10.2h1.6v1.6h-1.6zM0.2 12.2h1.6v1.6h-1.6zM2.2 12.2h1.6v1.6h-1.6zM4.2 12.2h1.6v1.6h-1.6zM6.2 12.2h1.6v1.6h-1.6zM8.2 12.2h1.6v1.6h-1.6zM10.2 12.2h1.6v1.6h-1.6zM12.2 12.2h1.6v1.6h-1.6zM14.2 12.2h1.6v1.6h-1.6zM16.2 12.2h1.6v1.6h-1.6zM18.2 12.2h1.6v1.6h-1.6zM20.2 12.2h1.6v1.6h-1.6zM22.2 12.2h1.6v1.6h-1.6zM0.2 14.2h1.6v1.6h-1.6zM2.2 14.2h1.6v1.6h-1.6zM4.2 14.2h1.6v1.6h-1.6zM6.2 14.2h1.6v1.6h-1.6zM16.2 14.2h1.6v1.6h-1.6zM18.2 14.2h1.6v1.6h-1.6zM20.2 14.2h1.6v1.6h-1.6zM22.2 14.2h1.6v1.6h-1.6zM4.2 16.2h1.6v1.6h-1.6zM6.2 16.2h1.6v1.6h-1.6zM16.2 16.2h1.6v1.6h-1.6zM18.2 16.2h1.6v1.6h-1.6zM4.2 18.2h1.6v1.6h-1.6zM6.2 18.2h1.6v1.6h-1.6zM16.2 18.2h1.6v1.6h-1.6zM18.2 18.2h1.6v1.6h-1.6z"/></svg>Allenamento</button>
+  <button data-v="prog"><svg viewBox="0 0 24 24"><g class="ic0"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></g><path class="icp" d="M18.2 6.2h1.6v1.6h-1.6zM16.2 8.2h1.6v1.6h-1.6zM8.2 10.2h1.6v1.6h-1.6zM16.2 10.2h1.6v1.6h-1.6zM6.2 12.2h1.6v1.6h-1.6zM10.2 12.2h1.6v1.6h-1.6zM14.2 12.2h1.6v1.6h-1.6zM6.2 14.2h1.6v1.6h-1.6zM12.2 14.2h1.6v1.6h-1.6zM4.2 16.2h1.6v1.6h-1.6zM2.2 20.2h1.6v1.6h-1.6zM4.2 20.2h1.6v1.6h-1.6zM6.2 20.2h1.6v1.6h-1.6zM8.2 20.2h1.6v1.6h-1.6zM10.2 20.2h1.6v1.6h-1.6zM12.2 20.2h1.6v1.6h-1.6zM14.2 20.2h1.6v1.6h-1.6zM16.2 20.2h1.6v1.6h-1.6zM18.2 20.2h1.6v1.6h-1.6zM20.2 20.2h1.6v1.6h-1.6z"/></svg>Progressi</button>
+  <button data-v="set"><svg viewBox="0 0 24 24"><g class="ic0"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></g><path class="icp" d="M6.2 2.2h1.6v1.6h-1.6zM16.2 2.2h1.6v1.6h-1.6zM2.2 4.2h1.6v1.6h-1.6zM4.2 4.2h1.6v1.6h-1.6zM6.2 4.2h1.6v1.6h-1.6zM8.2 4.2h1.6v1.6h-1.6zM10.2 4.2h1.6v1.6h-1.6zM12.2 4.2h1.6v1.6h-1.6zM14.2 4.2h1.6v1.6h-1.6zM16.2 4.2h1.6v1.6h-1.6zM18.2 4.2h1.6v1.6h-1.6zM20.2 4.2h1.6v1.6h-1.6zM2.2 6.2h1.6v1.6h-1.6zM4.2 6.2h1.6v1.6h-1.6zM6.2 6.2h1.6v1.6h-1.6zM8.2 6.2h1.6v1.6h-1.6zM10.2 6.2h1.6v1.6h-1.6zM12.2 6.2h1.6v1.6h-1.6zM14.2 6.2h1.6v1.6h-1.6zM16.2 6.2h1.6v1.6h-1.6zM18.2 6.2h1.6v1.6h-1.6zM20.2 6.2h1.6v1.6h-1.6zM2.2 8.2h1.6v1.6h-1.6zM20.2 8.2h1.6v1.6h-1.6zM2.2 10.2h1.6v1.6h-1.6zM6.2 10.2h1.6v1.6h-1.6zM10.2 10.2h1.6v1.6h-1.6zM14.2 10.2h1.6v1.6h-1.6zM20.2 10.2h1.6v1.6h-1.6zM2.2 12.2h1.6v1.6h-1.6zM20.2 12.2h1.6v1.6h-1.6zM2.2 14.2h1.6v1.6h-1.6zM6.2 14.2h1.6v1.6h-1.6zM10.2 14.2h1.6v1.6h-1.6zM20.2 14.2h1.6v1.6h-1.6zM2.2 16.2h1.6v1.6h-1.6zM20.2 16.2h1.6v1.6h-1.6zM2.2 18.2h1.6v1.6h-1.6zM4.2 18.2h1.6v1.6h-1.6zM6.2 18.2h1.6v1.6h-1.6zM8.2 18.2h1.6v1.6h-1.6zM10.2 18.2h1.6v1.6h-1.6zM12.2 18.2h1.6v1.6h-1.6zM14.2 18.2h1.6v1.6h-1.6zM16.2 18.2h1.6v1.6h-1.6zM18.2 18.2h1.6v1.6h-1.6zM20.2 18.2h1.6v1.6h-1.6z"/></svg>Settimana</button>
 </div></nav>
 
 <script>
@@ -3235,7 +3391,7 @@ function summarySheet(sess){
       <div><span>Serie</span><em>${ps.n} → ${st.n}</em></div>
       ${sess.dur&&prev.dur?`<div><span>Durata</span><em>${prev.dur} → ${sess.dur} min</em></div>`:""}
       ${com?`<div><span>Esercizi migliorati</span><em class="${up?"up":""}">${up} su ${com}</em></div>`:""}</section>`}
-  openSheet({html:()=>`<h2>${esc(sess.planName||"Seduta")} salvata</h2>
+  openSheet({html:()=>`<h2 class="sumh">${esc(sess.planName||"Seduta")} salvata</h2>
     <div class="tiles"><div class="tile"><b style="--n:${String(sess.dur??"—").length}">${sess.dur??"—"}</b><span>${sess.dur===1?"minuto":"minuti"}</span></div><div class="tile"><b style="--n:${String(st.n).length}">${st.n}</b><span>serie</span></div><div class="tile"><b style="--n:${Math.round(st.vol).toLocaleString("it-IT").length}">${Math.round(st.vol).toLocaleString("it-IT")}</b><span>kg sollevati</span></div></div>
     ${sumFigHTML(volRange(0,0,[sess]))}
     ${rankPromoHTML(ups)}
@@ -4784,19 +4940,21 @@ const R_BACK={
 };
 let rView="front",rSel=null;
 function rFigure(A,V,o){
-  const P=rView==="front"?R_FRONT:R_BACK;let defs="",g="",lg="";
+  const P=rView==="front"?R_FRONT:R_BACK;let defs="",g="",lg="",tx="";
   const LAG=new Set(V||!A.BW?[]:balanceAt().filter(b=>b.kind==="rank").map(b=>b.lo.k));
   if(!V)for(const [k] of RMU){const m=A.mus[k];if(m.none)continue;const [,a,b]=RANKS[m.r];defs+=`<linearGradient id="rmg-${k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient>`}
   for(const k in P){
-    const m=A.mus[k];let fill=k==="_n"?"var(--rk-n)":k==="core"?"var(--rk-c)":"var(--rk-0)",op="";
+    const m=A.mus[k];let fill=k==="_n"?"var(--rk-n)":k==="core"?"var(--rk-c)":"var(--rk-0)",op="",rf="";
     if(m&&V){const v=V[k]||0;if(v>0){fill=(o&&o.col||volCol)(v);op=` fill-opacity="${Math.min(1,.45+.55*Math.min(v,10)/10).toFixed(2)}"`}}
-    else if(m&&!m.none)fill=`url(#rmg-${k})`;
+    else if(m&&!m.none){fill=`url(#rmg-${k})`;rf=RANKS[m.r][2]}
     const paths=P[k].map(d=>`<path d="${d}"/>`).join("");
     // avatar: ogni muscolo è più grande quanto più alto è il suo rango (da 0,86 a 1,10); lampeggia se è indietro
     const sc=m&&!m.none&&m.r!=null?(.86+.03*m.r).toFixed(3):m?".86":"",lag=!V&&LAG.has(k);
-    const gk=`<g ${m?`class="mz${k===rSel?" sel":""}${lag?" lag":""}" data-rm="${k}" style="--s:${sc}"`:""} fill="${fill}"${op}>${paths}<g transform="matrix(-1 0 0 1 200 0)">${paths}</g></g>`;g+=gk;if(lag)lg+=gk}
+    const gk=`<g ${m?`class="mz${rf?" rk-r":""}${k===rSel?" sel":""}${lag?" lag":""}" data-rm="${k}" style="--s:${sc}${rf?`;--rf:${rf}`:""}"`:""} fill="${fill}"${op}>${paths}<g transform="matrix(-1 0 0 1 200 0)">${paths}</g></g>`;g+=gk;if(lag)lg+=gk;
+    // trama dello stile (retino in Manga, celle LED in Carbonio) sopra i muscoli colorati; nascosta negli altri stili
+    if(m&&!fill.startsWith("var("))tx+=`<g class="mz${lag?" lag":""}" style="--s:${sc}">${paths}<g transform="matrix(-1 0 0 1 200 0)">${paths}</g></g>`}
   return `<span class="rk-brw"><svg viewBox="38 0 124 380" aria-label="${o&&o.lbl||`Sagoma con i muscoli colorati per ${V?"serie della settimana":"rango"}`}"><defs>${defs}<filter id="rkglow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3"/></filter></defs>
-<g class="rk-br"><ellipse cx="100" cy="28" rx="15" ry="19" fill="var(--rk-n)"/><g class="rk-gl" filter="url(#rkglow)" aria-hidden="true">${g}</g><g class="rk-mz">${g}</g></g></svg>${lg?`<svg class="rk-lagl" viewBox="38 0 124 380" aria-hidden="true"><g class="rk-mz">${lg}</g></svg>`:""}</span>`}
+<g class="rk-br"><ellipse cx="100" cy="28" rx="15" ry="19" fill="var(--rk-n)"/><g class="rk-gl" filter="url(#rkglow)" aria-hidden="true">${g}</g><g class="rk-mz">${g}</g><g class="rk-tx" aria-hidden="true">${tx}</g></g></svg>${lg?`<svg class="rk-lagl" viewBox="38 0 124 380" aria-hidden="true"><g class="rk-mz">${lg}</g></svg>`:""}</span>`}
 // serie negli ultimi 7 giorni per ognuno dei 9 muscoli: 1 per il muscolo principale, 0,5 per i secondari
 const VOLMU={"Petto":"petto","Dorso":"dorso","Deltoidi":"spalle","Bicipiti":"bicipiti","Tricipiti":"tricipiti"},VOLNAME={"nordic curl":["femorali"],"face pull":["spalle"]};
 const VOLPUSH=/^(chest press|panca|landmine|lento|shoulder press|arnold|piegamenti)/,VOLPULL=/^(trazioni|lat machine|pulldown|rematore|pulley)/;
@@ -4831,7 +4989,7 @@ function rankHist(){
   const t0=+pts[0].at,t1=+pts[pts.length-1].at,xt=t=>L+(W-L-6)*((t-t0)/((t1-t0)||1));
   bands+=phaseBands(new Date(t0),new Date(t1)).map(b=>`<rect x="${xt(b.a).toFixed(1)}" y="6" width="${(xt(b.b)-xt(b.a)).toFixed(1)}" height="${H-12}" fill="none" stroke="${PH[b.ph].col}" stroke-dasharray="3 3"/><text x="${(xt(b.a)+3).toFixed(1)}" y="15" style="fill:${PH[b.ph].col};font-weight:700">${PH[b.ph].n}</text>`).join("");
   return `<div class="rk-hist"><div class="l"><b>Andamento</b><span>${perS?`${dv>0?"+":""}${dv} pt in ${pts.length} sedute`:(wk=>`${dv>0?"+":""}${dv} pt in ${wk===1?"1 settimana":wk+" settimane"}`)(Math.max(1,Math.round((last.at-first.at)/(7*864e5))))}</span></div>
-  <svg viewBox="0 0 ${W} ${H+20}" data-k="${andKey()}" aria-label="Rango generale nelle ultime ${pts.length} settimane">${bands}<path d="${d0}" fill="none" stroke="var(--hot)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><path class="and-new" d="${d1}" pathLength="1" stroke-dasharray="1" fill="none" stroke="var(--hot)" stroke-width="2.5" stroke-linecap="round"/>${pts.map((p,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="${i===pts.length-1?4:2.5}" fill="${i===pts.length-1?"var(--hot)":"var(--fg)"}"${i===pts.length-1?' class="and-dot"':""}/>`).join("")}
+  <svg viewBox="0 0 ${W} ${H+20}" data-k="${andKey()}" aria-label="Rango generale nelle ultime ${pts.length} settimane">${bands}<path class="and-a" d="M${x(0).toFixed(1)} ${H-6} L${P.join(" L")} L${x(pts.length-1).toFixed(1)} ${H-6} Z"/><path class="and-l" d="${d0}" fill="none" stroke="var(--hot)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><path class="and-new and-l" d="${d1}" pathLength="1" stroke-dasharray="1" fill="none" stroke="var(--hot)" stroke-width="2.5" stroke-linecap="round"/>${pts.map((p,i)=>`<circle class="and-p${i===pts.length-1?" and-dot":""}" cx="${x(i).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="${i===pts.length-1?4:2.5}" fill="${i===pts.length-1?"var(--hot)":"var(--fg)"}"/>`).join("")}
   <text x="${L}" y="${H+14}">${fmtShort(first.at)}</text><text x="${W-6}" y="${H+14}" text-anchor="end">${perS&&iso(last.at)!==iso(today())?fmtShort(last.at):"oggi"}</text></svg>
   <p class="note" style="margin:4px 0 0">Ogni punto conta le 6 settimane prima, come il rango: un esercizio che smetti di fare esce dal conto dopo 6 settimane e la linea può scendere.</p></div>`}
 // Andamento: dopo una seduta nuova si disegna solo l'ultimo tratto, poi il punto nuovo si accende (una volta per seduta)
@@ -5170,14 +5328,14 @@ const SKVARS={vetro:[["Cobalto","linear-gradient(135deg,#edf1f5 45%,#1e3fae 55%)
 // Vetro di sera: "auto" = scuro dalle 19 alle 7, oppure sempre giorno / sempre sera
 function seraOn(){const m=S.sera||"auto";if(m==="sera")return true;if(m==="giorno")return false;const h=new Date().getHours();return h>=19||h<7}
 // Alle 19 e alle 7 con l'app aperta il cambio sfuma (vtRun: un tocco la chiude e non va perso); mai sopra un'altra transizione (riprova al minuto dopo); al ritorno dallo sfondo cambia subito
-function seraSync(snap){if(S.skin!=="vetro")return;const on=seraOn();if(on===document.documentElement.hasAttribute("data-sera"))return;
+function seraSync(snap){if(S.skin!=="vetro"&&S.skin!=="campo")return;const on=seraOn(),h=document.documentElement;if(S.skin==="vetro"?on===h.hasAttribute("data-sera"):on!==h.hasAttribute("data-giorno"))return;
   if(snap!==true&&document.startViewTransition&&document.visibilityState==="visible"){if(!curVT)vtRun("vt-sera",applySkin);return}applySkin()}
 setInterval(seraSync,60000);document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")seraSync(true)});
 // Eclisse: stella cadente, 4 s dopo l'avvio dello stile e poi ogni 18 s; 0,72 s di volo (come il vecchio ecShoot 18 s: entra in 0,6%, sparisce al 4%). Ferma con Riduci movimento e a pagina nascosta
 function ecShootGo(start){clearTimeout(ecShootGo.t);if(document.documentElement.dataset.skin!=="eclisse")return;
   if(!start){const el=document.getElementById("ecShoot");if(el&&!RM()&&!document.hidden)el.animate([{opacity:0,transform:"translate(0,0) rotate(18deg)"},{opacity:1,offset:.15},{opacity:0,transform:"translate(150vw,48vw) rotate(18deg)"}],{duration:720,easing:"linear"})}
   ecShootGo.t=setTimeout(ecShootGo,start?4000:18000)}
-function applySkin(){const h=document.documentElement;if(!SKINS.some(x=>x[0]===S.skin))S.skin="vetro";const sk=S.skin;h.dataset.var=String((S.vars||{})[sk]||0);h.dataset.skin=sk;if(sk==="vetro"&&seraOn())h.dataset.sera="";else delete h.dataset.sera;
+function applySkin(){const h=document.documentElement;if(!SKINS.some(x=>x[0]===S.skin))S.skin="vetro";const sk=S.skin;h.dataset.var=String((S.vars||{})[sk]||0);h.dataset.skin=sk;if(sk==="vetro"&&seraOn())h.dataset.sera="";else delete h.dataset.sera;if(sk==="campo"&&!seraOn())h.dataset.giorno="";else delete h.dataset.giorno;
   if(sk==="campo"){const c=T("court");c.classList.remove("draw");void c.getBoundingClientRect();c.classList.add("draw")}
   if(sk==="carbonio"&&!RM()){h.classList.remove("boot");void h.offsetWidth;h.classList.add("boot");clearTimeout(applySkin.t);applySkin.t=setTimeout(()=>h.classList.remove("boot"),1000)}
   ecShootGo(true);
@@ -5253,7 +5411,7 @@ function renderSettings(){
    <div class="tgl"><div><b>Recupero adattivo</b><small>30 s in più dopo una serie sotto le ripetizioni o segnata "Al limite" su un multiarticolare, trazioni comprese.</small></div><button role="switch" data-tg="adrest" aria-checked="${S.adrest!==false}" aria-label="Recupero adattivo"></button></div>
   </section>
   <section class="card"><h3>Stile</h3><div class="skins" id="skins">${SKINS.map(([k,l,g])=>`<button data-s="${k}" aria-pressed="${(S.skin||"vetro")===k}"><i style="background:${g}"></i>${l}</button>`).join("")}</div>
-   <div class="vars" role="group" aria-label="Colore dello stile"><span>Colore: ${SKVARS[S.skin||"vetro"][(S.vars||{})[S.skin||"vetro"]||0][0]}</span>${SKVARS[S.skin||"vetro"].map(([l,g],i)=>`<button data-var="${i}" aria-label="${l}" aria-pressed="${((S.vars||{})[S.skin||"vetro"]||0)===i}" style="background:${g}"></button>`).join("")}</div>${(S.skin||"vetro")==="vetro"?`<div class="q"><span class="lab">Giorno e sera</span><div class="seg" id="segSera">${[["auto","Automatico"],["giorno","Giorno"],["sera","Sera"]].map(([v,l])=>`<button data-sera="${v}" aria-pressed="${(S.sera||"auto")===v}">${l}</button>`).join("")}</div><p class="note" style="margin:0">Automatico: chiaro di giorno, scuro dalle 19 alle 7.</p></div>`:""}</section>
+   <div class="vars" role="group" aria-label="Colore dello stile"><span>Colore: ${SKVARS[S.skin||"vetro"][(S.vars||{})[S.skin||"vetro"]||0][0]}</span>${SKVARS[S.skin||"vetro"].map(([l,g],i)=>`<button data-var="${i}" aria-label="${l}" aria-pressed="${((S.vars||{})[S.skin||"vetro"]||0)===i}" style="background:${g}"></button>`).join("")}</div>${["vetro","campo"].includes(S.skin||"vetro")?`<div class="q"><span class="lab">Giorno e sera</span><div class="seg" id="segSera">${[["auto","Automatico"],["giorno","Giorno"],["sera","Sera"]].map(([v,l])=>`<button data-sera="${v}" aria-pressed="${(S.sera||"auto")===v}">${l}</button>`).join("")}</div><p class="note" style="margin:0">Automatico: chiaro di giorno, scuro dalle 19 alle 7.</p></div>`:""}</section>
   <section class="card"><h3>Regole che l'app applica</h3>
    <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px">
     <li>Ripetizioni prima, carico poi: +1 ripetizione per serie finché chiudi tutto al limite alto del range, poi aumenta il carico e riparti dal basso. L'aumento segue l'attrezzo: +5 kg macchine e stazione cavi (pacco pesi), +2,5 kg cavo singolo (alzate, extrarotazione, pulley), bilanciere e Smith, +2 kg manubri e zavorra con kettlebell. Sui multiarticolari della parte alta, se il 2,5% del carico è più del gradino, sale di quello, arrotondato al gradino. Gambe: sempre un gradino (+2,5 kg col bilanciere).</li>
