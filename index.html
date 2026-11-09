@@ -2184,7 +2184,8 @@ html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5):not([data-s
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera]:not([data-var="1"]):not([data-var="2"]){--m-s1:#3458ca}
 /* contrasti residui: barra in basso di giorno, "(invece di N)" sulla scheda in corso velata, numero del recupero dentro l'anello */
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5):not([data-sera]) nav.bar button[aria-current="false"]{color:#46536c}
-html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .ex.cur .spec span.ad{color:color-mix(in srgb,var(--info) 68%,var(--m-ink))}
+/* REG-1 (v62): di giorno 56 % invece di 68 %: con la banda Madreperla tenue sopra il velo pieno (scheda completata) Acquamare scendeva a 4,30 */
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .ex.cur .spec span.ad{color:color-mix(in srgb,var(--info) 56%,var(--m-ink))}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .rest .rr .tv{font-size:21px;letter-spacing:0}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera] .ex.cur .spec span.ad{color:color-mix(in srgb,var(--info) 40%,var(--m-ink))}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera] .ex.cur .prog{color:var(--m-ink)}
@@ -2205,6 +2206,25 @@ html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera] 
 .hxs{color:var(--info)}
 .fixx{margin:4px 0 0;font-size:max(12px,.7059rem);font-weight:700;color:var(--info)}
 .fixr.xs span{color:var(--info);font-weight:800}
+/* REG-3 / COL-5 (v62): --info è "informazione", non "attenzione". Dove l'accento della variante è rosso o rosa (Carbonio Rosso, Manga Rosso,
+   Eclisse Rosa, Murano Rubino giorno e sera) l'accento schiarito cadeva a ΔE 9-49 dal colore di stop: lì --info passa a un freddo
+   accostato alla variante (azzurro-pervinca sul rosso, lilla sul rosa e sul rubino), ΔE ≥ 56 dallo stop e ≥ 4,5:1 sul fondo.
+   Campo: l'accento è lo stesso lime in tutte e tre le varianti, quindi --info segue il fondo della variante (Ardesia lime, Terra rossa
+   pervinca, Erba acqua) */
+html[data-skin="carbonio"][data-var="1"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5):not(#g6){--info:#a5c8ff}
+html[data-skin="manga"][data-var="0"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5):not(#g6){--info:#8fc3ff}
+html[data-skin="eclisse"][data-var="0"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5):not(#g6){--info:#d4a8ff}
+html[data-skin="vetro"][data-var="1"]:not([data-sera]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5):not(#g6){--info:#5b2a86}
+html[data-skin="vetro"][data-var="1"][data-sera]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5):not(#g6){--info:#c9b3ff}
+html[data-skin="campo"][data-var="1"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5):not(#g6){--info:#b8c8ff}
+html[data-skin="campo"][data-var="2"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5):not(#g6){--info:#8fe3ff}
+/* REG-2 (v62): chip accesi ("Ultima serie in myo-rep", superserie, range) sulla scheda in corso di Carbonio e Manga, e segno M della myo-rep
+   in Manga (in Carbonio la M ha già i suoi colori, 6,9-9,6:1):
+   la luce dall'alto di COL-6 passava sotto il chip trasparente e l'accento puro scendeva a 4,0-4,45:1. Il chip ha un fondo suo (la scheda)
+   e l'accento è schiarito del 20 % col bianco: resta rosso/blu/giallo della variante, ≥ 5,4:1. La scheda dorata non cambia; con il velo
+   (.tint) la M resta come prima (--muted, regola delle serie velate) */
+html:is([data-skin="carbonio"],[data-skin="manga"]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5):not(#g6) .ex.cur:not(.gold) .chip.hot{background:var(--card)!important;color:color-mix(in srgb,var(--hot) 80%,#fff)!important}
+html[data-skin="manga"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5):not(#g6) .ex.cur:not(.gold):not(.tint) .set.myom .i{color:color-mix(in srgb,var(--hot) 80%,#fff)}
 </style>
 <!--APP-HEAD-END-->
 </head>
@@ -3306,7 +3326,11 @@ function dlFx(g,mods){if(dlIO){dlIO.disconnect();dlIO=null}
     setTimeout(()=>{if(x.w.isConnected)close(x.w,x.gap,x.id);else dlLive.delete(x.id)},t0+(x.n-1)*110+260)}),{threshold:[.9],rootMargin:`${-th}px 0px ${-bh}px 0px`});
   go.forEach(o=>dlIO.observe(o.w))}
 const counted={has:k=>!!S.odo&&S.odo.d===iso(today())&&S.odo.k.includes(k),add:k=>{const d=iso(today());if(!S.odo||S.odo.d!==d)S.odo={d,k:[]};S.odo.k.push(k);save()}};
-function countUp(b,a,z,rest){if(RM())return;const t0=performance.now();const f=t=>{if(!b.isConnected)return;const k=Math.min(1,(t-t0)/800),e=1-Math.pow(1-k,3);setNum(b,fk(Math.round((a+(z-a)*e)*10)/10)+rest);if(k<1)requestAnimationFrame(f)};setNum(b,fk(a)+rest);setTimeout(()=>requestAnimationFrame(f),250)}
+// Le cifre che contano non devono cambiare l'impaginazione: se il valore di partenza (o la coda ",5" che si chiude) è più largo di quello
+// finale e manda a capo la riga di .tgt, la scheda cambierebbe altezza a metà animazione e tutto sotto (il tasto "Progredisci comunque")
+// salterebbe a scatto. Si confronta l'altezza della riga con il testo finale già in posto (h0) e, se cresce, si rinuncia alla parte larga
+function tgtH(b){const p=b.parentElement;return p?p.offsetHeight:0}
+function countUp(b,a,z,rest){if(RM())return;const h0=tgtH(b);setNum(b,fk(a)+rest);if(tgtH(b)>h0){setNum(b,fk(z)+rest);return}const t0=performance.now();const f=t=>{if(!b.isConnected)return;const k=Math.min(1,(t-t0)/800),e=1-Math.pow(1-k,3);setNum(b,fk(Math.round((a+(z-a)*e)*10)/10)+rest);if(k<1)requestAnimationFrame(f)};setNum(b,fk(a)+rest);setTimeout(()=>requestAnimationFrame(f),250)}
 // Come countUp ma in testo normale (riepilogo in Carbonio: le cifre restano quelle della lista, non il display a 7 segmenti)
 function txtUp(b,a,z,rest){if(RM())return;const t0=performance.now(),f=t=>{if(!b.isConnected)return;const k=Math.min(1,(t-t0)/700),e=1-Math.pow(1-k,3);b.textContent=fk(Math.round((a+(z-a)*e)*10)/10)+rest;if(k<1)requestAnimationFrame(f)};b.textContent=fk(a)+rest;requestAnimationFrame(f)}
 // Il carico della prossima volta sale come un contachilometri: ogni cifra scorre verso l'alto fino alla nuova (in Carbonio conta sul display a 7 segmenti)
@@ -3317,7 +3341,8 @@ function rollUp(b,a,z,rest){if(RM())return;if(skinNow()==="carbonio")return coun
     const o=old(i),n=+ch,L=o==null?["",n]:Array.from({length:(n-o+10)%10+1},(_,k)=>(o+k)%10);
     h+=`<span class="oc"><span class="og">${n}</span><span class="os" style="--n:${L.length-1};--d:${col++*45}ms">${L.map(x=>`<span>${x===""?"&nbsp;":x}</span>`).join("")}</span></span>`});
   const ex=af.length>zf.length?af.slice(zf.length):"",tail=ex?`<span class="otl">${zf?"":","}${ex}</span>`:"";
-  b.innerHTML=`<span class="sr">${esc(sz+rest)}</span><span aria-hidden="true">${h}${tail}${esc(rest)}</span>`;
+  const h0=tgtH(b);b.innerHTML=`<span class="sr">${esc(sz+rest)}</span><span aria-hidden="true">${h}${tail}${esc(rest)}</span>`;
+  if(tgtH(b)>h0){const tl=b.querySelector(".otl");if(tl)tl.remove();if(tgtH(b)>h0){setNum(b,sz+rest);return}}
   const sm=b.parentElement&&b.parentElement.querySelector("small");if(sm)sm.animate([{opacity:0,transform:"translateY(6px) scale(.95)"},{opacity:1,transform:"none"}],{duration:240,delay:820,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"});
   // Alcuni font (Syne, Manrope) mettono la cifra del blocco più in basso di quella nel testo: si allinea misurando le due
   b.querySelectorAll(".oc").forEach(c=>{const g=c.querySelector(".og"),f=c.querySelector(".os>span:last-child");if(!g||!f)return;const R=e=>{const r=document.createRange();r.selectNodeContents(e);return r.getBoundingClientRect()};
@@ -4219,6 +4244,11 @@ function pgoFx(card,ot,nb,y){if(!card||!card.animate)return;const rm=RM(),E="cub
   const pr=card.querySelector(":scope>.prog");if(pr&&pr.textContent!==ot.p)fade(pr);
   // Il tasto: se scrollBy non ha potuto compensare (inizio pagina, o fondo), tutto quello che sta sotto il messaggio parte da dov'era e scorre al suo posto in 200 ms.
   // Il bordo basso della scheda è già al suo posto: la parte spostata in giù si taglia lì, come in addXs (resta libero lo spazio fino all'elemento dopo, per l'ombra)
+  // Se il testo sopra il tasto si è accorciato e la pagina non può salire (scrollY 0), il tasto resta dov'era: lo spazio perso si
+  // rimette sopra il tasto come margine (fino al prossimo disegno della scheda). Così niente sotto si muove, nemmeno con Riduci
+  // movimento, e il secondo tocco cade ancora sul tasto (a 320 px con testo grande il riepilogo passava da 2 righe a 1: -55 px)
+  if(nb&&pr&&y-nb.getBoundingClientRect().top>1){const mt0=parseFloat(getComputedStyle(nb).marginTop)||0;let mt=mt0;
+    for(let i=0;i<3;i++){const d=y-nb.getBoundingClientRect().top;if(Math.abs(d)<=.5)break;mt=Math.max(mt0,mt+d);nb.style.marginTop=mt.toFixed(1)+"px"}}
   if(rm||!nb||!pr)return;const D=y-nb.getBoundingClientRect().top;if(Math.abs(D)<=1)return;
   const o={duration:200,easing:E},els=[];for(let e=pr.nextElementSibling;e;e=e.nextElementSibling)els.push(e);
   for(let e=card;e&&e!==app&&e!==document.body;e=e.parentElement)for(let x=e.nextElementSibling;x;x=x.nextElementSibling)if(getComputedStyle(x).position!=="fixed")els.push(x);
@@ -4411,14 +4441,39 @@ function tVal(){const left=Math.round((tEnd-Date.now())/1000);if(!tTw)return lef
 function tTxt(){const v=tVal();
   const a=Math.abs(v),txt=(v<0?"+":"")+Math.floor(a/60)+":"+String(a%60).padStart(2,"0");
   setNum(T("tval"),txt);ringFit(T("tval"),txt);const inl=document.getElementById("restIn");if(inl){const tv=inl.querySelector(".tv");setNum(tv,txt);ringFit(tv,txt)}}
-// Cifre dentro l'anello: la dimensione dipende dall'anello, non solo dal testo. Se "1:58", "9:59" o "+0:01" sono più larghi del foro
-// (50/64 del diametro, tratto escluso) si riducono quanto basta, in ogni stile e con il testo grande. Si misura solo quando cambiano
-// il numero di caratteri, lo stile o la grandezza del testo (non a ogni secondo); a recupero finito l'anello sparisce e torna la misura piena
+// Cifre dentro l'anello: la dimensione dipende dall'anello, non solo dal testo. Il foro è un cerchio (raggio 28 del viewBox meno metà
+// del tratto): non basta che la larghezza stia nel diametro, perché all'altezza del testo la corda è più corta, 2·√(r²−(h/2)²).
+// Si misura il rettangolo dell'inchiostro (cifre SVG di Carbonio comprese; in verticale l'ascendente/discendente vero dei glifi, non
+// l'altezza della riga) e si riduce finché i quattro angoli stanno nel foro con 1,5 px di margine, in tutti e due gli anelli.
+// Si rimisura solo quando cambiano numero di caratteri, stile, testo grande o anello (non a ogni secondo); a recupero finito
+// l'anello sparisce e torna la misura piena
+function ringInk(el){let L=1e9,Tp=1e9,Rt=-1e9,B=-1e9;const add=(l,t,r,b)=>{if(r<=l)return;L=Math.min(L,l);Tp=Math.min(Tp,t);Rt=Math.max(Rt,r);B=Math.max(B,b)};
+  el.querySelectorAll("svg").forEach(v=>{if(v.closest(".sr"))return;const q=v.getBoundingClientRect();add(q.left,q.top,q.right,q.bottom)});
+  const tw=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);let n;while((n=tw.nextNode())){const pe=n.parentElement;if(!n.textContent.trim()||!pe||pe.closest(".sr,svg"))continue;
+    const rg=document.createRange();rg.selectNodeContents(n);const q=rg.getBoundingClientRect();if(!q.width)continue;let t=q.top,b=q.bottom;
+    try{const cs=getComputedStyle(pe),cx=ringInk.c||(ringInk.c=document.createElement("canvas").getContext("2d"));cx.font=cs.fontStyle+" "+cs.fontWeight+" "+cs.fontSize+" "+cs.fontFamily;
+      const m=cx.measureText(n.textContent),fA=m.fontBoundingBoxAscent,fD=m.fontBoundingBoxDescent;
+      if(fA>0&&fD>=0&&isFinite(m.actualBoundingBoxAscent)){const base=q.top+(q.height-fA-fD)/2+fA;t=Math.max(q.top,base-m.actualBoundingBoxAscent);b=Math.min(q.bottom,base+m.actualBoundingBoxDescent)}}catch(e){}
+    add(q.left,t,q.right,b)}
+  return L<Rt?{l:L,t:Tp,r:Rt,b:B}:null}
 function ringFit(el,txt){if(!el)return;const r=el.closest(".tr,.rr");if(!r)return;if(r.closest(".rest.over")){if(el.dataset.fk){el.style.fontSize="";delete el.dataset.fk}return}
-  const k=txt.length+"|"+skinNow()+"|"+getComputedStyle(document.documentElement).fontSize;if(el.dataset.fk===k)return;
-  el.style.fontSize="";const W=r.offsetWidth,R=r.getBoundingClientRect().width;if(!W||!R)return;const rg=document.createRange();rg.selectNodeContents(el);const w=rg.getBoundingClientRect().width,max=R*(50/64-3/W);
-  if(w>max)el.style.fontSize=(parseFloat(getComputedStyle(el).fontSize)*max/w).toFixed(2)+"px";el.dataset.fk=k}
-if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{document.querySelectorAll(".tr .t,.rr .tv").forEach(e=>delete e.dataset.fk);if(tOn)tTxt()})
+  // timer nascosto (display:none): non si misura e non si tocca niente. Prima qui si azzerava la grandezza ridotta lasciando la chiave,
+  // così alla ricomparsa la chiave combaciava e il testo restava a grandezza piena, fuori dall'anello ("+0:01")
+  const rr=r.getBoundingClientRect(),R=rr.width;if(!r.offsetWidth||!R)return;
+  // la chiave comprende la larghezza resa del testo in em: se il carattere arriva dopo (Manrope da rete) o cambia la metrica, si rimisura
+  const rg=document.createRange();rg.selectNodeContents(el);const em=Math.round(rg.getBoundingClientRect().width*r.offsetWidth/R/(parseFloat(getComputedStyle(el).fontSize)||1)*10);
+  const k=txt.length+"|"+skinNow()+"|"+getComputedStyle(document.documentElement).fontSize+"|"+r.offsetWidth+"|"+em;if(el.dataset.fk===k)return;
+  el.style.fontSize="";
+  let sw=0;r.querySelectorAll(":scope>svg circle").forEach(c=>{sw=Math.max(sw,parseFloat(getComputedStyle(c).strokeWidth)||0)});
+  const hole=(28-sw/2)*R/64-1.5*R/r.offsetWidth,cx=rr.left+R/2,cy=rr.top+rr.height/2;
+  for(let i=0;i<4;i++){const q=ringInk(el);if(!q)break;const d=Math.hypot(Math.max(cx-q.l,q.r-cx),Math.max(cy-q.t,q.b-cy));if(d<=hole)break;
+    el.style.fontSize=(parseFloat(getComputedStyle(el).fontSize)*Math.max(.6,hole/d)*.995).toFixed(2)+"px"}
+  el.dataset.fk=k}
+// La misura va rifatta quando arriva un carattere: fonts.ready si risolve subito se in quel momento nessun font sta caricando, mentre
+// Manrope (cifre di Manga, Eclisse, Lavagna) si scarica solo la prima volta che il timer compare: senza "loadingdone" restava la misura
+// presa con il carattere di riserva, più stretto, e il testo vero usciva dall'anello
+function ringRefit(){document.querySelectorAll(".tr .t,.rr .tv").forEach(e=>delete e.dataset.fk);if(tOn)tTxt()}
+if(document.fonts&&document.fonts.ready){document.fonts.ready.then(ringRefit);if(document.fonts.addEventListener)document.fonts.addEventListener("loadingdone",ringRefit)}
 function tick(){if(!tOn)return;const left=Math.round((tEnd-Date.now())/1000);
   tTxt();const inl=document.getElementById("restIn");
   ringSync();
