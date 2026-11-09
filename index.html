@@ -2218,6 +2218,8 @@ html[data-skin="vetro"][data-var="1"]:not([data-sera]):not(#g1):not(#g2):not(#g3
 html[data-skin="vetro"][data-var="1"][data-sera]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5):not(#g6){--info:#c9b3ff}
 html[data-skin="campo"][data-var="1"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5):not(#g6){--info:#b8c8ff}
 html[data-skin="campo"][data-var="2"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5):not(#g6){--info:#8fe3ff}
+/* Lavagna: Gesso giallo e Gesso rosa avevano lo stesso azzurro: sul rosa --info è un gesso lilla (ΔE 64 dallo stop, 8,1:1) */
+html[data-skin="lavagna"][data-var="2"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5):not(#g6){--info:#c6b8ff}
 /* REG-2 (v62): chip accesi ("Ultima serie in myo-rep", superserie, range) sulla scheda in corso di Carbonio e Manga, e segno M della myo-rep
    in Manga (in Carbonio la M ha già i suoi colori, 6,9-9,6:1):
    la luce dall'alto di COL-6 passava sotto il chip trasparente e l'accento puro scendeva a 4,0-4,45:1. Il chip ha un fondo suo (la scheda)
@@ -3824,7 +3826,8 @@ function renderTrain(only){
   document.querySelectorAll("#exs [data-open]").forEach(b=>b.onclick=()=>openExVT(g,b.dataset.open));
   document.querySelectorAll("#exs [data-xadd]").forEach(b=>b.onclick=()=>addXs(g,b.dataset.xadd,1));
   // Progredisci comunque / Rimetti la ripresa dopo la pausa: il tasto resta dov'era sullo schermo e tiene il fuoco
-  document.querySelectorAll("#exs [data-pgo]").forEach(b=>b.onclick=()=>{const id=b.dataset.pgo,y=b.getBoundingClientRect().top,ex=PLAN[g].ex.map(e=>effEx(g,e)).find(e=>e.id===id)||exById(id),ot=pgoTxt(b.closest("article"));
+  // (v62) un secondo tocco entro 400 ms dal primo non riprime il tasto: il tasto sta ancora scorrendo al suo posto
+  document.querySelectorAll("#exs [data-pgo]").forEach(b=>b.onclick=()=>{if(performance.now()-pgoAt<400)return;pgoAt=performance.now();const id=b.dataset.pgo,y=b.getBoundingClientRect().top,ex=PLAN[g].ex.map(e=>effEx(g,e)).find(e=>e.id===id)||exById(id),ot=pgoTxt(b.closest("article"));
     togglePauseGo(ex);buzz(8);renderTrain();const nb=document.querySelector(`#exs [data-pgo="${id}"]`);if(nb){window.scrollBy(0,nb.getBoundingClientRect().top-y);nb.focus({preventScroll:true})}
     pgoFx(document.querySelector(`#exs article.ex.cur[data-ex="${CSS.escape(id)}"]`),ot,nb,y)});
   document.querySelectorAll("#exs [data-xdel]").forEach(b=>b.onclick=()=>addXs(g,b.dataset.xdel,-1));
@@ -4230,6 +4233,7 @@ function ssSheet(g,ex,mods){
     save();openEx[g]=ex.id;renderTrain();keepFocus(true,ex.id)})}
 // ANM-2 (v61) "Progredisci comunque" / "Rimetti la ripresa": la proposta cambia in modo leggibile e il tasto non salta.
 // Testi di prima (numero grande, badge, messaggio); in Carbonio il numero sta in data-t (le cifre sono LED)
+let pgoAt=-1e9;
 function pgoTxt(c){const q=s=>c&&c.querySelector(s),b=q(".tgt b"),sm=q(".tgt small"),p=q(":scope>.prog");return {b:b?b.dataset.t||b.textContent:"",s:sm?sm.textContent:"",p:p?p.textContent:""}}
 function pgoFx(card,ot,nb,y){if(!card||!card.animate)return;const rm=RM(),E="cubic-bezier(.23,1,.32,1)",fade=e=>e.animate([{opacity:0},{opacity:1}],{duration:150,easing:E});
   // kg e ripetizioni cambiati: la cifra nuova entra dal basso se sale, dall'alto se scende (come le serie fatte in alto: .45em, 180 ms); con Riduci movimento solo dissolvenza
@@ -4242,18 +4246,17 @@ function pgoFx(card,ot,nb,y){if(!card||!card.animate)return;const rm=RM(),E="cub
     if(!els)fade(b)}}
   const sm=card.querySelector(".tgt small");if(sm&&sm.textContent!==ot.s)fade(sm);
   const pr=card.querySelector(":scope>.prog");if(pr&&pr.textContent!==ot.p)fade(pr);
-  // Il tasto: se scrollBy non ha potuto compensare (inizio pagina, o fondo), tutto quello che sta sotto il messaggio parte da dov'era e scorre al suo posto in 200 ms.
-  // Il bordo basso della scheda è già al suo posto: la parte spostata in giù si taglia lì, come in addXs (resta libero lo spazio fino all'elemento dopo, per l'ombra)
-  // Se il testo sopra il tasto si è accorciato e la pagina non può salire (scrollY 0), il tasto resta dov'era: lo spazio perso si
-  // rimette sopra il tasto come margine (fino al prossimo disegno della scheda). Così niente sotto si muove, nemmeno con Riduci
-  // movimento, e il secondo tocco cade ancora sul tasto (a 320 px con testo grande il riepilogo passava da 2 righe a 1: -55 px)
-  if(nb&&pr&&y-nb.getBoundingClientRect().top>1){const mt0=parseFloat(getComputedStyle(nb).marginTop)||0;let mt=mt0;
-    for(let i=0;i<3;i++){const d=y-nb.getBoundingClientRect().top;if(Math.abs(d)<=.5)break;mt=Math.max(mt0,mt+d);nb.style.marginTop=mt.toFixed(1)+"px"}}
+  // Il tasto sceso (testo sopra più lungo) e non compensato: quello che sta sotto il messaggio parte da dov'era e scorre al suo posto in 200 ms
+  // ANM-2 (v62): se il testo sopra il tasto si è accorciato e la pagina non può salire (in cima, o in fondo dove si accorcia), il messaggio
+  // sopra il tasto parte dall'altezza che lo spazio aveva prima e scende alla sua in 200 ms: il tasto e ciò che segue scorrono insieme,
+  // senza salto e senza vuoto che resta (a fine animazione l'altezza è quella naturale, il disegno dopo non sposta niente).
+  // Con Riduci movimento solo la dissolvenza qui sopra: il tasto va subito al suo posto. Il doppio tocco è fermato nell'onclick (pgoAt)
   if(rm||!nb||!pr)return;const D=y-nb.getBoundingClientRect().top;if(Math.abs(D)<=1)return;
+  if(D>0){const cs=getComputedStyle(pr),h=pr.clientHeight-(parseFloat(cs.paddingTop)||0)-(parseFloat(cs.paddingBottom)||0);
+    pr.animate([{height:(h+D).toFixed(1)+"px"},{height:h.toFixed(1)+"px"}],{duration:200,easing:E});return}
   const o={duration:200,easing:E},els=[];for(let e=pr.nextElementSibling;e;e=e.nextElementSibling)els.push(e);
   for(let e=card;e&&e!==app&&e!==document.body;e=e.parentElement)for(let x=e.nextElementSibling;x;x=x.nextElementSibling)if(getComputedStyle(x).position!=="fixed")els.push(x);
-  els.forEach(e=>e.animate([{transform:`translateY(${D}px)`},{transform:"none"}],o));
-  if(D>0){const nx=card.nextElementSibling,gp=nx?Math.max(0,Math.min(48,nx.getBoundingClientRect().top-card.getBoundingClientRect().bottom)):48,cp=`inset(-48px -48px ${-gp}px -48px)`;card.animate([{clipPath:cp},{clipPath:cp}],o)}}
+  els.forEach(e=>e.animate([{transform:`translateY(${D}px)`},{transform:"none"}],o))}
 function keepFocus(changed,exId){
   // Seduta finita (nessuna scheda aperta): sale "Tutte le serie fatte" con Termina e salva, prima finiva sotto l'intestazione
   const c=(exId&&document.querySelector(`#exs .ex.cur[data-ex="${exId}"]`))||document.querySelector("#exs .ex.cur")||document.querySelector(".card.alldone");if(!c)return;
