@@ -3028,8 +3028,8 @@ function luPlan(ex,t,mods){if(!t||t.lu||t.pause||t.xr||t.kind==="down"||ex.lo===
   const heavy=sets.filter(x=>(num(x.kg)??(bw?0:null))===kg),hr=heavy.map(x=>num(x.reps));if(!hr.length||hr.some(r=>r<ex.lo))return null;
   const hp=pad(hr,ex.s),more=(t.reps||[]).some((r,i)=>num(r)>hp[Math.min(i,hp.length-1)]),keep=t.hold&&t.kind==="flat"&&(t.top||0)>ex.hi&&hr.every(r=>r>=ex.hi);if(!t.myo&&!more&&!keep)return null;
   const st=stepOf(ex),nk=kg+st,cap=eqMax(ex);if(!(st>0)||cap&&nk>cap+1e-6)return null;
-  const L=k=>bw?bwNow()+k:k,ri=rirMid(mods?rirFor(ex,mods):ex.rir);if(!(L(kg)>0))return null;
-  const b=Math.max(...heavy.map(x=>e1rm(L(kg),num(x.reps)+ri))),est=Math.floor((b/L(nk)-1)*30-ri),rr=Math.min(ex.lo,est),pc=Math.round(st/L(kg)*100);
+  const L=k=>bw?bwNow()+k:k,ri0=rirMid(ex.rir),ri=rirMid(mods?rirFor(ex,mods):ex.rir);if(!(L(kg)>0))return null;
+  const b=Math.max(...heavy.map(x=>e1rm(L(kg),num(x.reps)+ri0))),est=Math.floor((b/L(nk)-1)*30-ri+0.3),rr=Math.min(ex.lo,est),pc=Math.round(st/L(kg)*100);
   // Salto che ti porterebbe troppo sotto il range (es. croci 22,5 → 27,5 kg a 3 ripetizioni): niente tasto, la proposta resta quella
   if(rr<Math.max(ex.t==="iso"||ex.t==="prev"?5:3,ex.lo-4))return null;
   const kT=bw?(kg>0?`${fk(nk)} kg di zavorra (+${fk(st)})`:`${fk(st)} kg di zavorra`):`${fk(nk)} kg`;
