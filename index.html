@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#edf1f5">
 <script>/* stile giusto prima del primo disegno, niente lampo scuro all'avvio */
-try{var _s=JSON.parse(localStorage.getItem("allenati-scemo.v1")||"{}"),_h=document.documentElement,_k=_s.skin||"vetro",_m=_s.sera||"auto",_o=new Date().getHours();_h.dataset.skin=_k;_h.dataset.var=String((_s.vars||{})[_k]||0);var _n=_m==="sera"||(_m==="auto"&&(_o>=19||_o<7));if(_k==="vetro"&&_n)_h.dataset.sera="";if(_k==="campo"&&!_n)_h.dataset.giorno="";var _t=document.querySelector('meta[name="theme-color"]');if(_t)_t.content=_k==="campo"&&!_n?["#e6eef9","#f5e9e0","#e7f3ea"][(_s.vars||{}).campo||0]||"#e6eef9":_k!=="vetro"?"#10151d":_h.hasAttribute("data-sera")?"#0f1932":"#edf1f5"}catch(e){}</script>
+try{var _s=JSON.parse(localStorage.getItem("allenati-scemo.v1")||"{}"),_h=document.documentElement,_k=_s.skin||"vetro",_m=_s.sera||"auto",_o=new Date().getHours();_h.dataset.skin=_k;_h.dataset.var=String((_s.vars||{})[_k]||0);var _n=_m==="sera"||(_m==="auto"&&(_o>=19||_o<7));if(_k==="vetro"&&_n)_h.dataset.sera="";if(_k==="campo"&&!_n)_h.dataset.giorno="";var _t=document.querySelector('meta[name="theme-color"]');if(_t)_t.content=_k==="campo"&&!_n?["#e6eef9","#f5e9e0","#e7f3ea"][(_s.vars||{}).campo||0]||"#e6eef9":_k==="dischi"?["#d9dad6","#1a1b1e","#c99a5b"][(_s.vars||{}).dischi||0]||"#d9dad6":_k!=="vetro"?"#10151d":_h.hasAttribute("data-sera")?"#0f1932":"#edf1f5"}catch(e){}</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,7 +17,7 @@ try{var _s=JSON.parse(localStorage.getItem("allenati-scemo.v1")||"{}"),_h=docume
 <title>Allenati Scemo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bodoni+Moda:opsz,wght@6..96,500..900&family=Big+Shoulders+Display:wght@700;800&family=Cabin+Sketch:wght@400;700&family=Manrope:wght@400;500;600;700;800&family=Dela+Gothic+One&family=Syne:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Bebas+Neue&family=Bodoni+Moda:opsz,wght@6..96,500..900&family=Big+Shoulders+Display:wght@700;800&family=Cabin+Sketch:wght@400;700&family=Manrope:wght@400;500;600;700;800&family=Dela+Gothic+One&family=Syne:wght@600;700;800&display=swap">
 <style>
 /* Layout: app a schermo intero da telefono, scuro per scelta (stile "Notte"). Header con giorno, contenuto scorrevole, timer sopra la barra di navigazione in basso. */
 :root{
@@ -2392,6 +2392,148 @@ html[data-skin="campo"][data-giorno]:not(#c1):not(#c2):not(#c3):not(#c4):not(#c5
 html[data-skin="campo"][data-giorno]:not(#c1):not(#c2):not(#c3):not(#c4):not(#c5):not(#c6):not(#c7):not(#c8) :is(.xrow .ck:not(.o),.wd2 .dk){color:#fff}
 html[data-skin="vetro"]:not([data-sera]):not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-hist .and-l{stroke:url(#and-cane-d)}
 html[data-skin="manga"]:not(#f1):not(#f2):not(#f3):not(#f4):not(#f5):not(#f6):not(#f7) .rk-fig .rk-mz .mz.sel{stroke:var(--acc);stroke-width:2.4}
+/* ===== STILE DISCHI (2026-11-13): i colori dei dischi da gara (25 rosso, 20 blu, 15 giallo, 10 verde, 5 bianco) sul pavimento di gomma della sala pesi. Varianti: Gomma chiara, Gomma nera, Pedana di legno ===== */
+html[data-skin="dischi"]{color-scheme:light;--r:#d7262e;--b:#1f5bd1;--y:#f2c200;--g:#1f9a4a;--w:#f4f4f1;--iron:#8f949b;
+ --bg:#d9dad6;--card:#f1f1ee;--card-2:#e5e6e2;--field:#fbfbf9;--line:rgba(20,22,26,.16);--fg:#15171b;--muted:#43474e;--dim:#585c64;
+ --acc:#d7262e;--acc-rgb:215,38,46;--acc-d:#9e1a20;--hot:var(--acc);--hot-ink:#fff;--pad:#1f5bd1;--match:#1f9a4a;--info:#1f5bd1;--go:#17803c;--stop:#c41f27;--adapt:#8a6500;
+ --grad:linear-gradient(var(--acc),var(--acc));--glow:rgba(0,0,0,0);--hl:rgba(255,255,255,.6);--cardbg:var(--card);--tilebg:var(--card);--title:linear-gradient(var(--fg),var(--fg));--navbg:#15171b;
+ --hero:#15171b;--hero-ink:#f4f4f1;--hero-mut:#c3c6cb;--shd:rgba(20,22,26,.14);--fleck-n:#55585e;--fleck-w:#ffffff;
+ --display:"Barlow Condensed","Arial Narrow",sans-serif}
+html[data-skin="dischi"][data-var="1"]{color-scheme:dark;--bg:#1a1b1e;--card:#25272b;--card-2:#2e3035;--field:#1f2124;--line:rgba(238,238,234,.14);--fg:#eeeeea;--muted:#b9bcc2;--dim:#a2a6ad;
+ --acc:#f2c200;--acc-rgb:242,194,0;--acc-d:#a88700;--hot-ink:#15171b;--info:#7fa6ff;--pad:#7fa6ff;--go:#4cc77a;--stop:#ff6a6f;--adapt:#f2c200;--match:#4cc77a;
+ --hero:#0e0f11;--hero-ink:#f4f4f1;--hero-mut:#b9bcc2;--shd:rgba(0,0,0,.5);--fleck-n:#3a3c41;--fleck-w:#6a6d73;--navbg:#0e0f11}
+html[data-skin="dischi"][data-var="2"]{--bg:#c99a5b;--card:#f6eedf;--card-2:#ecdfc6;--field:#fcf7ee;--line:rgba(60,36,12,.18);--fg:#24170a;--muted:#55402a;--dim:#654d34;
+ --acc:#1f5bd1;--acc-rgb:31,91,209;--acc-d:#143f94;--hot-ink:#fff;--info:#1f5bd1;--pad:#1f5bd1;--go:#17803c;--stop:#c41f27;--adapt:#7d5800;
+ --hero:#24170a;--hero-ink:#f6eedf;--hero-mut:#d9c8ad;--shd:rgba(60,36,12,.22);--navbg:#24170a}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9){--hot:var(--acc);--grad:linear-gradient(var(--acc),var(--acc))}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) body{background:var(--bg)}
+/* pavimento di gomma: granelli colorati sparsi (pedana: venature del legno) */
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:1;filter:none;animation:none;
+ background:radial-gradient(1.6px 1.2px at 13% 21%,var(--r) 60%,transparent 70%) 0 0/37px 41px,radial-gradient(1.4px 1.6px at 61% 47%,var(--b) 60%,transparent 70%) 0 0/43px 37px,radial-gradient(1.5px 1.3px at 31% 77%,var(--y) 60%,transparent 70%) 0 0/29px 47px,radial-gradient(1.2px 1.2px at 81% 13%,var(--g) 60%,transparent 70%) 0 0/53px 31px,radial-gradient(1px 1px at 45% 55%,var(--fleck-w) 60%,transparent 70%) 0 0/17px 19px,radial-gradient(1.1px 1.1px at 20% 60%,var(--fleck-n) 60%,transparent 70%) 0 0/13px 15px,var(--bg)}
+html[data-skin="dischi"][data-var="2"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) body::before{
+ background:repeating-linear-gradient(90deg,rgba(90,55,20,.0) 0 61px,rgba(70,42,14,.35) 61px 62.5px,rgba(90,55,20,0) 62.5px 124px),repeating-linear-gradient(90deg,rgba(255,240,210,.08) 0 3px,rgba(120,75,30,.07) 3px 7px,rgba(255,240,210,.05) 7px 11px),linear-gradient(180deg,#cfa266,#c4945a 60%,#c99a5b)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9)::after{display:none}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) #court{display:none}
+
+/* caratteri: condensato come i numeri stampati sui dischi */
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) :is(h1,h2,h3,.hero .big,.tgt b,.kpi b,.tile b,.pitem b,.dayr .d,details.h summary b,.edx .top b){font-family:var(--display);font-weight:800;letter-spacing:0;color:var(--fg);background:none;-webkit-text-fill-color:currentColor;text-transform:uppercase;-webkit-mask:none;mask:none}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) h1{font-size:52px;line-height:.88}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) :is(.hero .lbl,.kicker){color:var(--acc);letter-spacing:.12em}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) :is(.timer .tr .t,.rest .rr .tv,.set .i,.set .field input){font-family:var(--display);font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:0}
+
+/* riquadri: gomma pressata, bordo netto e ombra corta da oggetto appoggiato a terra */
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) :is(.card,.ex,.status,details.h,.banner){background:var(--card);border:0;border-radius:6px;box-shadow:0 2px 0 var(--shd);-webkit-backdrop-filter:none;backdrop-filter:none}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) :is(.card,.ex,.status,details.h):not(.hero)::before,html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) :is(.card,.ex,.status,details.h):not(.hero)::after{display:none}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) :is(.ctx button,.xrow,.dayr,.tile,.gear,.pitem,.opt,.edx,.arx,.tabs button,.sbtn){background:var(--card);border:0;border-radius:6px;box-shadow:0 2px 0 var(--shd);-webkit-backdrop-filter:none;backdrop-filter:none;color:var(--fg)}
+
+/* seduta di oggi: un disco da 25 che entra di taglio nella scheda e gira piano */
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .card.hero{position:relative;overflow:hidden;isolation:isolate;background:var(--hero);color:var(--hero-ink);border-radius:6px;box-shadow:0 3px 0 var(--shd)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .card.hero :is(*,.big,h1,h2,h3){color:var(--hero-ink)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .card.hero :is(.muted,small,p,span){color:var(--hero-mut)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .card.hero .big{font-size:86px;line-height:.82}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .card.hero::before{display:none}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .card.hero::after{display:block;content:"";position:absolute;z-index:-1;width:230px;height:230px;inset:auto;right:-112px;top:-84px;border-radius:50%;pointer-events:none;
+ background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Cdefs%3E%3Cpath id='t' d='M150 150 m-112 0 a112 112 0 1 1 224 0 a112 112 0 1 1 -224 0'/%3E%3C/defs%3E%3Ccircle cx='150' cy='150' r='150' fill='%23d7262e'/%3E%3Ccircle cx='150' cy='150' r='143' fill='none' stroke='%23b81f26' stroke-width='4'/%3E%3Ccircle cx='150' cy='150' r='92' fill='none' stroke='%23b81f26' stroke-width='3'/%3E%3Ctext font-family='Arial Narrow,Arial' font-weight='700' font-size='22' fill='%23fff' fill-opacity='.85' letter-spacing='3'%3E%3CtextPath href='%23t'%3E25 KG · 55 LB · 25 KG · 55 LB · 25 KG · 55 LB · %3C/textPath%3E%3C/text%3E%3Ccircle cx='150' cy='150' r='52' fill='%233a3d42'/%3E%3Ccircle cx='150' cy='150' r='46' fill='%239aa0a8'/%3E%3Ccircle cx='150' cy='150' r='38' fill='%23101114'/%3E%3C/svg%3E") center/100% 100% no-repeat;
+ animation:dkRoll .62s cubic-bezier(.16,1,.3,1) both,dkSpin 90s linear .62s infinite}
+@keyframes dkRoll{from{transform:translateX(120px) rotate(160deg)}to{transform:translateX(0) rotate(0deg)}}
+@keyframes dkSpin{to{transform:rotate(-360deg)}}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .card.hero>*{position:relative}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .card.hero .chip{background:rgba(255,255,255,.12);color:var(--hero-ink)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .card.hero :is(a,.lnk){color:var(--hero-ink)}
+
+/* bottoni: il principale è un blocco di gomma colorata che si schiaccia */
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) :is(button.btn.hot,.btn.hot){background:var(--acc);color:var(--hot-ink);border:0;border-radius:6px;box-shadow:0 3px 0 var(--acc-d);font-family:var(--display);font-weight:800;letter-spacing:.04em;text-transform:uppercase;font-size:22px;transition:transform .12s var(--ease-out),box-shadow .12s var(--ease-out)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) :is(button.btn.hot,.btn.hot):active{transform:translateY(2px);box-shadow:0 1px 0 var(--acc-d)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .btn.hot::before,html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .btn.hot::after{display:none;animation:none}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .btn:not(.hot){background:var(--card);border:2px solid var(--fg);border-radius:6px;box-shadow:none;color:var(--fg)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .btn.danger{border-color:var(--stop);color:var(--stop)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .chip{border-radius:4px}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .tabs button[aria-pressed="true"]{background:var(--acc);color:var(--hot-ink);box-shadow:0 2px 0 var(--acc-d)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .tabs button[aria-pressed="true"] *{color:inherit}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .seg{background:var(--card-2);border-radius:6px}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-radius:4px;box-shadow:none}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .pill{border-radius:4px}
+
+/* esercizio in corso: fascia del colore della variante in alto, come il bordo di un disco */
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .ex.cur{box-shadow:inset 0 5px 0 var(--acc),0 2px 0 var(--shd)}
+/* firma: la pila di dischi del carico */
+.tgt .dk{display:none}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .tgt{position:relative;padding-right:64px;min-height:56px}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .tgt .dk{display:flex;align-items:center;gap:2px;position:absolute;right:0;top:50%;transform:translateY(-50%);height:56px;padding-left:4px}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .dk-bar{position:absolute;left:0;right:-2px;top:50%;height:6px;margin-top:-3px;border-radius:2px;background:linear-gradient(#b4b9c0,#7e838a)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .dk-p{position:relative;display:block;width:7px;height:calc(var(--h) * 56px);border-radius:2px;background:var(--c);box-shadow:inset -1.5px 0 0 rgba(0,0,0,.22),inset 1px 0 0 rgba(255,255,255,.25)}
+.dk-r{--c:#d7262e}.dk-b{--c:#1f5bd1}.dk-y{--c:#f2c200}.dk-g{--c:#1f9a4a}.dk-w{--c:#f4f4f1}.dk-r2{--c:#d7262e}.dk-s{--c:#9aa0a8}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .dk-w{box-shadow:inset 0 0 0 1px rgba(20,22,26,.3)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) :is(.dk-r2,.dk-s,.dk-w){width:5px}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .dk-cl{position:relative;display:block;width:6px;height:14px;border-radius:2px;background:linear-gradient(90deg,#5a5e66,#9aa0a8 50%,#5a5e66)}
+/* i dischi si infilano sul bilanciere uno dopo l'altro, poi si chiude il fermo */
+@media (prefers-reduced-motion:no-preference){
+ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .dk.in :is(.dk-p,.dk-cl){animation:dkLoad .28s cubic-bezier(.23,1,.32,1) calc(var(--i) * 60ms + 120ms) both}
+ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .dk.in .dk-cl{animation-name:dkClamp}
+}
+@keyframes dkLoad{from{opacity:0;transform:translateX(30px)}60%{opacity:1}to{opacity:1;transform:translateX(0)}}
+@keyframes dkClamp{from{opacity:0;transform:translateX(14px) scaleY(.7)}to{opacity:1;transform:none}}
+
+/* campi della serie */
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) :is(.field,select,.inl input,.edx input,.edx select,.ed input,.ed select){background:var(--field);border:0;border-radius:4px;box-shadow:inset 0 0 0 1.5px var(--line)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .set .field:focus-within{box-shadow:inset 0 0 0 2px var(--acc)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .set .field input{font-size:26px}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .pm{background:none;color:var(--muted)}
+/* spunta: un disco col foro; quando segni la serie il disco verde cade sul perno e fa un quarto di giro */
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .tick{background:var(--card);border:0;border-radius:50%;color:var(--dim);box-shadow:inset 0 0 0 2px var(--iron)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) button.tick[aria-pressed="true"]{background:radial-gradient(circle,#15171b 0 17%,#c9ccd1 18% 25%,var(--g) 26% 88%,#167a39 89%)!important;color:transparent!important;border:0;border-radius:50%;box-shadow:0 2px 0 var(--shd)!important}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) button.tick[aria-pressed="true"] svg{opacity:0}
+@media (prefers-reduced-motion:no-preference){
+ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .tick.pop{animation:dkDrop .3s cubic-bezier(.23,1,.32,1)}
+ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .tick.pop::after{display:none}
+}
+@keyframes dkDrop{from{transform:translateY(-8px) rotate(-90deg) scale(.92)}70%{transform:translateY(1px) rotate(0) scale(1)}to{transform:none}}
+
+/* recupero: anello giallo come il disco da 15, fondo nero */
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) :is(div.timer,.rest):not(.over){background:var(--hero);color:var(--hero-ink);border:0;border-radius:8px;box-shadow:0 12px 24px -12px rgba(0,0,0,.6)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) :is(.timer,.rest):not(.over) :is(*,.l){color:var(--hero-ink)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) :is(.timer,.rest):not(.over) .ra{stroke:var(--y)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) :is(.timer,.rest):not(.over) .rk{stroke:#3a3d42;opacity:1}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) :is(.timer,.rest):not(.over) button{background:rgba(255,255,255,.1);border:0;border-radius:6px;color:var(--hero-ink)}
+
+/* barra della seduta: il bilanciere che si carica di dischi */
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .pbar{background:linear-gradient(var(--iron),var(--iron)) 0 50%/100% 3px no-repeat;border:0;border-radius:0;height:12px;box-shadow:none}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .pbar i{background:repeating-linear-gradient(90deg,var(--r) 0 6px,transparent 6px 8px,var(--b) 8px 14px,transparent 14px 16px,var(--y) 16px 21px,transparent 21px 23px,var(--g) 23px 27px,transparent 27px 29px);border-radius:0;box-shadow:none}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .rk-bar{background:var(--card-2);border-radius:0;border:0}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .rk-bar i{background:repeating-linear-gradient(90deg,var(--r) 0 6px,transparent 6px 8px,var(--b) 8px 14px,transparent 14px 16px);border-radius:0;box-shadow:none}
+
+/* intestazione e barra in basso: nero ferro, la sezione attiva ha un disco sotto l'icona */
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .thead{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:0 2px 0 var(--shd)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) nav.bar{background:var(--navbg);border-top:0;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) nav.bar button{color:#a7abb2;background:none}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) nav.bar button[aria-current="page"]{color:#fff;background:none}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) nav.bar button[aria-current="page"] svg{stroke:var(--y);filter:none}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) nav.bar svg{stroke-width:2.3}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) nav.bar .ndot{background:var(--y);border-radius:50%;box-shadow:inset 0 0 0 2px #15171b}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .sheet{background:var(--card);border-top:0;box-shadow:inset 0 5px 0 var(--acc);-webkit-backdrop-filter:none;backdrop-filter:none}
+
+/* sagoma: gomma a granelli sopra i colori del rango */
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .rk-fig .rk-gl{display:none}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .rk-fig svg{-webkit-mask:radial-gradient(circle,rgba(0,0,0,.55) .7px,#000 1.1px) 0 0/4px 4px;mask:radial-gradient(circle,rgba(0,0,0,.55) .7px,#000 1.1px) 0 0/4px 4px}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .rk-fig .rk-mz>g{stroke:var(--fg);stroke-opacity:.45;stroke-width:1}
+/* Andamento: il bilanciere grigio con i punti nei colori dei dischi */
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .rk-hist .and-l{stroke:var(--iron);stroke-width:4;stroke-linecap:round}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .rk-hist .and-p{fill:var(--acc);stroke:var(--card);stroke-width:1.5}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .rk-hist .and-dot{fill:var(--y);stroke:#15171b;stroke-width:2}
+/* riepilogo: il cartellino di gara con la fascia dei quattro colori */
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .sheet:has(.sumh){box-shadow:inset 0 6px 0 var(--r),inset 0 12px 0 var(--b),inset 0 18px 0 var(--y),inset 0 24px 0 var(--g)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .sheet:has(.sumh) .grab{margin-top:22px}
+/* avvisi di Oggi: targhetta con il bollino a disco */
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .banner{position:relative;box-shadow:inset 0 3px 0 var(--info),0 2px 0 var(--shd)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .banner::before,html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .banner::after{display:none!important}
+/* passaggi tra le schermate: la pagina cade sul pavimento come un disco appoggiato */
+@media (prefers-reduced-motion:no-preference){
+ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .app.in-r{animation:dkInR .24s cubic-bezier(.23,1,.32,1)}
+ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .app.in-l{animation:dkInL .24s cubic-bezier(.23,1,.32,1)}
+}
+@keyframes dkInR{from{opacity:.25;transform:translate(14px,-6px)}to{opacity:1;transform:none}}
+@keyframes dkInL{from{opacity:.25;transform:translate(-14px,-6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .card.hero::after{animation:none}}
 </style>
 <!--APP-HEAD-END-->
 </head>
@@ -4234,7 +4376,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   const fN=Math.min(n,rows.filter(r=>r.done).length),fr=n?fN/n:0,isGold=goldHold&&goldHold.ex===ex.id,fa=fillAnim(ex.id,fr),fPrev=fa.from;
   return `<article class="ex cur ${ssP.length?"ss":""} ${isGold?"gold":""} ${fr>0||isGold?"tint":""}" data-ex="${ex.id}" style="--f:${fr.toFixed(3)};--f0:${fPrev.toFixed(3)};--fc:${fillCol(fr)};--fc0:${fillCol(fPrev)};--fd:-${fa.el}ms">${fa.on&&!isGold?'<i class="fl fq" aria-hidden="true"></i>':""}<i class="fl fp ${fa.on?"grow":""}" aria-hidden="true"></i>${isGold?'<i class="fl fg" aria-hidden="true"></i>':""}
     <div class="exhead"><h3>${esc(ex.n)}${(howOf(ex)||errOf(ex)||ex.note)?(IMGEX[ex.id]=ex,`<button class="qm" data-img="${ex.id}" aria-label="Come si fa: ${esc(ex.n)}">?</button>`):""}</h3><button class="swap" data-base="${base.id}" aria-label="Sostituisci ${esc(ex.n)}">⇄ Cambia</button></div>
-    <div class="tgt"><b${cu&&!nn?` data-cu="${lk}|${tg.kg}|${esc(" kg × "+r0)}|${ex.id}"`:""}>${dcw(nn&&nn.kg!=null&&hasKg?`${fk(nn.kg)} kg × ${rT}`:big)}</b>${tg.badge?`<small class="${tg.kind}">${esc(tg.badge)}</small>`:""}</div>
+    <div class="tgt"><b${cu&&!nn?` data-cu="${lk}|${tg.kg}|${esc(" kg × "+r0)}|${ex.id}"`:""}>${dcw(nn&&nn.kg!=null&&hasKg?`${fk(nn.kg)} kg × ${rT}`:big)}</b>${hasKg?dkStack(nn&&nn.kg!=null?nn.kg:tg.kg,ex.id):""}${tg.badge?`<small class="${tg.kind}">${esc(tg.badge)}</small>`:""}</div>
     ${nn?`<p class="prog down"><span>${esc(nn.txt)}</span></p>`:`<p class="prog ${tg.kind}"><span>${esc(tg.msg)}</span></p>`}
     ${pgH}${luH}
     <p class="spec">${spec.join("<i> · </i>")}</p>
@@ -5372,13 +5514,19 @@ function barChart(el,data){
 }
 
 /* ================= WEEK / SETTINGS ================= */
-const SKINS=[["vetro","Murano","linear-gradient(115deg,transparent 30%,rgba(224,64,154,.5) 44%,rgba(138,90,224,.5) 52%,rgba(47,143,224,.45) 60%,transparent 74%) padding-box,linear-gradient(160deg,#3158d4,#1a37a0 55%,#122a7e) padding-box,linear-gradient(120deg,#5d7cf0,#d470b8 38%,#e0a93a 58%,#3fb3a8 78%,#5d7cf0) border-box"],["carbonio","Carbonio","repeating-linear-gradient(45deg,#2a2f36 0 3px,#14171b 3px 6px),#ffb000"],["campo","Campo","linear-gradient(135deg,#12306a 50%,#e4ff3a 50%)"],["manga","Manga","radial-gradient(circle,rgba(255,255,255,.35) 1.1px,transparent 1.5px) 0 0/6px 6px,linear-gradient(135deg,#1a191e 58%,#ff2340 58%)"],["lavagna","Lavagna","linear-gradient(135deg,#1d2521 55%,#ffd84d 55%)"],["eclisse","Eclisse","radial-gradient(circle at 50% 50%,#040406 0 34%,#fffaf2 36%,#ff5277 48%,#040406 66%)"]];
+const SKINS=[["vetro","Murano","linear-gradient(115deg,transparent 30%,rgba(224,64,154,.5) 44%,rgba(138,90,224,.5) 52%,rgba(47,143,224,.45) 60%,transparent 74%) padding-box,linear-gradient(160deg,#3158d4,#1a37a0 55%,#122a7e) padding-box,linear-gradient(120deg,#5d7cf0,#d470b8 38%,#e0a93a 58%,#3fb3a8 78%,#5d7cf0) border-box"],["carbonio","Carbonio","repeating-linear-gradient(45deg,#2a2f36 0 3px,#14171b 3px 6px),#ffb000"],["campo","Campo","linear-gradient(135deg,#12306a 50%,#e4ff3a 50%)"],["manga","Manga","radial-gradient(circle,rgba(255,255,255,.35) 1.1px,transparent 1.5px) 0 0/6px 6px,linear-gradient(135deg,#1a191e 58%,#ff2340 58%)"],["lavagna","Lavagna","linear-gradient(135deg,#1d2521 55%,#ffd84d 55%)"],["dischi","Dischi","radial-gradient(circle,#15171b 0 14%,#9aa0a8 15% 19%,#d7262e 20% 62%,#1f5bd1 63%)"],["eclisse","Eclisse","radial-gradient(circle at 50% 50%,#040406 0 34%,#fffaf2 36%,#ff5277 48%,#040406 66%)"]];
 const SKVARS={vetro:[["Cobalto","linear-gradient(135deg,#edf1f5 45%,#1e3fae 55%)"],["Rubino","linear-gradient(135deg,#edf1f5 45%,#a3162f 55%)"],["Acquamare","linear-gradient(135deg,#edf1f5 45%,#0a6670 55%)"]],
  lavagna:[["Giallo","linear-gradient(135deg,#1d2521 55%,#ffd84d 55%)"],["Azzurro","linear-gradient(135deg,#1d2521 55%,#7fd0ff 55%)"],["Rosa","linear-gradient(135deg,#1d2521 55%,#ff94bd 55%)"]],
  eclisse:[["Rosa","radial-gradient(circle,#040406 0 34%,#fffaf2 36%,#ff5277 50%,#040406 68%)"],["Oro","radial-gradient(circle,#050403 0 34%,#fff1d2 36%,#ffb347 50%,#050403 68%)"],["Plasma","radial-gradient(circle,#02040a 0 34%,#e2f4ff 36%,#8f7bff 50%,#02040a 68%)"]],
  carbonio:[["Ambra","radial-gradient(circle,#ffd257,#ffb000 60%,#14171b 62%)"],["Rosso","radial-gradient(circle,#ff9a90,#ff3b30 60%,#14171b 62%)"],["Ciano","radial-gradient(circle,#a6f6ff,#19e3ff 60%,#14171b 62%)"]],
  campo:[["Cemento","linear-gradient(135deg,#12306a 55%,#e4ff3a 55%)"],["Terra rossa","linear-gradient(135deg,#a8441f 55%,#e4ff3a 55%)"],["Erba","linear-gradient(135deg,#1f6a38 55%,#e4ff3a 55%)"]],
+ dischi:[["Gomma chiara","linear-gradient(135deg,#d9dad6 50%,#d7262e 50%)"],["Gomma nera","linear-gradient(135deg,#1a1b1e 50%,#f2c200 50%)"],["Pedana","linear-gradient(135deg,#c99a5b 50%,#1f5bd1 50%)"]],
  manga:[["Rosso","linear-gradient(135deg,#1a191e 55%,#ff2340 55%)"],["Blu","linear-gradient(135deg,#1a191e 55%,#2f7bff 55%)"],["Giallo","linear-gradient(135deg,#1a191e 55%,#ffd400 55%)"]]};
+// Dischi: accanto al carico la pila di dischi che lo compone (25 rosso, 20 blu, 15 giallo, 10 verde, 5 bianco, 2,5 e 1,25 piccoli). Si monta con l'animazione solo la prima volta che quel carico compare per quell'esercizio
+const DKP=[[25,"r",1],[20,"b",.9],[15,"y",.8],[10,"g",.7],[5,"w",.5],[2.5,"r2",.4],[1.25,"s",.32]],DKSEEN=new Set();
+function dkStack(kg,id){kg=+kg;if(!(kg>0))return "";let r=Math.round(kg*100)/100;const ps=[];for(const [v,c,h] of DKP){while(r>=v-1e-6&&ps.length<7){ps.push([c,h]);r-=v}}if(!ps.length)ps.push(["s",.32]);
+  const k=id+"|"+kg,an=S.skin==="dischi"&&!DKSEEN.has(k)&&!RM();if(S.skin==="dischi")DKSEEN.add(k);
+  return `<i class="dk${an?" in":""}" aria-hidden="true"><i class="dk-bar"></i>${ps.map(([c,h],i)=>`<i class="dk-p dk-${c}" style="--h:${h};--i:${i}"></i>`).join("")}<i class="dk-cl" style="--i:${ps.length}"></i></i>`}
 // Vetro di sera: "auto" = scuro dalle 19 alle 7, oppure sempre giorno / sempre sera
 function seraOn(){const m=S.sera||"auto";if(m==="sera")return true;if(m==="giorno")return false;const h=new Date().getHours();return h>=19||h<7}
 // Alle 19 e alle 7 con l'app aperta il cambio sfuma (vtRun: un tocco la chiude e non va perso); mai sopra un'altra transizione (riprova al minuto dopo); al ritorno dallo sfondo cambia subito
