@@ -2435,7 +2435,7 @@ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):n
 html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .card.hero::after{display:block;content:"";position:absolute;z-index:-1;width:230px;height:230px;inset:auto;right:-112px;top:-84px;border-radius:50%;pointer-events:none;
  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.42' cy='.38' r='.7'%3E%3Cstop offset='0' stop-color='%23e2353c'/%3E%3Cstop offset='.7' stop-color='%23c8232b'/%3E%3Cstop offset='1' stop-color='%23a51b22'/%3E%3C/radialGradient%3E%3CradialGradient id='h' cx='.4' cy='.35' r='.7'%3E%3Cstop offset='0' stop-color='%23f2f3f5'/%3E%3Cstop offset='.6' stop-color='%23a7acb3'/%3E%3Cstop offset='1' stop-color='%236b7078'/%3E%3C/radialGradient%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .22 0'/%3E%3CfeComposite in2='SourceGraphic' operator='in'/%3E%3C/filter%3E%3Cpath id='t' d='M150 150 m-112 0 a112 112 0 1 1 224 0 a112 112 0 1 1 -224 0'/%3E%3C/defs%3E%3Ccircle cx='150' cy='150' r='150' fill='url(%23g)'/%3E%3Ccircle cx='150' cy='150' r='150' fill='%23000' filter='url(%23n)'/%3E%3Ccircle cx='150' cy='150' r='146' fill='none' stroke='%23fff' stroke-opacity='.18' stroke-width='3'/%3E%3Ccircle cx='150' cy='150' r='138' fill='none' stroke='%238e161c' stroke-width='5'/%3E%3Ccircle cx='150' cy='150' r='94' fill='none' stroke='%238e161c' stroke-width='4'/%3E%3Ccircle cx='150' cy='150' r='92' fill='none' stroke='%23fff' stroke-opacity='.15' stroke-width='1.5'/%3E%3Ctext font-family='Arial Narrow,Arial' font-weight='700' font-size='23' letter-spacing='3' fill='%237a1218' transform='translate(1.2 1.6)'%3E%3CtextPath href='%23t'%3E25 KG %C2%B7 55 LB %C2%B7 25 KG %C2%B7 55 LB %C2%B7 25 KG %C2%B7 55 LB %C2%B7 %3C/textPath%3E%3C/text%3E%3Ctext font-family='Arial Narrow,Arial' font-weight='700' font-size='23' letter-spacing='3' fill='%23fff' fill-opacity='.92'%3E%3CtextPath href='%23t'%3E25 KG %C2%B7 55 LB %C2%B7 25 KG %C2%B7 55 LB %C2%B7 25 KG %C2%B7 55 LB %C2%B7 %3C/textPath%3E%3C/text%3E%3Ccircle cx='150' cy='150' r='54' fill='url(%23h)'/%3E%3Ccircle cx='150' cy='150' r='54' fill='none' stroke='%234a4e55' stroke-width='2'/%3E%3Cg fill='%235a5e66'%3E%3Ccircle cx='150' cy='108' r='3.5'/%3E%3Ccircle cx='192' cy='150' r='3.5'/%3E%3Ccircle cx='150' cy='192' r='3.5'/%3E%3Ccircle cx='108' cy='150' r='3.5'/%3E%3C/g%3E%3Ccircle cx='150' cy='150' r='26' fill='%230e0f11'/%3E%3Ccircle cx='150' cy='150' r='26' fill='none' stroke='%232b2d31' stroke-width='3'/%3E%3C/svg%3E") center/100% 100% no-repeat;
  animation:dkRoll .62s cubic-bezier(.16,1,.3,1) both,dkSpin 26s linear .62s infinite}
-html[data-skin="dischi"][data-dkr]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .card.hero::after{animation:dkRoll 0s both,dkSpin 26s linear .62s infinite}
+html[data-skin="dischi"][data-dkr]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .card.hero::after{animation:dkRoll 0s both,dkSpin 26s linear -.62s infinite}
 @keyframes dkRoll{from{transform:translateX(120px) rotate(160deg)}to{transform:translateX(0) rotate(0deg)}}
 @keyframes dkSpin{to{transform:rotate(-360deg)}}
 html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .card.hero>*{position:relative}
@@ -2581,9 +2581,10 @@ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):n
  html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) button.tick.pop[aria-pressed="true"]{animation:dkDrop .3s cubic-bezier(.23,1,.32,1),dkRot 10.4s linear .3s infinite}
  html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) :is(.timer,.rest):not(.over) .rk{stroke-dasharray:3 4.2;transform-origin:32px 32px;transform-box:view-box;animation:dkRot 13s linear infinite}
  /* fine esercizio: prima che passi l'oro i dischi si sfilano, l'ultimo infilato esce per primo; l'attrezzo si ferma dov'è */
- html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .ex.cur.gold .dk :is(.dk-p,.dk-cl){animation:dkOff .26s cubic-bezier(.23,1,.32,1) calc((var(--n,4) - var(--i)) * 45ms) both}
+ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .ex.cur.gold .dk :is(.dk-p,.dk-cl){animation:dkOff .26s cubic-bezier(.23,1,.32,1) calc((var(--n,4) - var(--i)) * 45ms) both}
  html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .ex.cur.gold .dk-st .dk-up{animation:dkDown .3s cubic-bezier(.23,1,.32,1) both}
- html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .ex.cur.gold .tgt .dk:is(.dk-db,.dk-kb){animation:dkOffW .3s cubic-bezier(.23,1,.32,1) both}
+ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .ex.cur.gold .tgt .dk.dk-db{animation:dkCurl 2.6s ease-in-out infinite paused,dkOffW .3s cubic-bezier(.23,1,.32,1) both}
+ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .ex.cur.gold .tgt .dk.dk-kb{animation:dkSwing 2.6s ease-in-out infinite paused,dkOffW .3s cubic-bezier(.23,1,.32,1) both}
 }
 @keyframes dkFlex{0%,100%{transform:translateY(-50%) rotate(0)}50%{transform:translateY(-50%) rotate(3deg)}}
 @keyframes dkRep{0%,18%{transform:translateY(0)}50%,62%{transform:translateY(-9px)}100%{transform:translateY(0)}}
@@ -2596,7 +2597,7 @@ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):n
 @keyframes dkRot{to{transform:rotate(360deg)}}
 @keyframes dkOff{from{opacity:1;transform:none}to{opacity:0;transform:translateX(34px)}}
 @keyframes dkDown{from{transform:translateY(-9px)}to{transform:none}}
-@keyframes dkOffW{to{opacity:0;transform:translateY(-50%) translateX(20px)}}
+@keyframes dkOffW{to{opacity:0;translate:20px 0}}
 /* medaglie del rango: bordo di gomma come un disco, i colori del rango restano */
 html[data-skin="dischi"] .rbd :is(.hx,.wg,.cr){stroke:#15171b;stroke-width:3;stroke-linejoin:round}
 html[data-skin="dischi"][data-var="1"] .rbd :is(.hx,.wg,.cr){stroke:var(--fg)}
@@ -2612,7 +2613,7 @@ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):n
 html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .chip.hot{--hot:var(--acc-t)}
 html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .dk-p{width:min(7px,calc(40px / var(--n,1)))}
 html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) :is(.dk-r2,.dk-s,.dk-w){width:min(5px,calc(32px / var(--n,1)))}
-html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .tgt .dk:not(.dk-st):not(.dk-db):not(.dk-kb){gap:1px;max-width:62px}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .tgt .dk:not(.dk-st):not(.dk-db):not(.dk-kb){gap:1px;max-width:52px}
 </style>
 <!--APP-HEAD-END-->
 </head>
@@ -5607,7 +5608,7 @@ function dkStack(kg,ex){kg=+kg;if(!(kg>0)||!ex)return "";let eq=eqOf(ex);const n
   // presse caricate a dischi e palla medica: l'attrezzo vero, non quello della progressione
   if(/palla/i.test(nt))return "";if(/pressa/i.test(nt))eq="bar";if(eq==="altro")return "";
   const k=ex.id+"|"+kg,an=S.skin==="dischi"&&!DKSEEN.has(k)&&!RM();if(S.skin==="dischi")DKSEEN.add(k);const cls=`dk${an?" in":""}`;
-  if(eq==="mac"||eq==="cavl"){const on0=Math.max(1,Math.round(kg>70?7+(kg-70)/10:kg/5)),N=Math.min(16,Math.max(10,on0+2)),up=Math.min(on0,N-1);
+  if(eq==="mac"||eq==="cavl"){const on0=Math.max(1,Math.round(kg<=70?kg/5:14+(kg-70)/10)),N=Math.min(16,Math.max(10,on0+2)),up=Math.min(on0,N-1);
     const sl=n=>Array.from({length:n},()=>`<i class="dk-sl"></i>`).join("");
     return `<i class="${cls} dk-st" aria-hidden="true" style="--n:${N}"><i class="dk-up">${sl(up)}<i class="dk-pin"></i></i><i class="dk-dn">${sl(N-up)}</i></i>`}
   if(eq==="db"){const h=Math.max(.42,Math.min(1,.38+kg/60));return `<i class="${cls} dk-db" aria-hidden="true" style="--h:${h.toFixed(2)}"><i class="dk-dbp"></i><i class="dk-dbh"></i><i class="dk-dbp"></i></i>`}
