@@ -2613,7 +2613,7 @@ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):n
 html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .chip.hot{--hot:var(--acc-t)}
 html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .dk-p{width:min(7px,calc(40px / var(--n,1)))}
 html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) :is(.dk-r2,.dk-s,.dk-w){width:min(5px,calc(32px / var(--n,1)))}
-html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .tgt .dk:not(.dk-st):not(.dk-db):not(.dk-kb){gap:1px;max-width:52px}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .tgt .dk:not(.dk-st):not(.dk-db):not(.dk-kb){gap:1px;max-width:48px}
 </style>
 <!--APP-HEAD-END-->
 </head>
@@ -5608,7 +5608,7 @@ function dkStack(kg,ex){kg=+kg;if(!(kg>0)||!ex)return "";let eq=eqOf(ex);const n
   // presse caricate a dischi e palla medica: l'attrezzo vero, non quello della progressione
   if(/palla/i.test(nt))return "";if(/pressa/i.test(nt))eq="bar";if(eq==="altro")return "";
   const k=ex.id+"|"+kg,an=S.skin==="dischi"&&!DKSEEN.has(k)&&!RM();if(S.skin==="dischi")DKSEEN.add(k);const cls=`dk${an?" in":""}`;
-  if(eq==="mac"||eq==="cavl"){const on0=Math.max(1,Math.round(kg<=70?kg/5:14+(kg-70)/10)),N=Math.min(16,Math.max(10,on0+2)),up=Math.min(on0,N-1);
+  if(eq==="mac"||eq==="cavl"){const on0=Math.max(1,Math.round(kg<=70?kg/5:14+(kg-70)/15)),N=Math.min(20,Math.max(10,on0+2)),up=Math.min(on0,N-1);
     const sl=n=>Array.from({length:n},()=>`<i class="dk-sl"></i>`).join("");
     return `<i class="${cls} dk-st" aria-hidden="true" style="--n:${N}"><i class="dk-up">${sl(up)}<i class="dk-pin"></i></i><i class="dk-dn">${sl(N-up)}</i></i>`}
   if(eq==="db"){const h=Math.max(.42,Math.min(1,.38+kg/60));return `<i class="${cls} dk-db" aria-hidden="true" style="--h:${h.toFixed(2)}"><i class="dk-dbp"></i><i class="dk-dbh"></i><i class="dk-dbp"></i></i>`}
