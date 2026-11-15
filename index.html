@@ -2614,6 +2614,65 @@ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):n
 html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .dk-p{width:min(7px,calc(40px / var(--n,1)))}
 html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) :is(.dk-r2,.dk-s,.dk-w){width:min(5px,calc(32px / var(--n,1)))}
 html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9) .tgt .dk:not(.dk-st):not(.dk-db):not(.dk-kb){gap:1px;max-width:48px}
+
+/* ===== Dischi, 2026-11-15: pavimento a piastrelle di gomma (al posto dei granelli colorati) con la luce delle lampade che scorre; bilanciere intero e bilanciere da landmine accanto al carico ===== */
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) body::before{animation:none;opacity:1;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/200px 200px,linear-gradient(90deg,rgba(0,0,0,.16) 0 1.5px,transparent 1.5px) 0 0/130px 130px,linear-gradient(rgba(0,0,0,.16) 0 1.5px,transparent 1.5px) 0 0/130px 130px,linear-gradient(90deg,rgba(255,255,255,.12) 0 1px,transparent 1px) 1.5px 0/130px 130px,linear-gradient(rgba(255,255,255,.12) 0 1px,transparent 1px) 0 1.5px/130px 130px,var(--bg)}
+html[data-skin="dischi"][data-var="2"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) body::before{background:repeating-linear-gradient(90deg,rgba(90,55,20,.0) 0 61px,rgba(70,42,14,.35) 61px 62.5px,rgba(90,55,20,0) 62.5px 124px),repeating-linear-gradient(90deg,rgba(255,240,210,.08) 0 3px,rgba(120,75,30,.07) 3px 7px,rgba(255,240,210,.05) 7px 11px),linear-gradient(180deg,#cfa266,#c4945a 60%,#c99a5b)}
+/* luce delle lampade sul pavimento: una fascia chiara larga che attraversa piano lo schermo (solo transform) */
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1)::after{content:"";display:block;position:fixed;inset:0 -100%;z-index:-1;pointer-events:none;opacity:1;filter:none;
+ background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,var(--lamp,.16)) 47%,rgba(255,255,255,var(--lamp,.16)) 53%,transparent 62%);transform:translateX(-30%)}
+html[data-skin="dischi"][data-var="1"]{--lamp:.055}
+html[data-skin="dischi"][data-var="2"]{--lamp:.13}
+@media (prefers-reduced-motion:no-preference){ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1)::after{animation:dkLamp 13s ease-in-out infinite alternate} }
+@keyframes dkLamp{from{transform:translateX(-30%)}to{transform:translateX(30%)}}
+
+/* bilanciere intero: riga sotto il carico, dischi uguali sui due lati, i più grandi verso il centro */
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .tgt:has(.dk-bb,.dk-lm){padding-right:0;min-height:0}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .tgt .dk:is(.dk-bb,.dk-lm){position:relative;right:auto;top:auto;transform:none;max-width:none;flex:0 0 100%;height:50px;padding:0;margin-top:2px}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .tgt .dk.dk-bb{display:flex;align-items:center;gap:0;padding-inline:4px}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-bbs{position:absolute;left:8%;right:8%;bottom:0;height:5px;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.22),transparent)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-shaft{flex:1 1 auto;height:4px;border-radius:2px;background:repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 1px,transparent 1px 3px) center/36% 100% no-repeat,linear-gradient(#c3c7cd,#80858c)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-side{position:relative;display:flex;align-items:center;gap:1.5px;flex:0 0 auto;height:100%;background:linear-gradient(#c9ccd1,#7e838a) center/100% 7px no-repeat}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-end{display:block;width:9px;height:7px}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-col{display:block;width:5px;height:15px;border-radius:2px;background:linear-gradient(90deg,#5a5e66,#a7acb3 50%,#5a5e66)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-bb .dk-p,html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-lm .dk-p{width:7px;height:calc(var(--h) * 46px)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-bb :is(.dk-r2,.dk-s,.dk-w),html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-lm :is(.dk-r2,.dk-s,.dk-w){width:5px}
+/* bilanciere da landmine: piede incernierato a terra a sinistra, braccio inclinato, dischi sul capo libero */
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .tgt .dk.dk-lm{display:block;height:76px}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-lmb{position:absolute;left:2px;bottom:3px;width:18px;height:12px;border-radius:3px 3px 1px 1px;background:linear-gradient(#5a5e66,#2a2c30)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-lma{position:absolute;left:11px;bottom:12px;width:min(62%,200px);height:0;display:flex;align-items:center;justify-content:flex-end;transform-origin:0 50%;transform:rotate(-11deg)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-lms{position:absolute;left:0;right:0;top:-2px;height:4px;border-radius:2px;background:linear-gradient(#c3c7cd,#80858c)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-lmp{position:relative;display:flex;align-items:center;gap:1.5px;height:0;padding-right:2px}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-lmp::before{content:"";position:absolute;left:-6px;right:-14px;top:-3.5px;height:7px;border-radius:2px;background:linear-gradient(#c9ccd1,#7e838a);z-index:-1}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-lme{display:block;width:12px;height:0}
+@media (prefers-reduced-motion:no-preference){
+ /* bilanciere: si alza e scende come in una ripetizione, i capi carichi seguono con un attimo di ritardo */
+ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .tgt .dk.dk-bb{animation:dkLift 2.6s cubic-bezier(.45,0,.55,1) infinite}
+ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-bb .dk-side{animation:dkWhip 2.6s cubic-bezier(.45,0,.55,1) .12s infinite}
+ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .ex.cur:not(.gold):has(.tick.pop) .tgt .dk.dk-bb{animation:dkBounceB .42s cubic-bezier(.23,1,.32,1),dkLift 2.6s cubic-bezier(.45,0,.55,1) .42s infinite}
+ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-bb.in .dk-r .dk-p{animation:dkLoad .28s cubic-bezier(.23,1,.32,1) calc(var(--i) * 60ms + 120ms) both}
+ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-bb.in .dk-l .dk-p{animation:dkLoadL .28s cubic-bezier(.23,1,.32,1) calc(var(--i) * 60ms + 120ms) both}
+ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-bb.in .dk-col{animation:dkClamp .26s cubic-bezier(.23,1,.32,1) calc(var(--n) * 60ms + 140ms) both}
+ /* landmine: il braccio sale e scende attorno al piede, come la spinta */
+ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .tgt .dk.dk-lm{animation:none}
+ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-lm .dk-lma{animation:dkPress 2.6s cubic-bezier(.45,0,.55,1) infinite}
+ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-lm.in .dk-p{animation:dkLoad .28s cubic-bezier(.23,1,.32,1) calc((var(--n) - var(--i)) * 60ms + 120ms) both}
+ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .ex.cur:not(.gold):has(.tick.pop) .dk-lm .dk-lma{animation:dkPressB .42s cubic-bezier(.23,1,.32,1),dkPress 2.6s cubic-bezier(.45,0,.55,1) .42s infinite}
+ /* fine esercizio: i dischi escono dai capi, a sinistra verso sinistra */
+ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .ex.cur.gold .dk-bb,html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .ex.cur.gold .dk-bb .dk-side{animation-play-state:paused}
+ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .ex.cur.gold .dk-bb .dk-r .dk-p{animation:dkOff .26s cubic-bezier(.23,1,.32,1) calc((var(--n) - var(--i)) * 45ms) both}
+ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .ex.cur.gold .dk-bb .dk-l .dk-p{animation:dkOffL .26s cubic-bezier(.23,1,.32,1) calc((var(--n) - var(--i)) * 45ms) both}
+ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .ex.cur.gold .dk-lm .dk-lma{animation-play-state:paused}
+ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .ex.cur.gold .dk-lm .dk-p{animation:dkOff .26s cubic-bezier(.23,1,.32,1) calc(var(--i) * 45ms) both}
+}
+@keyframes dkLift{0%,18%{transform:translateY(0)}50%,62%{transform:translateY(-7px)}100%{transform:translateY(0)}}
+@keyframes dkWhip{0%,18%{transform:translateY(0)}45%{transform:translateY(2px)}62%{transform:translateY(-1px)}100%{transform:translateY(0)}}
+@keyframes dkBounceB{0%{transform:translateY(0)}35%{transform:translateY(-6px)}70%{transform:translateY(1.5px)}100%{transform:translateY(0)}}
+@keyframes dkLoadL{from{opacity:0;transform:translateX(-30px)}60%{opacity:1}to{opacity:1;transform:none}}
+@keyframes dkOffL{from{opacity:1;transform:none}to{opacity:0;transform:translateX(-34px)}}
+@keyframes dkPress{0%,18%{transform:rotate(-8deg)}50%,62%{transform:rotate(-15deg)}100%{transform:rotate(-8deg)}}
+@keyframes dkPressB{0%{transform:rotate(-8deg)}35%{transform:rotate(-12deg)}70%{transform:rotate(-7deg)}100%{transform:rotate(-8deg)}}
+@media (prefers-reduced-motion:reduce){ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-lma{transform:rotate(-11deg)} }
 </style>
 <!--APP-HEAD-END-->
 </head>
@@ -5615,7 +5674,12 @@ function dkStack(kg,ex){kg=+kg;if(!(kg>0)||!ex)return "";let eq=eqOf(ex);const n
   if(eq==="zav"){const h=Math.max(.5,Math.min(1,.42+kg/40));return `<i class="${cls} dk-kb" aria-hidden="true" style="--h:${h.toFixed(2)}"><i class="dk-kbh"></i><i class="dk-kbb"></i></i>`}
   const one=/landmine|t-bar/i.test(nt),incl=/compreso/i.test(nt);let r=one?kg:incl?(kg-20)/2:kg/2;r=Math.round(r*100)/100;const ps=[];
   for(const [v,c,h] of DKP){while(r>=v-1e-6&&ps.length<8){ps.push([c,h]);r-=v}}
-  return `<i class="${cls}" aria-hidden="true" style="--n:${ps.length}"><i class="dk-bar"></i>${ps.map(([c,h],i)=>`<i class="dk-p dk-${c}" style="--h:${h};--i:${i}"></i>`).join("")}<i class="dk-cl" style="--i:${ps.length}"></i></i>`}
+  const pl=(arr,side)=>arr.map(([c,h],i)=>`<i class="dk-p dk-${c}" style="--h:${h};--i:${i}"></i>`).join("");
+  // landmine e T-bar: bilanciere ancorato a terra da un lato, dischi sull'altro capo
+  if(one)return `<i class="${cls} dk-lm" aria-hidden="true" style="--n:${ps.length}"><i class="dk-lmb"></i><i class="dk-lma"><i class="dk-lms"></i><i class="dk-lmp">${pl(ps)}</i><i class="dk-lme"></i></i></i>`;
+  // bilanciere intero: i dischi più grandi verso il centro, uguali sui due lati
+  const L=pl(ps.slice().reverse().map(x=>x)),R=pl(ps);
+  return `<i class="${cls} dk-bb" aria-hidden="true" style="--n:${ps.length}"><i class="dk-bbs"></i><i class="dk-side dk-l"><i class="dk-end"></i>${ps.slice().reverse().map(([c,h],j)=>`<i class="dk-p dk-${c}" style="--h:${h};--i:${ps.length-1-j}"></i>`).join("")}<i class="dk-col"></i></i><i class="dk-shaft"></i><i class="dk-side dk-r"><i class="dk-col"></i>${R}<i class="dk-end"></i></i></i>`}
 // Vetro di sera: "auto" = scuro dalle 19 alle 7, oppure sempre giorno / sempre sera
 function seraOn(){const m=S.sera||"auto";if(m==="sera")return true;if(m==="giorno")return false;const h=new Date().getHours();return h>=19||h<7}
 // Alle 19 e alle 7 con l'app aperta il cambio sfuma (vtRun: un tocco la chiude e non va perso); mai sopra un'altra transizione (riprova al minuto dopo); al ritorno dallo sfondo cambia subito
