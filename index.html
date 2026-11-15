@@ -2640,7 +2640,7 @@ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):n
 /* bilanciere da landmine: piede incernierato a terra a sinistra, braccio inclinato, dischi sul capo libero */
 html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .tgt .dk.dk-lm{display:block;height:58px}
 html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-lmb{position:absolute;left:2px;bottom:3px;width:18px;height:12px;border-radius:3px 3px 1px 1px;background:linear-gradient(#5a5e66,#2a2c30)}
-html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-lma{position:absolute;left:11px;bottom:10px;width:min(52%,165px);height:0;display:flex;align-items:center;justify-content:flex-end;transform-origin:0 50%;transform:rotate(-11deg)}
+html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-lma{position:absolute;left:11px;bottom:10px;width:min(52%,165px);height:0;display:flex;align-items:center;justify-content:flex-end;transform-origin:0 50%;transform:rotate(-8deg)}
 html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-lms{position:absolute;left:0;right:0;top:-2px;height:4px;border-radius:2px;background:linear-gradient(#c3c7cd,#80858c)}
 html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-lmp{position:relative;display:flex;align-items:center;gap:1.5px;height:0;padding-right:2px}
 html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-lmp::before{content:"";position:absolute;left:-6px;right:-14px;top:-3.5px;height:7px;border-radius:2px;background:linear-gradient(#c9ccd1,#7e838a);z-index:-1}
@@ -2670,9 +2670,9 @@ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):n
 @keyframes dkBounceB{0%{transform:translateY(0)}35%{transform:translateY(-6px)}70%{transform:translateY(1.5px)}100%{transform:translateY(0)}}
 @keyframes dkLoadL{from{opacity:0;transform:translateX(-30px)}60%{opacity:1}to{opacity:1;transform:none}}
 @keyframes dkOffL{from{opacity:1;transform:none}to{opacity:0;transform:translateX(-34px)}}
-@keyframes dkPress{0%,18%{transform:rotate(-8deg)}50%,62%{transform:rotate(-15deg)}100%{transform:rotate(-8deg)}}
-@keyframes dkPressB{0%{transform:rotate(-8deg)}35%{transform:rotate(-12deg)}70%{transform:rotate(-7deg)}100%{transform:rotate(-8deg)}}
-@media (prefers-reduced-motion:reduce){ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-lma{transform:rotate(-11deg)} }
+@keyframes dkPress{0%,18%{transform:rotate(-5deg)}50%,62%{transform:rotate(-11deg)}100%{transform:rotate(-5deg)}}
+@keyframes dkPressB{0%{transform:rotate(-5deg)}35%{transform:rotate(-9deg)}70%{transform:rotate(-4deg)}100%{transform:rotate(-5deg)}}
+@media (prefers-reduced-motion:reduce){ html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .dk-lma{transform:rotate(-8deg)} }
 
 html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .card.hero :is(.big,h1,h2,p,span,a,.lnk,small){text-shadow:0 1px 2px rgba(0,0,0,.55)}
 html[data-skin="dischi"]:not(#d1):not(#d2):not(#d3):not(#d4):not(#d5):not(#d6):not(#d7):not(#d8):not(#d9):not(#e1) .card.hero::after{opacity:.9}
