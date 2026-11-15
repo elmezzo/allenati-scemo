@@ -2737,6 +2737,7 @@ const BUILTIN={
   {id:"a6",mu:"Bicipiti",n:"Curl panca inclinata",s:3,lo:8,hi:12,rir:"0-1",rest:0,t:"iso",step:2,ss:"6",eq:"db"},
   {id:"a7",mu:"Tricipiti",n:"French press al cavo",s:3,lo:10,hi:12,rir:"0-1",rest:75,t:"iso",step:5,ss:"6",eq:"mac"}]},
  G:{name:"Gambe",title:"Gambe",sub:"Forza, potenza e prevenzione",legs:true,ex:[
+  {id:"g0",n:"Equilibrio su una gamba",s:2,lo:30,hi:30,rir:"—",rest:30,t:"time",side:true,note:"Prevenzione caviglia. Quando è facile: cuscino o bosu, poi occhi chiusi."},
   {id:"g1",n:"Skater jump, arrivo bloccato",s:3,lo:5,hi:5,rir:"—",rest:90,t:"perf",side:true,note:"2 s fermo sull'atterraggio."},
   {id:"g2",n:"Box jump",s:3,lo:4,hi:4,rir:"—",rest:90,t:"perf",note:"Scendi camminando."},
   {id:"g3",mu:"Gambe",n:"Squat bilanciere",s:4,lo:5,hi:8,rir:"1-2",rest:180,t:"comp",step:2.5,lower:true,note:"Kg = bilanciere compreso (20 kg).",eq:"bar"},
@@ -2744,6 +2745,7 @@ const BUILTIN={
   {id:"g5",mu:"Gambe",n:"Bulgarian split squat",s:2,lo:8,hi:8,rir:"1-2",rest:90,t:"comp",step:2,side:true,note:"Kg = un manubrio.",eq:"db"},
   {id:"g6",mu:"Gambe",n:"Nordic curl",s:3,lo:4,hi:6,rir:"1-2",rest:120,t:"nordic",ecc:true,note:"Con elastico all'inizio."},
   {id:"g8",mu:"Gambe",n:"Calf in piedi",s:3,lo:10,hi:15,rir:"1",rest:75,t:"iso",step:5,note:"Discesa in 3 s.",eq:"mac"},
+  {id:"g11",mu:"Gambe",n:"Calf seduto",s:2,lo:12,hi:15,rir:"1",rest:60,t:"iso",step:5,note:"1 s fermo in alto, discesa in 3 s.",eq:"mac"},
   {id:"g9",mu:"Core",n:"Woodchop al cavo",s:3,lo:6,hi:6,rir:"—",rest:60,t:"prev",step:5,side:true,note:"Esplosivo in uscita, controllato al ritorno.",eq:"mac"},
   {id:"a8",n:"Extrarotazione al cavo",s:2,lo:15,hi:15,rir:"2",rest:45,t:"prev",step:2.5,side:true,note:"Gomito a 90°, braccio lungo il fianco.",eq:"cavl"},
   {id:"b9",n:"Estensione del polso",s:2,lo:15,hi:15,rir:"1-2",rest:45,t:"prev",step:2,note:"Discesa lenta. Prevenzione gomito.",eq:"db"}]},
@@ -2760,7 +2762,7 @@ const BUILTIN={
   {id:"c1",mu:"Petto",n:"Butterfly alla macchina",s:3,lo:12,hi:15,rir:"1-2",rest:75,t:"iso",step:5,note:"Gomiti non oltre la linea del corpo.",eq:"mac"},
   {id:"c2",mu:"Dorso",n:"Pullover al cavo",s:3,lo:12,hi:15,rir:"1-2",rest:75,t:"iso",step:5,eq:"mac"},
   {id:"c3",mu:"Deltoidi",n:"Alzate laterali al cavo",s:3,lo:15,hi:20,rir:"1-2",rest:60,t:"iso",step:2.5,eq:"cavl"},
-  {id:"c4",mu:"Deltoidi",n:"Reverse fly",s:2,lo:15,hi:15,rir:"1-2",rest:60,t:"iso",step:5,eq:"mac"},
+  {id:"c4",mu:"Deltoidi",n:"Reverse fly",s:3,lo:15,hi:15,rir:"1-2",rest:60,t:"iso",step:5,eq:"mac"},
   {id:"c5",mu:"Bicipiti",n:"Curl al cavo dietro la schiena",s:3,lo:12,hi:15,rir:"1-2",keep:true,side:true,rest:0,t:"iso",step:5,ss:"5",eq:"mac"},
   {id:"c6",mu:"Tricipiti",n:"Pushdown al cavo",s:3,lo:12,hi:15,rir:"1-2",keep:true,rest:60,t:"iso",step:5,ss:"5",eq:"mac"},
   {id:"c7",mu:"Core",n:"Pallof press",s:2,lo:10,hi:10,rir:"2",rest:45,t:"prev",step:5,side:true,eq:"mac"},
@@ -2785,7 +2787,9 @@ const ALTS={
  g5:[["affondi","Affondi camminati",{note:"Kg = un manubrio.",eq:"db"}],["stepup","Step-up su panca",{note:"Kg = un manubrio.",eq:"db"}],["smith","Split squat al Smith",{step:2.5,note:"Kg = dischi (barra esclusa).",eq:"bar"}],["affman","Affondi indietro con manubri",{step:2,note:"Kg = un manubrio.",eq:"db"}]],
  g6:[["legcurl","Leg curl seduto, discesa in 4 s",{t:"iso",lo:8,hi:10,step:5,note:"Eccentrico lento.",eq:"mac"}],["ghr","Glute-ham raise",{step:2,eq:"zav"}]],
  g7:[["adduttori","Adduttori alla macchina",{t:"iso",lo:12,hi:15,step:5,side:false,eq:"mac"}],["copbreve","Copenhagen a leva corta (ginocchio)",{}]],
+ g0:[["cuscino","Equilibrio su cuscino o bosu",{note:"Quando è facile: occhi chiusi."}],["occhi","Equilibrio a occhi chiusi",{note:"Vicino a un appoggio, senza usarlo."}]],
  g8:[["pressa","Calf alla pressa",{step:5,eq:"mac"}],["smith","Calf al Smith",{step:2.5,note:"Kg = dischi (barra esclusa).",eq:"bar"}],["mono","Calf a una gamba con manubrio",{side:true,step:2,eq:"db"}]],
+ g11:[["manubrio","Calf seduto con manubrio sulle ginocchia",{step:2,note:"Kg = un manubrio. Avampiedi su un disco o un gradino.",eq:"db"}]],
  g9:[["palla","Lancio rotazionale palla medica",{t:"perf"}],["elastico","Woodchop con elastico",{eq:"altro"}],["manubrio","Woodchop con manubrio",{step:2,note:"Kg = un manubrio.",eq:"db"}]],
  b10:[["macchina","Shoulder press alla macchina",{side:false,step:5,note:"Presa neutra se c'è.",eq:"mac"}],["manubri","Lento manubri seduto",{side:false,lo:6,hi:10,step:2,note:"Kg = un manubrio. Presa neutra.",eq:"db"}],["smith","Lento al Smith",{side:false,step:2.5,note:"Kg = dischi (barra esclusa).",eq:"bar"}],["arnold","Arnold press",{side:false,step:2,note:"Kg = un manubrio. Da evitare se la spalla tira.",eq:"db"}]],
  b1:[["macchina","Shoulder press alla macchina",{step:5,eq:"mac"}],["landmine","Landmine press",{side:true,step:2.5,note:"Kg = dischi sul bilanciere.",eq:"bar"}],["smith","Lento al Smith",{step:2.5,note:"Kg = dischi (barra esclusa).",eq:"bar"}],["arnold","Arnold press",{step:2,note:"Kg = un manubrio.",eq:"db"}]],
@@ -2903,7 +2907,17 @@ function boot(){normS();for(const P of Object.values(S.plans))for(const e of P.e
 if(S.deload&&iso(today())>S.deload.to)closeDeload(S.deload.to);
 // Esercizi allo Smith nei piani salvati (scheda modificata o creata da te): nota sui kg se non ce n'è già una
 for(const P of Object.values(S.plans))for(const e of P.ex||[])if(/\bal Smith\b/i.test(e.n||"")&&!/kg\s*=/i.test(e.note||""))e.note="Kg = dischi (barra esclusa)."+(e.note?" "+e.note:"");
-moveOld();rebuild();if(fixDupIds.n){fixDupIds.n=0;save()}}
+const mg=migScheda1115();moveOld();rebuild();if(fixDupIds.n||mg){fixDupIds.n=0;save()}}
+// Scheda del 15/11/2026 (equilibrio e calf seduto il martedì, reverse fly a 3 serie il venerdì) anche su Gambe e Upper C modificati da te:
+// la versione di prima va in Piani vecchi, poi si aggiungono gli esercizi che mancano. Una volta sola
+function migScheda1115(){if(S.mig1115)return false;S.mig1115=1;const at=new Date().toISOString(),has=(P,id)=>P.ex.some(e=>(e.lib||e.id)===id||e.id===id),
+    keep=k=>S.archive.unshift({id:"v"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),key:k,at,why:"modificato",plan:JSON.parse(JSON.stringify(S.plans[k]))}),
+    cp=id=>({...BUILTIN.G.ex.find(e=>e.id===id)});
+  const G=S.plans.G;if(G&&(!has(G,"g0")||!has(G,"g11"))){keep("G");
+    if(!has(G,"g0"))G.ex.unshift(cp("g0"));
+    if(!has(G,"g11")){let i=G.ex.findIndex(e=>(e.lib||e.id)==="g8"||e.id==="g8");if(i<0)i=G.ex.findIndex(e=>(e.lib||e.id)==="g9")-1;G.ex.splice(i<0?G.ex.length:i+1,0,cp("g11"))}}
+  const C=S.plans.C,rf=C&&C.ex.find(e=>e.id==="c4"&&e.s===2);if(rf){keep("C");rf.s=3}
+  return true}
 // Se i dati salvati mandano in errore l'avvio: prima si chiudono le sedute non salvate, poi si prova la copia di sicurezza, infine si tengono solo le sedute
 try{boot()}catch(e){const cur=JSON.parse(JSON.stringify(S));try{delete S.free;S.draft={};S.oldDraft={};boot();bootMsg="Una seduta non salvata mandava in errore l'app: l'ho chiusa. Le sedute salvate ci sono tutte."}catch(e2){try{S=JSON.parse(localStorage.getItem(KEY+".bak"));if(!S||!Array.isArray(S.sessions))throw 0;boot();bootMsg="I dati salvati davano errore: ho rimesso la copia di sicurezza. Controlla le ultime sedute."}catch(e3){S={sessions:Array.isArray(cur.sessions)?cur.sessions:[],skin:cur.skin};boot();bootMsg="I dati salvati davano errore: ho tenuto solo le sedute."}}try{localStorage.setItem(KEY+".err",JSON.stringify(cur))}catch(e4){}save()}
 // Chiede al browser di non cancellare i dati dell'app quando il telefono ha poco spazio
@@ -3090,6 +3104,10 @@ function target(ex,noMyo){
   // Esplosivi a ripetizioni fisse (woodchop): conta la velocità, mai ripetizioni in più o discesa lenta
   if(powEx(ex)&&!last)return {...base,msg:`Prima volta: un carico che sposti veloce per ${ex.lo} ripetizioni${ex.side?" per lato":""}, lontano dal cedimento. Esplosivo in uscita.`};
   if(ex.t==="perf"){const th=/lancio|palla/i.test(ex.n);return {...base,msg:last?(th?"Stesse ripetizioni. Se ogni lancio è stato esplosivo fino all'ultimo, usa una palla più pesante.":(/box/i.test(ex.n)?"Stesse ripetizioni. Se gli atterraggi sono stati puliti, alza il box.":/ostacolo/i.test(ex.n)?"Stesse ripetizioni. Se gli atterraggi sono stati puliti, alza l'ostacolo.":/squat jump/i.test(ex.n)?"Stesse ripetizioni. Se gli atterraggi sono stati puliti, salta più in alto.":"Stesse ripetizioni. Se gli atterraggi sono stati puliti, allunga il salto o atterra più fermo.")):(th?"Ripetizioni fisse: conta la velocità di ogni lancio.":"Ripetizioni fisse: conta la qualità di ogni salto.")}}
+  // Equilibrio su una gamba: prevenzione caviglia, secondi fissi. Non sale di tempo: quando le tenute sono pulite si passa alla versione più difficile
+  if(ex.t==="time"&&/^equilibrio/i.test(ex.n)){const r=last?(last.sets[ex.id]||[]).map(x=>num(x.reps)).filter(v=>v!=null):[],full=r.length&&r.every(v=>v>=ex.hi),
+      nx=/occhi chiusi/i.test(ex.n)?null:/cuscino|bosu/i.test(ex.n)?"agli occhi chiusi":"al cuscino o al bosu",ls=ex.side?" per lato":"";
+    return {...base,msg:!last?`Tieni ${ex.lo} s${ls} senza appoggiare l'altro piede.`:full?(nx?`Tenuti ${ex.hi} s su tutte: se sei stato fermo, passa ${nx} con ⇄ Cambia.`:`Stessi ${ex.hi} s${ls}: è già la versione più difficile.`):`Stessi ${ex.lo} s${ls}, senza appoggiare l'altro piede.`}}
   if(!last)return base;
   // Ultima volta fatto in un altro giorno con un altro range (es. 12-15 in Upper A, 15-20 in Upper C): carico ricalcolato dal massimale stimato
   const fx=last.from&&EX[last.from];
@@ -3191,7 +3209,7 @@ function target(ex,noMyo){
     // Si sale solo se il gradino non supera il 25% (Pallof 15 → 20 è +33%: resta, o ⇄ Cambia con l'elastico)
     if(allOk&&eff==="easy"&&nk>kg&&(nk-kg)/kg<=0.25+1e-9)return {kg:nk,reps:fix,top:ex.lo,kind:"up",badge:`+${fk(nk-kg)} kg`,msg:`Era facile: ${fk(nk)} kg, sempre ${ex.lo}${lp}. Se ruoti il busto, torna a ${fk(kg)} kg.`};
     return {kg,reps:fix,top:ex.lo,kind:"flat",badge:"=",hold:true,msg:`Ripetizioni fisse: ${fk(kg)} kg, ${ex.lo}${lp}, ferme senza ruotare.${nk>kg&&(nk-kg)/kg>0.25+1e-9?` Il prossimo gradino (${fk(nk)} kg) è un salto del ${Math.round((nk-kg)/kg*100)}%: ${allOk&&eff==="easy"?"":allOk?"quando l'ultima serie è Facile, ":`prima porta tutte le serie a ${ex.lo}${lp}; poi, quando l'ultima è Facile, `}per renderlo più duro allontanati di un passo dal cavo, o ⇄ Cambia con l'elastico.`:nk>kg?" Quando l'ultima serie è Facile, sali di carico.":""}`}}
-  // Gradino grosso: isolamento e prevenzione oltre il 15% (oltre il 10% se il range è fisso, es. reverse fly 2×15: 35 → 40 kg), multiarticolari a range fisso oltre il 10%
+  // Gradino grosso: isolamento e prevenzione oltre il 15% (oltre il 10% se il range è fisso, es. reverse fly 3×15: 35 → 40 kg), multiarticolari a range fisso oltre il 10%
   const bigC=!atCap&&!mx&&ex.t==="comp"&&ex.lo===ex.hi&&kg>0&&st/kg>0.1;
   const big=!atCap&&!mx&&((ex.t==="iso"||ex.t==="prev")&&kg>0&&st/kg>(ex.lo===ex.hi?0.1:0.15)||bigC);
   const top=mx?ex.hi:atCap?Math.min(30,ex.hi+(ex.t==="comp"?5:10)):bigC?ex.hi+2:big?Math.min(30,ex.hi+5):ex.hi;
@@ -3303,7 +3321,7 @@ function luKey(ex){const l=history(ex.id)[0];return l?String(l.id||dayOf(l)):nul
 function loadUpOn(ex){if(pgOff)return false;const k=luKey(ex);return !!k&&(S.loadUp||{})[ex.id]===k}
 function toggleLoadUp(ex){S.loadUp=S.loadUp||{};if(loadUpOn(ex))delete S.loadUp[ex.id];else S.loadUp[ex.id]=luKey(ex);for(const id in S.loadUp){const e=exById(id);if(!e||luKey(e)!==S.loadUp[id])delete S.loadUp[id]}save()}
 // Solo se la proposta chiede ripetizioni in più (o myo-rep, o il mantenimento in cima al range esteso). Mai sui multiarticolari a range fisso (bulgarian):
-// lì il massimale stimato non conta il peso del corpo. Isolamento e prevenzione a ripetizioni fisse (reverse fly 2×15, cuffia, polso) sì
+// lì il massimale stimato non conta il peso del corpo. Isolamento e prevenzione a ripetizioni fisse (reverse fly 3×15, cuffia, polso) sì
 function luPlan(ex,t,mods){if(!t||t.lu||t.pause||t.xr||t.kind==="down"||ex.lo===ex.hi&&(ex.t==="comp"||ex.t==="bw")||["time","nordic","perf"].includes(ex.t)||powEx(ex)||fixRep(ex))return null;
   const last=baseHist(ex)[0];if(!last||!last.sets[ex.id])return null;const bw=ex.t==="bw";
   let pk0=null;const sets=workSets(last.sets[ex.id].filter(x=>num(x.reps)!=null).map(x=>{if(num(x.kg)!=null){pk0=x.kg;return x}return pk0!=null&&!bw?{...x,kg:pk0}:x}),ex.lo);
@@ -3497,6 +3515,11 @@ const ERRS={
  "nordic curl":["Piegarsi ai fianchi: anche, schiena e testa restano in linea.","Cadere di colpo: frena il più a lungo possibile."],
  "copenhagen plank":["Bacino che cade: corpo dritto dalla testa ai piedi.","Trattenere il respiro: respira normalmente durante la tenuta."],
  "calf in piedi":["Rimbalzare in basso: fermati 1 s in allungamento.","Mezza ripetizione: sali fino in punta."],
+ "equilibrio su una gamba":["Ginocchio che cade verso l'interno: resta in linea con il piede.","Anca che scende dal lato della gamba libera: bacino dritto, gluteo della gamba d'appoggio attivo."],
+ "equilibrio su cuscino o bosu":["Ginocchio che cade verso l'interno: resta in linea con il piede.","Anca che scende dal lato della gamba libera: bacino dritto, gluteo della gamba d'appoggio attivo."],
+ "equilibrio a occhi chiusi":["Ginocchio che cade verso l'interno: resta in linea con il piede.","Aggrapparsi all'appoggio: serve solo se perdi l'equilibrio, poi riparti."],
+ "calf seduto":["Rimbalzo in basso: fermati in allungamento e risali lento.","Escursione corta: scendi coi talloni sotto il gradino e sali fino in punta, 1 s fermo in alto."],
+ "calf seduto con manubrio sulle ginocchia":["Rimbalzo in basso: fermati in allungamento e risali lento.","Escursione corta: talloni giù fino in fondo, poi sali fino in punta e fermati 1 s."],
  "woodchop al cavo":["Ruotare solo le braccia: la rotazione parte da anche e busto.","Schiena che si inarca: addome contratto."],
  "extrarotazione al cavo":["Gomito che si stacca dal fianco: tienilo incollato, aiutati con un asciugamano arrotolato.","Busto che ruota per spostare il peso: carico troppo alto."],
  "estensione del polso":["Usare il braccio: si muove solo il polso, avambraccio appoggiato.","Discesa veloce: scendi in 3 s."],
@@ -3595,7 +3618,8 @@ const ERRS={
 // Muscolo preciso nel "?" e, sulla prevenzione, a cosa serve nel padel
 const MUSC={
  "squat bilanciere":"Quadricipiti e glutei","stacco rumeno":"Femorali e glutei","bulgarian split squat":"Quadricipiti e glutei","nordic curl":"Femorali",
- "calf in piedi":"Polpacci","copenhagen plank":"Adduttori (interno coscia) e core","extrarotazione al cavo":"Cuffia dei rotatori (infraspinato e piccolo rotondo)",
+ "calf in piedi":"Polpacci","calf seduto":"Soleo (polpaccio profondo)","calf seduto con manubrio sulle ginocchia":"Soleo (polpaccio profondo)",
+ "equilibrio su una gamba":"Stabilizzatori di caviglia, piede e anca","equilibrio su cuscino o bosu":"Stabilizzatori di caviglia, piede e anca","equilibrio a occhi chiusi":"Stabilizzatori di caviglia, piede e anca","copenhagen plank":"Adduttori (interno coscia) e core","extrarotazione al cavo":"Cuffia dei rotatori (infraspinato e piccolo rotondo)",
  "estensione del polso":"Estensori del polso (avambraccio)","estensione del polso con elastico":"Estensori del polso (avambraccio)","flexbar (tyler twist)":"Estensori del polso e tendini del gomito",
  "skater jump, arrivo bloccato":"Glutei e quadricipiti, in modo esplosivo","box jump":"Quadricipiti, glutei e polpacci, in modo esplosivo",
  "woodchop al cavo":"Obliqui e core","landmine press":"Spalla anteriore e petto alto",
@@ -3614,7 +3638,9 @@ const PWHY={
  "copenhagen plank":"Nel padel protegge l'inguine negli scatti laterali e nei cambi di direzione.","nordic curl":"Nel padel protegge i femorali negli scatti e nelle frenate.",
  "skater jump, arrivo bloccato":"Nel padel allena gli spostamenti laterali e la frenata.","box jump":"Nel padel allena l'esplosività dei primi passi e dei salti.",
  "woodchop al cavo":"Nel padel allena la rotazione che porta la forza dalle gambe al colpo.","pallof press":"Nel padel tiene il busto stabile mentre colpisci in movimento.",
- "face pull":"Nel padel bilancia le spinte e aiuta la spalla del colpo."};
+ "face pull":"Nel padel bilancia le spinte e aiuta la spalla del colpo.",
+ "equilibrio su una gamba":"Nel padel protegge la caviglia negli appoggi e nei cambi di direzione.","equilibrio su cuscino o bosu":"Nel padel protegge la caviglia negli appoggi e nei cambi di direzione.","equilibrio a occhi chiusi":"Nel padel protegge la caviglia negli appoggi e nei cambi di direzione.",
+ "calf seduto":"Nel padel il soleo regge appoggi e frenate: protegge polpaccio e tendine d'Achille.","calf seduto con manubrio sulle ginocchia":"Nel padel il soleo regge appoggi e frenate: protegge polpaccio e tendine d'Achille."};
 
 const WARMUP={up:[["Rotazioni delle braccia avanti e indietro","30 s"],["Band pull-apart con elastico","2 × 15"],["Extrarotazione, elastico leggero","12 per lato"],["Scapular push-up","10"],["Polsi: cerchi e flesso-estensioni","30 s"]],
   legs:[["Cyclette o corsa leggera","3 min"],["Squat a corpo libero","10"],["Affondi camminati","6 per lato"],["Ponte glutei","10"],["Saltelli sulle caviglie","20 s"]]};
@@ -3918,6 +3944,11 @@ const HOW={
  "bulgarian split squat":["Collo del piede dietro appoggiato su una panca, piede davanti un passo lungo avanti, manubri in mano.", "Scendi dritto finché il ginocchio dietro quasi tocca terra; risali spingendo col piede davanti."],
  "nordic curl":["In ginocchio su un cuscino, caviglie bloccate sotto un rullo o tenute da un compagno, corpo dritto. Elastico agganciato in alto davanti a te e passato sotto il petto: ti sostiene nella parte bassa.", "Inclinati in avanti a corpo dritto frenando con i femorali più a lungo possibile; prendi la caduta con le mani e torna su."],
  "copenhagen plank":["Di fianco su un avambraccio, caviglia della gamba sopra appoggiata sulla panca e gamba tesa, gamba sotto libera. Per partire più facile c'è la leva corta col ginocchio (⇄ Cambia).", "Solleva il bacino finché il corpo è dritto dalla testa ai piedi e tieni la posizione per i secondi indicati."],
+ "equilibrio su una gamba":["In piedi su una gamba, ginocchio appena piegato, sguardo avanti, mani sui fianchi.", "Resta in equilibrio per i secondi indicati senza appoggiare l'altro piede, poi cambia gamba."],
+ "equilibrio su cuscino o bosu":["In piedi su una gamba sopra un cuscino morbido o la parte tonda del bosu, ginocchio appena piegato, sguardo avanti.", "Resta in equilibrio per i secondi indicati senza appoggiare l'altro piede, poi cambia gamba."],
+ "equilibrio a occhi chiusi":["In piedi su una gamba vicino a un muro o una spalliera, ginocchio appena piegato. Trova l'equilibrio e chiudi gli occhi.", "Resta in equilibrio per i secondi indicati senza appoggiare l'altro piede, poi cambia gamba."],
+ "calf seduto":["Seduto alla macchina, ginocchia a 90° sotto l'imbottitura, avampiedi sul gradino, talloni fuori.", "Sali sulle punte, fermati 1 s in alto, poi scendi in 3 s fino a sentire il polpaccio allungato."],
+ "calf seduto con manubrio sulle ginocchia":["Seduto su una panca, ginocchia a 90°, avampiedi su un disco o un gradino, manubrio appoggiato di traverso sulle ginocchia.", "Sali sulle punte, fermati 1 s in alto, poi scendi in 3 s fino a sentire il polpaccio allungato."],
  "calf in piedi":["Spalle sotto i cuscinetti, avampiedi sul bordo del gradino, gambe tese.", "Scendi coi talloni sotto il gradino e fermati 1 s, poi sali in punta più in alto possibile."],
  "woodchop al cavo":["Di fianco alla colonna, cavo alto, maniglia con due mani sopra la spalla vicina, piedi larghi.", "Tira in diagonale verso il fianco opposto ruotando anche e busto, braccia quasi tese; torna controllato."],
  "extrarotazione al cavo":["Di fianco al cavo regolato all'altezza del gomito, con il braccio che lavora dal lato lontano dalla colonna; gomito a 90° attaccato al fianco, mano davanti alla pancia.", "Ruota l'avambraccio verso l'esterno tenendo il gomito fermo al fianco; torna lento."],
@@ -5185,7 +5216,8 @@ hip thrust|glutei|b||hip-thrust|32,63,107,163,227,44,80,129,189,257,56,96,149,21
 hip thrust alla macchina|glutei|m|p|hip-thrust|32,63,107,163,227,44,80,129,189,257,56,96,149,213,285,68,111,168,236,311
 calf in piedi|polpacci|m||machine-calf-raise|31,63,110,168,236,40,76,126,189,260,49,88,141,207,282,57,99,155,224,302
 calf alla pressa|polpacci|m||sled-press-calf-raise|51,93,150,222,303,68,115,178,255,342,84,136,204,286,377,100,156,229,315,410
-calf al smith|polpacci|m|p|barbell-calf-raise|32,59,96,143,196,42,72,113,163,219,52,85,129,182,241,61,97,144,199,261`;
+calf al smith|polpacci|m|p|barbell-calf-raise|32,59,96,143,196,42,72,113,163,219,52,85,129,182,241,61,97,144,199,261
+calf seduto|polpacci|m||seated-calf-raise|20,41,73,112,158,26,50,83,126,174,31,57,93,138,188,37,64,102,149,201`;
 const STD={};STD_RAW.split("\n").forEach(l=>{const [n,m,k,p,slug,v]=l.split("|"),a=v.split(",").map(Number);STD[n.trim()]={m:m.split(","),k,proxy:p==="p",slug,rows:[60,70,80,90].map((bw,i)=>[bw,a.slice(i*5,i*5+5)])}});
 // livelli Strength Level al tuo peso (interpolati tra le righe della tabella)
 function stdAt(sd,BW){const R=sd.rows;let i=0;while(i<R.length-2&&BW>R[i+1][0])i++;const [b0,v0]=R[i],[b1,v1]=R[i+1],f=(BW-b0)/(b1-b0);return v0.map((x,j)=>Math.max(.5,x+(v1[j]-x)*f))}
@@ -5777,7 +5809,7 @@ function renderSettings(){
     <li>Ripetizioni prima, carico poi: +1 ripetizione per serie finché chiudi tutto al limite alto del range, poi aumenta il carico e riparti dal basso. L'aumento segue l'attrezzo: +5 kg macchine e stazione cavi (pacco pesi), +2,5 kg cavo singolo (alzate, extrarotazione, pulley), bilanciere e Smith, +2 kg manubri e zavorra con kettlebell. Sui multiarticolari della parte alta, se il 2,5% del carico è più del gradino, sale di quello, arrotondato al gradino. Gambe: sempre un gradino (+2,5 kg col bilanciere).</li>
     <li>Dopo l'ultima serie puoi dire com'era. Facile: due ripetizioni in più invece di una; a fine range sui multiarticolari e sulle trazioni aumento doppio, se resta entro il 10% del carico (per le trazioni conta anche il tuo peso). Al limite su un multiarticolare (trazioni comprese) a fine range: il carico resta fermo finché non chiudi con le ripetizioni in canna previste.</li>
     <li>Isolamento della parte alta a macchina o al cavo con un gradino grosso (oltre il 15%) o a pacco finito: ultima serie in myo-rep, mini-serie da 5 con 15 s di pausa; con 4 mini-serie complete sali di peso. Mai nei giorni con padel dopo, partita domani, scarico, Stanco o in superserie: lì serie normali con il range esteso fino a 5 ripetizioni oltre, come sotto. Con la tua settimana (padel lunedì e mercoledì, partite nel weekend) i myo-rep restano quasi sempre spenti.</li>
-    <li>Isolamento e prevenzione con un gradino grosso rispetto al carico (oltre il 15%, oltre il 10% se il range è fisso come il reverse fly 2×15; es. extrarotazione al cavo da 5 a 7,5 kg, +50%), e cavi e macchine nei giorni senza myo-rep: prima porti le ripetizioni fino a 5 oltre il range, poi sali di peso. Se anche così il salto è troppo grosso, resti al carico con la discesa in 3 secondi e una ripetizione in più ogni volta, fino a 10 oltre il range: quello è il carico di mantenimento. Con un salto oltre il 25% l'app ti propone subito la variante dove il peso sale a passi più piccoli (⇄ Cambia).</li>
+    <li>Isolamento e prevenzione con un gradino grosso rispetto al carico (oltre il 15%, oltre il 10% se il range è fisso come il reverse fly 3×15; es. extrarotazione al cavo da 5 a 7,5 kg, +50%), e cavi e macchine nei giorni senza myo-rep: prima porti le ripetizioni fino a 5 oltre il range, poi sali di peso. Se anche così il salto è troppo grosso, resti al carico con la discesa in 3 secondi e una ripetizione in più ogni volta, fino a 10 oltre il range: quello è il carico di mantenimento. Con un salto oltre il 25% l'app ti propone subito la variante dove il peso sale a passi più piccoli (⇄ Cambia).</li>
     <li>Pacco finito (pulley sul cavo singolo a 50 kg, Selection 700): si sale con le ripetizioni, fino a 5 oltre il range sui multiarticolari e 10 sull'isolamento, poi stesso carico con discesa in 3 secondi e 1 secondo fermo; per più carico ⇄ Cambia. Se l'ultima volta hai segnato più del pacco, riparti dal pacco.</li>
     <li>Una serie sotto il minimo: la volta dopo quella serie punta al minimo, le altre restano come l'ultima volta. Una serie che mancava (seduta con una serie in meno) riparte dall'ultima fatta.</li>
     <li>Due sedute di fila allo stesso carico con almeno 2 ripetizioni sotto il minimo in tutto, ripetizioni medie non salite, ultima serie non Facile e niente giorno Stanco o partita: -10% e riparti dalle ripetizioni che facevi a quel carico. Nelle prime 3 sedute dopo un aumento stare 1-2 ripetizioni sotto il minimo non conta. Se il -10% vuol dire scendere più del 15% (gradino grosso), carico fermo e una ripetizione in più per serie. Con la zavorra conta anche il tuo peso.</li>
