@@ -2915,7 +2915,7 @@ function migScheda1115(){if(S.mig1115)return false;S.mig1115=1;const at=new Date
     cp=id=>({...BUILTIN.G.ex.find(e=>e.id===id)});
   const G=S.plans.G;if(G&&(!has(G,"g0")||!has(G,"g11"))){keep("G");
     if(!has(G,"g0"))G.ex.unshift(cp("g0"));
-    if(!has(G,"g11")){let i=G.ex.findIndex(e=>(e.lib||e.id)==="g8"||e.id==="g8");if(i<0)i=G.ex.findIndex(e=>(e.lib||e.id)==="g9")-1;G.ex.splice(i<0?G.ex.length:i+1,0,cp("g11"))}}
+    if(!has(G,"g11")){let i=G.ex.findIndex(e=>(e.lib||e.id)==="g8"||e.id==="g8");if(i<0)i=G.ex.findIndex(e=>["g9","a8","b9"].includes(e.lib||e.id))-1;G.ex.splice(i<-1?G.ex.length:i+1,0,cp("g11"))}}
   const C=S.plans.C,rf=C&&C.ex.find(e=>e.id==="c4"&&e.s===2);if(rf){keep("C");rf.s=3}
   return true}
 // Se i dati salvati mandano in errore l'avvio: prima si chiudono le sedute non salvate, poi si prova la copia di sicurezza, infine si tengono solo le sedute
@@ -3107,7 +3107,7 @@ function target(ex,noMyo){
   // Equilibrio su una gamba: prevenzione caviglia, secondi fissi. Non sale di tempo: quando le tenute sono pulite si passa alla versione più difficile
   if(ex.t==="time"&&/^equilibrio/i.test(ex.n)){const r=last?(last.sets[ex.id]||[]).map(x=>num(x.reps)).filter(v=>v!=null):[],full=r.length&&r.every(v=>v>=ex.hi),
       nx=/occhi chiusi/i.test(ex.n)?null:/cuscino|bosu/i.test(ex.n)?"agli occhi chiusi":"al cuscino o al bosu",ls=ex.side?" per lato":"";
-    return {...base,msg:!last?`Tieni ${ex.lo} s${ls} senza appoggiare l'altro piede.`:full?(nx?`Tenuti ${ex.hi} s su tutte: se sei stato fermo, passa ${nx} con ⇄ Cambia.`:`Stessi ${ex.hi} s${ls}: è già la versione più difficile.`):`Stessi ${ex.lo} s${ls}, senza appoggiare l'altro piede.`}}
+    return {...base,msg:!last?`Tieni ${ex.lo} s${ls} senza appoggiare l'altro piede.`:full?(nx?`Tenuti ${ex.hi} s su tutte: se sei stato fermo, passa ${nx} con ⇄ Cambia, «Sempre».`:`Stessi ${ex.hi} s${ls}: è già la versione più difficile.`):`Di nuovo ${ex.lo} s${ls}, senza appoggiare l'altro piede.`}}
   if(!last)return base;
   // Ultima volta fatto in un altro giorno con un altro range (es. 12-15 in Upper A, 15-20 in Upper C): carico ricalcolato dal massimale stimato
   const fx=last.from&&EX[last.from];
@@ -3371,7 +3371,7 @@ function tgFor0(ex,mods,g){let t=target(ex);
       if(up)return {...t,myo:false,kg,reps:rp,kind:"flat",badge:"=",msg:`Seduta alleggerita: ${kg>0?`${fk(kg)} kg, `:""}${ex.t==="time"?"stessi secondi":"stesse ripetizioni"} dell'ultima volta. Si sale la prossima volta.`}}}
   if(!mods.has("deload")||ex.t==="perf")return t;
   // Scarico: Nordic e tenute restano come l'ultima volta (niente +1); per i carichi vale l'ultima seduta nello stesso range, mai un carico più alto
-  if(ex.t==="time"||ex.t==="nordic"){const l=history(ex.id)[0],r=l?l.sets[ex.id].map(x=>num(x.reps)).filter(v=>v!=null):[],r0=r.length?Math.min(...r):ex.lo;return {...t,...(ex.t==="nordic"&&eqOf(ex)==="zav"?{kg:lastKg(ex,true)}:{}),top:ex.hi,reps:Array(ex.s).fill(r0),kind:"flat",badge:"Scarico",msg:ex.t==="time"?`Scarico: ${r0} s come l'ultima volta, metà serie.`:`Scarico: ${eqOf(ex)==="zav"?"":"stesso elastico e "}${r0} ripetizioni come l'ultima volta, metà serie.`}}
+  if(ex.t==="time"||ex.t==="nordic"){const l=history(ex.id)[0],r=l?l.sets[ex.id].map(x=>num(x.reps)).filter(v=>v!=null):[],r0=r.length?Math.min(...r):ex.lo;return {...t,...(ex.t==="nordic"&&eqOf(ex)==="zav"?{kg:lastKg(ex,true)}:{}),top:ex.hi,reps:Array(ex.s).fill(r0),kind:"flat",badge:"Scarico",msg:ex.t==="time"?(l?`Scarico: ${r0} s come l'ultima volta, metà serie.`:`Scarico: ${r0} s, metà serie.`):`Scarico: ${eqOf(ex)==="zav"?"":"stesso elastico e "}${r0} ripetizioni come l'ultima volta, metà serie.`}}
   // Carico dell'ultima seduta vera nello stesso range, al massimo il pacco. Se la proposta è un calo (due sedute sotto il minimo, pausa lunga) vale il carico già abbassato:
   // quello di prima non lo reggi con 3-4 in canna. Il pacco abbassato invece non conta (lì il carico c'era)
   const k0=lastKg(ex,true),cp=eqMax(ex),kd=t.kind==="down"&&t.kg!=null&&k0!=null&&t.kg<k0&&!(cp&&k0>cp)?t.kg:k0,k=kd!=null?(cp&&kd>cp?cp:kd):t.kg;return {...t,myo:false,top:ex.hi,kg:k,reps:Array(ex.s).fill(ex.lo),kind:"flat",badge:"Scarico",msg:`${k0!=null&&k===k0?"Stesso carico dell'ultima volta":kd!=null&&kd<k0?`${ex.t==="bw"&&!(k>0)?"A corpo libero":`${fk(k)} kg`}, il carico abbassato`:k0!=null?`${fk(k)} kg, il massimo del pacco`:"Carico leggero"}, ${ex.lo} ripetizioni, 3-4 in canna.`}}
@@ -5584,7 +5584,7 @@ function renderProg(){
   <section class="card ph">
     <label class="exsel"><span class="sr">Esercizio</span><select id="exSel">${progGroups(seen).map(([lab,ids])=>`<optgroup label="${esc(lab)}">${ids.map(id=>`<option value="${id}" ${id===progEx?"selected":""}>${esc(exName(id))}</option>`).join("")}</optgroup>`).join("")}</select></label>
     <div class="kpi"><b>${fk(weighted?Math.round(lastV):Math.round(lastV*10)/10)}<small>${unit}</small></b>${pts.length>1?`<span class="pill ${delta>=0?"go":"stop"}">${delta>=0?"+":""}${fk(Math.round(delta))}% in ${wks} sett.</span>`:""}</div>
-    <span class="cap">${weighted?"Massimale stimato":ex.t==="time"?"Tenuta migliore":"Ripetizioni migliori"} · record ${fk(weighted?Math.round(bestV):Math.round(bestV*10)/10)} ${unit} il ${fmtShort(bestP.date)}</span>
+    <span class="cap">${/^equilibrio/i.test(ex.n)?`Tenuta fissa a ${ex.hi} s${ex.side?" per lato":""}: quando è facile passa a una versione più difficile`:`${weighted?"Massimale stimato":ex.t==="time"?"Tenuta migliore":"Ripetizioni migliori"} · record ${fk(weighted?Math.round(bestV):Math.round(bestV*10)/10)} ${unit} il ${fmtShort(bestP.date)}`}</span>
     <div class="chart" id="lineChart"></div>
     ${weighted?`<p class="note">${ex.t==="bw"?`Stimato dalla serie migliore di ogni seduta col tuo peso (${fk(bwNow())} kg) più la zavorra: (peso + zavorra) × (1 + ripetizioni/30).`:"Stimato dalla serie migliore di ogni seduta: kg × (1 + ripetizioni/30)."}</p>`:""}
   </section>
@@ -5781,7 +5781,7 @@ function impMsg(t,err){const bm=document.getElementById("bmsg");if(!bm)return;bm
 // Con più import di fila "Annulla l'import" torna ai dati di prima del primo: KEY.imp non si sovrascrive
 function applyImport(j){const prev=S,pre=JSON.stringify(S),had=impUndoOk();if(!had&&!setKey(KEY+".imp",pre)){impMsg("Memoria piena: non importo senza poter annullare. Esporta prima un backup dei dati attuali.",true);return}
   // Prima si prova il backup su tutte le schermate; se qualcosa non va si rimettono i dati di prima e non si salva niente
-  render.strict=true;try{S=j;normS();rebuild();assess(today());for(const v of ["oggi","train","prog","set","imp"]){view=v;render()}}catch(e){S=prev;normS();rebuild();view="imp";render();try{localStorage.removeItem(KEY+".imp")}catch(x){}impMsg("File non valido: scegli un backup esportato da Allenati Scemo.",true);return}finally{render.strict=false}
+  render.strict=true;try{S=j;normS();migScheda1115();rebuild();assess(today());for(const v of ["oggi","train","prog","set","imp"]){view=v;render()}}catch(e){S=prev;normS();rebuild();view="imp";render();try{localStorage.removeItem(KEY+".imp")}catch(x){}impMsg("File non valido: scegli un backup esportato da Allenati Scemo.",true);return}finally{render.strict=false}
   fixDupIds.n=0;stopTimer();save();applySkin();view="imp";render();const n=S.sessions.length;
   impMsg(`Backup importato: ${n===1?"1 seduta":n+" sedute"}. Puoi annullare l'import finché non salvi una seduta nuova.`)}
 function renderSettings(){
@@ -5965,7 +5965,7 @@ function loadDemo(){
       const d=addDays(now,-(w*7)+off-((now.getDay()+6)%7));if(d>=now)continue;
       const sets={};
       for(const ex of PLAN[g].ex){
-        const base={a1:50,a2:0,a3:40,a4:45,a5:7.5,a6:10,a7:15,a8:5,g3:70,g4:60,g5:14,g8:40,g9:15,b1:16,b10:15,b2:50,b3:7.5,b4:45,b5:8,b6:20,b7:10,b8:20,b9:6,c1:40,c2:20,c3:5,c4:30,c5:7.5,c6:17.5,c7:15}[ex.id];
+        const base={a1:50,a2:0,a3:40,a4:45,a5:7.5,a6:10,a7:15,a8:5,g3:70,g4:60,g5:14,g8:40,g11:30,g9:15,b1:16,b10:15,b2:50,b3:7.5,b4:45,b5:8,b6:20,b7:10,b8:20,b9:6,c1:40,c2:20,c3:5,c4:30,c5:7.5,c6:17.5,c7:15}[ex.id];
         const prog=(7-w);const kg=base!=null?base+Math.floor(prog/2)*(ex.step||2.5):null;
         const reps=Math.min(ex.hi,ex.lo+(prog%2)+(prog%3===0?1:0));
         sets[ex.id]=[...Array(ex.s)].map(()=>({kg:kg!=null&&!["perf","nordic","time"].includes(ex.t)?String(kg):"",reps:String(ex.t==="time"?Math.min(30,20+prog*2):reps)}));
