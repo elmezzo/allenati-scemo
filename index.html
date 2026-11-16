@@ -3895,7 +3895,7 @@ function rollUp(b,a,z,rest){if(RM())return;if(skinNow()==="carbonio")return coun
 // A ogni serie le luci passano dal valore di prima (--f0) al nuovo (--f) animando --fv; startTime riprende da dove era arrivata se la scheda viene ridisegnata a metà.
 // Senza @property (iOS sotto 16.4) --fv non si anima a valori intermedi: niente animazione, le luci cambiano subito
 function veilFx(){if(!(window.CSS&&CSS.registerProperty))return;app.querySelectorAll(".ex.cur:not(.gold)>.fp.grow").forEach(fp=>{const st=fp.parentElement.style,f=+st.getPropertyValue("--f")||0,f0=+st.getPropertyValue("--f0")||0,el=Math.max(0,-parseFloat(st.getPropertyValue("--fd"))||0);
-  try{const an=fp.animate([{"--fv":String(f0)},{"--fv":String(f)}],{duration:FILL_MS,easing:FILL_EZ,fill:"both"}),tl=document.timeline&&document.timeline.currentTime;if(tl!=null)an.startTime=tl-el;else an.currentTime=el}catch(e){}})}
+  try{const an=fp.animate([{"--fv":String(f0)},{"--fv":String(f)}],{duration:FILL_MS,easing:FILL_EZ,fill:"both"}),tl=typeof performance!=="undefined"&&performance.now?performance.now():null;if(tl!=null)an.startTime=tl-el;else an.currentTime=el}catch(e){}})}
 function trainFx(g,pct,mods){
   // Serie fatte in alto: la cifra nuova entra dal basso in 180 ms (dall'alto se togli una spunta); breve perché si spunta decine di volte
   const dc=app.querySelector(".thead .dnc"),dw=lastDn[g];if(dc){const v=+dc.textContent;if(dw!=null&&v!==dw&&Math.abs(v-dw)<=3&&!RM()){const u=v>dw?1:-1;dc.animate([{transform:`translateY(${u*.45}em)`,opacity:0},{transform:"none",opacity:1}],{duration:180,easing:"cubic-bezier(.23,1,.32,1)"})}lastDn[g]=v}
