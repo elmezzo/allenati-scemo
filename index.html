@@ -2904,7 +2904,7 @@ function fixDupIds(){const seen=new Set(),base=id=>String(id).split("~")[0],keys
     if(P)for(const e of P.ex)if(e&&e.id)mine.add(e.id);mine.forEach(i=>seen.add(i))}}
 let bootMsg=loadMsg;
 function boot(){normS();for(const P of Object.values(S.plans))for(const e of P.ex||[])if(/^Alzate laterali al cavo/i.test(e.n||"")&&(e.eq||"mac")==="mac"){e.eq="cavl";e.step=2.5}for(const P of Object.values(S.plans))for(const e of P.ex||[])if(e.n==="Curl panca Scott"&&e.eq==="db"){e.n="Curl Scott con manubri";e.note=e.note||"Kg = un manubrio."}
-if(S.deload&&iso(today())>S.deload.to)closeDeload(S.deload.to);
+closeStale();
 // Esercizi allo Smith nei piani salvati (scheda modificata o creata da te): nota sui kg se non ce n'è già una
 for(const P of Object.values(S.plans))for(const e of P.ex||[])if(/\bal Smith\b/i.test(e.n||"")&&!/kg\s*=/i.test(e.note||""))e.note="Kg = dischi (barra esclusa)."+(e.note?" "+e.note:"");
 const mg=migScheda1115();moveOld();rebuild();if(fixDupIds.n||mg){fixDupIds.n=0;save()}}
@@ -3415,9 +3415,9 @@ const monOf=d=>{const [y,m,g]=String(d).slice(0,10).split("-").map(Number),x=new
 function loadStart(){if(!S.sessions.length)return null;const a=S.lastDeload?monOf(iso(addDays(S.lastDeload+"T12:00:00",7))):"",wk0=d=>monOf(iso(addDays(d+"T12:00:00",3))),r=restEnd(),b=r?wk0(r):"",c=wk0(S.sessions.map(dayOf).sort()[0]);return [a,b,c].sort().pop()}
 const loadWeeks=()=>{const a=loadStart();return a?Math.max(0,Math.floor(dayDiff(a,monOf(iso(today())))/7)):0};
 // Settimana del prossimo scarico (lunedì), null durante lo scarico o senza sedute; con "Non ora" è il lunedì a cui l'hai rimandato
-function nextDeloadWeek(){if(S.deload)return null;const a=loadStart();if(!a)return null;const z=S.deloadSnooze&&S.deloadSnooze>iso(today())?monOf(S.deloadSnooze):"";return [iso(addDays(a+"T12:00:00",DL_WK*7)),monOf(iso(today())),z].sort().pop()}
+function nextDeloadWeek(){if(S.deload)return null;const a=loadStart();if(!a)return null;const m=monOf(iso(today()));if(deloadAdvice())return m;const z=S.deloadSnooze&&monOf(S.deloadSnooze)>iso(today())?monOf(S.deloadSnooze):"";return [iso(addDays(a+"T12:00:00",DL_WK*7)),monOf(iso(today())),z].sort().pop()}
 function deloadAdvice(){
-  if(S.deload||!S.sessions.length)return null;if(S.deloadSnooze&&iso(today())<S.deloadSnooze)return null;
+  if(S.deload||!S.sessions.length)return null;if(S.deloadSnooze&&iso(today())<monOf(S.deloadSnooze))return null;
   const why=[],cut=iso(addDays(today(),-21));
   const ids=[...new Set(S.sessions.filter(x=>dayOf(x)>=cut).flatMap(x=>Object.keys(x.sets||{})))];
   const st=new Set(ids.filter(id=>{const ex=exById(id);if(!stalled(ex))return false;try{const t=target(ex);return !t.hold&&t.kind!=="down"}catch(e){return true}}).map(id=>nmKey(exName(id)))).size;const wk=loadWeeks();
@@ -3426,9 +3426,12 @@ function deloadAdvice(){
   if(st>=3&&wk>=4)why.push(`${st} esercizi fermi da 3 sedute`);
   return why.length?why:null;
 }
-function startDeload(){const from=cycleStart()||iso(today());S.cycles=S.cycles||[];const cy=S.cycles.some(c=>c.to===iso(today()))?0:1;if(cy)S.cycles.push({from,to:iso(today())});S.deload={from:iso(today()),to:iso(addDays(today(),6)),cy};delete S.deloadSnooze;save()}
+// Avviato da lunedì a giovedì finisce la domenica di questa settimana (così il ciclo dopo riparte lunedì e resta 5+1); da venerdì dura 7 giorni
+function startDeload(){closeStale();const from=cycleStart()||iso(today());S.cycles=S.cycles||[];const cy=S.cycles.some(c=>c.to===iso(today()))?0:1;if(cy)S.cycles.push({from,to:iso(today()),wk:loadWeeks()});const t=iso(today()),dw=(new Date(t+"T12:00:00").getDay()+6)%7;S.deload={from:t,to:iso(addDays(monOf(t)+"T12:00:00",dw<4?6:dw+6)),cy};delete S.deloadSnooze;save()}
 // Scarico vero solo se è durato almeno 2 giorni e ha almeno una seduta di scarico; altrimenti è annullato: non conta come fatto e il ciclo aggiunto all'avvio si toglie
 function deloadReal(D,end){return !!D&&dayDiff(D.from,end)>=2&&S.sessions.some(x=>x.deload&&iso(x.date)>=D.from&&iso(x.date)<=end)}
+// Scarico scaduto (app rimasta aperta oltre la domenica, backup importato, altra scheda): si chiude alla sua fine e si salva
+function closeStale(){if(S.deload&&iso(today())>S.deload.to){closeDeload(S.deload.to);save();return true}return false}
 function closeDeload(end){const D=S.deload;if(!D)return false;const real=deloadReal(D,end);if(real)S.lastDeload=end;else if(D.cy!==0)S.cycles=(S.cycles||[]).filter(c=>c.to!==D.from);delete S.deload;delete S.dlFx;return real}
 function endDeload(){const r=closeDeload(iso(today()));save();return r}
 // Testo della conferma di "Termina": dice se lo scarico conterà come fatto
@@ -3495,7 +3498,7 @@ document.querySelectorAll("nav.bar button").forEach(b=>b.onclick=()=>go(b.datase
 let shownDay=null,shownGym=null;
 const dayStale=()=>!!shownDay&&shownDay!==iso(today());
 function natGym(){const w=gymSel;gymSel=null;try{return currentGym()}finally{gymSel=w}}
-function freshDay(auto){if(!dayStale())return false;if(auto&&(view==="edit"||document.querySelector(".sheet-wrap")||/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement||{}).tagName||"")))return false;gymSel=null;moveOld();rebuild();render();return true}
+function freshDay(auto){closeStale();if(!dayStale())return false;if(auto&&(view==="edit"||document.querySelector(".sheet-wrap")||/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement||{}).tagName||"")))return false;gymSel=null;moveOld();rebuild();render();return true}
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")freshDay(true)});
 addEventListener("pageshow",()=>freshDay(true));addEventListener("focus",()=>freshDay(true));
 setInterval(()=>{if(document.visibilityState==="visible")freshDay(true)},60000);
@@ -5514,7 +5517,7 @@ function buildReview(c){
   // Come la scheda (stalled/history): fermo e variazione si calcolano sulle serie della scheda, senza le serie in più
   const ss=S.sessions.filter(s=>!s.deload&&dayOf(s)>=c.from&&dayOf(s)<c.to).sort((a,b)=>a.date.localeCompare(b.date)).map(xsStrip);
   if(ss.length<3)return null;
-  const wk=Math.max(1,(to-from)/(7*864e5));
+  const wk=c.wk>0?c.wk:Math.max(1,(to-from)/(7*864e5));
   const grp={};for(const s of ss)for(const id in s.sets){const k=String(exName(id)).trim().toLowerCase();(grp[k]=grp[k]||new Set()).add(id)}
   const ex=[];for(const k in grp){const ids=[...grp[k]],e=exById(ids[0]);if(["perf","prev","time"].includes(e.t))continue;const ns=noStall(e);
     // Stesso nome in giorni diversi (es. alzate laterali in A e in C) = serie separate: si valuta ogni esercizio per conto suo
@@ -5790,7 +5793,7 @@ function impMsg(t,err){const bm=document.getElementById("bmsg");if(!bm)return;bm
 // Con più import di fila "Annulla l'import" torna ai dati di prima del primo: KEY.imp non si sovrascrive
 function applyImport(j){const prev=S,pre=JSON.stringify(S),had=impUndoOk();if(!had&&!setKey(KEY+".imp",pre)){impMsg("Memoria piena: non importo senza poter annullare. Esporta prima un backup dei dati attuali.",true);return}
   // Prima si prova il backup su tutte le schermate; se qualcosa non va si rimettono i dati di prima e non si salva niente
-  render.strict=true;try{S=j;normS();migScheda1115();rebuild();assess(today());for(const v of ["oggi","train","prog","set","imp"]){view=v;render()}}catch(e){S=prev;normS();rebuild();view="imp";render();try{localStorage.removeItem(KEY+".imp")}catch(x){}impMsg("File non valido: scegli un backup esportato da Allenati Scemo.",true);return}finally{render.strict=false}
+  render.strict=true;try{S=j;normS();migScheda1115();closeStale();rebuild();assess(today());for(const v of ["oggi","train","prog","set","imp"]){view=v;render()}}catch(e){S=prev;normS();rebuild();view="imp";render();try{localStorage.removeItem(KEY+".imp")}catch(x){}impMsg("File non valido: scegli un backup esportato da Allenati Scemo.",true);return}finally{render.strict=false}
   fixDupIds.n=0;stopTimer();save();applySkin();view="imp";render();const n=S.sessions.length;
   impMsg(`Backup importato: ${n===1?"1 seduta":n+" sedute"}. Puoi annullare l'import finché non salvi una seduta nuova.`)}
 function renderSettings(){
