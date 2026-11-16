@@ -3665,7 +3665,7 @@ const legGrp=n=>/stacco|deadlift|good morning|hip thrust|rdl|ponte/i.test(n)?"fe
 const rampMu=e=>{const sd=STD[(e.n||"").trim().toLowerCase()],mu=e.mu||muOf(e.id),m=sd?sd.m[0]:mu==="Gambe"?legGrp(e.n||""):VOLMU[mu];
   if(m==="petto"||m==="dorso")return ["comp","iso","bw"].includes(e.t)?m:null;
   return e.t!=="comp"?null:m==="quadricipiti"?"quad":m==="femorali"||m==="glutei"?"post":null};
-function rampOn(g,ex,mods){if(mods.has("deload"))return false;const L=PLAN[g].ex.map(e=>effEx(g,e)).filter(e=>setsFor(e,mods)>0);
+function rampOn(g,ex,mods){const L=PLAN[g].ex.map(e=>effEx(g,e)).filter(e=>setsFor(e,mods)>0);
   const m=rampMu(ex);
   // Un gruppo muscolare si scalda una volta sola: il primo esercizio del gruppo; il primo multiarticolare senza gruppo (es. landmine press) lo prende comunque
   if(!m&&L.find(e=>e.t==="comp")?.id===ex.id)return true;return !!m&&L.find(e=>rampMu(e)===m)?.id===ex.id}
