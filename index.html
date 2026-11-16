@@ -945,9 +945,9 @@ html:not([data-skin="vetro"]):not(#z):not(#y):not(#x) .ex.cur.tint:not(.gold){--
 /* Scheda dorata: le luci sfumano mentre arriva l'oro (deve vincere su .grow, che ha la stessa specificità) */
 .ex.cur.gold>.fp.grow{animation:flOut .6s cubic-bezier(.23,1,.32,1) forwards}
 /* Oro a fine esercizio (v74): si accende a luci come le serie. Quattro luci d'oro nascono una dopo l'altra negli angoli dell'aurora e si allargano (--gv da 0 a 1)
-   finché coprono la scheda (.fgl, sopra); il fondo d'oro dello stile (.fg) arriva sotto subito dopo, poi passa il riflesso */
+   finché coprono la scheda (.fgl, sopra); il fondo d'oro dello stile (.fg) parte da metà e si riempie in 0,4 s, così il testo inchiostro resta leggibile anche negli stili scuri; poi passa il riflesso */
 @property --gv{syntax:"<number>";inherits:false;initial-value:1}
-.ex.cur>.fg{background:linear-gradient(135deg,rgba(255,226,140,.42),rgba(232,170,52,.3) 55%,rgba(196,128,24,.38));animation:flGold .8s .3s cubic-bezier(.33,0,.2,1) both}
+.ex.cur>.fg{background:linear-gradient(135deg,rgba(255,226,140,.42),rgba(232,170,52,.3) 55%,rgba(196,128,24,.38));animation:flGold .4s cubic-bezier(.23,1,.32,1) both}
 .ex.cur>.fgl{animation:flGoldLux 1.1s cubic-bezier(.23,1,.32,1) both;
  background:
   radial-gradient(calc(8% + var(--gv)*110%) calc(6% + var(--gv)*62%) at 6% 4%,rgba(255,236,170,calc(min(1,var(--gv)*5)*.92)),rgba(255,236,170,0) 72%),
@@ -955,7 +955,7 @@ html:not([data-skin="vetro"]):not(#z):not(#y):not(#x) .ex.cur.tint:not(.gold){--
   radial-gradient(calc(8% + var(--gv)*104%) calc(6% + var(--gv)*54%) at 4% 72%,rgba(255,222,140,calc(min(1,max(0,var(--gv)*5 - 1.2))*.9)),rgba(255,222,140,0) 72%),
   radial-gradient(calc(8% + var(--gv)*110%) calc(6% + var(--gv)*54%) at 90% 104%,rgba(232,172,70,calc(min(1,max(0,var(--gv)*5 - 1.8))*.9)),rgba(232,172,70,0) 72%)}
 .ex.cur>.fg::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,transparent 35%,rgba(255,250,225,.55) 50%,transparent 65%);background-size:300% 300%;animation:flShine .9s 1s cubic-bezier(.23,1,.32,1) both}
-@keyframes flGold{from{opacity:0}to{opacity:1}}
+@keyframes flGold{from{opacity:.5}to{opacity:1}}
 @keyframes flGoldLux{from{--gv:0}to{--gv:1}}
 @keyframes flShine{from{background-position:100% 100%;opacity:1}to{background-position:0 0;opacity:0}}
 .ex.cur.gold{outline-color:#e8b440!important;box-shadow:0 0 0 1px rgba(255,214,120,.5),0 10px 34px rgba(232,170,52,.28)}
@@ -4780,7 +4780,7 @@ function fillEz(t){const bz=(a,b,u)=>3*a*u*(1-u)*(1-u)+3*b*u*u*(1-u)+u*u*u;let l
 // Se intanto cambi schermata, esercizio o scheda, la passata si chiude subito: stato finale senza ridisegnare, e il timer non ridisegna più l'Allenamento sopra un'altra schermata
 function goldFlush(){const p=goldCard.p;if(!p)return;clearTimeout(goldCard.t);goldCard.p=null;goldHold=null;delete fillMem[p.exId];if(openEx[p.g]===p.exId)openEx[p.g]=ssGo[p.g]&&ssGo[p.g]!==p.exId?ssGo[p.g]:null;p.after&&p.after()}
 function goldCard(g,exId,after){goldFlush();goldHold={g,ex:exId};openEx[g]=exId;goldCard.p={g,exId,after};renderTrain();keepFocus(false,exId);
-  goldCard.t=setTimeout(()=>{goldFlush();if(view!=="train"||currentGym()!==g)return;renderTrain();keepFocus(false);{const c=document.querySelector("#exs .ex.cur");if(c)c.classList.add(RM()?"rmfade":"sw-n")}},RM()?450:2000)}
+  goldCard.t=setTimeout(()=>{goldFlush();if(view!=="train"||currentGym()!==g)return;renderTrain();keepFocus(false);{const c=document.querySelector("#exs .ex.cur");if(c)c.classList.add(RM()?"rmfade":"sw-n")}},RM()?450:1800)}
 // Superserie: quella del piano, oppure quella scelta solo per la seduta di oggi (draft.ss, "" = sciolta)
 const ssOf=(g,ex)=>{const o=(S.draft&&S.draft[g]&&S.draft[g].ss)||{};return ex.id in o?o[ex.id]:(ex.ss||"")};
 function ssSheet(g,ex,mods){
