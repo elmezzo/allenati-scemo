@@ -911,16 +911,38 @@ html[data-skin="campo"] .rbd .gs{opacity:.5}
 @property --fx{syntax:"<number>";inherits:false;initial-value:0}
 @property --cx{syntax:"<color>";inherits:false;initial-value:transparent}
 /* Velo: lo strato nuovo (--fc, --f) entra sopra quello vecchio (--fc0, --f0) animando solo l'opacità (veilFx), niente gradiente ridipinto a ogni fotogramma */
-.ex.cur>.fp{background:radial-gradient(130% 100% at 25% 15%,color-mix(in srgb,var(--fc,var(--go)) 58%,transparent),color-mix(in srgb,var(--fc,var(--go)) 34%,transparent) 70%);opacity:calc(min(var(--fmax,.75),min(1,var(--f)*6)*(.25 + var(--f)*.75)))}
-/* --fmax: tetto del velo (0,75 = 2 serie su 3), così il testo della scheda resta sopra 4,5:1 anche con 5-6 serie o serie in più; Murano ha il suo velo e resta com'era */
-html[data-skin="vetro"] .ex.cur{--fmax:1}
+/* Aurora viva (v74, 2026-11-16): quattro luci nei colori dello stile; se ne accende una a ogni quarto di esercizio, negli angoli a turno, e si allargano.
+   Sopra: grana fine e riflesso chiaro in alto; sotto: la stessa luce sfocata che respira piano. .fq è lo stato prima della serie (--f0), .fp quello nuovo che entra sopra (veilFx) */
+.ex.cur>:is(.fp,.fq){overflow:hidden;
+ background:
+  radial-gradient(calc(55% + var(--f)*45%) calc(34% + var(--f)*26%) at 6% 4%,color-mix(in srgb,var(--au1) 78%,transparent),transparent 70%),
+  radial-gradient(calc(45% + var(--f)*50%) calc(28% + var(--f)*28%) at 98% 36%,color-mix(in srgb,var(--au2) calc(min(1,max(0,var(--f)*4 - .6))*74%),transparent),transparent 70%),
+  radial-gradient(calc(50% + var(--f)*50%) calc(26% + var(--f)*28%) at 4% 72%,color-mix(in srgb,var(--au3) calc(min(1,max(0,var(--f)*4 - 1.6))*72%),transparent),transparent 70%),
+  radial-gradient(calc(55% + var(--f)*45%) calc(24% + var(--f)*26%) at 90% 104%,color-mix(in srgb,var(--au4) calc(min(1,max(0,var(--f)*4 - 2.6))*72%),transparent),transparent 70%)}
+.ex.cur>.fp{opacity:min(1,calc(var(--f)*1000))}
+.ex.cur>.fq{--f:var(--f0)}
+.ex.cur>:is(.fp,.fq)::before{content:"";position:absolute;inset:-20%;background:inherit;filter:blur(18px) saturate(1.15);animation:auBreath 7s ease-in-out infinite alternate}
+.ex.cur>:is(.fp,.fq)::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,rgba(255,255,255,.28),transparent 22%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");mix-blend-mode:soft-light;opacity:.7}
+@keyframes auBreath{from{transform:translate(0,0) scale(1)}to{transform:translate(2%,-1.5%) scale(1.04)}}
+@media (prefers-reduced-motion:reduce){.ex.cur>:is(.fp,.fq)::before{animation:none}}
+/* colori delle luci per stile: la prima è il colore dello stile o della variante */
+.ex.cur{--au1:#ff4f9a;--au2:#ff9a3c;--au3:#8a5cff;--au4:#2fd0c4}
+html[data-skin="vetro"] .ex.cur{--au1:var(--hot);--au2:#ff5fa8;--au3:#2fd0c4;--au4:#ffb347}
+html[data-skin="vetro"][data-var="1"] .ex.cur{--au2:#ff9a3c;--au3:#8a5cff;--au4:#2fd0c4}
+html[data-skin="vetro"][data-var="2"] .ex.cur{--au2:#4aa8ff;--au3:#ff5fa8;--au4:#ffb347}
+html[data-skin="dischi"] .ex.cur{--au1:#2f6bff;--au2:#ff3b44;--au3:#ffd21a;--au4:#22b35a}
+html[data-skin="campo"] .ex.cur{--au1:#b8f000;--au2:#00b2ff;--au3:#ff7a3c;--au4:#ffe14d}
+html[data-skin="carbonio"] .ex.cur{--au1:var(--hot);--au2:#ff3b6b;--au3:#3ad0ff;--au4:#b36bff}
+html[data-skin="eclisse"] .ex.cur{--au1:var(--hot);--au2:#ffb84d;--au3:#7a5cff;--au4:#3ad0ff}
+html[data-skin="lavagna"] .ex.cur{--au1:var(--acc);--au2:#ff8fb1;--au3:#7fd6ff;--au4:#b6f27a}
+html[data-skin="manga"] .ex.cur{--au1:var(--hot);--au2:#ffd400;--au3:#2f7bff;--au4:#ff4f9a}
 html:not([data-skin="vetro"]):not(#z):not(#y):not(#x) .ex.cur.tint:not(.gold){--muted:var(--fg)}
-.ex.cur>.fq{background:radial-gradient(130% 100% at 25% 15%,color-mix(in srgb,var(--fc0,var(--go)) 58%,transparent),color-mix(in srgb,var(--fc0,var(--go)) 34%,transparent) 70%);opacity:0}
+.ex.cur>.fq{opacity:0}
 .ex.cur.gold>.fq{display:none}
 .ex.cur.gold>.fp{--fc:var(--fc0);opacity:0;animation:flOut .6s cubic-bezier(.23,1,.32,1) forwards}
 @media (prefers-reduced-motion:reduce){.ex.cur.gold>.fp{animation:none}}
 /* Parte da com'era il velo prima dell'ultima serie (--f0, --fc0), così non si schiarisce per un fotogramma */
-@keyframes flOut{from{opacity:calc(min(var(--fmax,.75),min(1,var(--f0)*6)*(.25 + var(--f0)*.75)))}to{opacity:0}}
+@keyframes flOut{from{opacity:min(1,calc(var(--f0)*1000))}to{opacity:0}}
 /* Scheda dorata: il velo sfuma mentre arriva l'oro (deve vincere su .grow, che ha la stessa specificità) */
 .ex.cur.gold>.fp.grow{animation:flOut .6s cubic-bezier(.23,1,.32,1) forwards}
 .ex.cur>.fg{background:linear-gradient(135deg,rgba(255,226,140,.42),rgba(232,170,52,.3) 55%,rgba(196,128,24,.38));clip-path:polygon(0 0,200% 0,0 200%);animation:flGold .68s cubic-bezier(.23,1,.32,1) both}
@@ -1910,8 +1932,6 @@ html[data-skin="manga"]:not(#z):not(#y):not(#x) .sheet .fxgo,html[data-skin="man
    Scheda dorata: oro pieno e coprente con scritte scure (inchiostro) negli stili scuri e in Murano sera, come Murano giorno.
    Le "isole" con fondo proprio (campi, spunte, recupero, scelte) tengono i colori dello stile: i valori vengono presi da #exs, prima dell'inchiostro. */
 #exs{--gx-fg:var(--fg);--gx-mut:var(--muted);--gx-dim:var(--dim);--gx-info:var(--info);--gx-go:var(--go);--gx-adapt:var(--adapt);--gx-mink:var(--m-ink);--gx-mmut:var(--m-mut);--gx-mdim:var(--m-dim);--gx-chalk:var(--chalk);--gx-chalkrgb:var(--chalk-rgb)}
-html:not([data-skin="vetro"]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur>.fp{background:radial-gradient(130% 100% at 25% 15%,color-mix(in srgb,color-mix(in srgb,var(--fc,var(--go)) 42%,var(--card)) 80%,transparent),color-mix(in srgb,color-mix(in srgb,var(--fc,var(--go)) 42%,var(--card)) 55%,transparent) 70%)}
-html:not([data-skin="vetro"]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur>.fq{background:radial-gradient(130% 100% at 25% 15%,color-mix(in srgb,color-mix(in srgb,var(--fc0,var(--go)) 42%,var(--card)) 80%,transparent),color-mix(in srgb,color-mix(in srgb,var(--fc0,var(--go)) 42%,var(--card)) 55%,transparent) 70%)}
 :is(html:not([data-skin="vetro"]),html[data-skin="vetro"][data-sera]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur>.fg{background:linear-gradient(135deg,#ffe193,#f5c65e 50%,#e6ab45)}
 /* COL-5: link, "Salva", "Avvia scarico" e adattamenti (--info) seguono la variante: accento schiarito col testo, invece dell'azzurro fisso. Lavagna e Murano lo fanno già */
 html:is([data-skin="carbonio"],[data-skin="manga"],[data-skin="eclisse"],[data-skin="campo"]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5){--info:color-mix(in srgb,var(--acc) 58%,var(--fg))}
@@ -1927,7 +1947,6 @@ html[data-skin="lavagna"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur:n
 html[data-skin="vetro"]:not([data-sera]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .rk-pr .rbd.o{opacity:1}
 :root:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .rk-pr .f{color:var(--muted)}
 /* Murano sera Acquamare: il velo pieno (acqua chiara) schiariva la pillola "A Avvicinamento" a 4,4:1; un po' meno colore nel velo. Murano giorno: la ✓ verde della pillola sul velo rosa sotto 3:1, più inchiostro */
-html[data-skin="vetro"][data-sera][data-var="2"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur>.fp{background:radial-gradient(130% 100% at 25% 15%,color-mix(in srgb,color-mix(in srgb,var(--fc,var(--go)) 32%,var(--m-card)) 80%,transparent),color-mix(in srgb,color-mix(in srgb,var(--fc,var(--go)) 32%,var(--m-card)) 55%,transparent) 70%)}
 html[data-skin="vetro"]:not([data-sera]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur.tint .wpill .wck{color:color-mix(in srgb,var(--go) 70%,var(--m-ink))}
 /* Murano giorno: l'oro resta crema sul vetro lattimo ma più carico, così si stacca anche dal velo rosa di Rubino e acqua di Acquamare */
 html[data-skin="vetro"]:not([data-sera]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur>.fg{background:linear-gradient(135deg,rgba(255,220,130,.62),rgba(236,172,52,.5) 55%,rgba(206,140,32,.56))}
@@ -2190,8 +2209,6 @@ html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .rest .rr .
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera] .ex.cur .spec span.ad{color:color-mix(in srgb,var(--info) 40%,var(--m-ink))}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera] .ex.cur .prog{color:var(--m-ink)}
 /* velo della scheda in corso: stesso colore, ma più profondo di sera e un po' più tenue di giorno, così il testo resta leggibile anche a scheda quasi piena */
-html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5):not([data-sera]) .ex.cur>.fp{background:radial-gradient(130% 100% at 25% 15%,color-mix(in srgb,var(--fc,var(--go)) 44%,transparent),color-mix(in srgb,var(--fc,var(--go)) 26%,transparent) 70%)}
-html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera] .ex.cur>.fp{background:radial-gradient(130% 100% at 25% 15%,color-mix(in srgb,color-mix(in srgb,var(--fc,var(--go)) 42%,var(--m-card)) 80%,transparent),color-mix(in srgb,color-mix(in srgb,var(--fc,var(--go)) 42%,var(--m-card)) 55%,transparent) 70%)}
 @media (prefers-reduced-motion:reduce){html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) :is(.card.hero,.ex.cur)::after{animation:none}}
 
 /* Serie in più: tasti testuali sotto le righe, a sinistra (lontani dalle ✓). "Togli" sotto "+ Aggiungi", almeno 44 px */
@@ -3878,7 +3895,7 @@ function rollUp(b,a,z,rest){if(RM())return;if(skinNow()==="carbonio")return coun
   setTimeout(()=>{if(b.isConnected&&b.querySelector(".oc"))setNum(b,sz+rest)},1400)}
 // Velo che si intensifica: il nuovo strato sale da 0 alla sua opacità a1, il vecchio scende con o(u)=(1-u)/(1-a1·u): sovrapposti danno a0+(a1-a0)·u, come prima, ma solo con l'opacità
 function veilFx(){app.querySelectorAll(".ex.cur:not(.gold)>.fp.grow").forEach(fp=>{const a=fp.parentElement,st=a.style,f=+st.getPropertyValue("--f")||0,f0=+st.getPropertyValue("--f0")||0,el=Math.max(0,-parseFloat(st.getPropertyValue("--fd"))||0),fq=a.querySelector(":scope>.fq");
-  const mx=+getComputedStyle(a).getPropertyValue("--fmax")||.75,op=x=>Math.min(mx,Math.min(1,x*6)*(.25+x*.75)),a0=op(f0),a1=op(f),o={duration:FILL_MS,easing:"cubic-bezier(.45,0,.25,1)",fill:"both"};
+  const op=x=>x>0?1:0,a0=op(f0),a1=op(f),o={duration:FILL_MS,easing:"cubic-bezier(.45,0,.25,1)",fill:"both"};
   fp.animate([{opacity:0},{opacity:a1}],o).currentTime=el;
   if(fq&&a0>.001){const kf=[];for(let i=0;i<=10;i++){const u=i/10,dn=1-a1*u;kf.push({opacity:dn>1e-3?a0*(1-u)/dn:0})}fq.animate(kf,o).currentTime=el}})}
 function trainFx(g,pct,mods){
