@@ -944,12 +944,22 @@ html:not([data-skin="vetro"]):not(#z):not(#y):not(#x) .ex.cur.tint:not(.gold){--
 @keyframes flOut{from{opacity:min(1,calc(var(--f0)*1000))}to{opacity:0}}
 /* Scheda dorata: le luci sfumano mentre arriva l'oro (deve vincere su .grow, che ha la stessa specificità) */
 .ex.cur.gold>.fp.grow{animation:flOut .6s cubic-bezier(.23,1,.32,1) forwards}
-.ex.cur>.fg{background:linear-gradient(135deg,rgba(255,226,140,.42),rgba(232,170,52,.3) 55%,rgba(196,128,24,.38));clip-path:polygon(0 0,200% 0,0 200%);animation:flGold .68s cubic-bezier(.23,1,.32,1) both}
-.ex.cur>.fg::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,transparent 35%,rgba(255,250,225,.55) 50%,transparent 65%);background-size:300% 300%;animation:flShine .9s .25s cubic-bezier(.23,1,.32,1) both}
-@keyframes flGold{from{clip-path:polygon(0 0,0 0,0 0)}to{clip-path:polygon(0 0,200% 0,0 200%)}}
+/* Oro a fine esercizio (v74): si accende a luci come le serie. Quattro luci d'oro nascono una dopo l'altra negli angoli dell'aurora e si allargano (--gv da 0 a 1)
+   finché coprono la scheda (.fgl, sopra); il fondo d'oro dello stile (.fg) arriva sotto subito dopo, poi passa il riflesso */
+@property --gv{syntax:"<number>";inherits:false;initial-value:1}
+.ex.cur>.fg{background:linear-gradient(135deg,rgba(255,226,140,.42),rgba(232,170,52,.3) 55%,rgba(196,128,24,.38));animation:flGold .8s .3s cubic-bezier(.33,0,.2,1) both}
+.ex.cur>.fgl{animation:flGoldLux 1.1s cubic-bezier(.23,1,.32,1) both;
+ background:
+  radial-gradient(calc(8% + var(--gv)*110%) calc(6% + var(--gv)*62%) at 6% 4%,rgba(255,236,170,calc(min(1,var(--gv)*5)*.92)),rgba(255,236,170,0) 72%),
+  radial-gradient(calc(8% + var(--gv)*100%) calc(6% + var(--gv)*56%) at 98% 36%,rgba(245,198,94,calc(min(1,max(0,var(--gv)*5 - .6))*.9)),rgba(245,198,94,0) 72%),
+  radial-gradient(calc(8% + var(--gv)*104%) calc(6% + var(--gv)*54%) at 4% 72%,rgba(255,222,140,calc(min(1,max(0,var(--gv)*5 - 1.2))*.9)),rgba(255,222,140,0) 72%),
+  radial-gradient(calc(8% + var(--gv)*110%) calc(6% + var(--gv)*54%) at 90% 104%,rgba(232,172,70,calc(min(1,max(0,var(--gv)*5 - 1.8))*.9)),rgba(232,172,70,0) 72%)}
+.ex.cur>.fg::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,transparent 35%,rgba(255,250,225,.55) 50%,transparent 65%);background-size:300% 300%;animation:flShine .9s 1s cubic-bezier(.23,1,.32,1) both}
+@keyframes flGold{from{opacity:0}to{opacity:1}}
+@keyframes flGoldLux{from{--gv:0}to{--gv:1}}
 @keyframes flShine{from{background-position:100% 100%;opacity:1}to{background-position:0 0;opacity:0}}
 .ex.cur.gold{outline-color:#e8b440!important;box-shadow:0 0 0 1px rgba(255,214,120,.5),0 10px 34px rgba(232,170,52,.28)}
-@media (prefers-reduced-motion:reduce){.ex.cur>.fp.grow,.ex.cur>.fg,.ex.cur>.fg::after{animation:none}.ex.cur>.fg::after{display:none}}
+@media (prefers-reduced-motion:reduce){.ex.cur>.fp.grow,.ex.cur>.fg,.ex.cur>.fgl,.ex.cur>.fg::after{animation:none}.ex.cur>.fg::after{display:none}}
 .stn-s{display:block;font-size:max(12px,0.7059rem);font-weight:600;opacity:.75;margin-top:2px}.eqmx{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:max(14px,0.8235rem);font-weight:600}.eqmx input{width:84px;min-height:44px;text-align:center}.eqf{display:grid;gap:6px;margin:12px 0 4px}.eqf b{font-size:max(14px,0.8235rem)}.eqf small{color:var(--muted);font-size:max(12px,0.7059rem);line-height:1.4}.eqseg button{padding:10px 2px;font-size:max(14px,0.8235rem);min-height:44px}
 .setup{display:flex;gap:8px;align-items:baseline;width:100%;text-align:left;border:1px dashed var(--line);background:none;border-radius:12px;padding:8px 11px;color:var(--muted);font-size:max(14px,0.8235rem);font-weight:600}
 .setup.has{border-style:solid;background:var(--field);color:var(--fg)}
@@ -4574,7 +4584,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   const rest=withRest&&tOn?`<div class="rest ${over?"over":""}" id="restIn" role="timer"><span class="rr"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rk" cx="32" cy="32" r="28"/><circle class="ra rc" cx="32" cy="32" r="28" pathLength="100"/></svg><i class="rg" aria-hidden="true"><i class="rh r1" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><i class="rh r2" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><i class="rh rd" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra rc" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i></i><b class="tv"></b></span><span class="tl" aria-live="assertive">${over?"Recupero finito":"Recupero"+(tPlus?"\u00a0· +"+tPlus+"\u00a0s":"")}</span><span class="tb"><button data-ts>Chiudi</button><button data-tp>+15 s</button></span></div>`:"";
   // Scheda che si colora (Aurora viva): a ogni serie le luci si accendono e si allargano piano; a esercizio finito passa l'oro in diagonale
   const fN=Math.min(n,rows.filter(r=>r.done).length),fr=n?fN/n:0,isGold=goldHold&&goldHold.ex===ex.id,fa=fillAnim(ex.id,fr),fPrev=fa.from;
-  return `<article class="ex cur ${ssP.length?"ss":""} ${isGold?"gold":""} ${fr>0||isGold||fa.on&&fPrev>0?"tint":""}" data-ex="${ex.id}" style="--f:${fr.toFixed(3)};--f0:${fPrev.toFixed(3)};--fd:-${fa.el}ms"><i class="fl fp ${fa.on?"grow":""}" aria-hidden="true"></i>${isGold?'<i class="fl fg" aria-hidden="true"></i>':""}
+  return `<article class="ex cur ${ssP.length?"ss":""} ${isGold?"gold":""} ${fr>0||isGold||fa.on&&fPrev>0?"tint":""}" data-ex="${ex.id}" style="--f:${fr.toFixed(3)};--f0:${fPrev.toFixed(3)};--fd:-${fa.el}ms"><i class="fl fp ${fa.on?"grow":""}" aria-hidden="true"></i>${isGold?'<i class="fl fg" aria-hidden="true"></i><i class="fl fgl" aria-hidden="true"></i>':""}
     <div class="exhead"><h3>${esc(ex.n)}${(howOf(ex)||errOf(ex)||ex.note)?(IMGEX[ex.id]=ex,`<button class="qm" data-img="${ex.id}" aria-label="Come si fa: ${esc(ex.n)}">?</button>`):""}</h3><button class="swap" data-base="${base.id}" aria-label="Sostituisci ${esc(ex.n)}">⇄ Cambia</button></div>
     <div class="tgt"><b${cu&&!nn?` data-cu="${lk}|${tg.kg}|${esc(" kg × "+r0)}|${ex.id}"`:""}>${dcw(nn&&nn.kg!=null&&hasKg?`${fk(nn.kg)} kg × ${rT}`:big)}</b>${hasKg?dkStack(nn&&nn.kg!=null?nn.kg:tg.kg,ex):""}${tg.badge?`<small class="${tg.kind}">${esc(tg.badge)}</small>`:""}</div>
     ${nn?`<p class="prog down"><span>${esc(nn.txt)}</span></p>`:`<p class="prog ${tg.kind}"><span>${esc(tg.msg)}</span></p>`}
@@ -4770,7 +4780,7 @@ function fillEz(t){const bz=(a,b,u)=>3*a*u*(1-u)*(1-u)+3*b*u*u*(1-u)+u*u*u;let l
 // Se intanto cambi schermata, esercizio o scheda, la passata si chiude subito: stato finale senza ridisegnare, e il timer non ridisegna più l'Allenamento sopra un'altra schermata
 function goldFlush(){const p=goldCard.p;if(!p)return;clearTimeout(goldCard.t);goldCard.p=null;goldHold=null;delete fillMem[p.exId];if(openEx[p.g]===p.exId)openEx[p.g]=ssGo[p.g]&&ssGo[p.g]!==p.exId?ssGo[p.g]:null;p.after&&p.after()}
 function goldCard(g,exId,after){goldFlush();goldHold={g,ex:exId};openEx[g]=exId;goldCard.p={g,exId,after};renderTrain();keepFocus(false,exId);
-  goldCard.t=setTimeout(()=>{goldFlush();if(view!=="train"||currentGym()!==g)return;renderTrain();keepFocus(false);{const c=document.querySelector("#exs .ex.cur");if(c)c.classList.add(RM()?"rmfade":"sw-n")}},RM()?450:1050)}
+  goldCard.t=setTimeout(()=>{goldFlush();if(view!=="train"||currentGym()!==g)return;renderTrain();keepFocus(false);{const c=document.querySelector("#exs .ex.cur");if(c)c.classList.add(RM()?"rmfade":"sw-n")}},RM()?450:2000)}
 // Superserie: quella del piano, oppure quella scelta solo per la seduta di oggi (draft.ss, "" = sciolta)
 const ssOf=(g,ex)=>{const o=(S.draft&&S.draft[g]&&S.draft[g].ss)||{};return ex.id in o?o[ex.id]:(ex.ss||"")};
 function ssSheet(g,ex,mods){
