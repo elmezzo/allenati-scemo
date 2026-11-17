@@ -957,11 +957,18 @@ html:not([data-skin="vetro"]):not(#z):not(#y):not(#x) .ex.cur.tint:not(.gold){--
   radial-gradient(calc(8% + var(--gv)*110%) calc(6% + var(--gv)*54%) at 90% 104%,rgba(232,172,70,calc(min(1,max(0,var(--gv)*5 - 1.8))*.9)),rgba(232,172,70,0) 72%)}
 .ex.cur>.fg::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,transparent 35%,rgba(255,250,225,.55) 50%,transparent 65%);background-size:300% 300%;animation:flShine .9s 1.35s cubic-bezier(.23,1,.32,1) both}
 @keyframes flGold{0%,8%{opacity:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}62%,to{opacity:1}}
-@keyframes goldRim{from{box-shadow:0 0 0 1px rgba(255,214,120,0),0 10px 34px rgba(232,170,52,0);outline-color:transparent}}
+/* goldRim parte dal bordo e dall'ombra che la scheda aveva un attimo prima (letti in goldCard e passati come --rim-*), così il riquadro dello stile sfuma nell'oro invece di sparire */
+@keyframes goldRim{from{box-shadow:var(--rim-s0,0 0 0 1px rgba(255,214,120,0),0 10px 34px rgba(232,170,52,0));outline-color:var(--rim-o0,transparent);border-color:var(--rim-b0,transparent)}}
+@keyframes goldPill{from{background-color:transparent}}
+:root:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur.gold .pgr>span{animation:goldPill 1.5s cubic-bezier(.45,0,.25,1) both}
+/* Murano giorno tiene l'ombra sotto le scritte dell'oro: sale anche lei invece di comparire */
+@keyframes goldTs{from{text-shadow:0 1px 2px rgba(0,0,0,0)}}
+html[data-skin="vetro"]:not([data-sera]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur.gold :is(.pgr,.pgr *,.swap,.sethd,.set .i,.tgt b,.spec,.prog,.setup){animation:goldTs 1.5s cubic-bezier(.45,0,.25,1) both}
+html[data-skin="vetro"]:not([data-sera]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5):not(#g6) .ex.cur.gold .pgr>span{animation:goldTs 1.5s cubic-bezier(.45,0,.25,1) both,goldPill 1.5s cubic-bezier(.45,0,.25,1) both}
 @keyframes flGoldLux{from{--gv:0}to{--gv:1}}
 @keyframes flShine{from{background-position:100% 100%;opacity:1}to{background-position:0 0;opacity:0}}
 .ex.cur.gold{outline-color:#e8b440;box-shadow:0 0 0 1px rgba(255,214,120,.5),0 10px 34px rgba(232,170,52,.28);animation:goldRim 1.5s cubic-bezier(.45,0,.25,1) both}
-@media (prefers-reduced-motion:reduce){.ex.cur>.fp.grow,.ex.cur>.fg,.ex.cur>.fgl,.ex.cur>.fg::after,.ex.cur.gold:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5):not(#g6){animation:none}.ex.cur>.fg::after{display:none}}
+@media (prefers-reduced-motion:reduce){.ex.cur>.fp.grow,.ex.cur>.fg,.ex.cur>.fgl,.ex.cur>.fg::after,.ex.cur.gold:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5):not(#g6),.ex.cur.gold:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5):not(#g6):not(#g7) :is(.pgr,.pgr *,.swap,.sethd,.set .i,.tgt b,.spec,.prog,.setup){animation:none}.ex.cur>.fg::after{display:none}}
 .stn-s{display:block;font-size:max(12px,0.7059rem);font-weight:600;opacity:.75;margin-top:2px}.eqmx{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:max(14px,0.8235rem);font-weight:600}.eqmx input{width:84px;min-height:44px;text-align:center}.eqf{display:grid;gap:6px;margin:12px 0 4px}.eqf b{font-size:max(14px,0.8235rem)}.eqf small{color:var(--muted);font-size:max(12px,0.7059rem);line-height:1.4}.eqseg button{padding:10px 2px;font-size:max(14px,0.8235rem);min-height:44px}
 .setup{display:flex;gap:8px;align-items:baseline;width:100%;text-align:left;border:1px dashed var(--line);background:none;border-radius:12px;padding:8px 11px;color:var(--muted);font-size:max(14px,0.8235rem);font-weight:600}
 .setup.has{border-style:solid;background:var(--field);color:var(--fg)}
@@ -1952,7 +1959,8 @@ html[data-skin="manga"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur{bac
 html[data-skin="eclisse"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur{background:linear-gradient(180deg,rgba(var(--acc-rgb),.2),rgba(var(--acc-rgb),.06) 200px,rgba(var(--acc-rgb),.05)),var(--cardbg)}
 html[data-skin="lavagna"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur{background:linear-gradient(180deg,rgba(var(--acc-rgb),.2),rgba(var(--acc-rgb),.06) 200px,rgba(var(--acc-rgb),.05)),var(--cardbg)}
 /* Lavagna: il nome dell'esercizio in corso scritto col gesso colorato della variante */
-html[data-skin="lavagna"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur:not(.gold) h3{color:var(--acc)}
+html[data-skin="lavagna"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur h3{color:var(--lvh,var(--acc))}
+html[data-skin="lavagna"]:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur.gold{--lvh:var(--fg)}
 /* COL-7: nel riepilogo il rango di partenza resta più piccolo del nuovo (la gerarchia la fa la misura), ma non più spento a metà */
 :root:not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .rk-pr .rbd.o{opacity:.9}
 html[data-skin="vetro"]:not([data-sera]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .rk-pr .rbd.o{opacity:1}
@@ -1965,7 +1973,7 @@ html[data-skin="vetro"]:not([data-sera]):not(#g1):not(#g2):not(#g3):not(#g4):not
  --fg:var(--gold-ink);--muted:var(--gold-ink2);--dim:var(--gold-ink2);--m-ink:var(--gold-ink);--m-mut:var(--gold-ink2);--m-dim:var(--gold-ink2);--info:#1b3170;--go:#1b5228;--adapt:#6e3304;color:var(--fg);animation:goldRim 1.5s cubic-bezier(.45,0,.25,1) both,goldInk 1.5s linear both}
 /* v75: il testo resta nei colori dello stile finché l'oro sotto è scuro, poi passa all'inchiostro quando l'oro diventa più chiaro (a circa 0,4 s su 1,5).
    --gk-chalk: il gesso di Lavagna diventa inchiostro, negli altri stili resta com'è */
-@keyframes goldInk{0%,26.9%{--fg:var(--gx-fg);--muted:var(--gx-mut);--dim:var(--gx-dim);--m-ink:var(--gx-mink);--m-mut:var(--gx-mmut);--m-dim:var(--gx-mdim);--info:var(--gx-info);--go:var(--gx-go);--adapt:var(--gx-adapt);--chalk:var(--gx-chalk);--chalk-rgb:var(--gx-chalkrgb)}27%,100%{--fg:var(--gold-ink);--muted:var(--gold-ink2);--dim:var(--gold-ink2);--m-ink:var(--gold-ink);--m-mut:var(--gold-ink2);--m-dim:var(--gold-ink2);--info:#1b3170;--go:#1b5228;--adapt:#6e3304;--chalk:var(--gk-chalk);--chalk-rgb:var(--gk-chalkrgb)}}
+@keyframes goldInk{0%,26.9%{--lvh:var(--acc);--fg:var(--gx-fg);--muted:var(--gx-fg);--dim:color-mix(in srgb,var(--gx-fg) 88%,transparent);--m-ink:var(--gx-mink);--m-mut:var(--gx-mmut);--m-dim:var(--gx-mdim);--info:var(--gx-info);--go:var(--gx-go);--adapt:var(--gx-adapt);--chalk:var(--gx-chalk);--chalk-rgb:var(--gx-chalkrgb)}27%,100%{--lvh:var(--gold-ink);--fg:var(--gold-ink);--muted:var(--gold-ink2);--dim:var(--gold-ink2);--m-ink:var(--gold-ink);--m-mut:var(--gold-ink2);--m-dim:var(--gold-ink2);--info:#1b3170;--go:#1b5228;--adapt:#6e3304;--chalk:var(--gk-chalk);--chalk-rgb:var(--gk-chalkrgb)}}
 :is(html:not([data-skin="vetro"]),html[data-skin="vetro"][data-sera]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur.gold :is(.field,.tick,.rest,.seg,.timer){--fg:var(--gx-fg);--muted:var(--gx-mut);--dim:var(--gx-dim);--info:var(--gx-info);--go:var(--gx-go);--adapt:var(--gx-adapt);--m-ink:var(--gx-mink);--m-mut:var(--gx-mmut);--m-dim:var(--gx-mdim)}
 :is(html:not([data-skin="vetro"]),html[data-skin="vetro"][data-sera]):not(#g1):not(#g2):not(#g3):not(#g4):not(#g5) .ex.cur.gold :is(.pgr,.pgr *,.swap,.sethd,.set .i,.tgt b,.tgt b *,.spec,.spec *,.prog,.setup,.lu,h3){text-shadow:none}
 /* pillole "1 di 8" e "?" sull'oro: bronzo chiaro con l'inchiostro dello stile, non più capsule nere */
@@ -2204,7 +2212,7 @@ html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .ex.cur::af
  background:linear-gradient(115deg,transparent 30%,rgba(224,64,154,.07) 39%,rgba(138,90,224,.07) 46%,rgba(47,143,224,.065) 53%,transparent 62%);
  will-change:transform;animation:mpBand 18s ease-in-out infinite alternate}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5)[data-sera] .ex.cur::after{background:linear-gradient(115deg,transparent 30%,rgba(255,150,215,.08) 39%,rgba(200,170,255,.08) 46%,rgba(140,205,255,.07) 53%,transparent 62%)}
-html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .ex.cur.gold{border-width:2px}
+html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .ex.cur.gold{border-width:2px;background:linear-gradient(var(--m-card),var(--m-card)) padding-box,var(--mp-rim) border-box}
 /* leggibilità sulla lastra: testo bianco pieno, riflesso in alto più tenue, pillola scura, Acquamare e Rubino sera più profondi */
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero{background:radial-gradient(120% 70% at 18% 0%,rgba(255,255,255,.04),transparent 55%),linear-gradient(160deg,var(--m-s1),var(--m-s2) 55%,var(--m-s3))}
 html[data-skin="vetro"]:not(#m1):not(#m2):not(#m3):not(#m4):not(#m5) .card.hero :is(p,.meta,.meta span,.meta b,.hn,small){color:#fff}
@@ -4589,7 +4597,7 @@ function exCard(g,ex,mods,dr,base,withRest){base=base||ex;
   const rest=withRest&&tOn?`<div class="rest ${over?"over":""}" id="restIn" role="timer"><span class="rr"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rk" cx="32" cy="32" r="28"/><circle class="ra rc" cx="32" cy="32" r="28" pathLength="100"/></svg><i class="rg" aria-hidden="true"><i class="rh r1" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><i class="rh r2" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i><i class="rh rd" aria-hidden="true"><b><svg viewBox="0 0 64 64"><circle class="ra rc" cx="32" cy="32" r="28" pathLength="100"/></svg></b></i></i><b class="tv"></b></span><span class="tl" aria-live="assertive">${over?"Recupero finito":"Recupero"+(tPlus?"\u00a0· +"+tPlus+"\u00a0s":"")}</span><span class="tb"><button data-ts>Chiudi</button><button data-tp>+15 s</button></span></div>`:"";
   // Scheda che si colora (Aurora viva): a ogni serie le luci si accendono e si allargano piano; a esercizio finito passa l'oro in diagonale
   const fN=Math.min(n,rows.filter(r=>r.done).length),fr=n?fN/n:0,isGold=goldHold&&goldHold.ex===ex.id,fa=fillAnim(ex.id,fr),fPrev=fa.from;
-  return `<article class="ex cur ${ssP.length?"ss":""} ${isGold?"gold":""} ${fr>0||isGold||fa.on&&fPrev>0?"tint":""}" data-ex="${ex.id}" style="--f:${fr.toFixed(3)};--f0:${fPrev.toFixed(3)};--fd:-${fa.el}ms"><i class="fl fp ${fa.on?"grow":""}" aria-hidden="true"></i>${isGold?'<i class="fl fg" aria-hidden="true"></i><i class="fl fgl" aria-hidden="true"></i>':""}
+  return `<article class="ex cur ${ssP.length?"ss":""} ${isGold?"gold":""} ${fr>0||isGold||fa.on&&fPrev>0?"tint":""}" data-ex="${ex.id}" style="--f:${fr.toFixed(3)};--f0:${fPrev.toFixed(3)};--fd:-${fa.el}ms${isGold&&goldCard.p&&goldCard.p.exId===ex.id&&goldCard.rim?`;--rim-o0:${goldCard.rim.o};--rim-s0:${goldCard.rim.s};--rim-b0:${goldCard.rim.b}`:""}"><i class="fl fp ${fa.on?"grow":""}" aria-hidden="true"></i>${isGold?'<i class="fl fg" aria-hidden="true"></i><i class="fl fgl" aria-hidden="true"></i>':""}
     <div class="exhead"><h3>${esc(ex.n)}${(howOf(ex)||errOf(ex)||ex.note)?(IMGEX[ex.id]=ex,`<button class="qm" data-img="${ex.id}" aria-label="Come si fa: ${esc(ex.n)}">?</button>`):""}</h3><button class="swap" data-base="${base.id}" aria-label="Sostituisci ${esc(ex.n)}">⇄ Cambia</button></div>
     <div class="tgt"><b${cu&&!nn?` data-cu="${lk}|${tg.kg}|${esc(" kg × "+r0)}|${ex.id}"`:""}>${dcw(nn&&nn.kg!=null&&hasKg?`${fk(nn.kg)} kg × ${rT}`:big)}</b>${hasKg?dkStack(nn&&nn.kg!=null?nn.kg:tg.kg,ex):""}${tg.badge?`<small class="${tg.kind}">${esc(tg.badge)}</small>`:""}</div>
     ${nn?`<p class="prog down"><span>${esc(nn.txt)}</span></p>`:`<p class="prog ${tg.kind}"><span>${esc(tg.msg)}</span></p>`}
@@ -4784,7 +4792,7 @@ function fillEz(t){const bz=(a,b,u)=>3*a*u*(1-u)*(1-u)+3*b*u*u*(1-u)+u*u*u;let l
 // Fine esercizio: la scheda resta in primo piano il tempo della passata dorata, poi passa al prossimo
 // Se intanto cambi schermata, esercizio o scheda, la passata si chiude subito: stato finale senza ridisegnare, e il timer non ridisegna più l'Allenamento sopra un'altra schermata
 function goldFlush(){const p=goldCard.p;if(!p)return;clearTimeout(goldCard.t);goldCard.p=null;goldHold=null;delete fillMem[p.exId];if(openEx[p.g]===p.exId)openEx[p.g]=ssGo[p.g]&&ssGo[p.g]!==p.exId?ssGo[p.g]:null;p.after&&p.after()}
-function goldCard(g,exId,after){goldFlush();goldHold={g,ex:exId};openEx[g]=exId;goldCard.p={g,exId,after};renderTrain();keepFocus(false,exId);
+function goldCard(g,exId,after){goldFlush();{const c=document.querySelector("#exs .ex.cur");goldCard.rim=null;if(c&&c.dataset.ex===exId&&!c.classList.contains("gold")){const cs=getComputedStyle(c);goldCard.rim={o:cs.outlineColor,s:cs.boxShadow,b:cs.borderTopColor}}}goldHold={g,ex:exId};openEx[g]=exId;goldCard.p={g,exId,after};renderTrain();keepFocus(false,exId);
   goldCard.t=setTimeout(()=>{goldFlush();if(view!=="train"||currentGym()!==g)return;renderTrain();keepFocus(false);{const c=document.querySelector("#exs .ex.cur");if(c)c.classList.add(RM()?"rmfade":"sw-n")}},RM()?450:2300)}
 // Superserie: quella del piano, oppure quella scelta solo per la seduta di oggi (draft.ss, "" = sciolta)
 const ssOf=(g,ex)=>{const o=(S.draft&&S.draft[g]&&S.draft[g].ss)||{};return ex.id in o?o[ex.id]:(ex.ss||"")};
