@@ -2863,6 +2863,9 @@ const EQS=[["mac","Macchina o cavo",5],["cavl","Cavo singolo (alzate, extrarotaz
 const eqOf=e=>e.eq||(e.t==="bw"?"zav":e.step===5?"mac":e.step===2.5?"bar":e.step===2?"db":"altro");
 const TYPES=[["comp","Multiarticolare"],["iso","Isolamento"],["bw","Corpo libero + zavorra"],["prev","Prevenzione (reps fisse)"],["perf","Salti / pliometria"],["nordic","Eccentrico assistito"],["time","Tenuta in secondi"]];
 let PLAN={},GYM_ORDER=[],ALL_EX=[],EX={};
+const OLD_EX=[{id:"g3",mu:"Gambe",n:"Squat bilanciere",s:4,lo:5,hi:8,rir:"1-2",rest:180,t:"comp",step:2.5,lower:true,eq:"bar"},
+  {id:"g4",mu:"Gambe",n:"Stacco rumeno",s:3,lo:6,hi:8,rir:"2",rest:150,t:"comp",step:2.5,lower:true,ecc:true,eq:"bar"},
+  {id:"g6",mu:"Gambe",n:"Nordic curl",s:3,lo:4,hi:6,rir:"1-2",rest:120,t:"nordic",ecc:true}];
 function altsOf(e){const k=e.lib||e.id;let out=[...(ALTS[k]||[]).map(([key,n,o])=>({k:key,n,o})),...((S.customAlts||{})[k]||[]).map(a=>({k:a.k,n:a.n,o:{},custom:true}))];
   if(k!==e.id){let b=null;for(const P of Object.values(BUILTIN)){b=P.ex.find(x=>x.id===k);if(b)break}if(b)out.unshift({k:"orig",n:b.n,o:{t:b.t,step:b.step,note:b.note||"",side:!!b.side}})}
   return out.filter(a=>a.n!==e.n)}
@@ -2877,6 +2880,9 @@ function rebuild(){famRev++;
   // Esercizi che ci sono solo in Piani vecchi (piano eliminato o esercizio tolto; vale la versione più recente): restano noti col loro range,
   // così le loro sedute non contano come stesso range di un esercizio di un altro piano. Non entrano in ALL_EX
   for(const v of S.archive||[])if(v.plan&&Array.isArray(v.plan.ex))for(const e of v.plan.ex)if(e&&e.id&&!EX[e.id])EX[e.id]={...e,day:v.key,gone:true};
+  // Esercizi tolti dalla scheda il 20/11/2026 (vecchio martedì gambe) e le loro varianti: restano noti col loro range, così leg curl e pressa nuovi
+  // non prendono le loro sedute come "stesso range" ma ricalcolano il carico dal massimale stimato
+  for(const e of OLD_EX){if(!EX[e.id])EX[e.id]={...e,day:"G",gone:true};for(const a of altsOf(e)){const v=variant(e,a);if(!EX[v.id])EX[v.id]={...v,day:"G",gone:true}}}
   // Seduta libera: esercizi scelti al volo, fuori dal piano, solo per oggi. Stessi id della scheda, quindi carichi e progressi restano quelli
   if(S.free&&(S.free.d===iso(today())||(S.draft&&S.draft.LIB))){const ex=S.free.ex.filter(id=>EX[id]).map(id=>({...EX[id],ss:""}));
     if(ex.length){PLAN.LIB={name:"Libera",title:"Seduta libera",sub:"Fuori dal piano",custom:true,ex};GYM_ORDER.push("LIB")}}
@@ -2989,7 +2995,7 @@ function migScheda1120(){if(S.mig1120)return false;S.mig1120=1;S.legsDil=iso(tod
   S.draft=S.draft||{};for(const k of ["A","G","B","C"]){const d=S.draft[k];if(!d||!d.ex)continue;const ids=new Set(BUILTIN[k].ex.map(e=>e.id));
     // Come parkDraft, senza toccare il timer (all'avvio non esiste ancora): la seduta va tra quelle da salvare con la sua data, col nome di prima
     if(Object.keys(d.ex).some(id=>!ids.has(String(id).split("~")[0])&&(d.ex[id]||[]).some(x=>x&&x.done))){delete S.draft[k];const names={};for(const id in d.ex)names[id]=nm[id]||id;
-      S.oldDraft=S.oldDraft||{};let key=k+"@"+d.date;while(S.oldDraft[key])key+="+";S.oldDraft[key]={...d,g:k,names,planName:pn[k]};if(S.timer&&S.timer.ctx&&S.timer.ctx.g===k)delete S.timer}}
+      S.oldDraft=S.oldDraft||{};let key=k+"@"+d.date;while(S.oldDraft[key])key+="+";S.oldDraft[key]={...d,g:k,names,planName:pn[k],...(k==="G"?{oldPlan:1}:{})};if(S.timer&&S.timer.ctx&&S.timer.ctx.g===k)delete S.timer}}
   if(ch.length)bootMsg=(bootMsg?bootMsg+" ":"")+`Scheda aggiornata con le gambe distribuite: ${ch.join(", ")} ${ch.length>1?"modificati da te sono":"modificato da te è"} in Piani vecchi.`;
   return true}
 // Se i dati salvati mandano in errore l'avvio: prima si chiudono le sedute non salvate, poi si prova la copia di sicurezza, infine si tengono solo le sedute
@@ -3084,7 +3090,7 @@ function assess(d){
   // del venerdì), via tutte con Stanco. Nelle prime 2 settimane (da S.legsDil) una serie in meno sulle gambe, finché il DOMS si abitua
   if(p.gym in PLAN&&!PLAN[p.gym].legs){const L=PLAN[p.gym].ex.map(e=>effEx(p.gym,e)).filter(e=>e.lower),pm=L.filter(e=>e.pm);
     if(L.length){const mt=p.padel==="match"||t1.padel==="match";
-      if(energy==="low")r.mods.add("legsOffAll");
+      if(energy==="low"){r.mods.add("legsOffAll");if(mt&&!r.mods.has("prevOnly"))r.mods.add("legsOff")}
       else if(mt&&!r.mods.has("prevOnly")){r.mods.add("legsOff");say("adapt",`${p.padel==="match"?"Partita oggi":"Partita domani"}: niente gambe${pm.length?`, resta solo la ${pm.map(e=>e.n.toLowerCase()).join(" e la ")}, leggera`:""}.`)}
       else if(!dlo&&!r.mods.has("prevOnly")&&S.legsDil&&dayDiff(S.legsDil,iso(d))>=0&&dayDiff(S.legsDil,iso(d))<14){r.mods.add("legIntro");r.notes=r.notes.filter(n=>!/: seduta completa\.$/.test(n));say("adapt","Prime 2 settimane con le gambe distribuite: una serie in meno sulle gambe, così il DOMS si abitua.")}}}
   if(energy==="low"&&p.gym in PLAN&&!(PLAN[p.gym].legs&&r.level==="stop")){say("adapt",dlo?"Stanco: lo scarico è già leggero, oggi non cambia altro.":r.mods.has("light")?"Stanco: la serie in meno c'è già, stessi carichi dell'ultima volta.":"Stanco: stessi carichi, una serie in meno per esercizio.");r.mods.add("light");if(r.mods.has("legsOffAll")){r.notes=r.notes.filter(n=>!/: seduta completa\.$/.test(n));r.notes[r.notes.length-1]=dlo?"Stanco: lo scarico è già leggero, oggi togli solo le gambe.":r.notes[r.notes.length-1]+" Niente gambe."}}
@@ -3099,7 +3105,9 @@ function assess(d){
   const sv=(S.normal||{})[r.day];
   if(sv&&r.canNorm&&(sv===1||sv===r.nk)){r.norm=own;r.mods=new Set([...r.mods].filter(keep));r.level=[...r.mods].some(m=>m!=="pAfter")?"adapt":"go";
     const dl=r.mods.has("deload");
-    r.notes=[dl||r.pm?`Adattamenti del giorno tolti da te: ${dl&&r.pm?"restano lo scarico e quello per le partite":dl?"resta solo lo scarico":"resta solo quello per le partite"}.`:"Adattamenti tolti da te: oggi serie e ripetizioni in canna come da scheda.",
+    const lo=r.mods.has("legsOff");
+    r.notes=[dl||r.pm?`Adattamenti del giorno tolti da te: ${dl&&r.pm?"restano lo scarico e quello per le partite":dl?"resta solo lo scarico":"resta solo quello per le partite"}.`:lo?"Adattamenti tolti da te: oggi serie e ripetizioni in canna come da scheda, tranne le gambe.":"Adattamenti tolti da te: oggi serie e ripetizioni in canna come da scheda.",
+      ...(lo?r.notes.filter(n=>/^Partita (oggi|domani): niente gambe/.test(n)):[]),
       ...r.notes.filter(n=>/^(Settimana di scarico|Partite domani e dopodomani)/.test(n)).map(n=>r.mods.has("rir")&&!dl?n.replace(/^Partite domani e dopodomani: niente/,"Partite domani e dopodomani: seduta completa, ma niente"):n)]}
   else if(sv)r.normLost=true;
   r.title={go:"Via libera",adapt:"Seduta adattata",stop:"Cambia programma"}[r.level];
@@ -3196,9 +3204,9 @@ function target(ex,noMyo){
   if(!last)return base;
   // Gambe passate ai giorni col padel (es. bulgarian dal martedì al mercoledì, ora a 3 in canna): la prima volta dopo il cambio di scheda
   // stesso carico e stesse ripetizioni dell'ultima seduta fatta più vicino al cedimento, senza salire
-  if(ex.lower&&!["perf","time","bw","nordic"].includes(ex.t)&&S.legsDil&&iso(last.date)<S.legsDil&&rirMid(ex.rir)>=3&&(!last.from||sameRng(EX[last.from],ex))){
+  if(ex.lower&&!["perf","time","bw","nordic"].includes(ex.t)&&S.legsDil&&iso(last.date)<S.legsDil&&rirMid(ex.rir)>=3&&(!last.from||EX[last.from]&&sameRng(EX[last.from],ex))){
     const ws=workSets(last.sets[ex.id],ex.lo),kg=workKg(last.sets[ex.id],ex.lo),rr=ws.map(x=>num(x.reps)).filter(v=>v!=null);
-    if(kg!=null&&rr.length){const r0=Math.max(ex.lo,Math.min(ex.hi,Math.min(...rr)));
+    if(kg!=null&&rr.length&&Math.min(...rr)>=ex.lo){const r0=Math.min(ex.hi,Math.min(...rr));
       return {...base,kg,reps:Array(ex.s).fill(r0),msg:`Stesso carico e ${r0} ripetizioni come l'ultima volta, ma ora lontano dal cedimento: oggi giochi. Si sale dalla prossima.`}}}
   // Ultima volta fatto in un altro giorno con un altro range (es. 12-15 in Upper A, 15-20 in Upper C): carico ricalcolato dal massimale stimato
   const fx=last.from&&EX[last.from];
@@ -4938,7 +4946,7 @@ function finish(g,mods,oldKey,miss){
   const bk=miss>0&&!oldKey?JSON.parse(JSON.stringify({d,free:g==="LIB"?S.free:null,ds:S.sessions.filter(x=>x.demo),db:(S.body||[]).filter(x=>x.demo)})):null;
   clearDemo();
   try{localStorage.removeItem(KEY+".imp")}catch(e){}
-  S.sessions.push({id:"s"+Date.now(),day:g,planName:d.planName||(PLAN[g]?PLAN[g].name:"Seduta libera"),date:when.toISOString(),sets,names,eff,mods:[...mods],...(mods.norm&&mods.norm.length?{norm:[...mods.norm]}:{}),deload:mods.has("deload"),dur,prv:1,...(hasXs?{xs:1}:{}),...(stn?{stn}:{}),...(d.pre&&Object.values(d.pre).some(v=>v>0)?{pre:{...d.pre}}:{})});
+  S.sessions.push({id:"s"+Date.now(),day:g,planName:d.planName||(PLAN[g]?PLAN[g].name:"Seduta libera"),...(d.oldPlan?{oldPlan:1}:{}),date:when.toISOString(),sets,names,eff,mods:[...mods],...(mods.norm&&mods.norm.length?{norm:[...mods.norm]}:{}),deload:mods.has("deload"),dur,prv:1,...(hasXs?{xs:1}:{}),...(stn?{stn}:{}),...(d.pre&&Object.values(d.pre).some(v=>v>0)?{pre:{...d.pre}}:{})});
   if(oldKey)delete S.oldDraft[oldKey];else{delete S.draft[g];openEx[g]=null;if(g==="LIB"){delete S.free;rebuild();gymSel=null}stopTimer()}save();sheetFrom(document.getElementById("finish"),()=>{renderTrain();
   const mm=document.getElementById("msg");mm.className="msg ok";mm.textContent=`Seduta salvata: ${n} serie. I carichi della prossima volta sono già pronti.`;
   if(!storageOk){mm.className="msg err";mm.textContent=STOR_MSG}
